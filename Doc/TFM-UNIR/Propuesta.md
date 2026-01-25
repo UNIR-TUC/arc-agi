@@ -1,5 +1,9 @@
 # Propuesta
 
+[ X ] Tipo 1. Piloto experimental
+[ ] Tipo 2. Desarrollo Software
+[ ] Tipo 3. Comparativa de soluciones
+
 ## Título provisional
 Optimización de modelos de lenguaje compactos para la síntesis de programas orientada a la resolución de ARC-AGI
 
