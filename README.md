@@ -1,5 +1,8 @@
 # arc-agi-small-language-model
 
+## Taxonomía Deep Learning con Benchmarks ARC-AGI
+
+```
 Deep Learning
 │
 ├── 1. Modelos Perceptivos
@@ -74,7 +77,7 @@ Deep Learning
 │   │   └── Claude 3.5 Sonnet + Evolutionary TTC ── ARC-AGI-1: 53.6% (Jeremy Berman)
 │   │
 │   ├── **Tiny Recursive Models (TRM) - Redes Pequeñas con Razonamiento Recursivo** 🆕
-│   │   ├── TRM (7M params) ────────── ARC-AGI-1: 45% | ARC-AGI-2: 8% | Paper Award 1st 2025
+│   │   ├── TRM (7M params) ────────── ARC-AGI-1: 45% | ARC-AGI-2: 8% | Paper Award 1st 2025 (https://arxiv.org/abs/2510.04871)
 │   │   │   └── Solo 2 capas, <0.01% parámetros de LLMs, supera DeepSeek R1, o3-mini, Gemini 2.5 Pro
 │   │   └── HRM (27M params) ────────── ARC-AGI-1: ~40% | Hierarchical Reasoning Model (precursor)
 │   │
@@ -93,24 +96,25 @@ Deep Learning
 ├── 9. **Soluciones Híbridas / Especializadas (Kaggle ARC Prize)**
 │   │
 │   ├── ARC Prize 2024 (ARC-AGI-1)
-│   │   ├── the ARChitects (1º) ─────── 53.5% (Program synthesis + search)
+│   │   ├── the ARChitects (1º) ─────── 53.5% (Program synthesis + search)      (https://da-fr.github.io/arc-prize-2024/the_architects.pdf) usando x4 NVIDIA T4
 │   │   ├── Guillermo Barbadillo (2º)── 40%
 │   │   ├── alijs (3º) ─────────────── 40%
 │   │   ├── William Wu (4º) ────────── 37%
 │   │   └── Ensemble Solutions ─────── ~81% (combinación de múltiples soluciones)
 │   │
-│   └── ARC Prize 2025 (ARC-AGI-2) 
-│       ├── NVARC (1º) ─────────────── 24.03% | $0.20/task | SOTA Kaggle
-│       ├── the ARChitects (2º) ────── 16.53% | 2D-aware masked-diffusion LLM
-│       ├── MindsAI (3º) ───────────── 12.64% | Test-time training pipeline
-│       ├── Lonnie (4º) ────────────── 6.67%
-│       └── G. Barbadillo (5º) ─────── 6.53%
+│   └── ARC Prize 2025 (ARC-AGI-2)  (https://arxiv.org/pdf/2601.10904)
+│       ├── NVARC (1º) ─────────────── 24.03% | $0.20/task | SOTA Kaggle        (https://drive.google.com/file/d/1vkEluaaJTzaZiJL69TkZovJUkPSDH5Xc/view)
+│       ├── the ARChitects (2º) ────── 16.53% | 2D-aware masked-diffusion LLM   (https://lambdalabsml.github.io/ARC2025_Solution_by_the_ARChitects/)
+│       ├── MindsAI (3º) ───────────── 12.64% | Test-time training pipeline     (https://arxiv.org/abs/2506.14276)
+│       ├── Lonnie (4º) ────────────── 6.67%                                    (https://www.kaggle.com/competitions/arc-prize-2025/writeups/arc-prize-2025-competition-writeup-5th-place)
+│       └── G. Barbadillo (5º) ─────── 6.53%                                    (https://ironbar.github.io/arc25/05_Solution_Summary/#vision-search-and-learn)
 │
 └── 10. **Model Refinement Solutions (Refinement Loops)**  
     ├── Poetiq (Gemini 3 Pro Ref) ──── ARC-AGI-2: 54% | $31/task | SOTA refinement
     ├── Poetiq (Claude Opus 4.5 Ref)── ARC-AGI-2: ~54% | $60/task
     ├── SOAR (Self-Improving LLM) ──── ARC-AGI-1: 52% | Paper Award 2nd 2025
     └── Evolutionary Program Synthesis (E. Pang) ── Paper Award Runner-up
+```
 
 ---
 
@@ -155,7 +159,7 @@ Deep Learning
 | **GPT-3** | 0% | - | Base LLM |
 | **Humanos** | ~85% | ~$5 | Referencia humana |
 
-### ARC-AGI-2 (Benchmark más difícil - lanzado Marzo 2025)
+### ARC-AGI-2 (lanzado Marzo 2025)
 
 | Modelo/Sistema | Score | Costo/Tarea | Notas |
 |----------------|-------|-------------|-------|
@@ -222,3 +226,10 @@ Deep Learning
 4. **"The Surprising Effectiveness of Test-Time Training for Abstract Reasoning"** (2024)
    - MIT/Cornell
    - Resultado: ARC-AGI-1: 47.5%
+  
+## Enlaces imprescindibles
+
+https://lewish.io/posts/arc-agi-2025-research-review#ttt-ttft
+
+https://lewish.io/posts/how-to-beat-arc-agi-2
+
