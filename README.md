@@ -1,4 +1,4 @@
-# arc-agi-small-language-model
+# arc-agi
 
 ## Taxonomía Deep Learning con Benchmarks ARC-AGI
 
@@ -37,7 +37,7 @@ Deep Learning
 │   ├── Neuro-symbolic models
 │   ├── Program Induction Models
 │   │   ├── Test-Time Training (MIT/Cornell) ── ARC-AGI-1: 47.5%
-│   │   └── CompressARC (76K params) ────────── ARC-AGI-1: 20-34% | ARC-AGI-2: 4% (sin pretraining)
+│   │   └── CompressARC (76K params) ────────── ARC-AGI-1: 20-34% | ARC-AGI-2: 4% (sin pretraining) (https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html)
 │   ├── Neural Theorem Provers
 │   └── Differentiable Reasoning Systems
 │
@@ -232,4 +232,46 @@ Deep Learning
 https://lewish.io/posts/arc-agi-2025-research-review#ttt-ttft
 
 https://lewish.io/posts/how-to-beat-arc-agi-2
+
+---
+
+## Tabla comparativa (Convergencias 2025 en ARC-AGI)
+
+Fuentes (PDFs en este repo):
+
+- ARC Prize 2025 Technical Report: [Doc/Bibliography/2601.10904v1.pdf](Doc/Bibliography/2601.10904v1.pdf)
+- HRM (Hierarchical Reasoning Model): [Doc/Bibliography/2506.21734v3.pdf](Doc/Bibliography/2506.21734v3.pdf)
+- TRM (Tiny Recursive Model): [Doc/Bibliography/2510.04871v1.pdf](Doc/Bibliography/2510.04871v1.pdf)
+- Thesis proposal (SLMs + program synthesis para ARC-AGI): [Doc/Master_Thesis.pdf](Doc/Master_Thesis.pdf)
+
+Leyenda: ✅ = central / explícito en el enfoque; ◻️ = aparece como técnica relacionada o compatible.
+
+| Técnica / Metodología (qué aporta) | Convergencia (forma del loop) | ARC Prize 2025 report | HRM (2506.21734) | TRM (2510.04871) | Thesis proposal |
+|---|---|---:|---:|---:|---:|
+| Refinement loop por tarea (iterar hasta cumplir demos) | Programa o modelo se refina con feedback | ✅ | ◻️ | ✅ | ✅ |
+| Test-time compute scaling (más pasos = más fiabilidad) | Más iteraciones/muestras por task | ✅ | ✅ | ✅ | ✅ |
+| Test-time training (TTT) / fine-tuning por puzzle | Refinamiento en **espacio de pesos** | ✅ | ✅ (entrena desde cero por task) | ✅ (entrena por task) | ✅ |
+| Zero-pretraining (entrenar desde inicialización aleatoria) | Todo el “aprendizaje” sucede en test | ✅ | ✅ | ✅ | ✅ |
+| Razonamiento iterativo en latente (estado que se actualiza) | Refinar **estado/solución** paso a paso | ◻️ | ✅ | ✅ | ✅ |
+| Deep supervision / multi-step improvement | Optimizar para mejorar en varios pasos | ◻️ | ✅ | ✅ | ◻️ |
+| Halting / early-stopping aprendido (ACT o similar) | Ajustar compute a la dificultad | ◻️ | ✅ | ✅ (simplificado) | ◻️ |
+| Ensemble / voto sobre variantes | Explorar múltiples propuestas y seleccionar | ✅ | ✅ (voto top-2 en ARC) | ◻️ | ◻️ |
+| Data augmentation por simetrías 2D (dihedral, color perm, etc.) | Invariancias del dominio para generalizar | ✅ | ✅ | ✅ | ◻️ |
+| “Synthesis > prediction” (resolver generando procedimiento) | Output como resultado de un “programa” | ✅ | ✅ | ✅ | ✅ |
+| Búsqueda + verificación (explore/verify) | Candidatos → score/verifier → refinar | ✅ | ◻️ | ◻️ | ✅ |
+| Verificadores / harness de aplicación (layer externo) | Refinamiento a nivel orquestación | ✅ | ◻️ | ◻️ | ◻️ |
+| Regularización/criterios de compresión (MDL/description length) | Refina maximizando parsimonia | ✅ | ◻️ | ◻️ | ◻️ |
+
+### Dónde “vive” el refinamiento (vista unificadora)
+
+| Espacio | Qué se refina | Ejemplos típicos |
+|---|---|---|
+| Pesos (weight space) | Un solver “compilado” en pesos para ese puzzle | TTT / zero-pretraining (HRM, TRM), NVARC-style |
+| Estado latente / solución parcial | La solución candidata y/o el estado de razonamiento | HRM (dos módulos), TRM (y + z) |
+| Programas explícitos | Código (Python/DSL) o pseudo-programas | Evolución / program synthesis + verificación |
+| “Programa en lenguaje” | CoT como traza optimizable con feedback | Reasoning models + verifiers + retries |
+
+### Nota práctica (por qué converge todo)
+
+En ARC-AGI-2 el patrón común es: *la generalización “sale” de iterar con feedback*, no solo de un pase directo. La diferencia principal entre líneas de trabajo es **dónde** iteran (pesos vs. programas vs. estados) y **qué feedback** usan (consistencia con demos, verificador, scoring, MDL, etc.).
 
