@@ -275,3 +275,14 @@ Leyenda: ✅ = central / explícito en el enfoque; ◻️ = aparece como técnic
 
 En ARC-AGI-2 el patrón común es: *la generalización “sale” de iterar con feedback*, no solo de un pase directo. La diferencia principal entre líneas de trabajo es **dónde** iteran (pesos vs. programas vs. estados) y **qué feedback** usan (consistencia con demos, verificador, scoring, MDL, etc.).
 
+---
+
+PLATAFORMAS COMPUTACIÓN EN LA NUBE
+
+google cloud
+azure
+
+CÓMO LO VAMOS A VENDER?
+QUÉ ES LO QUE QUEREMOS CONSEGUIR?
+CÓMO NOS VAMOS A COMPARAR AL RESPECTO DE OTROS MODELOS? QUÉ MÉTRICAS DE EVALUACIÓN? MATRIZ PARA PONDERAR? O MULTIPLICADOR
+
