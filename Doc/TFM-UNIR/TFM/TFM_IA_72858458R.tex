@@ -28,7 +28,7 @@
 %---------------------------
 %título del trabajo y autor
 %---------------------------
-\title{Optimización de modelos de lenguaje compactos para la síntesis de programas orientada a la resolución de ARC-AGI}
+\title{Optimización de modelos de lenguaje compactos para la síntesis de programas orientada a la resolución de ARC-AGI-1}
 \titulacion{Máster en Inteligencia Artificial}
 \author{Asier Marin Fernandez}
 \date{22 de julio de 2026}
@@ -50,9 +50,8 @@
 \renewcommand{\figurename}{Figura}
 \renewcommand{\tablename}{Tabla} 
 
-\maketitle
-
 \frontmatter
+\maketitle
 \tableofcontents
 \listoffigures
 \listoftables
@@ -75,32 +74,93 @@
 \mainmatter
 \chapter{Introducción} % 1. Introducción
 
-[INTRODUCTION]
+Actualmente una tendencia ascendente en el campo de inteligencia artificial. El paradigma del aprendiza profundo ha demostrado ser una herramienta de presente y de futuro. El \textit{software}
+es un elemento fundamente en la sociedad actual, y con la evolución del propio \textit{software} también evolucionan los distintos campos tecnológicos, entre ellos el de la inteligencia artifical.
 
-\section{Antecedentes}
+La inteligencia artificial es un campo de estudio que se centra en la creación de sistemas capaces de realizar tareas que normalmente requieren inteligencia humana, como el aprendizaje,
+el razonamiento, la resolución de problemas, la comprensión del lenguaje natural y la percepción visual. En los últimos años, ha habido un aumento significativo en el interés y el
+desarrollo de la inteligencia artificial, lo que ha llevado a avances notables en áreas como el aprendizaje automático, el procesamiento del lenguaje natural y la visión por computadora.
 
-[RTRTHRTHRTHRTHRTHRTH]
+Cada vez se le dá más importancia a las herramientas basadas en inteligencia artificial y cada vez llega a un público más amplio. En este contexto, los mecanismos para que esta tecnología
+pueda ser consumida por el público general se vuelven cada vez más importantes. En este sentido, la eficiencia en el consumo de estos recursos tecnolóligos cada vez es más relevante. Con la
+llegada de más modelos de lenguaje, la necesidad de encontrar formas de medir la capacidad de generalización de estos modelos se vuelve cada vez más importante también.
 
-\subsection{Contexto}
+Es aquí donde entra en juego el \textit{Abstraction and Reasoning Corpus (ARC-AGI)}, un \textit{benchmark} diseñado específicamente para evaluar la inteligencia de los sistemas y su capacidad para
+adquirir nuevas habilidades de forma eficiente a partir de unos pocos ejemplos, basándose en los principios del conocimiento central innato humano. El estándar ARC-AGI es una respuesta a la nececidad
+de medir la inteligencia, permitiendo la comparación entre sistemas y humanos.
 
-[RTRTHRTHRTHRTHRTHRTH]
+
+\section{Contexto}
+
+A pesar de los avances recientes, los Grandes Modelos de Lenguaje (LLMS) siguen teniendo dificultades para resolver este tipo de tareas, ya que sus capacidades se derivan principalmente de
+de volúmenes masivos de datos de pre-entrenamiento y memorización probabilística. Esto evidencia que, la hipótesis de escalar los modelos sin límites insospechados, no es suficiente
+para alcanzar el razonamiento abstracto. Aumentar ciegamente la cantidad de parámetros no dota automáticamente al sistema la capacidad de resolver tareas que requieren un razonamiento
+abstracto más novedoso.
+
+ARC-AGI representa el indicador estándar por excelencia de la industria para medir el progreso real hacia la inteligencia general artificial (AGI) a través de la generalización
+amplia y sístesis de programas.
 
 \section{Justificación}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Abordar el problema de ARC-AGI desde la perspectiva de los Modelos de Lenguaje Pequeños (SLMs) y la optimización en tiempo de inferencia supone un cambio de paradigma necesario: 
+pasar del escalado por fuerza bruta a la optimización inteligente de los parámetros. Limitar deliberadamente la capacidad del modelo evita la sobre-generalización y fuerza al sistema a 
+concentrarse exclusivamente en descubrir transformaciones algorítmicas robustas y reglas recursivas, en lugar de memorizar estadísticas superficiales.
 
+La viabilidad de este enfoque está respaldada por investigaciones muy recientes. Arquitecturas como el \textit{Hierarchical Reasoning Model (HRM)} y el \textit{Tiny Recursive Model (TRM)} han
+logrado superar el rendimiento de modelos masivos (como o3-mini o Claude 3.7) en ARC-AGI utilizando redes minúsculas de apenas 7 a 27 millones de parámetros, gracias a la aplicación de pasos de 
+computación recursiva en un espacio latente. Asimismo, enfoques revolucionarios como CompressARC han demostrado que es posible resolver un alto porcentaje de puzles sin absolutamente ningún 
+pre-entrenamiento, utilizando apenas 76.000 parámetros y minimizando la longitud de descripción puramente en el tiempo de inferencia \textit{(Test-Time Training)}.
+
+Dadas las restricciones de capacidad de cómputo disponibles para este proyecto, apostar por estos paradigmas (bucles de refinamiento, síntesis de programas y entrenamiento en tiempo de prueba) 
+no solo es una necesidad técnica, sino la estrategia científica más prometedora y eficiente para abordar el razonamiento complejo sin la saturación de recursos inherente a los LLMs tradicionales.
 
 \section{Objetivos}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Objetivo principal El objetivo principal es diseñar y desarrollar un modelo compacto (SLM) que maximice la puntuación en la resolución del benchmark ARC-AGI-1, priorizando estrictamente la
+eficiencia computacional y el rendimiento por parámetro frente a los modelos de lenguaje a gran escala.
 
+En cuanto a objetivos particulares se enumeran los siguientes:
+
+\begin{itemize}
+	\item Desarrollar e implementar bucles de refinamiento recursivo que permitan al modelo actualizar iterativamente sus estados latentes y mejorar progresivamente sus predicciones,
+	simulando la síntesis de programas.
+	\item Explorar y aplicar técnicas de adaptación en tiempo de prueba \textit{Test-Time Training y Test-Time Compute} para que el modelo aprenda y descubra abstracciones algorítmicas directamente
+	sobre las tareas objetivo, reduciendo la dependencia del pre-entrenamiento.
+	\item Integrar mecanismos de tiempo de cálculo adaptativo o \textit{early-stopping} que permitan al sistema abortar el bucle de razonamiento iterativo una vez haya 
+	alcanzado una solución convergente, optimizando drásticamente el consumo de memoria y tiempo de ejecución.
+	\item Implementar estrategias de consistencia y ensamblado \textit{top-k} que operen sobre diversas variantes o aumentos de los datos de entrada para seleccionar las predicciones más 
+	robustas.
+	\item Realizar una comparativa exhaustiva de eficiencia que evalúe cuantitativamente la relación entre la precisión lograda en el benchmark y el coste computacional empleado, como el uso de VRAM,
+	y precisión en FLOPs, validando la viabilidad de la inteligencia algorítmica en entornos de recursos restringidos.
+\end{itemize}
 
 \chapter{Estado del Arte}
 
+\section{Definicón de la inteligencia}
+
+[RTRTHRTHRTHRTHRTHRTH]
+
 \section{La inteligencia desde un punto de vista filosófico}
+
+[RTRTHRTHRTHRTHRTHRTH]
 
 \section{Nucleos del conocimiento}
 
+[RTRTHRTHRTHRTHRTHRTH]
+
+\section{El Abstract and Reasoning Corpus (ARC-AGI)}
+
+[RTRTHRTHRTHRTHRTHRTH]
+
+\section{Estudio de las limitaciones de los Grandes Modelos de Lenguaje (LLMs)}
+
+[RTRTHRTHRTHRTHRTHRTH]
+
+\section{Enfoques de modelos sin Pre-entrenamiento}
+
+[RTRTHRTHRTHRTHRTHRTH]
+
+\section{Optimización en Tiempo de Inferencia}
 
 [RTRTHRTHRTHRTHRTHRTH]
 
