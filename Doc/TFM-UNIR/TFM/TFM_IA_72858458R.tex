@@ -92,27 +92,28 @@ de medir la inteligencia, permitiendo la comparación entre sistemas y humanos.
 
 \section{Contexto}
 
-A pesar de los avances recientes, los Grandes Modelos de Lenguaje (LLMS) siguen teniendo dificultades para resolver este tipo de tareas, ya que sus capacidades se derivan principalmente de
+A pesar de los avances recientes, los Grandes Modelos de Lenguaje siguen teniendo dificultades para resolver este tipo de tareas, ya que sus capacidades se derivan principalmente de
 de volúmenes masivos de datos de pre-entrenamiento y memorización probabilística. Esto evidencia que, la hipótesis de escalar los modelos sin límites insospechados, no es suficiente
 para alcanzar el razonamiento abstracto. Aumentar ciegamente la cantidad de parámetros no dota automáticamente al sistema la capacidad de resolver tareas que requieren un razonamiento
 abstracto más novedoso.
 
-ARC-AGI representa el indicador estándar por excelencia de la industria para medir el progreso real hacia la inteligencia general artificial (AGI) a través de la generalización
+ARC-AGI representa el indicador estándar por excelencia de la industria para medir el progreso real hacia la inteligencia general artificial a través de la generalización
 amplia y sístesis de programas.
 
 \section{Justificación}
 
-Abordar el problema de ARC-AGI desde la perspectiva de los Modelos de Lenguaje Pequeños (SLMs) y la optimización en tiempo de inferencia supone un cambio de paradigma necesario: 
+Abordar el problema de ARC-AGI desde la perspectiva de los Modelos de Lenguaje Pequeños o SMLs y la optimización en tiempo de inferencia supone un cambio de paradigma necesario: 
 pasar del escalado por fuerza bruta a la optimización inteligente de los parámetros. Limitar deliberadamente la capacidad del modelo evita la sobre-generalización y fuerza al sistema a 
 concentrarse exclusivamente en descubrir transformaciones algorítmicas robustas y reglas recursivas, en lugar de memorizar estadísticas superficiales.
 
-La viabilidad de este enfoque está respaldada por investigaciones muy recientes. Arquitecturas como el \textit{Hierarchical Reasoning Model (HRM)} y el \textit{Tiny Recursive Model (TRM)} han
-logrado superar el rendimiento de modelos masivos (como o3-mini o Claude 3.7) en ARC-AGI utilizando redes minúsculas de apenas 7 a 27 millones de parámetros, gracias a la aplicación de pasos de 
+La viabilidad de este enfoque está respaldada por investigaciones muy recientes. Arquitecturas como el \textit{Hierarchical Reasoning Model} y el \textit{Tiny Recursive Model} han
+logrado superar el rendimiento de modelos masivos en ARC-AGI utilizando redes minúsculas de apenas 7 a 27 millones de parámetros, gracias a la aplicación de pasos de 
 computación recursiva en un espacio latente. Asimismo, enfoques revolucionarios como CompressARC han demostrado que es posible resolver un alto porcentaje de puzles sin absolutamente ningún 
 pre-entrenamiento, utilizando apenas 76.000 parámetros y minimizando la longitud de descripción puramente en el tiempo de inferencia \textit{(Test-Time Training)}.
 
 Dadas las restricciones de capacidad de cómputo disponibles para este proyecto, apostar por estos paradigmas (bucles de refinamiento, síntesis de programas y entrenamiento en tiempo de prueba) 
-no solo es una necesidad técnica, sino la estrategia científica más prometedora y eficiente para abordar el razonamiento complejo sin la saturación de recursos inherente a los LLMs tradicionales.
+no solo es una necesidad técnica, sino la estrategia científica más prometedora y eficiente para abordar el razonamiento complejo sin la saturación de recursos inherente a los modelos de lenguaje
+a gran escala.
 
 \section{Objetivos}
 
@@ -148,11 +149,11 @@ En cuanto a objetivos particulares se enumeran los siguientes:
 
 [RTRTHRTHRTHRTHRTHRTH]
 
-\section{El Abstract and Reasoning Corpus (ARC-AGI)}
+\section{El Abstract and Reasoning Corpus}
 
 [RTRTHRTHRTHRTHRTHRTH]
 
-\section{Estudio de las limitaciones de los Grandes Modelos de Lenguaje (LLMs)}
+\section{Estudio de las limitaciones de los Grandes Modelos de Lenguaje}
 
 [RTRTHRTHRTHRTHRTHRTH]
 
