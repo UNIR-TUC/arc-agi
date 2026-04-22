@@ -233,6 +233,8 @@ https://lewish.io/posts/arc-agi-2025-research-review#ttt-ttft
 
 https://lewish.io/posts/how-to-beat-arc-agi-2
 
+https://gist.github.com/willccbb/34e749d8d4a85d3671859b1fe624468a
+
 ---
 
 ## Tabla comparativa (Convergencias 2025 en ARC-AGI)
@@ -287,4 +289,5 @@ QUÉ ES LO QUE QUEREMOS CONSEGUIR?
 CÓMO NOS VAMOS A COMPARAR AL RESPECTO DE OTROS MODELOS? QUÉ MÉTRICAS DE EVALUACIÓN? MATRIZ PARA PONDERAR? O MULTIPLICADOR
 
 https://archive.org/details/aristoteles-de-anima_202106/page/n3/mode/2up
+
 
