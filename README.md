@@ -235,6 +235,10 @@ https://lewish.io/posts/how-to-beat-arc-agi-2
 
 https://gist.github.com/willccbb/34e749d8d4a85d3671859b1fe624468a
 
+https://www.kaggle.com/competitions/abstraction-and-reasoning-challenge
+
+https://www.nvidia.com/en-us/on-demand/session/gtc25-s74252/
+
 ---
 
 ## Tabla comparativa (Convergencias 2025 en ARC-AGI)
