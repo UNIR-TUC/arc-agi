@@ -1,3 +1,96 @@
 \begin{thebibliography}{}
 
+\bibitem [\protect \citeauthoryear {%
+Aristotle%
+\ \BBA {} Boeri%
+}{%
+Aristotle%
+\ \BBA {} Boeri%
+}{%
+{\protect \APACyear {2010}}%
+}]{%
+aristotle2010acerca}
+\APACinsertmetastar {%
+aristotle2010acerca}%
+\begin{APACrefauthors}%
+Aristotle%
+\BCBT {}\ \BBA {} Boeri, M\BPBI D.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYear{2010}.
+\newblock
+\APACrefbtitle {Acerca del alma} {Acerca del alma}.
+\newblock
+\APACaddressPublisher{}{Colihue Buenos Aires}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Gonz{\'a}lez%
+}{%
+Gonz{\'a}lez%
+}{%
+{\protect \APACyear {2011}}%
+}]{%
+gonzalez2011descartes}
+\APACinsertmetastar {%
+gonzalez2011descartes}%
+\begin{APACrefauthors}%
+Gonz{\'a}lez, R.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2011}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Descartes: las intuiciones modales y la inteligencia artificial cl{\'a}sica} {Descartes: las intuiciones modales y la inteligencia artificial cl{\'a}sica}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Alpha (Osorno)}{}{32}{181--198}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Legg%
+, Hutter%
+\BCBL {}\ \protect \BOthers {.}}{%
+Legg%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2007}}%
+}]{%
+legg2007collection}
+\APACinsertmetastar {%
+legg2007collection}%
+\begin{APACrefauthors}%
+Legg, S.%
+, Hutter, M.%
+\BCBL {}\ \BOthersPeriod {.}\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2007}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A collection of definitions of intelligence} {A collection of definitions of intelligence}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Frontiers in Artificial Intelligence and applications}{157}{}{17}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Waxman%
+}{%
+Waxman%
+}{%
+{\protect \APACyear {2014}}%
+}]{%
+waxman2014kant}
+\APACinsertmetastar {%
+waxman2014kant}%
+\begin{APACrefauthors}%
+Waxman, W.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYear{2014}.
+\newblock
+\APACrefbtitle {Kant's anatomy of the intelligent mind} {Kant's anatomy of the intelligent mind}.
+\newblock
+\APACaddressPublisher{}{OUP USA}.
+\PrintBackRefs{\CurrentBib}
+
 \end{thebibliography}
