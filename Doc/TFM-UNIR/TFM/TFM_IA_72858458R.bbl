@@ -48,6 +48,28 @@ Gonz{\'a}lez, R.%
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
+Hern{\'a}ndez-Orallo%
+}{%
+Hern{\'a}ndez-Orallo%
+}{%
+{\protect \APACyear {2017}}%
+}]{%
+hernandez2017evaluation}
+\APACinsertmetastar {%
+hernandez2017evaluation}%
+\begin{APACrefauthors}%
+Hern{\'a}ndez-Orallo, J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2017}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Evaluation in artificial intelligence: from task-oriented to ability-oriented measurement} {Evaluation in artificial intelligence: from task-oriented to ability-oriented measurement}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Artificial Intelligence Review}{48}{3}{397--447}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
 Legg%
 , Hutter%
 \BCBL {}\ \protect \BOthers {.}}{%
@@ -69,6 +91,53 @@ Legg, S.%
 {\BBOQ}\APACrefatitle {A collection of definitions of intelligence} {A collection of definitions of intelligence}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Frontiers in Artificial Intelligence and applications}{157}{}{17}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Minsky%
+}{%
+Minsky%
+}{%
+{\protect \APACyear {1968}}%
+}]{%
+minsky1968matter}
+\APACinsertmetastar {%
+minsky1968matter}%
+\begin{APACrefauthors}%
+Minsky, M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1968}{}{}.
+\newblock
+\APACrefbtitle {Matter, Mind, and Models in: ML Minsky (ed.): Semantic Information Processing.} {Matter, mind, and models in: Ml minsky (ed.): Semantic information processing.}
+\newblock
+\APACaddressPublisher{}{MIT Press}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Spelke%
+\ \BBA {} Kinzler%
+}{%
+Spelke%
+\ \BBA {} Kinzler%
+}{%
+{\protect \APACyear {2007}}%
+}]{%
+spelke2007core}
+\APACinsertmetastar {%
+spelke2007core}%
+\begin{APACrefauthors}%
+Spelke, E\BPBI S.%
+\BCBT {}\ \BBA {} Kinzler, K\BPBI D.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2007}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Core knowledge} {Core knowledge}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Developmental science}{10}{1}{89--96}.
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%

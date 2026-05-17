@@ -1,15 +1,15 @@
 # Fdb version 4
-["bibtex TFM_IA_72858458R"] 1778932755.32105 "TFM_IA_72858458R.aux" "TFM_IA_72858458R.bbl" "TFM_IA_72858458R" 1778932755.92648 0
-  "./bibliografia.bib" 1778932710.42639 8397 e2b53dd017d7d4464b883b70d2ae7a54 ""
+["bibtex TFM_IA_72858458R"] 1779057211.18706 "TFM_IA_72858458R.aux" "TFM_IA_72858458R.bbl" "TFM_IA_72858458R" 1779057211.78136 0
+  "./bibliografia.bib" 1779056176.80481 8575 dd404dccce9853a25bee6ef18278f3ac ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/apacite/apacite.bst" 1374530685 141073 9d7b79dbf9d91133318126032cff8c27 ""
-  "TFM_IA_72858458R.aux" 1778932755.74707 5001 2749def69b04f3f0b0b44f4595ab40f3 "pdflatex"
+  "TFM_IA_72858458R.aux" 1779057211.61731 5912 0c0277a855360a22312c0688e587ba8c "pdflatex"
   (generated)
   "TFM_IA_72858458R.bbl"
   "TFM_IA_72858458R.blg"
   (rewritten before read)
-["pdflatex"] 1778932755.39001 "/home/asier/repos/arc-agi/Doc/TFM-UNIR/TFM/TFM_IA_72858458R.tex" "TFM_IA_72858458R.pdf" "TFM_IA_72858458R" 1778932755.92659 0
+["pdflatex"] 1779057211.25218 "/home/asier/repos/arc-agi/Doc/TFM-UNIR/TFM/TFM_IA_72858458R.tex" "TFM_IA_72858458R.pdf" "TFM_IA_72858458R" 1779057211.78147 0
   "/etc/texmf/web2c/texmf.cnf" 1766149145.60144 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/asier/repos/arc-agi/Doc/TFM-UNIR/TFM/TFM_IA_72858458R.tex" 1778932754.64464 12602 f79cc083a9fe69d99cc551d2a1ed8b98 ""
+  "/home/asier/repos/arc-agi/Doc/TFM-UNIR/TFM/TFM_IA_72858458R.tex" 1779057209.91301 16360 fe963ee2c3c6c007518bc4d95b0a5538 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1246382020 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -122,13 +122,13 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1769038489.10307 5472669 54eaf61a88b6b7896ebd0dac973cb29c ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1769038538 8214393 c3bb473726382c5bd72eaa8943506e81 ""
-  "TFM_IA_72858458R.aux" 1778932755.74707 5001 2749def69b04f3f0b0b44f4595ab40f3 "pdflatex"
-  "TFM_IA_72858458R.bbl" 1778932755.38707 2177 af7f33980a0c7729aed91d5f99950d1a "bibtex TFM_IA_72858458R"
-  "TFM_IA_72858458R.lof" 1778932755.74807 230 0d730e2619ef0f22aacbec22bb6fcb0f "pdflatex"
-  "TFM_IA_72858458R.lot" 1778932755.74807 230 0d730e2619ef0f22aacbec22bb6fcb0f "pdflatex"
-  "TFM_IA_72858458R.out" 1778932755.74807 3962 4b184fd9fa395647f2fc72d1e81f072e "pdflatex"
-  "TFM_IA_72858458R.tex" 1778932754.64464 12602 f79cc083a9fe69d99cc551d2a1ed8b98 ""
-  "TFM_IA_72858458R.toc" 1778932755.74807 1956 8a61f608eafb00555beb78b723ea0cdd "pdflatex"
+  "TFM_IA_72858458R.aux" 1779057211.61731 5912 0c0277a855360a22312c0688e587ba8c "pdflatex"
+  "TFM_IA_72858458R.bbl" 1779057211.2493 3882 2237fc4f689fd03ff182ed9211c62617 "bibtex TFM_IA_72858458R"
+  "TFM_IA_72858458R.lof" 1779057211.61892 230 0d730e2619ef0f22aacbec22bb6fcb0f "pdflatex"
+  "TFM_IA_72858458R.lot" 1779057211.61892 230 0d730e2619ef0f22aacbec22bb6fcb0f "pdflatex"
+  "TFM_IA_72858458R.out" 1779057211.61831 4190 4a224b4675aca7ff11dd2806cef64efd "pdflatex"
+  "TFM_IA_72858458R.tex" 1779057209.91301 16360 fe963ee2c3c6c007518bc4d95b0a5538 ""
+  "TFM_IA_72858458R.toc" 1779057211.61892 2052 8d724b3c9e6a84d7cd8f970af2901ccc "pdflatex"
   "estilo_unir-1.sty" 1776894148.58202 3307 47f512e159fdf783b8019cb68ae7777d ""
   "logo_unir.pdf" 1774293030.86495 5261 e89deec51d32a79481fdbc2d4b98931c ""
   (generated)
