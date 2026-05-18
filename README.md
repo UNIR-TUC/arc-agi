@@ -241,6 +241,8 @@ https://www.nvidia.com/en-us/on-demand/session/gtc25-s74252/
 
 https://www.kaggle.com/competitions/arc-prize-2024/writeups/guillermo-barbadillo-2nd-place-solution-for-the-ar
 
+https://ironbar.github.io/arc24/03_State_of_the_art/#reasoning-abilities-of-large-language-models-in-depth-analysis-on-the-abstraction-and-reasoning-corpus
+
 ---
 
 ## Tabla comparativa (Convergencias 2025 en ARC-AGI)
