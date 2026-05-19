@@ -1,58 +1,60 @@
-This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
+This is BibTeX, Version 0.99e
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: TFM_IA_72858458R.aux
+Reallocating 'name_of_file' (item size: 1) to 8 items.
 The style file: apacite.bst
-Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
-Reallocated global_strs (elt_size=200001) to 20 items from 10.
-Reallocated glb_str_end (elt_size=4) to 20 items from 10.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocating 'name_of_file' (item size: 1) to 13 items.
+Reallocating 'glb_str_end' (item size: 4) to 20 items.
+Reallocating 'glb_str_ptr' (item size: 4) to 20 items.
+Reallocating 'global_strs' (item size: 1) to 4000000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 6000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 9000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: bibliografia.bib
 apacite.bst [2013/07/21 v6.03 APA bibliography style]
 Warning--`others' not consistent with 6th ed. of the APA Manual
-You've used 7 entries,
+You've used 8 entries,
             6951 wiz_defined-function locations,
-            1313 strings with 11593 characters,
-and the built_in function-call counts, 11169 in all, are:
-= -- 1383
-> -- 87
-< -- 477
-+ -- 465
-- -- 18
-* -- 672
-:= -- 2029
-add.period$ -- 28
-call.type$ -- 7
-change.case$ -- 119
+            1318 strings with 11693 characters,
+and the built_in function-call counts, 12500 in all, are:
+= -- 1550
+> -- 97
+< -- 524
++ -- 507
+- -- 20
+* -- 745
+:= -- 2249
+add.period$ -- 32
+call.type$ -- 8
+change.case$ -- 136
 chr.to.int$ -- 0
-cite$ -- 14
-duplicate$ -- 274
-empty$ -- 499
-format.name$ -- 136
-if$ -- 2189
+cite$ -- 16
+duplicate$ -- 307
+empty$ -- 567
+format.name$ -- 150
+if$ -- 2464
 int.to.chr$ -- 0
-int.to.str$ -- 21
+int.to.str$ -- 24
 missing$ -- 0
-newline$ -- 165
-num.names$ -- 56
-pop$ -- 257
+newline$ -- 187
+num.names$ -- 64
+pop$ -- 279
 preamble$ -- 1
-purify$ -- 28
+purify$ -- 32
 quote$ -- 0
-skip$ -- 752
+skip$ -- 871
 stack$ -- 0
-substring$ -- 509
-swap$ -- 166
-text.length$ -- 16
+substring$ -- 556
+swap$ -- 186
+text.length$ -- 18
 text.prefix$ -- 0
 top$ -- 1
-type$ -- 560
+type$ -- 640
 warning$ -- 1
-while$ -- 46
+while$ -- 51
 width$ -- 0
-write$ -- 193
+write$ -- 217
 (There was 1 warning)

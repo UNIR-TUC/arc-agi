@@ -229,6 +229,8 @@ Deep Learning
   
 ## Enlaces imprescindibles
 
+Primera solucion ARC-AGI 2020 -> https://github.com/top-quarks/ARC-solution
+
 https://lewish.io/posts/arc-agi-2025-research-review#ttt-ttft
 
 https://lewish.io/posts/how-to-beat-arc-agi-2
@@ -242,6 +244,10 @@ https://www.nvidia.com/en-us/on-demand/session/gtc25-s74252/
 https://www.kaggle.com/competitions/arc-prize-2024/writeups/guillermo-barbadillo-2nd-place-solution-for-the-ar
 
 https://ironbar.github.io/arc24/03_State_of_the_art/#reasoning-abilities-of-large-language-models-in-depth-analysis-on-the-abstraction-and-reasoning-corpus
+
+https://www.kaggle.com/code/allegich/arc-agi-2025-starter-notebook-eda
+
+https://www.kaggle.com/code/iliao2345/arc-agi-without-pretraining/notebook?scriptVersionId=232760209
 
 ---
 
