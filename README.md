@@ -245,9 +245,12 @@ https://www.kaggle.com/competitions/arc-prize-2024/writeups/guillermo-barbadillo
 
 https://ironbar.github.io/arc24/03_State_of_the_art/#reasoning-abilities-of-large-language-models-in-depth-analysis-on-the-abstraction-and-reasoning-corpus
 
+https://ironbar.github.io/arc25/03_State_of_the_art/#a-2d-ngpt-model-for-arc-prize
+
 https://www.kaggle.com/code/allegich/arc-agi-2025-starter-notebook-eda
 
 https://www.kaggle.com/code/iliao2345/arc-agi-without-pretraining/notebook?scriptVersionId=232760209
+
 
 ---
 
