@@ -168,15 +168,15 @@ la idea de que la mente y el cuerpo son entidades separadas, lo que se conoce co
 facultad innata que nos permite organizar y comprender el mundo a través de categorías y conceptos \cite{waxman2014kant}. Hume, en cambio, se centró en la experiencia y
 la percepción como base de la inteligencia humana.
 
-\begin{quote}
-\itshape
-``El intelecto -siendo impasible- ha de ser capaz de recibir la forma, es decir, ha de ser en potencia tal como la forma pero sin ser ella misma y será 
-respecto de lo inteligible algo análogo a lo que es la facultad sensitiva respecto de lo sensible.''
-\end{quote}
+%\begin{quote}
+%\itshape
+%``Even though such machines might do some things as well as we do them, or perhaps even better, they would inevitably fail in others, which would reveal they were acting not through understanding,
+%but only from the disposition of their organs.''
+%\end{quote}
 
-\begin{center}
-\cite[p.~230, párr.~1]{aristotle2010acerca}
-\end{center}
+%\begin{center}
+%\cite[p.~9, párr.~6]{descartes1905discours}
+%\end{center}
 
 Aristóteles también realiza varias reflexiones sobre lo que hoy se entiende por inteligencia. En concreto, sus reflexiones se desarrollan fundamentalmente a 
 través de la naturaleza del intelecto, la facultad de inteligir y el pensamiento.
@@ -225,16 +225,112 @@ la inteligencia intrínsica.
 \cite{minsky1968matter}
 \end{center}
 
-Tras los métodos tracicionales de evaluar algorimtos, la IA ha pasado a una evaluacióm de "caja negra" basada en el comportamiento que involucra la discriminación
-humana (comparación directa por o contra humanos) y pruebas de rendimiento de problemas. Se iniciaron evaluación metodológicas de dudosa validez,
-donde los investigadores a mnudo seleccionaban los conjuntos de datos que mejor les convievían y ajustaban parámetros en exceso provocando sobreajustes. Esto
+Tras los métodos tracicionales de evaluar algorimtos, la IA ha pasado a una evaluacióm de ``caja negra'' basada en el comportamiento que involucra la discriminación
+humana (comparación directa por o contra humanos) y pruebas de rendimiento de problemas. Se iniciaron evaluaciones metodológicas de dudosa validez,
+donde los investigadores a menudo seleccionaban los conjuntos de datos que mejor les convenían y ajustaban parámetros en exceso provocando sobreajustes. Esto
 llevó a situaciones donde muchos resultados publicados eran reproducibles pero dificilmente replicables \cite{hernandez2017evaluation}. En consecuencia,
-hacía que la aparente mejora del modelo desapareciera en cuenta de cambiaba ligeramente el dominio de los datos además de una fuerte dispersión de los métodos
+la aparente mejora del modelo desaparecía en cuanto cambiaba ligeramente el dominio de los datos, además de una fuerte dispersión de los métodos
 en las diferentes disciplinas.
 
-Para sistemas de inteligencia artificial de propósito general era necesario un nuevo enfoque orientado a habilidades.
+Para sistemas de inteligencia artificial de propósito general era necesario un nuevo enfoque orientado a habilidades. Este enfoque se basa en la evaluación de capacidades congnitivas en lugar de tareas en
+las que fue diseñado originalmente \cite{hernandez2017evaluation}. Para garantizar la validez de este enfoque, las pruebas de evaluación requieren directrices estrictas, como definir con antelación
+los conjuntos de datos para entrenamiento y evaluación, y evitar la sobreajuste a conjuntos de datos específicos.
 
-\section{Estudio de las limitaciones de los Grandes Modelos de Lenguaje}
+\begin{quote}
+\itshape
+``The field of artificial intelligence has been very successful in developing artificial systems that perform these tasks without featuring intelligence.''
+\end{quote}
+
+\begin{center}
+\cite{hernandez2017evaluation}
+\end{center}
+
+Para avanzar hacia sistemas de inteligenca actificial más inteligentes y humanos es necesario un método de evaluación de la inteligencia que compare dos o más sistemas y humanos. Es aquí donde estra en juego
+el Abstract and Reasoning Corpus (ARC-AGI), un \textit{benchmark} dieñado para respestar todas las directrices necesarias. ARC-AGI está construido con un conjunto de preioridades para ser lo más parecido posible
+a la capacidad de razonamiento innata del ser humano \cite{chollet2019measure}.
+
+Los modelos que existen en la actualidad funcionan correctamente en tareas específicas, todavía están ciertamente limitados y hambrientos de datos . En situaciones en los que se desvían ligeramente de sus datos de entrenamiento,
+son incapaces de afrontar tareas que requieren un razonamiento novedoso. ARC-AGI también está pensado para medir el progreso de manera precisa y cuantitativa de la inteligencia. En este sentido, las definiciones
+que se han dado en en este trabajo en secciones anteriores puede ayudar a intuir la estructura de las pruebas de evaluación de ARC-AGI. Las tareas de evaluación no deben ser necesariamente conocidas de
+antemano, para conseguir la generalización el agente debe que ser capaz de aprender y gestionar nuevas tareas \cite{chollet2019measure}.
+
+\begin{quote}
+\itshape
+``We have been conceptualizing and evaluating intelligence in the context of AI research: crystallized skill on one hand, skill-acquisition ability on the other.''
+\end{quote}
+
+\begin{center}
+\cite{chollet2019measure}
+\end{center}
+
+\subsection{Espectro de la generalización}
+
+La generalización es un concepto que ha llegado de la mano del aprendizaje automáticom desarrollado originamente para caracterizar el buen rendimiento de un modelo estadístico en 
+datos de entrada que no forman parte de su conjunto de datos de entrenamiento. Este concepto ha seguido siendo parte de la conversación  y se puede definir como la "habilidad" de
+un modelo para gestionar una situación o varias situaciones (o tareas) que no se ha encontrado previamente. Nótese que el cencepto de la frase "situación que no se ha encontrado previamente"
+puede ser tremendamente ambigua y el autor \cite{chollet2019measure} propone un espectro de generalización para aclarar esta ambigüedad. En este espectro, se pueden encontrar diferentes tipos de generalización, 
+como la generalización sistémica (centrada en el sistema)  o generalización consciente-desarrollada (capacidad de manejar situaciones que ni el sistema ni su creador humano habían encontrado antes) que no se va a 
+profundizar en este artículo. Al contrario, se va a profundizar en la generalización de habilidades, que eses más útil para cuantificar los grados de generalización.
+
+\begin{itemize}
+\item \textbf{Ausencia de generalización:} Sistemas donde no existe incertidumbre ni novedad. Entorno cerrado como un algoritmo que juega al ``tres en raya'',  iterando exhaustivamente sobre todas las jugadas posibles. No hay adapatación posible.
+\item \textbf{Generalización local o robustez:} Es la capacidad de un sistema para manejar nuevos ejemplos dentro de una distribución de datos conocida para una sola tarea o un conjunto bien definido de ellas.  Este es el nivel en el que ha operado históricamente el aprerndizaje profundo moderno. El autor \cite{chollet2019measure} hace referencia a un ejemplo de clasificador de gatos que, se casifican gatos donde el modelo no había visto antes.
+\item \textbf{Generalización amplia o flexibilidad:} Es la capacidad de manejar una categoría amplia de tareas y entornos relacionados sin intervención humana adicional, incluyendo situaciones imprevistas por los creadores \cite{chollet2019measure}. Un ejemplo de esto puede ser el coche autónomo de nivel 5.
+\item \textbf{Generalización extrema o generalidad:} Sistemas abiertos capaces de manejar tareas enteramente nuevas que solo comparten características abstractas con las ya conocidas, aplicable a cualquier dominio. También se puede denominar como inteligencia general.
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{image/images/1779113749902.png}
+\caption[Modelo jerárquico de habilidades cognitivas y su mapeo del espectro de generalización]{Modelo jerárquico de habilidades cognitivas y su mapeo del espectro de generalización.}
+%\caption[Modelo jerárquico de habilidades cognitivas y su mapeo del espectro de generalización]{Modelo jerárquico de habilidades cognitivas y su mapeo del espectro de generalización. 2}
+\label{fig:fig1SECTION2}
+{\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
+\end{figure}
+	
+\subsection{La inteligencia desde la perspectiova de la adquisición de habilidades}
+
+\begin{figure}[h]
+\includegraphics[width= 0.8\textwidth]{image/images/1779113798928.png}
+\caption{}
+\label{fig:fig2SECTION2}
+\end{figure}
+
+\subsection{ARC-AGI-1}
+% 400 tareas trainning
+% 400 tareas evaluation
+
+\begin{figure}[h]
+\includegraphics[width= 0.8\textwidth]{image/images/1779113847784.png}
+\caption{}
+\label{fig:fig3SECTION2}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[width= 0.8\textwidth]{image/images/1779113875500.png}
+\caption{}
+\label{fig:fig4SECTION2}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[width= 0.8\textwidth]{image/images/1779113886168.png}
+\caption{}
+\label{fig:fig5SECTION2}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[width= 0.8\textwidth]{image/images/1779113897546.png}
+\caption{}
+\label{fig:fig6SECTION2}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[width= 0.8\textwidth]{image/images/1779113937981.png}
+\caption{}
+\label{fig:fig7SECTION2}
+\end{figure}
+
+\section{Grandes Modelos de Lenguaje en ARC-AGI-1}
 
 [RTRTHRTHRTHRTHRTHRTH]
 
@@ -252,13 +348,14 @@ Para sistemas de inteligencia artificial de propósito general era necesario un 
 
 %\chapter{Objetivos}
 
+\chapter{Metodología, infraestructura y herramientas}
+
+[RTRTHRTHRTHRTHRTHRTH]
+
 \chapter{Desarrollo}
 
 [RTRTHRTHRTHRTHRTHRTH]
 
-\section{Metodología, infraestructura y herramientas}
-
-[EDRHGEGRERG]
 
 \section{Datos}
 
