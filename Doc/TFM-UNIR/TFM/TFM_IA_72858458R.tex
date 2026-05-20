@@ -209,8 +209,7 @@ poco imprecisas, esta imprecisión crece de forma lineal a medida que aumenta el
 \item \textbf{Sistema de reprensentación del lenguaje y social:} Es la capacidad de comprender y utilizar el lenguaje, así como de interactuar socialmente con otros individuos.
 \end{enumerate}
 
-
-\section{El Abstract and Reasoning Corpus}
+\section{Abstract and Reasoning Corpus}
 
 Los sistemas de evaluación de la inteligencia artificial han ido evolucionando a lo largo del tiempo. La investigación de esta área de ha centrado
 históricamente en comprobar si las máquinas realizan bien tareas específicas, sidnedo una evaluación orientada a tareas y no una evaluación de 
@@ -294,7 +293,7 @@ Existen dos perspectivas fundamentales sobre la mente humana, una que es una col
 mente como una página en blanco. El autor François Chollet, en el manifiesto ``On the Measure of Intelligence'' \cite{chollet2019measure}, sugiere que los humanos no nacen con una mente vacía que
 aprende cualquier conocimiento desde cero., ppero tampoco son una colleción de instintos. Se puede decir que nacemos con algunos conocimientos previos innatos \cite{spelke2007core}.
 
-Para que un ``benchmark ''como ARC pueda ser una medida real de la inteligencia no puede depender de conocimientos adquiridos y las tareas deb ser resolubles utilizando únicamente los principios de los
+Para que un ``benchmark'' como ARC pueda ser una medida real de la inteligencia no puede depender de conocimientos adquiridos y las tareas deb ser resolubles utilizando únicamente los principios de los
 núcleos de conocimiento. Cómo de eficiente puede ser un agente para usar usu conocimientos innatos en resolver problemas que no ha conocido antes.
 
 François Chollet define la inteligencia no como un programa estático, sino como un proceso de síntesis de programas. Para establecer esta definición, hay que detallar en una primera
@@ -330,51 +329,165 @@ El proceso de la resolución de una tarea se podría dividir en dos fases:
 \end{enumerate}
 
 En conclusión, ¿qué se puede esperar de un \textit{benchmark} de inteligencia ideal? Un \textit{benchmark} ideal debe ser explícito sobre su alcance, se debe demostrar el éxito sobre las pruebas y que exista una correlación
-estadística con éxito en un entorno real. Los resultados deben ser reproducibles, tal como señalaba el autor Jose Hernandez-Orallo \cite{hernandez2017evaluation}. Además. se deberñia 
+estadística con éxito en un entorno real. Los resultados deben ser reproducibles, tal como señalaba el autor Jose Hernandez-Orallo \cite{hernandez2017evaluation}. Además, se debería 
 medir la capacidad de generalización, es decir, medir la capacidad de gestionar situaciones que ni el sistema ni el desarrollador ha visto anteriormente. Esto indica que el conjutno de tareas dedicadas
 a la evaluación debe ser estrictamente privado para evitar el se inyecte la solución o bien en el código o en los propios datos de entrenamiento (contaminación). Otro punto relevante que acompaña a
-este aspecto es el diseño opara evitar trampas estadísticas que no requieran una verdadera comprensión abstracta.
+este aspecto es el diseño para evitar trampas estadísticas que no requieran una verdadera comprensión abstracta.
 
-El control de la experiencia debe ser fundamental. No se debe "comprar" el rendimiento de un \textit{benchmark} mediante un conjunto de datos de entrenamiento ilimitados. Si un sistema inteligente
+El control de la experiencia debe ser fundamental. No se debe ``comprar'' el rendimiento de un \textit{benchmark} mediante un conjunto de datos de entrenamiento ilimitados. Si un sistema inteligente
 necesita de millones de datos de entrenamiento para generar programas de habilidad consistentes que un humando puede captar con apenas pocos ejemplos, significa que el sistema es ineficiente y no inteligente 
-aun que logre la misma puntuación. La cantidad de datos de entrenamiento serña estrictamente limitada.
+aun que logre la misma puntuación. La cantidad de datos de entrenamiento sería estrictamente limitada. Por último, el \textit{benchmark} debe ser funcional de la misma forma para humanos y máquinas, de forma justa, asumiendo que
+ambos agentes poseen los mismos núcleos de rendimiento y que requiere tiempo y tamaño del entrenamiento de un humano.
+
 \subsection{ARC-AGI-1}
 % 400 tareas trainning
 % 400 tareas evaluation
 
+Con el objetivo de dar respuesta a todas las necessidades que se han mencionado en las secciones anteriores, nace el la propuesta de \textit{benchmark} Abstraction and Reasoning Corpus (ARC), un repositorio de datos 
+con la intención de servir como referencia para medir la inteligenca general. En esta sección se va a explorar los objetivos y el diseño de este repositorio.
+
+AC-AGI coomo \textit{benchmark} de síntesis de programas tiene diferentes objetivos finales:
+\begin{itemize}
+\item Mantener un formato cercano o simple para que pueda ser solucionable por humanos.
+\item Centrar el foco en medir la generalización y no sólo habilidades. La generalización de debe medir de una manera cuantitativa. Presentar taeas altamente abstractas que deben ser entendidas por el ser humano con pocos
+ejemplos.
+\item Control cuantitavo de la experiencia proporcionada (datos de entrenamiento limitados). Los datos de entrenamiento tendrán una cantidad fija.
+\item Describir el conjunto completo de núcleos de conocimiento y comparación ``precisa'' con la inteligencia entre el ser humano y los agentes de inteligencia artificial.
+\end{itemize}
+
+En la imagen siguiente \ref{fig:fig3SECTION2} se muestra un ejemplo de una tarea de ARC-AGI-1. En esta tarea, el objetivo es completar un patrón de una area dada. La solución de esta tarea pasa por generar una cuadrícula
+de salida que corresponde con la entrada a su izquierda. Para resolver esta tarea, el agente debe ser capaz de identificar el patrón subyacente en la entrada y generar la salida correcta, demostrando así su capacidad para 
+generalizar a partir de los ejemplos proporcionados.
+
 \begin{figure}[h]
+\centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113847784.png}
-\caption{}
+\caption[Tarea donde el objetivo es completar un patrón de una area dada]{Tarea donde el objetivo es completar un patrón de una area dada. Para solciionar esta tarea debe generar una cuadrícula de salida que corresponde con la entrada a su izquierda.}
 \label{fig:fig3SECTION2}
+{\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
-\subsection{Conocimientos centrales de ARC-AGI}
+\subsection{Núcleos de conocimiento aplicado en ARC-AGI}
+
+Todos los problemas planteados están diseñados espcificamente para abordar los núcleos de conocimiento. Los nucleos de conocimiento de ARC están planteados para ser lo mñas parecido posible
+a los núcleos de conocimiento del ser humano.
+
+\subsubsection{Objetualidad}
+
+Nucleo de conocimmiento centrado en la capacidad de interpretaciñon del entorno, analizando las diferentes entidades. Se fundamenta bajo el principio cohesión y persistencia de objetos. Se analiza y se separa la cuadrícula
+de la entrada en diferentes objetos basándose en valores o criterios de continuidad como los bloques del mismo color.
 
 \begin{figure}[h]
+\centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113875500.png}
-\caption{}
+\caption[Prueba de ruido]{Prueba de ruido (\textit{denoising}).}
 \label{fig:fig4SECTION2}
+{\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
+Generalmente, los objetos presentes en la cuadrícula de entrada persisten en la salida, a menudo trasformando algun transformación geomñétrica. A pesar del ruido visual o la inclusión
+provoicada por otros objetos, muchos de los objetos persisten.
+
 \begin{figure}[h]
-\includegraphics[width= 0.8\textwidth]{image/images/1779113886168.png}
-\caption{}
+\centering
+\includegraphics[width= 1\textwidth]{image/images/1779113886168.png}
+\caption[El objetivo rojo debe ``moverse'' jusnto al objeto azul hasta hacer ``contacto'']{El objetivo rojo debe ``moverse'' jusnto al objeto azul hasta hacer ``contacto''.}
 \label{fig:fig5SECTION2}
+{\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
-\begin{figure}[h]
-\includegraphics[width= 0.8\textwidth]{image/images/1779113897546.png}
-\caption{}
-\label{fig:fig6SECTION2}
-\end{figure}
+La influenca mediante el contacto es otro punto especialmente relevante, muccchas taras requiere de entender ciertas interacciones físicas, como un objeto que se desplaza hasta tocar a otro o una
+línea qu se dibuja y rebota al entrar en contacto con un obstáculo.
+
+\subsubsection{Orientación a objetivos}
+
+Las cuadrículas de entrada y salida suelen ser comprendidas por los humanos como los estados iniciales y finales de un proceso que conlleva intencionalidad. Las transformaciones buscan alccanzar una meta
+y resulta ser una heurística útil para resolver puzles.
+
+\subsubsection{Números y conteo}
+
+Diversas tareas de AMD implicar contar y clasificar objetos. Las tareas pueden tener distintos tamaños y
+es especialmente relevante la comparación de magnitudes. No es sólo contar objetos o ``puntos'',
+es también identificar aquellos símbolos que aparecen en más ocasiones (concurrencia). Es necesario nociones básicas de suma y resta en cantidades pequeñas. En ARC las cantidades
+utilizadas no tienen un número mayor de 9. Esto se refleja como una capacidad innata de los humanos para la representación numérica, en secciones anteriores se ha explorado
+esta capacidad como uno de los núcleos de conocimiento innato. El ser humano es capaz de usar esta capacidad sin ninguna formación previa con limitación en la cantidad de objetos que contar.
 
 \begin{figure}[h]
+\centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113937981.png}
-\caption{}
+\caption[Tarea donde el objetivo es contar el objeto que aparece más veces]{Tarea donde el objetivo es contar el objeto que aparece más veces.}
 \label{fig:fig7SECTION2}
+{\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
+\end{figure}
+
+
+\subsubsection{Geometría y Topología básica}
+
+La orientación espacial es un aspecto fundamental como núcleo de conocimiento. Se engloban aquellas tareas de reconocimiento de formas para la compresión de líneas u otras figuras
+geométricas. El agente debe ser capaz de estimar ccon mayor probabilidad la apariciñon de formas egulares frente a otras formas más complejas.
+
+Las transformaciones espaciales como las simetrías y rotaciones, así como el escalado, deben ser comprendidas y aplicables. Relaciones espaciales específicamente en nociones topológicas sobre contener
+o ser contenido y estar fuera o dentro de un perímetro delimitado también será requerido en diversas tareas. El trazado de líneas o la conexión de puntos (proyecciones ortogonales) o la copia de 
+diversos objetos repetidamente también se incluyen en este núcleo de conocimiento.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width= 0.8\textwidth]{image/images/1779113897546.png}
+\caption[Tarea donde el objetivo es generar un línea diagonal hasta rebotar al hacer contacto con el obtaculo  rojo]{Tarea donde el objetivo es generar un línea diagonal hasta rebotar al hacer contacto con el obtaculo  rojo.}
+\label{fig:fig6SECTION2}
+{\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
 \subsection{Repositorio de datos}
+
+Los datos de ARC-AGI se puede encontrar en el repositorio de GitHub \cite{githubGitHubFcholletARCAGI}. Los datos están contenidos en dos sub-directorios diferentes:
+
+\begin{itemize}
+\item \textbf{training}: Contiene 400 tareas de entrenamiento. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son 400 archivos. Todos los archivos de este directorio
+sirven para el entrenamiento del modelo y la adquisición de habilidades.
+	\subitem{a} Pares ``train'': Típicamente suele tener tres o más pares de ``arrays''. Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
+	\subitem{b} Pares ``test'': Típicamente suele tener un par de ``arrays''. El par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
+\item \textbf{evaluation}: Contiene 400 tareas de evaluación. Cada tarea contiene todo el contenido en un arvhivo, por lo tanto, son otros 400 archivos.
+\end{itemize}
+
+Los archivos están en formato JSON. Cada archivo contiene un diccionario con dos claves: ``train'' y ``test''. El valor de cada clave es una lista de pares de ``arrays''.
+Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''. Los ``arrays'' son matrices bidimensionales de números enteros que representan los estados iniciales y finales de una tarea.
+
+En las siguientes matrices se puede ver una matriz de input $X$ y una matriz de output $Y$:
+
+\[
+X=
+\begin{bmatrix}
+0&7&7\\
+7&7&7\\
+0&7&7
+\end{bmatrix},
+\qquad
+Y=
+\begin{bmatrix}
+0&0&0&0&7&7&0&7&7\\
+0&0&0&7&7&7&7&7&7\\
+0&0&0&0&7&7&0&7&7\\
+0&7&7&0&7&7&0&7&7\\
+7&7&7&7&7&7&7&7&7\\
+0&7&7&0&7&7&0&7&7\\
+0&0&0&0&7&7&0&7&7\\
+0&0&0&7&7&7&7&7&7\\
+0&0&0&0&7&7&0&7&7
+\end{bmatrix}
+\]
+
+\section{Primeros enfoques para resolver ARC-AGI}
+
+[RTRTHRTHRTHRTHRTHRTH]
+
+\subsection{Domain Specific Languages (DSLs) y síntesis de programas}
+
+[RTRTHRTHRTHRTHRTHRTH]
+
+\subsection{Enfoque Neurosimbólico}
+
+[RTRTHRTHRTHRTHRTHRTH]
 
 \section{Grandes Modelos de Lenguaje en ARC-AGI-1}
 
@@ -388,13 +501,21 @@ aun que logre la misma puntuación. La cantidad de datos de entrenamiento serña
 
 [RTRTHRTHRTHRTHRTHRTH]
 
+\section{Estado actual con perspectiva de eficiencia computacional}
+
+[RTRTHRTHRTHRTHRTHRTH]
+
 %\chapter{Especificación de requisitos}
 
 %[RTRTHRTHRTHRTHRTHRTH]
 
 %\chapter{Objetivos}
 
-\chapter{Metodología, infraestructura y herramientas}
+\chapter{Metodología}
+
+[RTRTHRTHRTHRTHRTHRTH]
+
+\chapter{Infraestructura y herramientas}
 
 [RTRTHRTHRTHRTHRTHRTH]
 
@@ -402,12 +523,7 @@ aun que logre la misma puntuación. La cantidad de datos de entrenamiento serña
 
 [RTRTHRTHRTHRTHRTHRTH]
 
-
-\section{Datos}
-
-[RTRTHRTHRTHRTHRTHRTH]
-
-\subsection{Técnicas de aumentos de datos}
+\subsection{Técnicas de aumento de datos}
 
 [RTRTHRTHRTHRTHRTHRTH]
 	
@@ -432,7 +548,7 @@ aun que logre la misma puntuación. La cantidad de datos de entrenamiento serña
 \bibliography{bibliografia}
 
 \appendix
-\chapter{Apendices}
+\chapter{Apéndices}
 
 \end{document}
 
