@@ -31,7 +31,34 @@ Chollet%
 Chollet%
 }{%
 {\protect \APACyear {2019}}%
-}]{%
+{\protect \APACexlab {{\protect \BCnt {1}}}}}]{%
+githubGitHubFcholletARCAGI}
+\APACinsertmetastar {%
+githubGitHubFcholletARCAGI}%
+\begin{APACrefauthors}%
+Chollet, F.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2019{\protect \BCnt {1}}}{}{}.
+\newblock
+\APACrefbtitle {{G}it{H}ub - fchollet/{A}{R}{C}-{A}{G}{I}: {T}he {A}bstraction
+  and {R}easoning {C}orpus --- github.com.} {{G}it{H}ub -
+  fchollet/{A}{R}{C}-{A}{G}{I}: {T}he {A}bstraction and {R}easoning {C}orpus
+  --- github.com.}
+\newblock
+\APAChowpublished {\url{https://github.com/fchollet/{A}{R}{C}-{A}{G}{I}}}.
+\newblock
+\APACrefnote{[Accessed 20-05-2026]}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Chollet%
+}{%
+Chollet%
+}{%
+{\protect \APACyear {2019}}%
+{\protect \APACexlab {{\protect \BCnt {2}}}}}]{%
 chollet2019measure}
 \APACinsertmetastar {%
 chollet2019measure}%
@@ -40,9 +67,10 @@ Chollet, F.%
 \end{APACrefauthors}%
 \unskip\
 \newblock
-\APACrefYearMonthDay{2019}{}{}.
+\APACrefYearMonthDay{2019{\protect \BCnt {2}}}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {On the measure of intelligence} {On the measure of intelligence}.{\BBCQ}
+{\BBOQ}\APACrefatitle {On the measure of intelligence} {On the measure of
+  intelligence}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:1911.01547}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -64,7 +92,9 @@ Gonz{\'a}lez, R.%
 \newblock
 \APACrefYearMonthDay{2011}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Descartes: las intuiciones modales y la inteligencia artificial cl{\'a}sica} {Descartes: las intuiciones modales y la inteligencia artificial cl{\'a}sica}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Descartes: las intuiciones modales y la inteligencia
+  artificial cl{\'a}sica} {Descartes: las intuiciones modales y la inteligencia
+  artificial cl{\'a}sica}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Alpha (Osorno)}{}{32}{181--198}.
 \PrintBackRefs{\CurrentBib}
@@ -86,7 +116,9 @@ Hern{\'a}ndez-Orallo, J.%
 \newblock
 \APACrefYearMonthDay{2017}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Evaluation in artificial intelligence: from task-oriented to ability-oriented measurement} {Evaluation in artificial intelligence: from task-oriented to ability-oriented measurement}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Evaluation in artificial intelligence: from
+  task-oriented to ability-oriented measurement} {Evaluation in artificial
+  intelligence: from task-oriented to ability-oriented measurement}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Artificial Intelligence Review}{48}{3}{397--447}.
 \PrintBackRefs{\CurrentBib}
@@ -110,9 +142,11 @@ Legg, S.%
 \newblock
 \APACrefYearMonthDay{2007}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {A collection of definitions of intelligence} {A collection of definitions of intelligence}.{\BBCQ}
+{\BBOQ}\APACrefatitle {A collection of definitions of intelligence} {A
+  collection of definitions of intelligence}.{\BBCQ}
 \newblock
-\APACjournalVolNumPages{Frontiers in Artificial Intelligence and applications}{157}{}{17}.
+\APACjournalVolNumPages{Frontiers in Artificial Intelligence and
+  applications}{157}{}{17}.
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -132,7 +166,9 @@ Minsky, M.%
 \newblock
 \APACrefYearMonthDay{1968}{}{}.
 \newblock
-\APACrefbtitle {Matter, Mind, and Models in: ML Minsky (ed.): Semantic Information Processing.} {Matter, mind, and models in: Ml minsky (ed.): Semantic information processing.}
+\APACrefbtitle {Matter, Mind, and Models in: ML Minsky (ed.): Semantic
+  Information Processing.} {Matter, mind, and models in: Ml minsky (ed.):
+  Semantic information processing.}
 \newblock
 \APACaddressPublisher{}{MIT Press}.
 \PrintBackRefs{\CurrentBib}
@@ -179,7 +215,8 @@ Waxman, W.%
 \newblock
 \APACrefYear{2014}.
 \newblock
-\APACrefbtitle {Kant's anatomy of the intelligent mind} {Kant's anatomy of the intelligent mind}.
+\APACrefbtitle {Kant's anatomy of the intelligent mind} {Kant's anatomy of the
+  intelligent mind}.
 \newblock
 \APACaddressPublisher{}{OUP USA}.
 \PrintBackRefs{\CurrentBib}
