@@ -1,0 +1,101 @@
+Infraestructura
+
+hostnamectl
+ Static hostname: asier-linux
+       Icon name: computer-desktop
+         Chassis: desktop 🖥️
+      Machine ID: 3185baac8f754452b6c837f5e22e3fe1
+         Boot ID: 5e9906ac7f384927bda98a51f089d43c
+Operating System: Ubuntu 24.04.4 LTS              
+          Kernel: Linux 6.14.0-34-generic
+    Architecture: x86-64
+ Hardware Vendor: ASUS
+  Hardware Model: ROG STRIX Z690-E GAMING WIFI
+Firmware Version: 2004
+   Firmware Date: Wed 2022-08-24
+    Firmware Age: 3y 8month 3w 5d                 
+
+lsb_release -a
+No LSB modules are available.
+Distributor ID:	Ubuntu
+Description:	Ubuntu 24.04.4 LTS
+Release:	24.04
+Codename:	noble
+
+uname -a
+Linux asier-linux 6.14.0-34-generic #34~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue Sep 23 15:35:20 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+
+lscpu
+Arquitectura:                            x86_64
+  modo(s) de operación de las CPUs:      32-bit, 64-bit
+  Tamaños de las direcciones:            46 bits physical, 48 bits virtual
+  Orden de los bytes:                    Little Endian
+CPU(s):                                  24
+  Lista de la(s) CPU(s) en línea:        0-23
+ID de fabricante:                        GenuineIntel
+  Nombre del modelo:                     12th Gen Intel(R) Core(TM) i9-12900K
+    Familia de CPU:                      6
+    Modelo:                              151
+    Hilo(s) de procesamiento por núcleo: 2
+    Núcleo(s) por «socket»:              16
+    «Socket(s)»:                         1
+    Revisión:                            2
+    CPU(s) factor de escala MHz:         40%
+    CPU MHz máx.:                        5200,0000
+    CPU MHz mín.:                        800,0000
+    BogoMIPS:                            6374,40
+    Indicadores:                         fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology no
+                                         nstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm
+                                          3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveop
+                                         t xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid movdiri movdir64b f
+                                         srm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities
+Características de virtualización:       
+  Virtualización:                        VT-x
+Cachés (suma de todas):                  
+  L1d:                                   640 KiB (16 instancias)
+  L1i:                                   768 KiB (16 instancias)
+  L2:                                    14 MiB (10 instancias)
+  L3:                                    30 MiB (1 instancia)
+NUMA:                                    
+  Modo(s) NUMA:                          1
+  CPU(s) del nodo NUMA 0:                0-23
+Vulnerabilidades:                        
+  Gather data sampling:                  Not affected
+  Ghostwrite:                            Not affected
+  Indirect target selection:             Not affected
+  Itlb multihit:                         Not affected
+  L1tf:                                  Not affected
+  Mds:                                   Not affected
+  Meltdown:                              Not affected
+  Mmio stale data:                       Not affected
+  Reg file data sampling:                Vulnerable: No microcode
+  Retbleed:                              Not affected
+  Spec rstack overflow:                  Not affected
+  Spec store bypass:                     Mitigation; Speculative Store Bypass disabled via prctl
+  Spectre v1:                            Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+  Spectre v2:                            Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S
+  Srbds:                                 Not affected
+  Tsa:                                   Not affected
+  Tsx async abort:                       Not affected
+
+free -h
+               total       usado       libre  compartido   búf/caché  disponible
+Mem:            94Gi       5,3Gi        81Gi       101Mi       8,0Gi        88Gi
+Inter:         8,0Gi          0B       8,0Gi
+
+sudo lshw -C display
+  *-display                 
+       descripción: VGA compatible controller
+       producto: Navi 48 [RX 9070/9070 XT]
+       fabricante: Advanced Micro Devices, Inc. [AMD/ATI]
+       id físico: 0
+       información del bus: pci@0000:03:00.0
+       nombre lógico: /dev/fb0
+       versión: c0
+       anchura: 64 bits
+       reloj: 33MHz
+       capacidades: pm pciexpress msi vga_controller bus_master cap_list rom fb
+       configuración: depth=32 driver=amdgpu latency=0 mode=2560x1440 resolution=2560,1440 visual=truecolor xres=2560 yres=1440
+       recursos: iomemory:440-43f iomemory:420-41f irq:241 memoria:4400000000-47ffffffff memoria:4200000000-42001fffff ioport:6000(size=256) memoria:85600000-8567ffff memoria:85680000-8569ffff
+
+ROCm 7.2.3

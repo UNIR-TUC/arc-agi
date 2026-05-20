@@ -406,7 +406,7 @@ y resulta ser una heurística útil para resolver puzles.
 
 \subsubsection{Números y conteo}
 
-Diversas tareas de AMD implicar contar y clasificar objetos. Las tareas pueden tener distintos tamaños y
+Diversas tareas de ARC implican contar y clasificar objetos. Las tareas pueden tener distintos tamaños y
 es especialmente relevante la comparación de magnitudes. No es sólo contar objetos o ``puntos'',
 es también identificar aquellos símbolos que aparecen en más ocasiones (concurrencia). Es necesario nociones básicas de suma y resta en cantidades pequeñas. En ARC las cantidades
 utilizadas no tienen un número mayor de 9. Esto se refleja como una capacidad innata de los humanos para la representación numérica, en secciones anteriores se ha explorado
@@ -479,65 +479,195 @@ Y=
 
 \section{Primeros enfoques para resolver ARC-AGI}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Pendiente de redactar.
 
 \subsection{Domain Specific Languages (DSLs) y síntesis de programas}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Pendiente de redactar.
 
 \subsection{Enfoque Neurosimbólico}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Pendiente de redactar.
 
 \section{Grandes Modelos de Lenguaje en ARC-AGI-1}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Pendiente de redactar.
 
 \section{Enfoques de modelos sin Pre-entrenamiento}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Pendiente de redactar.
 
 \section{Optimización en Tiempo de Inferencia}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Pendiente de redactar.
 
 \section{Estado actual con perspectiva de eficiencia computacional}
 
-[RTRTHRTHRTHRTHRTHRTH]
-
-%\chapter{Especificación de requisitos}
-
-%[RTRTHRTHRTHRTHRTHRTH]
-
-%\chapter{Objetivos}
+Pendiente de redactar.
 
 \chapter{Metodología}
 
-[RTRTHRTHRTHRTHRTHRTH]
+\section{Enfoque Científico y Método de Investigación}
+
+El presente trabajo se enmarca dentro del método científico empírico-analítico. Dado que el objetivo principal es evaluar la eficiencia y capacidad de un modelo de lenguaje compacto
+en la resolución del benchmark ARC-AGI-1, el enfoque adoptado es de carácter cuantitativo. La investigación sigue un proceso hipotético-deductivo articulado en etapas: planteamiento del problema ante los 
+límites de la hipótesis de escala en modelos LLM, formulación de la hipótesis basada en modelos compactos, diseño experimental, ejecución y análisis métrico de los resultados.
+
+Desde la perspectiva investigadora, se aplica un método empírico experimental. Este método es el más idóneo ya que permite establecer relaciones causales bajo condiciones de laboratorio estrictamente 
+controladas. Se manipularán de forma deliberada variables independientes arquitectónicas para medir su impacto sobre variables dependientes clave de rendimiento, 
+siendo la tasa de precisión en la evaluación de ARC-AGI y el coste computacional asociado.
+
+\section{Metodología de Desarrollo y Gestión del Proyecto}
+
+Debido a la naturaleza incremental de la síntesis de programas y la necesidad de adaptarse a los resultados de las pruebas continuas, el desarrollo del componente software se rige por metodologías ágiles, combinando prácticas de Scrum y Kanban.
+El trabajo se ha estructurado en torno a una épica principal desglosada en cuatro grandes hitos o bloques de tareas o \textit{milestones}:
+
+\begin{itemize}
+	\item \textbf{Milestone 1:} Investigación y análisis.
+	\item \textbf{Milestone 2:} Escritura y documentación del trabajo.
+	\item \textbf{Milestone 3:} Diseño y desarrollo del modelo.
+	\item \textbf{Milestone 4:} Validación y experimentación del modelo.
+\end{itemize}
+
+El ciclo de desarrollo se ejecuta en iteraciones cortas o \textit{Sprints} de 14 días de duración. Esta cadencia temporal permite realizar inspecciones regulares del código, 
+facilitando la adaptación temprana de hiperparámetros o la corrección de derivas en el entrenamiento. El control de versiones, el seguimiento de tareas y la representación visual de los tableros 
+Kanban se centralizan mediante un repositorio de código alojado en GitHub.
+
+\section{Ciclo de Vida del Modelo basado en MLOps}
+
+Alineado con las prácticas de desarrollo ágil para proyectos de Inteligencia Artificial, se ha adoptado una versión adaptada del ciclo de vida MLOps orientada a la experimentación en entornos restringidos. 
+Este ciclo se compone de las siguientes fases iterativas:
+
+\begin{itemize}
+	\item \textbf{Preparación de datos:} Tratamiento del corpus ARC-AGI, definiendo las rutinas de visualización y codificación espacial necesarias.
+	\item \textbf{Desarrollo del modelo y selección algorítmica:} Diseño de las arquitecturas compactas y las rutinas de inferencia iterativa.
+	\item \textbf{Entrenamiento y ajuste:} Ejecución de pruebas de Test-Time Training y refinamiento de hiperparámetros bajo las restricciones de hardware.
+	\item \textbf{Evaluación:} Medición cuantitativa del rendimiento del modelo utilizando conjuntos de evaluación de ARC-AGI-1.
+\end{itemize}
+
+Esta estructura garantiza que tanto el marco teórico como el desarrollo de la ingeniería se ejecuten de manera rigurosa, permitiendo que las conclusiones extraídas al final del proyecto sean sólidas y 
+reproducibles.
 
 \chapter{Infraestructura y herramientas}
 
-[RTRTHRTHRTHRTHRTHRTH]
+\section{Infraestructura de computación}
+
+Para el desarrollo y experimentación de este proyecto, se ha utilizado una estación de trabajo local equipada con hardware de alto rendimiento. Las especificaciones técnicas del equipo base son las siguientes:
+
+\begin{itemize}
+	\item Sistema Operativo y Entorno: El sistema opera bajo la distribución de Linux Ubuntu 24.04.4 LTS con el kernel 6.14.0-34-generic. 
+	Para la aceleración de cargas de trabajo de IA en la GPU, se emplea la plataforma abierta de AMD, ROCm en su versión 7.2.3.
+	\item Procesador (CPU): Intel Core i9-12900K de 12ª generación.
+	\item Memoria Principal (RAM): El sistema dispone de aproximadamente 96 GB de memoria RAM disponible.
+\end{itemize}
+
+El componente central para el entrenamiento, este proyecto es la GPU AMD Radeon RX 9070 XT. Esta GPU de arquitectura avanzada está equipada con 64 Unidades de Cómputo, 4096 Stream Processors y 
+cuenta con 128 aceleradores de IA dedicados específicamente a optimizar las cargas de trabajo de aprendizaje profundo. Su consumo típico (Typical Board Power) es de 304 W.
+
+Para las tareas de Inteligencia Artificial, las dos métricas más críticas son la memoria de vídeo (VRAM) y el rendimiento en diferentes precisiones matemáticas. La tarjeta cuenta con 16 GB de 
+memoria GDDR6 operando sobre una interfaz de 256 bits. Esta memoria proporciona un ancho de banda de hasta 640 GB/s.
+
+La GPU ofrece un rendimiento de hasta 48.7 TFLOPs en precisión de punto flotante de 32 bits (FP32) para operaciones vectoriales, y hasta 195.0 TFLOPs en precisión de punto flotante de 16 bits (FP16) 
+para operaciones matriciales. En la siguiente tabla \ref{tab:rendimiento-precision} se muestra el rendimiento de la GPU en diferentes niveles de precisión y formatos, 
+incluyendo el impacto de la dispersión estructurada en el rendimiento.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    \begin{tabular}{c}Nivel de Precisión\end{tabular} &
+    \begin{tabular}{c}Formato\end{tabular} &
+    \begin{tabular}{c}Rendimiento Base\end{tabular} &
+    \begin{tabular}{c}Rendimiento con Dispersión\\Estructurada\end{tabular} \\
+    \hline
+    \begin{tabular}{c}Precisión Simple\\(Vector)\end{tabular} & FP32 & 48.7 TFLOPs & - \\
+    \hline
+    \begin{tabular}{c}Media Precisión\\(Matriz)\end{tabular} & FP16 & 195.0 TFLOPs & 389.0 TFLOPs \\
+    \hline
+    \begin{tabular}{c}Precisión de 8 bits\\(Matriz)\end{tabular} & FP8 / INT8 & 389.0 TFLOPs / TOPs & 779.0 TFLOPs / TOPs \\
+    \hline
+    \begin{tabular}{c}Precisión de 4 bits\\(Matriz)\end{tabular} & INT4 & 779.0 TOPs & 1557.0 TOPs \\
+    \hline
+\end{tabular}
+\caption{Rendimiento por nivel de precisión y formato}
+\label{tab:rendimiento-precision}
+\end{table}
+
+\section{Entorno de desarrollo}
+
+Se ha un amplio ecosistema de paquetes y librerías para el desarrollo y la experimentación. En la tabla \ref{tab:python-libs} se muestra una lista de las principales librerías utilizadas, 
+junto con sus versiones y abreviaciones para su referencia en el resto del documento.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+	\hline
+	Nombre & Versión & Abreviación \\
+	\hline
+	PyTorch & 2.12.0+rocm7.2 & torch \\
+	Torchaudio & 2.11.0+rocm7.2 & torchaudio \\
+	Torchvision & 0.27.0+rocm7.2 & torchvision \\
+	Huggingface\_hub & 0.34.4 & huggingface\_hub \\
+	Packaging & 24.1 & packaging \\
+	Ninja & 1.13.0 & ninja \\
+	Wheel & 0.45.1 & wheel \\
+	Setuptools & 80.9.0 & setuptools \\
+	Setuptools-scm & 9.2.0 & setuptools-scm \\
+	Pydantic-core & 2.33.2 & pydantic-core \\
+	Triton & 3.3.0 & triton \\
+	Matplotlib & 3.10.0 & matplotlib \\
+	Numpy & 2.2.2 & numpy \\
+	Jupyter-events & 0.12.0 & jupyter-events \\
+	Jupyter-lsp & 2.2.5 & jupyter-lsp \\
+	Jupyter\_client & 8.6.3 & jupyter\_client \\
+	Jupyter\_core & 5.7.2 & jupyter\_core \\
+	Jupyter\_server & 2.16.0 & jupyter\_server \\
+	Jupyter\_server\_terminals & 0.5.3 & jupyter\_server\_terminals \\
+	Jupyterlab & 4.4.2 & jupyterlab \\
+	Jupyterlab\_pygments & 0.3.0 & jupyterlab\_pygments \\
+	Jupyterlab\_server & 2.27.3 & jupyterlab\_server \\
+	Keras & 3.9.2 & keras \\
+	Notebook & 7.4.2 & notebook \\
+	Tensorboard & 2.19.0 & tensorboard \\
+	Tensorboard-data-server & 0.7.2 & tensorboard-data-server \\
+	Tensorflow & 2.19.1 & tensorflow\_rocm \\
+	\hline
+\end{tabular}
+\caption{Librerías de entorno en Python, versión y abreviación}
+\label{tab:python-libs}
+\end{table}
+
+% TODO: Añadir herramientas de visualización y análisis de resultados.
+\section{Utilidades externas de ARC-AGI}
+
 
 \chapter{Desarrollo}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Pendiente de redactar.
 
 \subsection{Técnicas de aumento de datos}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Pendiente de redactar.
 	
 \section{Arquitectura y entrenamiento}
 
-[RTRTHRTHRTHRTHRTHRTH]
+Pendiente de redactar.
 
 \chapter{Resultados}
 
+Pendiente de redactar.
+
 \chapter{Planificación}
+
+Pendiente de redactar.
 
 \chapter{Estudio económico}
 
+Pendiente de redactar.
+
 \chapter{Conclusiones y Trabajo Futuro}
+
+Pendiente de redactar.
 
 %\begin{thebibliography}{a}
 %\bibitem{etiqueta} \textsc{Autores},
