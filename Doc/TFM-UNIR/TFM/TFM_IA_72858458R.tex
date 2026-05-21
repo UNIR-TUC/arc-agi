@@ -479,31 +479,71 @@ Y=
 
 \section{Primeros enfoques para resolver ARC-AGI}
 
-Pendiente de redactar.
+Investigado. Pendiente de redactar.
 
 \subsection{Domain Specific Languages (DSLs) y síntesis de programas}
 
-Pendiente de redactar.
+En 2020 Johan Sokrates Wind publicó uno de los primero intentos basado en un Lenguaje de Dominio Específico ó DSL. El uso de código estrictamente diseñado para resolver tareas específicas
+de ARC-AGI permitió alcanzar una puntuación de 20\% en el benchmark. La idea detrás de esto es codificar algoritmos de programación para crear un conjunto de programas primitivos
+capaz de modificar matrices bidimensionales.
+
+Los algoritmos realizan búsquedas exhaustivas sobre el espacio de programas posibles que se puede contruir cambiando nucleos de conocimiento. Esta mecánica se puede considerar
+casi fuerza bruta. Formalmente, el método evalúa iterativamente funciones unarias sobre fragmentos de las cuadrículas de entrada, formando un Grafo Acíclico Dirigido (DAG) que r
+epresenta múltiples secuencias de transformaciones.
+
+Según el propio autor, la búsqueda de nivel 4, siendo de las más altas, dura entorno a 9 horas usando sólamente CPU. Este enfoque no requiere de ningún pre-entrenamiento y sus conocimientos
+previos son inyectas mediante líneas de código. El espacio de búsqueda crece de manera exponencial a medida que aumenta el tamaño del DSL y para los puzles que requieren
+de más pasos lógicos, la búsqueda simplemente sin tiempo. Otro aspecto negativo del enfoque es que si un problema de transformación no se programó específicamente, el sistema
+simplemente no es capaz de resolverlo. Escalar este enfoque significa que es necesario de capacidad humana constante para seguir añadiendo conocimientos primitivos  y heurísticas
+de poda diseñadas manulamente para guiar la búsqueda \cite{wind2020dsl}.
 
 \subsection{Enfoque Neurosimbólico}
 
-Pendiente de redactar.
+Investigado. Pendiente de redactar.
+
+\subsection{LARC}
+
+Investigado. Pendiente de redactar.
 
 \section{Grandes Modelos de Lenguaje en ARC-AGI-1}
 
-Pendiente de redactar.
+Investigado. Pendiente de redactar.
+
+\section{Modelos basandos en la Neurodiversidad}
+
+Investigado. Pendiente de redactar.
+
+\subsection{Inducción de Sísteis de programas mediante Redes Neuronales Eficientes}
+
+Investigado. Pendiente de redactar.
+
+\section{Modelos basado en Transformers compactos}
+
+Investigado. Pendiente de redactar.
 
 \section{Enfoques de modelos sin Pre-entrenamiento}
 
-Pendiente de redactar.
+Investigado. Pendiente de redactar.
 
 \section{Optimización en Tiempo de Inferencia}
 
-Pendiente de redactar.
+Investigado. Pendiente de redactar.
+
+\section{Modelos compactos basados en bucles de refinamiento iterativo}
+
+Investigado. Pendiente de redactar.
+
+\subsection{Modelos de razonamientos jerárquicos}
+
+Investigado. Pendiente de redactar.
+
+\subsection{Modelos de razonamientos recursivos con redes neuronales compactas}
+
+Investigado. Pendiente de redactar.
 
 \section{Estado actual con perspectiva de eficiencia computacional}
 
-Pendiente de redactar.
+Investigado. Pendiente de redactar.
 
 \chapter{Metodología}
 

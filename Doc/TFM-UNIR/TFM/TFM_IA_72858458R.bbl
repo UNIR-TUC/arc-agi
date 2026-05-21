@@ -221,4 +221,27 @@ Waxman, W.%
 \APACaddressPublisher{}{OUP USA}.
 \PrintBackRefs{\CurrentBib}
 
+\bibitem [\protect \citeauthoryear {%
+Wind%
+}{%
+Wind%
+}{%
+{\protect \APACyear {2020}}%
+}]{%
+wind2020dsl}
+\APACinsertmetastar {%
+wind2020dsl}%
+\begin{APACrefauthors}%
+Wind, J\BPBI S.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2020}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {DSL solution to the ARC challenge} {Dsl solution to the
+  arc challenge}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{URL https://github. com/top-quarks/ARC-solution}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
 \end{thebibliography}
