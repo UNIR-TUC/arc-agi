@@ -229,6 +229,8 @@ Deep Learning
   
 ## Enlaces imprescindibles
 
+https://arahim3.github.io/arc-agi-guide/
+
 Primera solucion ARC-AGI 2020 -> https://github.com/top-quarks/ARC-solution
 
 https://lewish.io/posts/arc-agi-2025-research-review#ttt-ttft
