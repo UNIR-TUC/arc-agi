@@ -230,6 +230,7 @@ Deep Learning
 ## Enlaces imprescindibles
 
 https://arahim3.github.io/arc-agi-guide/
+https://github.com/michaelhodel/arc-dsl
 
 Primera solucion ARC-AGI 2020 -> https://github.com/top-quarks/ARC-solution
 
