@@ -221,11 +221,68 @@ Investigado. Pendiente de redactar.
 % GridCoder
 % Execution-Guided Search
 % Learning Program Space (LPS)
+
+% 1. Heuristic Search
+% 2. Best-First Search
+% 3. A*
+% 4. Beam Search
+
+% 5. Monte Carlo Methods
+% 6. UCB / UCT
+% 7. Monte Carlo Tree Search (MCTS)
+
+% 8. Program Synthesis
+% 9. Enumerative Search
+% 10. Constraint-Based Search
+
+% 11. Execution-Guided Search
+% 12. Learning Program Space (LPS)
+
+% 13. Neural Guided Search
+% 14. Tree of Thoughts
+
+% 15. GridCoder
+
+% 16. Inference-Time Scaling
+% 17. Repeated Sampling
+% 18. Sequential Refinement
+
+% 19. Adaptive Branching MCTS (AB-MCTS)
+
+% 20. Sakana AI
+% 21. TreeQuest
+% 22. The AI Scientist
+% 23. Multi-LLM AB-MCTS
 \section{Algoritmos de búsqueda y optimización}
 
-Investigado. Pendiente de redactar.
+Tóricamente, casi cualquier problema puede ser resuelto por fuerza bruta, pero en la la realidad el coste computacional y tiempo hace inabarcable este enfoque. El problema y el espacio
+son caracterísicas fundamentales para determinar la estrategia de búsqueda y optimización más adecuada. En este sentido, existen diferentes algoritmos de búsqueda y optimización que se pueden aplicar
+en función de las características del problema y el espacio.
 
-\subsection{Clasificación de algoritmos de búsqueda}
+Tradicionalmente los algoritmos de búsqueda se han clasificado en dos grandes categorías, los algoritmos de búsqueda no informada y los algoritmos de búsqueda informada. Los
+algoritmos de búsqueda no informada, son aquellos algorimos que no están guidados o simplemente están basados en fuerza bruta. No exise información sobre el dominio del
+problema, sólo representación. Estos algoritmos intentan explorar todas las opciones posibles en cada nodo. Para buscar una solución óptima
+se imponen una serie de restricciones o reglas con el objetivo de evitar caer en bucles o cilos de la estructura de los datos. Algunos ejemplos
+de algormitmos de búsqueda no informada son; búsqueda en anchuna (BFS), búsqueda en profundidad (DFS), 
+búsqueda de coste uniforme, búsqueda iterativa o limitada en profundidad, entre otros.
+
+Los algoritmos no informados pueden ser mejorados proporcionando más información sobre el problema. Búsqueda informada significa que el algoritmo tiene un contexto específico y la
+heurística ayuda a representar el contexto. La heurística puede ser una serie de reglas para evaluar un estado y puede medir su rendimiewnto. De esta manera,
+no existe un camino fijo y los nodos son visitados de acuerdo al coste heurístrico. Los costes son calculados a medida que se recorre
+el árbold de cada noso visitado y se añade a la cola. El objetivo es simple, ignorar los árboles cuyo coste es mayor 
+que los vistados, ahorrando coste computacional. La heurística se puede definir como la capacidad de realizar innovaciones para conseguir
+alcanzar los objetivos.
+
+\begin{quote}
+\itshape
+``Un proceso que puede resolver un problema dado, pero que no ofrece ninguna garantía de que lo hará, se llama una heurística para ese problema.''
+\end{quote}
+\begin{center}
+\cite{newell1962processes}
+\end{center}
+
+La heurística puede reducir drásticamente el coste computacional de problemas que son resueltos con algoritmos no informados, pero también puede llevar a soluciones subóptimas.
+Algunos algoritmos de búsqueda informados son; búsqueda el primero el mejor (BFA), búsqueda codicionsa el primero el mejor (GBFS), búsqueda A*, búsqueda de haz (Beam Search), entre otros.
 
 \section{Abstract and Reasoning Corpus}
 
