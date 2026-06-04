@@ -98,7 +98,7 @@ para alcanzar el razonamiento abstracto. Aumentar ciegamente la cantidad de par�
 abstracto más novedoso.
 
 ARC-AGI representa el indicador estándar por excelencia de la industria para medir el progreso real hacia la inteligencia general artificial a través de la generalización
-amplia y sístesis de programas.
+amplia y síntesis de programas.
 
 \section{Justificación}
 
@@ -123,7 +123,7 @@ eficiencia computacional y el rendimiento por parámetro frente a los modelos de
 En cuanto a objetivos particulares se enumeran los siguientes:
 
 \begin{itemize}
-	\item Desarrollar e implementar bucles de refinamiento recursivo que permitan al modelo actualizar iterativamente sus estados latentes y mejorar progresivamente sus predicciones,
+	\item Desarrollar e implementar bucles de refinamiento recursivo que permitan al modelo actualizar de manera iterativa sus estados latentes y mejorar progresivamente sus predicciones,
 	simulando la síntesis de programas.
 	\item Explorar y aplicar técnicas de adaptación en tiempo de prueba \textit{Test-Time Training y Test-Time Compute} para que el modelo aprenda y descubra abstracciones algorítmicas directamente
 	sobre las tareas objetivo, reduciendo la dependencia del pre-entrenamiento.
@@ -131,7 +131,7 @@ En cuanto a objetivos particulares se enumeran los siguientes:
 	alcanzado una solución convergente, optimizando drásticamente el consumo de memoria y tiempo de ejecución.
 	\item Implementar estrategias de consistencia y ensamblado \textit{top-k} que operen sobre diversas variantes o aumentos de los datos de entrada para seleccionar las predicciones más 
 	robustas.
-	\item Realizar una comparativa exhaustiva de eficiencia que evalúe cuantitativamente la relación entre la precisión lograda en el benchmark y el coste computacional empleado, como el uso de VRAM,
+	\item Realizar una comparativa exhaustiva de eficiencia que evalúe cualitativamente la relación entre la precisión lograda en el benchmark y el coste computacional empleado, como el uso de VRAM,
 	y precisión en FLOPs, validando la viabilidad de la inteligencia algorítmica en entornos de recursos restringidos.
 \end{itemize}
 
@@ -139,7 +139,7 @@ En cuanto a objetivos particulares se enumeran los siguientes:
 
 \section{Definición de la inteligencia}
 
-La definoición de inteligencia no es una tarea sencilla. A lo largo de la historia, filósofos, científicos y expertos en diversas disciplinas han propuesto 
+La definición de inteligencia no es una tarea sencilla. A lo largo de la historia, filósofos, científicos y expertos en diversas disciplinas han propuesto 
 diferentes definiciones de inteligencia, cada una con su propia perspectiva y enfoque. A pesar de muchos intentos, no existe una definición estándar 
 de inteligencia.
 
@@ -149,7 +149,7 @@ Sin embargo, esta definición es bastante amplia y no captura completamente la c
 
 Para crear una definición única se debe tener en cuenta varios factores. La inteligencia es una propiedad que tiene en consideración 
 la interacción con uno o diversos entornos. La inteligencia también se relaciona con la capacidad del agente para tener éxito u obtener ganancias 
-al respecto de alguna meta. De la misma forma, también dependen de cómo el agente está capacidado en diferentes objetivos y entornos. En base a 
+al respecto de alguna meta. De la misma forma, también dependen de cómo el agente está capacitado en diferentes objetivos y entornos. En base a 
 referencias de diversos autores, en este trabajo se adoptará el estándar de definición más utilizada a día de hoy.
 
 \begin{quote}
@@ -203,14 +203,14 @@ poco imprecisas, esta imprecisión crece de forma lineal a medida que aumenta el
 
 \begin{enumerate}
 \item \textbf{Sistema de representación de objetos inanimados:} Es la capacidad de percibir límites de objetos, la forma forma completo o pacial de objtos ocultos y percibir cuándo y hacia donde se moverán los obketos.
-\item \textbf{Sistema de reprensentación de agentes y sus acciones:} Es la capacidad de percibir agentes animados, sus acciones y sus intenciones, incluso sin lenguaje.
-\item \textbf{Sistema de reprensentación numérica:} Es la capacidad de representar cantidades numéricas, incluso sin lenguaje, y de realizar operaciones aritméticas básicas.
-\item \textbf{Sistema de reprensentación geométrica del espacio:} Es la capacidad de representar el espacio y las relaciones espaciales entre objetos.
-\item \textbf{Sistema de reprensentación del lenguaje y social:} Es la capacidad de comprender y utilizar el lenguaje, así como de interactuar socialmente con otros individuos.
+\item \textbf{Sistema de representación de agentes y sus acciones:} Es la capacidad de percibir agentes animados, sus acciones y sus intenciones, incluso sin lenguaje.
+\item \textbf{Sistema de representación numérica:} Es la capacidad de representar cantidades numéricas, incluso sin lenguaje, y de realizar operaciones aritméticas básicas.
+\item \textbf{Sistema de representación geométrica del espacio:} Es la capacidad de representar el espacio y las relaciones espaciales entre objetos.
+\item \textbf{Sistema de representación del lenguaje y social:} Es la capacidad de comprender y utilizar el lenguaje, así como de interactuar socialmente con otros individuos.
 \end{enumerate}
 
 % Inducción y transinducción
-\section{Sistemas de pensamientoi}
+\section{Sistemas de pensamiento}
 
 Investigado. Pendiente de redactar.
  
@@ -255,22 +255,22 @@ Investigado. Pendiente de redactar.
 % 23. Multi-LLM AB-MCTS
 \section{Algoritmos de búsqueda y optimización}
 
-Tóricamente, casi cualquier problema puede ser resuelto por fuerza bruta, pero en la la realidad el coste computacional y tiempo hace inabarcable este enfoque. El problema y el espacio
-son caracterísicas fundamentales para determinar la estrategia de búsqueda y optimización más adecuada. En este sentido, existen diferentes algoritmos de búsqueda y optimización que se pueden aplicar
+Teóricamente, casi cualquier problema puede ser resuelto por fuerza bruta, pero en la la realidad el coste computacional y tiempo hace inabarcable este enfoque. El problema y el espacio
+son características fundamentales para determinar la estrategia de búsqueda y optimización más adecuada. En este sentido, existen diferentes algoritmos de búsqueda y optimización que se pueden aplicar
 en función de las características del problema y el espacio.
 
 Tradicionalmente los algoritmos de búsqueda se han clasificado en dos grandes categorías, los algoritmos de búsqueda no informada y los algoritmos de búsqueda informada. Los
-algoritmos de búsqueda no informada, son aquellos algorimos que no están guidados o simplemente están basados en fuerza bruta. No exise información sobre el dominio del
+algoritmos de búsqueda no informada, son aquellos algoritmos que no están guiados o simplemente están basados en fuerza bruta. No existe información sobre el dominio del
 problema, sólo representación. Estos algoritmos intentan explorar todas las opciones posibles en cada nodo. Para buscar una solución óptima
-se imponen una serie de restricciones o reglas con el objetivo de evitar caer en bucles o cilos de la estructura de los datos. Algunos ejemplos
-de algormitmos de búsqueda no informada son; búsqueda en anchuna (BFS), búsqueda en profundidad (DFS), 
+se imponen una serie de restricciones o reglas con el objetivo de evitar caer en bucles o ciclos de la estructura de los datos. Algunos ejemplos
+de algoritmos de búsqueda no informada son; búsqueda en anchura (BFS), búsqueda en profundidad (DFS), 
 búsqueda de coste uniforme, búsqueda iterativa o limitada en profundidad, entre otros.
 
 Los algoritmos no informados pueden ser mejorados proporcionando más información sobre el problema. Búsqueda informada significa que el algoritmo tiene un contexto específico y la
 heurística ayuda a representar el contexto. La heurística puede ser una serie de reglas para evaluar un estado y puede medir su rendimiewnto. De esta manera,
 no existe un camino fijo y los nodos son visitados de acuerdo al coste heurístrico. Los costes son calculados a medida que se recorre
-el árbold de cada noso visitado y se añade a la cola. El objetivo es simple, ignorar los árboles cuyo coste es mayor 
-que los vistados, ahorrando coste computacional. La heurística se puede definir como la capacidad de realizar innovaciones para conseguir
+el árbol de cada nodo visitado y se añade a la cola. El objetivo es simple, ignorar los árboles cuyo coste es mayor 
+que los visitados, ahorrando coste computacional. La heurística se puede definir como la capacidad de realizar innovaciones para conseguir
 alcanzar los objetivos.
 
 \begin{quote}
@@ -284,11 +284,56 @@ alcanzar los objetivos.
 La heurística puede reducir drásticamente el coste computacional de problemas que son resueltos con algoritmos no informados, pero también puede llevar a soluciones subóptimas.
 Algunos algoritmos de búsqueda informados son; búsqueda el primero el mejor (BFA), búsqueda codicionsa el primero el mejor (GBFS), búsqueda A*, búsqueda de haz (Beam Search), entre otros.
 
+\subsection{Búsqueda en anchura}
+
+Explora todas las opciones de un determinado nivel de profundidad antes de pasar al siguiente nivel. Es necesario visitar todos los nodos hijos de un
+determinado nivel y finalizar al llegar al objetivo. Para implementarlo se usa una cola FIFO ó \textit{First In First Out}, los nodos de un nivel son 
+procesados y sus nodos hijos son añadidos a la cola. Puede ser óptimo si todas las acciones tienen el mismo coste y es completo siempre
+que el espacio sea discreto o finito.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{image/images/1780498631168.png}
+\caption[Representación árbol de nodos búsqueda en anchura]{Representación árbol  de nodos búsqueda en anchura.}
+\label{fig:fig1SECTION2}
+{\footnotesize Fuente: Adaptado de ``Grokking Artificial Intelligence Algorithms: Understand and apply the core algorithms of deep learning and artificial intelligence' \cite{hurbans2020grokking}}
+\end{figure}
+
+\subsection{Búsqueda de coste uniforme}
+
+Se trata de una variación de la búsqueda en anchura, pero en este caso se tiene en cuenta el coste de cada acción.
+El nodo con el menor coste acumulado es expandido primero. Para implementarlo se usa una cola de prioridad, donde los nodos con menor coste acumulado tienen mayor prioridad.
+Es óptimo siempre que el coste de las acciones sea no negativo y es completo siempre que el espacio sea discreto o finito.
+
+En caso de que el coste sea el mismo en todos los nodos, la búsqueda de coste uniforme se comporta exactamente igual que la búsqueda en anchura,
+ya que el orden de expansión de los nodos será el mismo. Sin embargo, si los costes varían, la búsqueda de coste uniforme puede ser más eficiente al expandir primero
+los nodos con menor coste acumulado, lo que puede llevar a encontrar una solución óptima más rápidamente que la búsqueda en anchura.
+
+\subsection{Búsqueda en profundidad}
+
+Explora un nodo hijo antes de explorar los nodos hermanos. Repite el proceso para el resto de hijos que ya ha
+visitado. Para implementarlo se usa una pila LIFO ó \textit{Last In First Out}, el nodo más recientemente visitado es el primero en ser procesado. 
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{image/images/1780498575930.png}
+\caption[Representación árbol de nodos búsqueda en profundidad]{Representación árbol  de nodos búsqueda en profundidad.}
+\label{fig:fig1SECTION2}
+{\footnotesize Fuente: Adaptado de ``Grokking Artificial Intelligence Algorithms: Understand and apply the core algorithms of deep learning and artificial intelligence' \cite{hurbans2020grokking}}
+\end{figure}
+
+No es completo en caso de entorno no finito. Tampoco es óptimo en caso de entorno no finito. Es aconsejable utilizar
+la búsqueda en profundidad de manera limitada, se considera que los nodos por debajo del límite no tienen hijos.
+
+También existe la alternativa al uso del algoritmo en profundidad iterativa, incrementando el límite del nivel de 
+profundidad de manera iterativa, hasta que se alcance el objetivo. Es completo y óptimo siempre que el coste de las acciones sea el mismo.
+
 \section{Abstract and Reasoning Corpus}
 
 Los sistemas de evaluación de la inteligencia artificial han ido evolucionando a lo largo del tiempo. La investigación de esta área de ha centrado
-históricamente en comprobar si las máquinas realizan bien tareas específicas, sidnedo una evaluación orientada a tareas y no una evaluación de 
-la inteligencia intrínsica.
+históricamente en comprobar si las máquinas realizan bien tareas específicas, siendo una evaluación orientada a tareas y no una evaluación de 
+la inteligencia intrínseca.
 
 \begin{quote}
 \itshape
@@ -299,16 +344,16 @@ la inteligencia intrínsica.
 \cite{minsky1968matter}
 \end{center}
 
-Tras los métodos tracicionales de evaluar algorimtos, la IA ha pasado a una evaluacióm de ``caja negra'' basada en el comportamiento que involucra la discriminación
+Tras los métodos tradicionales de evaluar algoritmos, la IA ha pasado a una evaluación de ``caja negra'' basada en el comportamiento que involucra la discriminación
 humana (comparación directa por o contra humanos) y pruebas de rendimiento de problemas. Se iniciaron evaluaciones metodológicas de dudosa validez,
 donde los investigadores a menudo seleccionaban los conjuntos de datos que mejor les convenían y ajustaban parámetros en exceso provocando sobreajustes. Esto
-llevó a situaciones donde muchos resultados publicados eran reproducibles pero dificilmente replicables \cite{hernandez2017evaluation}. En consecuencia,
+llevó a situaciones donde muchos resultados publicados eran reproducibles pero difícilmente replicables \cite{hernandez2017evaluation}. En consecuencia,
 la aparente mejora del modelo desaparecía en cuanto cambiaba ligeramente el dominio de los datos, además de una fuerte dispersión de los métodos
 en las diferentes disciplinas.
 
-Para sistemas de inteligencia artificial de propósito general era necesario un nuevo enfoque orientado a habilidades. Este enfoque se basa en la evaluación de capacidades congnitivas en lugar de tareas en
+Para sistemas de inteligencia artificial de propósito general era necesario un nuevo enfoque orientado a habilidades. Este enfoque se basa en la evaluación de capacidades cognitivas en lugar de tareas en
 las que fue diseñado originalmente \cite{hernandez2017evaluation}. Para garantizar la validez de este enfoque, las pruebas de evaluación requieren directrices estrictas, como definir con antelación
-los conjuntos de datos para entrenamiento y evaluación, y evitar la sobreajuste a conjuntos de datos específicos.
+los conjuntos de datos para entrenamiento y evaluación, y evitar el sobreajuste a conjuntos de datos específicos.
 
 \begin{quote}
 \itshape
@@ -319,8 +364,8 @@ los conjuntos de datos para entrenamiento y evaluación, y evitar la sobreajuste
 \cite{hernandez2017evaluation}
 \end{center}
 
-Para avanzar hacia sistemas de inteligenca actificial más inteligentes y humanos es necesario un método de evaluación de la inteligencia que compare dos o más sistemas y humanos. Es aquí donde estra en juego
-el Abstract and Reasoning Corpus (ARC-AGI), un \textit{benchmark} dieñado para respestar todas las directrices necesarias. ARC-AGI está construido con un conjunto de preioridades para ser lo más parecido posible
+Para avanzar hacia sistemas de inteligencia artificial más inteligentes y humanos es necesario un método de evaluación de la inteligencia que compare dos o más sistemas y humanos. Es aquí donde estra en juego
+el Abstract and Reasoning Corpus (ARC-AGI), un \textit{benchmark} diseñado para respetar todas las directrices necesarias. ARC-AGI está construido con un conjunto de prioridades para ser lo más parecido posible
 a la capacidad de razonamiento innata del ser humano \cite{chollet2019measure}.
 
 Los modelos que existen en la actualidad funcionan correctamente en tareas específicas, todavía están ciertamente limitados y hambrientos de datos. En situaciones en los que se desvían ligeramente de sus datos de entrenamiento,
@@ -339,12 +384,12 @@ antemano, para conseguir la generalización el agente debe que ser capaz de apre
 
 \subsection{Espectro de la generalización}
 
-La generalización es un concepto que ha llegado de la mano del aprendizaje automáticom desarrollado originamente para caracterizar el buen rendimiento de un modelo estadístico en 
+La generalización es un concepto que ha llegado de la mano del aprendizaje automático, desarrollado originamente para caracterizar el buen rendimiento de un modelo estadístico en 
 datos de entrada que no forman parte de su conjunto de datos de entrenamiento. Este concepto ha seguido siendo parte de la conversación  y se puede definir como la "habilidad" de
-un modelo para gestionar una situación o varias situaciones (o tareas) que no se ha encontrado previamente. Nótese que el cencepto de la frase "situación que no se ha encontrado previamente"
+un modelo para gestionar una situación o varias situaciones (o tareas) que no se ha encontrado previamente. Nótese que el concepto de la frase "situación que no se ha encontrado previamente"
 puede ser tremendamente ambigua y el autor \cite{chollet2019measure} propone un espectro de generalización para aclarar esta ambigüedad. En este espectro, se pueden encontrar diferentes tipos de generalización, 
 como la generalización sistémica (centrada en el sistema)  o generalización consciente-desarrollada (capacidad de manejar situaciones que ni el sistema ni su creador humano habían encontrado antes) que no se va a 
-profundizar en este artículo. Al contrario, se va a profundizar en la generalización de habilidades, que eses más útil para cuantificar los grados de generalización.
+profundizar en este artículo. Al contrario, se va a profundizar en la generalización de habilidades, que es más útil para cuantificar los grados de generalización.
 
 \begin{itemize}
 \item \textbf{Ausencia de generalización:} Sistemas donde no existe incertidumbre ni novedad. Entorno cerrado como un algoritmo que juega al ``tres en raya'',  iterando exhaustivamente sobre todas las jugadas posibles. No hay adapatación posible.
