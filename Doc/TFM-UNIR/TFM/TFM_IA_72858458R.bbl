@@ -42,10 +42,7 @@ Chollet, F.%
 \newblock
 \APACrefYearMonthDay{2019{\protect \BCnt {1}}}{}{}.
 \newblock
-\APACrefbtitle {{G}it{H}ub - fchollet/{A}{R}{C}-{A}{G}{I}: {T}he {A}bstraction
-  and {R}easoning {C}orpus --- github.com.} {{G}it{H}ub -
-  fchollet/{A}{R}{C}-{A}{G}{I}: {T}he {A}bstraction and {R}easoning {C}orpus
-  --- github.com.}
+\APACrefbtitle {{G}it{H}ub - fchollet/{A}{R}{C}-{A}{G}{I}: {T}he {A}bstraction and {R}easoning {C}orpus --- github.com.} {{G}it{H}ub - fchollet/{A}{R}{C}-{A}{G}{I}: {T}he {A}bstraction and {R}easoning {C}orpus --- github.com.}
 \newblock
 \APAChowpublished {\url{https://github.com/fchollet/{A}{R}{C}-{A}{G}{I}}}.
 \newblock
@@ -69,8 +66,7 @@ Chollet, F.%
 \newblock
 \APACrefYearMonthDay{2019{\protect \BCnt {2}}}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {On the measure of intelligence} {On the measure of
-  intelligence}.{\BBCQ}
+{\BBOQ}\APACrefatitle {On the measure of intelligence} {On the measure of intelligence}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:1911.01547}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -92,9 +88,7 @@ Gonz{\'a}lez, R.%
 \newblock
 \APACrefYearMonthDay{2011}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Descartes: las intuiciones modales y la inteligencia
-  artificial cl{\'a}sica} {Descartes: las intuiciones modales y la inteligencia
-  artificial cl{\'a}sica}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Descartes: las intuiciones modales y la inteligencia artificial cl{\'a}sica} {Descartes: las intuiciones modales y la inteligencia artificial cl{\'a}sica}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Alpha (Osorno)}{}{32}{181--198}.
 \PrintBackRefs{\CurrentBib}
@@ -116,9 +110,7 @@ Hern{\'a}ndez-Orallo, J.%
 \newblock
 \APACrefYearMonthDay{2017}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Evaluation in artificial intelligence: from
-  task-oriented to ability-oriented measurement} {Evaluation in artificial
-  intelligence: from task-oriented to ability-oriented measurement}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Evaluation in artificial intelligence: from task-oriented to ability-oriented measurement} {Evaluation in artificial intelligence: from task-oriented to ability-oriented measurement}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Artificial Intelligence Review}{48}{3}{397--447}.
 \PrintBackRefs{\CurrentBib}
@@ -140,12 +132,7 @@ Hurbans, R.%
 \newblock
 \APACrefYear{2020}.
 \newblock
-\APACrefbtitle {Grokking Artificial Intelligence Algorithms: Understand and
-  apply the core algorithms of deep learning and artificial intelligence in
-  this friendly illustrated guide including exercises and examples} {Grokking
-  artificial intelligence algorithms: Understand and apply the core algorithms
-  of deep learning and artificial intelligence in this friendly illustrated
-  guide including exercises and examples}.
+\APACrefbtitle {Grokking Artificial Intelligence Algorithms: Understand and apply the core algorithms of deep learning and artificial intelligence in this friendly illustrated guide including exercises and examples} {Grokking artificial intelligence algorithms: Understand and apply the core algorithms of deep learning and artificial intelligence in this friendly illustrated guide including exercises and examples}.
 \newblock
 \APACaddressPublisher{}{Manning}.
 \PrintBackRefs{\CurrentBib}
@@ -169,11 +156,9 @@ Legg, S.%
 \newblock
 \APACrefYearMonthDay{2007}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {A collection of definitions of intelligence} {A
-  collection of definitions of intelligence}.{\BBCQ}
+{\BBOQ}\APACrefatitle {A collection of definitions of intelligence} {A collection of definitions of intelligence}.{\BBCQ}
 \newblock
-\APACjournalVolNumPages{Frontiers in Artificial Intelligence and
-  applications}{157}{}{17}.
+\APACjournalVolNumPages{Frontiers in Artificial Intelligence and applications}{157}{}{17}.
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -193,9 +178,7 @@ Minsky, M.%
 \newblock
 \APACrefYearMonthDay{1968}{}{}.
 \newblock
-\APACrefbtitle {Matter, Mind, and Models in: ML Minsky (ed.): Semantic
-  Information Processing.} {Matter, mind, and models in: Ml minsky (ed.):
-  Semantic information processing.}
+\APACrefbtitle {Matter, Mind, and Models in: ML Minsky (ed.): Semantic Information Processing.} {Matter, mind, and models in: Ml minsky (ed.): Semantic information processing.}
 \newblock
 \APACaddressPublisher{}{MIT Press}.
 \PrintBackRefs{\CurrentBib}
@@ -221,14 +204,9 @@ Newell, A.%
 \newblock
 \APACrefYearMonthDay{1962}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {The processes of creative thinking.} {The processes of
-  creative thinking.}{\BBCQ}
+{\BBOQ}\APACrefatitle {The processes of creative thinking.} {The processes of creative thinking.}{\BBCQ}
 \newblock
-\BIn{} \APACrefbtitle {Contemporary Approaches to Creative Thinking, 1958,
-  University of Colorado, CO, US; This paper was presented at the
-  aforementioned symposium.} {Contemporary approaches to creative thinking,
-  1958, university of colorado, co, us; this paper was presented at the
-  aforementioned symposium.}
+\BIn{} \APACrefbtitle {Contemporary Approaches to Creative Thinking, 1958, University of Colorado, CO, US; This paper was presented at the aforementioned symposium.} {Contemporary approaches to creative thinking, 1958, university of colorado, co, us; this paper was presented at the aforementioned symposium.}
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -273,8 +251,7 @@ Waxman, W.%
 \newblock
 \APACrefYear{2014}.
 \newblock
-\APACrefbtitle {Kant's anatomy of the intelligent mind} {Kant's anatomy of the
-  intelligent mind}.
+\APACrefbtitle {Kant's anatomy of the intelligent mind} {Kant's anatomy of the intelligent mind}.
 \newblock
 \APACaddressPublisher{}{OUP USA}.
 \PrintBackRefs{\CurrentBib}
@@ -296,8 +273,7 @@ Wind, J\BPBI S.%
 \newblock
 \APACrefYearMonthDay{2020}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {DSL solution to the ARC challenge} {Dsl solution to the
-  arc challenge}.{\BBCQ}
+{\BBOQ}\APACrefatitle {DSL solution to the ARC challenge} {Dsl solution to the arc challenge}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{URL https://github. com/top-quarks/ARC-solution}{}{}{}.
 \PrintBackRefs{\CurrentBib}
