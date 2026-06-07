@@ -214,8 +214,23 @@ poco imprecisas, esta imprecision crece de forma lineal a medida que aumenta el 
 % https://arahim3.github.io/arc-agi-guide/
 \section{Sistemas de pensamiento}
 
-Investigado. Pendiente de redactar.
- 
+El concepto de sistemas de pensamiento fue originalmente propuesto por los psicólogos Keith Stanovich y Richard West, quienes describieron 
+dos sistemas de pensamiento: el sistema 1, que es rápido, automático e intuitivo, y el sistema 2, que es lento, deliberado y analítico. Posteriormente fue popularizado
+por el ganador del Nobel Daniel Kahneman en su libro \textit{Thinking, Fast and Slow} \citeyear{kahneman2011thinking}.
+
+\begin{itemize}
+	\item \textbf{Sistema 1 (Pensamiento intuitivo o rápido):} Este es el sistema de pensamiento más rápido, automático e intuitivo. Funciona de manera automática 
+	y es responsable de nuestras «reacciones instintivas», juicios rápidos y habilidades aprendidas que se han vuelto algo natural, como reconocer la cara de un amigo o resolver 
+	2+2. En el contexto de la inteligencia artificial, esto es análogo a la transducción, donde un modelo realiza directamente una predicción global basada en patrones.
+	\item \textbf{Sistema 2 (Pensamiento analítico o lento):} Este es nuestro modo de pensamiento lento, deliberado y lógico. Requiere atención consciente y se utiliza para 
+	tareas complejas, como resolver un problema matemático difícil, sopesar ventajas e inconvenientes o aprender una nueva habilidad. En el ámbito de la inteligencia artificial, 
+	esto se corresponde con la inducción o la síntesis de programas, donde un sistema construye deliberadamente un programa lógico paso a paso para llegar a una solución.
+\end{itemize}
+
+La clave de estos conceptos es que el pensamiento humano hace uso de una combinación de ambos sistemas, tiene la capacidad de usar un pensamiento más transductor o
+inductivo dependiendo de la tarea y situación. Para la mayoría de tareas diarias es más eficiente el uso de un pensamiento más transductor, pero cuando se requiere un 
+razonamiento más complejo o intensivo, el pensamiento inductivo es más adecuado.
+
 % Monte Carlo Tree Search (MCTS) -> https://www.cs.us.es/~fsancho/Blog/posts/MCTS.md
 % Sakana AI
 % Adaptive Branching MCTS (AB-MCTS)
@@ -297,9 +312,11 @@ que el espacio sea discreto o finito.
 \centering
 \includegraphics[width=0.8\textwidth]{image/images/1780498631168.png}
 \caption[Representación árbol de nodos búsqueda en anchura]{Representación árbol  de nodos búsqueda en anchura.}
-\label{fig:fig1SECTION2}
+\label{fig:fig1SECTION1}
 {\footnotesize Fuente: Adaptado de ``Grokking Artificial Intelligence Algorithms: Understand and apply the core algorithms of deep learning and artificial intelligence' \cite{hurbans2020grokking}}
 \end{figure}
+
+\FloatBarrier
 
 \subsection{Búsqueda de coste uniforme}
 
@@ -321,9 +338,11 @@ visitado. Para implementarlo se usa una pila LIFO ó \textit{Last In First Out},
 \centering
 \includegraphics[width=0.8\textwidth]{image/images/1780498575930.png}
 \caption[Representación árbol de nodos búsqueda en profundidad]{Representación árbol  de nodos búsqueda en profundidad.}
-\label{fig:fig1SECTION2}
+\label{fig:fig2SECTION2}
 {\footnotesize Fuente: Adaptado de ``Grokking Artificial Intelligence Algorithms: Understand and apply the core algorithms of deep learning and artificial intelligence' \cite{hurbans2020grokking}}
 \end{figure}
+
+\FloatBarrier
 
 No es completo en caso de entorno no finito. Tampoco es óptimo en caso de entorno no finito. Es aconsejable utilizar
 la búsqueda en profundidad de manera limitada, se considera que los nodos por debajo del límite no tienen hijos.
@@ -348,14 +367,14 @@ la inteligencia intrínseca.
 
 Tras los métodos tradicionales de evaluar algoritmos, la IA ha pasado a una evaluación de ``caja negra'' basada en el comportamiento que involucra la discriminación
 humana (comparación directa por o contra humanos) y pruebas de rendimiento de problemas. Se iniciaron evaluaciones metodológicas de dudosa validez,
-donde los investigadores a menudo seleccionaban los conjuntos de datos que mejor les convenían y ajustaban parámetros en exceso provocando sobreajustes. Esto
-llevó a situaciones donde muchos resultados publicados eran reproducibles pero difícilmente replicables \cite{hernandez2017evaluation}. En consecuencia,
+donde los investigadores a menudo seleccionaban los conjuntos de datos que mejor les convenían y ajustaban parámetros en exceso provocando sobre-ajustes. Esto
+llevó a situaciones donde muchos resultados publicados eran reproducibles pero difícilmente replicable \cite{hernandez2017evaluation}. En consecuencia,
 la aparente mejora del modelo desaparecía en cuanto cambiaba ligeramente el dominio de los datos, además de una fuerte dispersión de los métodos
 en las diferentes disciplinas.
 
 Para sistemas de inteligencia artificial de propósito general era necesario un nuevo enfoque orientado a habilidades. Este enfoque se basa en la evaluación de capacidades cognitivas en lugar de tareas en
 las que fue diseñado originalmente \cite{hernandez2017evaluation}. Para garantizar la validez de este enfoque, las pruebas de evaluación requieren directrices estrictas, como definir con antelación
-los conjuntos de datos para entrenamiento y evaluación, y evitar el sobreajuste a conjuntos de datos específicos.
+los conjuntos de datos para entrenamiento y evaluación, y evitar el sobre-ajuste a conjuntos de datos específicos.
 
 \begin{quote}
 \itshape
@@ -366,7 +385,7 @@ los conjuntos de datos para entrenamiento y evaluación, y evitar el sobreajuste
 \cite{hernandez2017evaluation}
 \end{center}
 
-Para avanzar hacia sistemas de inteligencia artificial más inteligentes y humanos es necesario un método de evaluación de la inteligencia que compare dos o más sistemas y humanos. Es aquí donde estra en juego
+Para avanzar hacia sistemas de inteligencia artificial más inteligentes y humanos es necesario un método de evaluación de la inteligencia que compare dos o más sistemas y humanos. Es aquí donde entra en juego
 el Abstract and Reasoning Corpus (ARC-AGI), un \textit{benchmark} diseñado para respetar todas las directrices necesarias. ARC-AGI está construido con un conjunto de prioridades para ser lo más parecido posible
 a la capacidad de razonamiento innata del ser humano \cite{chollet2019measure}.
 
@@ -386,7 +405,7 @@ antemano, para conseguir la generalización el agente debe que ser capaz de apre
 
 \subsection{Espectro de la generalización}
 
-La generalización es un concepto que ha llegado de la mano del aprendizaje automático, desarrollado originamente para caracterizar el buen rendimiento de un modelo estadístico en 
+La generalización es un concepto que ha llegado de la mano del aprendizaje automático, desarrollado originalmente para caracterizar el buen rendimiento de un modelo estadístico en 
 datos de entrada que no forman parte de su conjunto de datos de entrenamiento. Este concepto ha seguido siendo parte de la conversación  y se puede definir como la "habilidad" de
 un modelo para gestionar una situación o varias situaciones (o tareas) que no se ha encontrado previamente. Nótese que el concepto de la frase "situación que no se ha encontrado previamente"
 puede ser tremendamente ambigua y el autor \cite{chollet2019measure} propone un espectro de generalización para aclarar esta ambigüedad. En este espectro, se pueden encontrar diferentes tipos de generalización, 
@@ -394,8 +413,9 @@ como la generalización sistémica (centrada en el sistema)  o generalización c
 profundizar en este artículo. Al contrario, se va a profundizar en la generalización de habilidades, que es más útil para cuantificar los grados de generalización.
 
 \begin{itemize}
-\item \textbf{Ausencia de generalización:} Sistemas donde no existe incertidumbre ni novedad. Entorno cerrado como un algoritmo que juega al ``tres en raya'',  iterando exhaustivamente sobre todas las jugadas posibles. No hay adapatación posible.
-\item \textbf{Generalización local o robustez:} Es la capacidad de un sistema para manejar nuevos ejemplos dentro de una distribución de datos conocida para una sola tarea o un conjunto bien definido de ellas.  Este es el nivel en el que ha operado históricamente el aprerndizaje profundo moderno. El autor \cite{chollet2019measure} hace referencia a un ejemplo de clasificador de gatos que, se casifican gatos donde el modelo no había visto antes.
+\item \textbf{Ausencia de generalización:} Sistemas donde no existe incertidumbre ni novedad. Entorno cerrado como un algoritmo que juega al ``tres en raya'',  iterando exhaustivamente sobre todas las jugadas posibles. No hay adaptación posible.
+\item \textbf{Generalización local o robustez:} Es la capacidad de un sistema para manejar nuevos ejemplos dentro de una distribución de datos conocida para una sola tarea o un conjunto bien definido de ellas.  Este es el nivel en el que ha operado históricamente el 
+aprendizaje profundo moderno. El autor \cite{chollet2019measure} hace referencia a un ejemplo de clasificador de gatos que, se califican gatos donde el modelo no había visto antes.
 \item \textbf{Generalización amplia o flexibilidad:} Es la capacidad de manejar una categoría amplia de tareas y entornos relacionados sin intervención humana adicional, incluyendo situaciones imprevistas por los creadores \cite{chollet2019measure}. Un ejemplo de esto puede ser el coche autónomo de nivel 5.
 \item \textbf{Generalización extrema o generalidad:} Sistemas abiertos capaces de manejar tareas enteramente nuevas que solo comparten características abstractas con las ya conocidas, aplicable a cualquier dominio. También se puede denominar como inteligencia general.
 \end{itemize}
@@ -405,33 +425,33 @@ profundizar en este artículo. Al contrario, se va a profundizar en la generaliz
 \includegraphics[width=0.8\textwidth]{image/images/1779113749902.png}
 \caption[Modelo jerárquico de habilidades cognitivas y su mapeo del espectro de generalización]{Modelo jerárquico de habilidades cognitivas y su mapeo del espectro de generalización.}
 %\caption[Modelo jerárquico de habilidades cognitivas y su mapeo del espectro de generalización]{Modelo jerárquico de habilidades cognitivas y su mapeo del espectro de generalización. 2}
-\label{fig:fig1SECTION2}
+\label{fig:fig3SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 	
-\subsection{La inteligencia desde la perspectiova de la adquisición de habilidades}
+\subsection{La inteligencia desde la perspectiva de la adquisición de habilidades}
 
 Existen dos perspectivas fundamentales sobre la mente humana, una que es una colección de habilidades que se han grabado en nuestro ADN en la evolución y y la otra que se trata de ver la
 mente como una página en blanco. El autor François Chollet, en el manifiesto ``On the Measure of Intelligence'' \cite{chollet2019measure}, sugiere que los humanos no nacen con una mente vacía que
-aprende cualquier conocimiento desde cero., ppero tampoco son una colleción de instintos. Se puede decir que nacemos con algunos conocimientos previos innatos \cite{spelke2007core}.
+aprende cualquier conocimiento desde cero., pero tampoco son una colección de instintos. Se puede decir que nacemos con algunos conocimientos previos innatos \cite{spelke2007core}.
 
 Para que un ``benchmark'' como ARC pueda ser una medida real de la inteligencia no puede depender de conocimientos adquiridos y las tareas deb ser resolubles utilizando únicamente los principios de los
 núcleos de conocimiento. Cómo de eficiente puede ser un agente para usar usu conocimientos innatos en resolver problemas que no ha conocido antes.
 
 François Chollet define la inteligencia no como un programa estático, sino como un proceso de síntesis de programas. Para establecer esta definición, hay que detallar en una primera
-instancia la posición del problema y el proceso técnico de una tarea según su marco formal. La arquitectura del sistema se comprondría de tres entidades principales;
+instancia la posición del problema y el proceso técnico de una tarea según su marco formal. La arquitectura del sistema se compone de tres entidades principales;
 
 \begin{itemize}
 \item \textbf{El Sistema Inteligente ($IS$)}: Es el agente que genera un programa de habilidad ($SP$) basándose la experiencia recibida.
-\item \textbf{La Tarea ($T$)}: Es el entorno que plantea un problema a resolver. La tarea tiene la función de puntuación (exito o fracaso) y una función de retroalimentación que devuelve al sistema inteligente.
-\item \textbf{El programa de habilidad ($SP$)}: Artefacto producido por ($IS$), un programa ejecutable que trata de resolver la tarea y devuelve una respuesta. Representa la capacidad del sistema para gestionar el entorno o problema dado. Un sistema es más inteligencia si proporciona progeamas de alta habilidad usando los menos recursos posibles en tareas de alta dificultad de generalización.
+\item \textbf{La Tarea ($T$)}: Es el entorno que plantea un problema a resolver. La tarea tiene la función de puntuación (éxito o fracaso) y una función de retroalimentación que devuelve al sistema inteligente.
+\item \textbf{El programa de habilidad ($SP$)}: Artefacto producido por ($IS$), un programa ejecutable que trata de resolver la tarea y devuelve una respuesta. Representa la capacidad del sistema para gestionar el entorno o problema dado. Un sistema es más inteligente si proporciona programas de alta habilidad usando los menos recursos posibles en tareas de alta dificultad de generalización.
 \end{itemize}
 
 \begin{figure}[h]
 \centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113798928.png}
-\caption[Posición del problema, un sistmema inteligente que genera programas de habilidades]{Posición del problema, un sistmema inteligente que genera programas de habilidades que interactúan con una tarea.}
-\label{fig:fig2SECTION2}
+\caption[Posición del problema, un sistema inteligente que genera programas de habilidades]{Posición del problema, un sistema inteligente que genera programas de habilidades que interactúan con una tarea.}
+\label{fig:fig4SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
@@ -451,8 +471,8 @@ El proceso de la resolución de una tarea se podría dividir en dos fases:
 \end{enumerate}
 
 En conclusión, ¿qué se puede esperar de un \textit{benchmark} de inteligencia ideal? Un \textit{benchmark} ideal debe ser explícito sobre su alcance, se debe demostrar el éxito sobre las pruebas y que exista una correlación
-estadística con éxito en un entorno real. Los resultados deben ser reproducibles, tal como señalaba el autor Jose Hernandez-Orallo \cite{hernandez2017evaluation}. Además, se debería 
-medir la capacidad de generalización, es decir, medir la capacidad de gestionar situaciones que ni el sistema ni el desarrollador ha visto anteriormente. Esto indica que el conjutno de tareas dedicadas
+estadística con éxito en un entorno real. Los resultados deben ser reproducibles, tal como señalaba el autor Jose Hernandez-Orallo \citeyear{hernandez2017evaluation}. Además, se debería 
+medir la capacidad de generalización, es decir, medir la capacidad de gestionar situaciones que ni el sistema ni el desarrollador ha visto anteriormente. Esto indica que el conjunto de tareas dedicadas
 a la evaluación debe ser estrictamente privado para evitar el se inyecte la solución o bien en el código o en los propios datos de entrenamiento (contaminación). Otro punto relevante que acompaña a
 este aspecto es el diseño para evitar trampas estadísticas que no requieran una verdadera comprensión abstracta.
 
@@ -465,66 +485,66 @@ ambos agentes poseen los mismos núcleos de rendimiento y que requiere tiempo y 
 % 400 tareas trainning
 % 400 tareas evaluation
 
-Con el objetivo de dar respuesta a todas las necessidades que se han mencionado en las secciones anteriores, nace el la propuesta de \textit{benchmark} Abstraction and Reasoning Corpus (ARC), un repositorio de datos 
-con la intención de servir como referencia para medir la inteligenca general. En esta sección se va a explorar los objetivos y el diseño de este repositorio.
+Con el objetivo de dar respuesta a todas las necesidades que se han mencionado en las secciones anteriores, nace el la propuesta de \textit{benchmark} Abstraction and Reasoning Corpus (ARC), un repositorio de datos 
+con la intención de servir como referencia para medir la inteligencia general. En esta sección se va a explorar los objetivos y el diseño de este repositorio.
 
-AC-AGI coomo \textit{benchmark} de síntesis de programas tiene diferentes objetivos finales:
+ARC-AGI como \textit{benchmark} de síntesis de programas tiene diferentes objetivos finales:
 \begin{itemize}
 \item Mantener un formato cercano o simple para que pueda ser solucionable por humanos.
-\item Centrar el foco en medir la generalización y no sólo habilidades. La generalización de debe medir de una manera cuantitativa. Presentar taeas altamente abstractas que deben ser entendidas por el ser humano con pocos
+\item Centrar el foco en medir la generalización y no sólo habilidades. La generalización de debe medir de una manera cuantitativa. Presentar tareas altamente abstractas que deben ser entendidas por el ser humano con pocos
 ejemplos.
 \item Control cuantitavo de la experiencia proporcionada (datos de entrenamiento limitados). Los datos de entrenamiento tendrán una cantidad fija.
 \item Describir el conjunto completo de núcleos de conocimiento y comparación ``precisa'' con la inteligencia entre el ser humano y los agentes de inteligencia artificial.
 \end{itemize}
 
-En la imagen siguiente \ref{fig:fig3SECTION2} se muestra un ejemplo de una tarea de ARC-AGI-1. En esta tarea, el objetivo es completar un patrón de una area dada. La solución de esta tarea pasa por generar una cuadrícula
+En la imagen siguiente \ref{fig:fig5SECTION2} se muestra un ejemplo de una tarea de ARC-AGI-1. En esta tarea, el objetivo es completar un patrón de una area dada. La solución de esta tarea pasa por generar una cuadrícula
 de salida que corresponde con la entrada a su izquierda. Para resolver esta tarea, el agente debe ser capaz de identificar el patrón subyacente en la entrada y generar la salida correcta, demostrando así su capacidad para 
 generalizar a partir de los ejemplos proporcionados.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113847784.png}
-\caption[Tarea donde el objetivo es completar un patrón de una area dada]{Tarea donde el objetivo es completar un patrón de una area dada. Para solciionar esta tarea debe generar una cuadrícula de salida que corresponde con la entrada a su izquierda.}
-\label{fig:fig3SECTION2}
+\caption[Tarea donde el objetivo es completar un patrón de una area dada]{Tarea donde el objetivo es completar un patrón de una area dada. Para solucionar esta tarea debe generar una cuadrícula de salida que corresponde con la entrada a su izquierda.}
+\label{fig:fig5SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
 \subsection{Núcleos de conocimiento aplicado en ARC-AGI}
 
-Todos los problemas planteados están diseñados espcificamente para abordar los núcleos de conocimiento. Los nucleos de conocimiento de ARC están planteados para ser lo más parecido posible
-a los núcleos de conocimiento del ser humano.
+Todos los problemas planteados están diseñados espcificamente para abordar los núcleos de conocimiento. Los nucleos de conocimiento de ARC están planteados
+para ser lo más parecido posible a los núcleos de conocimiento del ser humano.
 
 \subsubsection{Objetualidad}
 
-Nucleo de conocimmiento centrado en la capacidad de interpretaciñon del entorno, analizando las diferentes entidades. Se fundamenta bajo el principio cohesión y persistencia de objetos. Se analiza y se separa la cuadrícula
+Núcleo de conocimiento centrado en la capacidad de interpretación del entorno, analizando las diferentes entidades. Se fundamenta bajo el principio cohesión y persistencia de objetos. Se analiza y se separa la cuadrícula
 de la entrada en diferentes objetos basándose en valores o criterios de continuidad como los bloques del mismo color.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113875500.png}
 \caption[Prueba de ruido]{Prueba de ruido (\textit{denoising}).}
-\label{fig:fig4SECTION2}
+\label{fig:fig6SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
-Generalmente, los objetos presentes en la cuadrícula de entrada persisten en la salida, a menudo trasformando algun transformación geomñétrica. A pesar del ruido visual o la inclusión
-provoicada por otros objetos, muchos de los objetos persisten.
+Generalmente, los objetos presentes en la cuadrícula de entrada persisten en la salida, a menudo trasformando algún transformación geométrica. A pesar del ruido visual o la inclusión
+provocada por otros objetos, muchos de los objetos persisten.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width= 1\textwidth]{image/images/1779113886168.png}
-\caption[El objetivo rojo debe ``moverse'' jusnto al objeto azul hasta hacer ``contacto'']{El objetivo rojo debe ``moverse'' jusnto al objeto azul hasta hacer ``contacto''.}
-\label{fig:fig5SECTION2}
+\caption[El objetivo rojo debe ``moverse'' junto al objeto azul hasta hacer ``contacto'']{El objetivo rojo debe ``moverse'' junto al objeto azul hasta hacer ``contacto''.}
+\label{fig:fig7SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
-La influenca mediante el contacto es otro punto especialmente relevante, muccchas taras requiere de entender ciertas interacciones físicas, como un objeto que se desplaza hasta tocar a otro o una
-línea qu se dibuja y rebota al entrar en contacto con un obstáculo.
+La influencia mediante el contacto es otro punto especialmente relevante, muchas tareas requieren de entender ciertas interacciones físicas, como un objeto que se desplaza hasta tocar a otro o una
+línea que se dibuja y rebota al entrar en contacto con un obstáculo.
 
 \subsubsection{Orientación a objetivos}
 
-Las cuadrículas de entrada y salida suelen ser comprendidas por los humanos como los estados iniciales y finales de un proceso que conlleva intencionalidad. Las transformaciones buscan alccanzar una meta
-y resulta ser una heurística útil para resolver puzles.
+Las cuadrículas de entrada y salida suelen ser comprendidas por los humanos como los estados iniciales y finales de un proceso que conlleva intencionalidad. Las transformaciones buscan alcanzar una meta
+y resulta ser una heurística útil para resolver puzzles.
 
 \subsubsection{Números y conteo}
 
@@ -538,7 +558,7 @@ esta capacidad como uno de los núcleos de conocimiento innato. El ser humano es
 \centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113937981.png}
 \caption[Tarea donde el objetivo es contar el objeto que aparece más veces]{Tarea donde el objetivo es contar el objeto que aparece más veces.}
-\label{fig:fig7SECTION2}
+\label{fig:fig8SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
@@ -546,7 +566,7 @@ esta capacidad como uno de los núcleos de conocimiento innato. El ser humano es
 \subsubsection{Geometría y Topología básica}
 
 La orientación espacial es un aspecto fundamental como núcleo de conocimiento. Se engloban aquellas tareas de reconocimiento de formas para la compresión de líneas u otras figuras
-geométricas. El agente debe ser capaz de estimar ccon mayor probabilidad la apariciñon de formas egulares frente a otras formas más complejas.
+geométricas. El agente debe ser capaz de estimar con mayor probabilidad la aparición de formas regulares frente a otras formas más complejas.
 
 Las transformaciones espaciales como las simetrías y rotaciones, así como el escalado, deben ser comprendidas y aplicables. Relaciones espaciales específicamente en nociones topológicas sobre contener
 o ser contenido y estar fuera o dentro de un perímetro delimitado también será requerido en diversas tareas. El trazado de líneas o la conexión de puntos (proyecciones ortogonales) o la copia de 
@@ -555,8 +575,8 @@ diversos objetos repetidamente también se incluyen en este núcleo de conocimie
 \begin{figure}[h]
 \centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113897546.png}
-\caption[Tarea donde el objetivo es generar un línea diagonal hasta rebotar al hacer contacto con el obtaculo  rojo]{Tarea donde el objetivo es generar un línea diagonal hasta rebotar al hacer contacto con el obtaculo  rojo.}
-\label{fig:fig6SECTION2}
+\caption[Tarea donde el objetivo es generar un línea diagonal hasta rebotar al hacer contacto con el obstáculo  rojo]{Tarea donde el objetivo es generar un línea diagonal hasta rebotar al hacer contacto con el obstáculo rojo.}
+\label{fig:fig9SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
@@ -569,9 +589,9 @@ Los datos de ARC-AGI se puede encontrar en el repositorio de GitHub \cite{github
 sirven para el entrenamiento del modelo y la adquisición de habilidades.
 	\subitem{a} Pares ``train'': Típicamente suele tener tres o más pares de ``arrays''. Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
 	\subitem{b} Pares ``test'': Típicamente suele tener un par de ``arrays''. El par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
-\item \textbf{evaluation}: Contiene 400 tareas de evaluación. Cada tarea contiene todo el contenido en un arvhivo, por lo tanto, son otros 400 archivos.
+\item \textbf{evaluation}: Contiene 400 tareas de evaluación. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son otros 400 archivos.
 \end{itemize}
-
+	
 Los archivos están en formato JSON. Cada archivo contiene un diccionario con dos claves: ``train'' y ``test''. El valor de cada clave es una lista de pares de ``arrays''.
 Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''. Los ``arrays'' son matrices bidimensionales de números enteros que representan los estados iniciales y finales de una tarea.
 
@@ -621,15 +641,15 @@ En 2020 Johan Sokrates Wind publicó uno de los primero intentos basado en un Le
 de ARC-AGI permitió alcanzar una puntuación de 20\% en el benchmark. La idea detrás de esto es codificar algoritmos de programación para crear un conjunto de programas primitivos
 capaz de modificar matrices bidimensionales.
 
-Los algoritmos realizan búsquedas exhaustivas sobre el espacio de programas posibles que se puede contruir cambiando nucleos de conocimiento. Esta mecánica se puede considerar
+Los algoritmos realizan búsquedas exhaustivas sobre el espacio de programas posibles que se puede construir cambiando núcleos de conocimiento. Esta mecánica se puede considerar
 casi fuerza bruta. Formalmente, el método evalúa iterativamente funciones unarias sobre fragmentos de las cuadrículas de entrada, formando un Grafo Acíclico Dirigido (DAG) que r
 epresenta múltiples secuencias de transformaciones.
 
-Según el propio autor, la búsqueda de nivel 4, siendo de las más altas, dura entorno a 9 horas usando sólamente CPU. Este enfoque no requiere de ningún pre-entrenamiento y sus conocimientos
-previos son inyectas mediante líneas de código. El espacio de búsqueda crece de manera exponencial a medida que aumenta el tamaño del DSL y para los puzles que requieren
+Según el propio autor, la búsqueda de nivel 4, siendo de las más altas, dura entorno a 9 horas usando solamente CPU. Este enfoque no requiere de ningún pre-entrenamiento y sus conocimientos
+previos son inyectas mediante líneas de código. El espacio de búsqueda crece de manera exponencial a medida que aumenta el tamaño del DSL y para los puzzles que requieren
 de más pasos lógicos, la búsqueda simplemente sin tiempo. Otro aspecto negativo del enfoque es que si un problema de transformación no se programó específicamente, el sistema
-simplemente no es capaz de resolverlo. Escalar este enfoque significa que es necesario de capacidad humana constante para seguir añadiendo conocimientos primitivos  y heurísticas
-de poda diseñadas manulamente para guiar la búsqueda \cite{wind2020dsl}.
+simplemente no es capaz de resolverlo. Escalar este enfoque significa que es necesario de capacidad humana constante para seguir añadiendo conocimientos primitivos  y heurística
+de poda diseñada manualmente para guiar la búsqueda \cite{wind2020dsl}.
 
 \subsection{Enfoque Neurosimbólico}
 
@@ -643,15 +663,15 @@ Investigado. Pendiente de redactar.
 
 Investigado. Pendiente de redactar.
 
-\section{Modelos basandos en la Neurodiversidad}
+\section{Modelos basados en la Neurodiversidad}
 
 Investigado. Pendiente de redactar.
 
-\subsection{Inducción de Sísteis de programas mediante Redes Neuronales Eficientes}
+\subsection{Inducción de Síntesis de programas mediante Redes Neuronales Eficientes}
 
 Investigado. Pendiente de redactar.
 
-\section{Modelos basado en Transformers compactos}
+\section{Modelos basados en Transformers compactos}
 
 Investigado. Pendiente de redactar.
 
@@ -663,7 +683,7 @@ Investigado. Pendiente de redactar.
 
 Investigado. Pendiente de redactar.
 
-\section{Combinación de sísteis de programas con models de transinducción}
+\section{Combinación de sistemas de programas con modelos de transducción}
 
 Investigado. Pendiente de redactar.
 
@@ -708,7 +728,7 @@ El trabajo se ha estructurado en torno a una épica principal desglosada en cuat
 \end{itemize}
 
 El ciclo de desarrollo se ejecuta en iteraciones cortas o \textit{Sprints} de 14 días de duración. Esta cadencia temporal permite realizar inspecciones regulares del código, 
-facilitando la adaptación temprana de hiperparámetros o la corrección de derivas en el entrenamiento. El control de versiones, el seguimiento de tareas y la representación visual de los tableros 
+facilitando la adaptación temprana de hiper-parámetros o la corrección de derivas en el entrenamiento. El control de versiones, el seguimiento de tareas y la representación visual de los tableros 
 Kanban se centralizan mediante un repositorio de código alojado en GitHub.
 
 \section{Ciclo de Vida del Modelo basado en MLOps}
@@ -719,7 +739,7 @@ Este ciclo se compone de las siguientes fases iterativas:
 \begin{itemize}
 	\item \textbf{Preparación de datos:} Tratamiento del corpus ARC-AGI, definiendo las rutinas de visualización y codificación espacial necesarias.
 	\item \textbf{Desarrollo del modelo y selección algorítmica:} Diseño de las arquitecturas compactas y las rutinas de inferencia iterativa.
-	\item \textbf{Entrenamiento y ajuste:} Ejecución de pruebas de Test-Time Training y refinamiento de hiperparámetros bajo las restricciones de hardware.
+	\item \textbf{Entrenamiento y ajuste:} Ejecución de pruebas de Test-Time Training y refinamiento de hiper-parámetros bajo las restricciones de hardware.
 	\item \textbf{Evaluación:} Medición cuantitativa del rendimiento del modelo utilizando conjuntos de evaluación de ARC-AGI-1.
 \end{itemize}
 
