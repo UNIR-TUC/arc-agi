@@ -1,6 +1,6 @@
 \babel@toc {spanish}{}\relax 
-\contentsline {chapter}{Resumen}{\es@scroman {vi}}{chapter*.4}%
-\contentsline {chapter}{Abstract}{\es@scroman {vii}}{chapter*.5}%
+\contentsline {chapter}{Resumen}{\es@scroman {v}}{chapter*.4}%
+\contentsline {chapter}{Abstract}{\es@scroman {vi}}{chapter*.5}%
 \contentsline {chapter}{\numberline {1}Introducción}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Contexto}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Justificación}{2}{section.1.2}%
@@ -18,9 +18,9 @@
 \contentsline {section}{\numberline {2.6}Abstract and Reasoning Corpus}{10}{section.2.6}%
 \contentsline {subsection}{\numberline {2.6.1}Espectro de la generalización}{11}{subsection.2.6.1}%
 \contentsline {subsection}{\numberline {2.6.2}La inteligencia desde la perspectiva de la adquisición de habilidades}{13}{subsection.2.6.2}%
-\contentsline {subsection}{\numberline {2.6.3}ARC-AGI-1}{15}{subsection.2.6.3}%
+\contentsline {subsection}{\numberline {2.6.3}ARC-AGI-1}{16}{subsection.2.6.3}%
 \contentsline {subsection}{\numberline {2.6.4}Núcleos de conocimiento aplicado en ARC-AGI}{16}{subsection.2.6.4}%
-\contentsline {subsubsection}{Objetualidad}{17}{subsubsection*.6}%
+\contentsline {subsubsection}{Objetualidad}{16}{subsubsection*.6}%
 \contentsline {subsubsection}{Orientación a objetivos}{18}{subsubsection*.7}%
 \contentsline {subsubsection}{Números y conteo}{18}{subsubsection*.8}%
 \contentsline {subsubsection}{Geometría y Topología básica}{18}{subsubsection*.9}%
@@ -28,11 +28,11 @@
 \contentsline {subsection}{\numberline {2.6.6}ARC-AGI-2}{20}{subsection.2.6.6}%
 \contentsline {subsection}{\numberline {2.6.7}ARC-AGI-3}{20}{subsection.2.6.7}%
 \contentsline {subsection}{\numberline {2.6.8}Comparativa entre ARC-AGI-1, ARC-AGI-2 y ARC-AGI-3}{20}{subsection.2.6.8}%
-\contentsline {section}{\numberline {2.7}Primeros enfoques para resolver ARC-AGI}{20}{section.2.7}%
+\contentsline {section}{\numberline {2.7}Primeros enfoques para resolver ARC-AGI}{21}{section.2.7}%
 \contentsline {subsection}{\numberline {2.7.1}Domain Specific Languages (DSLs) y síntesis de programas}{21}{subsection.2.7.1}%
 \contentsline {subsection}{\numberline {2.7.2}Enfoque Neurosimbólico}{21}{subsection.2.7.2}%
 \contentsline {subsection}{\numberline {2.7.3}LARC}{21}{subsection.2.7.3}%
-\contentsline {section}{\numberline {2.8}Grandes Modelos de Lenguaje en ARC-AGI-1}{21}{section.2.8}%
+\contentsline {section}{\numberline {2.8}Grandes Modelos de Lenguaje en ARC-AGI-1}{22}{section.2.8}%
 \contentsline {section}{\numberline {2.9}Modelos basados en la Neurodiversidad}{22}{section.2.9}%
 \contentsline {subsection}{\numberline {2.9.1}Inducción de Síntesis de programas mediante Redes Neuronales Eficientes}{22}{subsection.2.9.1}%
 \contentsline {section}{\numberline {2.10}Modelos basados en Transformers compactos}{22}{section.2.10}%
@@ -40,7 +40,7 @@
 \contentsline {section}{\numberline {2.12}Optimización en Tiempo de Inferencia}{22}{section.2.12}%
 \contentsline {section}{\numberline {2.13}Combinación de sistemas de programas con modelos de transducción}{22}{section.2.13}%
 \contentsline {section}{\numberline {2.14}Modelos compactos basados en bucles de refinamiento iterativo}{22}{section.2.14}%
-\contentsline {subsection}{\numberline {2.14.1}Modelos de razonamientos jerárquicos}{22}{subsection.2.14.1}%
+\contentsline {subsection}{\numberline {2.14.1}Modelos de razonamientos jerárquicos}{23}{subsection.2.14.1}%
 \contentsline {subsection}{\numberline {2.14.2}Modelos de razonamientos recursivos con redes neuronales compactas}{23}{subsection.2.14.2}%
 \contentsline {section}{\numberline {2.15}Estado actual con perspectiva de eficiencia computacional}{23}{section.2.15}%
 \contentsline {chapter}{\numberline {3}Metodología}{24}{chapter.3}%
