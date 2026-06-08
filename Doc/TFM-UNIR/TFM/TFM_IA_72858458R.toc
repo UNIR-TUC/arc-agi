@@ -14,6 +14,7 @@
 \contentsline {subsection}{\numberline {2.5.1}Búsqueda en anchura}{8}{subsection.2.5.1}%
 \contentsline {subsection}{\numberline {2.5.2}Búsqueda de coste uniforme}{8}{subsection.2.5.2}%
 \contentsline {subsection}{\numberline {2.5.3}Búsqueda en profundidad}{9}{subsection.2.5.3}%
+\contentsline {subsection}{\numberline {2.5.4}Búsqueda A*}{10}{subsection.2.5.4}%
 \contentsline {section}{\numberline {2.6}Abstract and Reasoning Corpus}{10}{section.2.6}%
 \contentsline {subsection}{\numberline {2.6.1}Espectro de la generalización}{11}{subsection.2.6.1}%
 \contentsline {subsection}{\numberline {2.6.2}La inteligencia desde la perspectiva de la adquisición de habilidades}{13}{subsection.2.6.2}%

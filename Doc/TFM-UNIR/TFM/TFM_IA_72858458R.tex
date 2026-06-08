@@ -351,6 +351,17 @@ la búsqueda en profundidad de manera limitada, se considera que los nodos por d
 También existe la alternativa al uso del algoritmo en profundidad iterativa, incrementando el límite del nivel de 
 profundidad de manera iterativa, hasta que se alcance el objetivo. Es completo y óptimo siempre que el coste de las acciones sea el mismo.
 
+\subsection{Búsqueda A*}
+
+Existen distintas variantes de algoritmos de búsquedas informadas \textit{Best Search}. La mayoría de estos algoritmos emplean una función heurística estimar el coste estimado de la ruta
+computacionalmente más eficiente. Por ejemplo, el algoritmo el primero el mejor codicioso (GBFS) es el caso más básico, se expande aquel nodo que parece más carca del objetivo según
+la estimación heurística.
+
+La búsqueda A* es el más utilizado de esta categoría. Se considera el coste tanto el coste acumulado desde el nodo raíz, como el coste estimado mediante heurística hasta el objetivo. Es 
+completo siempre que la heurística sea admisible. También se puede considerar óptimo y una complejidad temporal y espacial de O(b^d), donde b es el factor de ramificación y d es la 
+profundidad de la solución óptima. Para que la heurística sea admisible, nunca debe sobrestimar el coste real y debe ser consistente. Se asume que el coste de cualquier transición es mayor
+que 0.
+
 \section{Abstract and Reasoning Corpus}
 
 Los sistemas de evaluación de la inteligencia artificial han ido evolucionando a lo largo del tiempo. La investigación de esta área de ha centrado
@@ -460,15 +471,15 @@ El proceso de la resolución de una tarea se podría dividir en dos fases:
 
 \begin{enumerate}
 \item \textbf{Fase de entrenamiento o adquisición de habilidades:} Ciclo interactivo donde el sistema inteligente ($IS$) aprende a generar un programa de habilidad ($SP$) a través de la experiencia con la tarea ($T$). En esta fase, el sistema recibe retroalimentación sobre su desempeño y ajusta su programa de habilidad en consecuencia.
-	\subitem{a} Fase de generación. Se presenta una situación de entrenamiento.
-	\subitem{b} Fase de Producción. El $IS$ genera un programa de habilidad ($SP$).
-	\subitem{c} Fase de Acción. El $SP$ interactúa con la tarea ($T$) para producir una respuesta.
-	\subitem{d} Fase de Retroalimentación. La tarea evalúa la respuesta, se asigna una puntuación y se genera un \textit{feedback}.
-	\subitem{e} Fase de Actualización. El sistema inteligente ($IS$) recibe ese feedback para actualizar su estado ó estados internos, mejorando su comprensión del problema para una siguiente iteración.
+	\subitem{\textbf{a.}} Fase de generación. Se presenta una situación de entrenamiento.
+	\subitem{\textbf{b.}} Fase de Producción. El $IS$ genera un programa de habilidad ($SP$).
+	\subitem{\textbf{c.}} Fase de Acción. El $SP$ interactúa con la tarea ($T$) para producir una respuesta.
+	\subitem{\textbf{d.}} Fase de Retroalimentación. La tarea evalúa la respuesta, se asigna una puntuación y se genera un \textit{feedback}.
+	\subitem{\textbf{e.}} Fase de Actualización. El sistema inteligente ($IS$) recibe ese feedback para actualizar su estado ó estados internos, mejorando su comprensión del problema para una siguiente iteración.
 \item \textbf{Fase de evaluación o prueba de generalización:} Una vez terminada la fase de entrenamiento, el $IS$ entrega la versión definitiva de su programa de habilidad. En esta fase el programa se enfrenta a situaciones o entornos que no ha percibido anteriormente.
-	\subitem{a} Fase de Desafío. Se presenta una situación nueva (test) que implica incertidumbre.
-	\subitem{a} Fase de Ejecución. El programa de habilidad produce respuestas sin posibilidad de recibir retroalimentación.
-	\subitem{a} Fase de Medición. Suma de la puntuación obtenida. Si el programa ha podido gestionar las situaciones nuevas significa que se ha demostrado el principio de generalización.
+	\subitem{\textbf{a.}} Fase de Desafío. Se presenta una situación nueva (test) que implica incertidumbre.
+	\subitem{\textbf{b.}} Fase de Ejecución. El programa de habilidad produce respuestas sin posibilidad de recibir retroalimentación.
+	\subitem{\textbf{c.}} Fase de Medición. Suma de la puntuación obtenida. Si el programa ha podido gestionar las situaciones nuevas significa que se ha demostrado el principio de generalización.
 \end{enumerate}
 
 En conclusión, ¿qué se puede esperar de un \textit{benchmark} de inteligencia ideal? Un \textit{benchmark} ideal debe ser explícito sobre su alcance, se debe demostrar el éxito sobre las pruebas y que exista una correlación
@@ -588,8 +599,8 @@ Los datos de ARC-AGI se puede encontrar en el repositorio de GitHub \cite{github
 \begin{itemize}
 \item \textbf{training}: Contiene 400 tareas de entrenamiento. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son 400 archivos. Todos los archivos de este directorio
 sirven para el entrenamiento del modelo y la adquisición de habilidades.
-	\subitem{a} Pares ``train'': Típicamente suele tener tres o más pares de ``arrays''. Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
-	\subitem{b} Pares ``test'': Típicamente suele tener un par de ``arrays''. El par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
+	\subitem{\textbf{a.}} Pares ``train'': Típicamente suele tener tres o más pares de ``arrays''. Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
+	\subitem{\textbf{b.}} Pares ``test'': Típicamente suele tener un par de ``arrays''. El par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
 \item \textbf{evaluation}: Contiene 400 tareas de evaluación. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son otros 400 archivos.
 \end{itemize}
 	
@@ -643,8 +654,8 @@ de ARC-AGI permitió alcanzar una puntuación de 20\% en el benchmark. La idea d
 capaz de modificar matrices bidimensionales.
 
 Los algoritmos realizan búsquedas exhaustivas sobre el espacio de programas posibles que se puede construir cambiando núcleos de conocimiento. Esta mecánica se puede considerar
-casi fuerza bruta. Formalmente, el método evalúa iterativamente funciones unarias sobre fragmentos de las cuadrículas de entrada, formando un Grafo Acíclico Dirigido (DAG) que r
-epresenta múltiples secuencias de transformaciones.
+casi fuerza bruta. Formalmente, el método evalúa iterativamente funciones unarias sobre fragmentos de las cuadrículas de entrada, formando un Grafo Acíclico Dirigido (DAG) que representa
+múltiples secuencias de transformaciones.
 
 Según el propio autor, la búsqueda de nivel 4, siendo de las más altas, dura entorno a 9 horas usando solamente CPU. Este enfoque no requiere de ningún pre-entrenamiento y sus conocimientos
 previos son inyectas mediante líneas de código. El espacio de búsqueda crece de manera exponencial a medida que aumenta el tamaño del DSL y para los puzzles que requieren
