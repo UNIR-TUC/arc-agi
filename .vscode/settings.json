@@ -9,6 +9,7 @@
         "GBFS",
         "GDDR",
         "heurística",
+        "heurísticas",
         "heurístrico",
         "huggingface",
         "Johan",
@@ -20,6 +21,7 @@
         "Keras",
         "LARC",
         "matplotlib",
+        "MCTS",
         "Neurodiversidad",
         "Neurosimbólico",
         "numpy",
@@ -29,6 +31,7 @@
         "Pydantic",
         "Radeon",
         "rocm",
+        "Sakana",
         "setuptools",
         "Sokrates",
         "solucionable",
@@ -41,6 +44,7 @@
         "torchaudio",
         "Torchaudio",
         "torchvision",
-        "Torchvision"
+        "Torchvision",
+        "UCBT"
     ]
 }

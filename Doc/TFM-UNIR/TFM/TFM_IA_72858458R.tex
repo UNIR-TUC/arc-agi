@@ -340,7 +340,7 @@ visitado. Para implementarlo se usa una pila LIFO ó \textit{Last In First Out},
 \includegraphics[width=0.8\textwidth]{image/images/1780498575930.png}
 \caption[Representación árbol de nodos búsqueda en profundidad]{Representación árbol  de nodos búsqueda en profundidad.}
 \label{fig:fig2SECTION2}
-{\footnotesize Fuente: Adaptado de ``Grokking Artificial Intelligence Algorithms: Understand and apply the core algorithms of deep learning and artificial intelligence' \cite{hurbans2020grokking}}
+{\footnotesize Fuente: Adaptado de ``Grokking Artificial Intelligence Algorithms: Understand and apply the core algorithms of deep learning and artificial intelligence'' \cite{hurbans2020grokking}}
 \end{figure}
 
 \FloatBarrier
@@ -354,13 +354,102 @@ profundidad de manera iterativa, hasta que se alcance el objetivo. Es completo y
 \subsection{Búsqueda A*}
 
 Existen distintas variantes de algoritmos de búsquedas informadas \textit{Best Search}. La mayoría de estos algoritmos emplean una función heurística estimar el coste estimado de la ruta
-computacionalmente más eficiente. Por ejemplo, el algoritmo el primero el mejor codicioso (GBFS) es el caso más básico, se expande aquel nodo que parece más carca del objetivo según
+a nivel computacional más eficiente. Por ejemplo, el algoritmo el primero el mejor codicioso (GBFS) es el caso más básico, se expande aquel nodo que parece más carca del objetivo según
 la estimación heurística.
 
 La búsqueda A* es el más utilizado de esta categoría. Se considera el coste tanto el coste acumulado desde el nodo raíz, como el coste estimado mediante heurística hasta el objetivo. Es 
-completo siempre que la heurística sea admisible. También se puede considerar óptimo y una complejidad temporal y espacial de O(b^d), donde b es el factor de ramificación y d es la 
+completo siempre que la heurística sea admisible. También se puede considerar óptimo y una complejidad temporal y espacial de $O(b^d)$, donde b es el factor de ramificación y d es la 
 profundidad de la solución óptima. Para que la heurística sea admisible, nunca debe sobrestimar el coste real y debe ser consistente. Se asume que el coste de cualquier transición es mayor
 que 0.
+
+La combinación de búsquedas y la satisfacción de restricciones es una técnica habitual. La idea de CSP es representar problemas mediante la declaración de restricciones sobre
+un dominio y encontrar soluciones que satisfagan esas restricciones.
+
+\subsection{Algoritmo de Monte Carlo aplicado a Búsquedas}
+
+En diversos problemas o juegos, se puede construir, al menos en teoría, un espacio que se asemeja a un árbol de estados completo que puede contener
+todos los resultados posibles. Un algoritmo como Minimax se basa precisamente en la idea de evaluar la bondad de las jugadas de etiquetas de estados
+que se propagan hasta un estado actual. El objetivo es decidir cual es el camino o árbol que conduce a mejores resultados al jugador. El problema
+que se encuentra con el algoritmo Minimax y derivados es que el espacio de búsqueda puede ser tan grande que resulta absolutamente inabarcable. En todos
+los algoritmos se han proporcionado métodos para mitigar el problema mediante acotaciones de la profundidad de búsqueda hacia adelante ó directamente la
+poda de ramificaciones para evitar visitar aquellos nodos que parecen resultar menos prometedores.
+
+Como respuesta a este tipo de aproximaciones hace unos años surgió la técnica de \textit{Monte Carlo Tree Search} (Búsqueda en Árboles con Monte Carlo)
+que ofrece algunas ventajas inherentes. Se puede aplicar en espacios de búsqueda con muchas ramificaciones, espacios que antes eran inabarcables. No requiere 
+conocimiento específico del juego y no siempre tiene porqué encontrar una solución óptima. \textit{Upper Confidence Bound applied to Trees} (UCBT) 
+es la variante más común que trata de equilibrar la exploración y explotación de nodos. La idea general es simular jugadas al azar desde una posición actual 
+para realizar una muestra de cómo se comportan las distintas. El algoritmo del límite superior de confianza (UCB) trata de equilibrar la exploración
+y explotación de nodos. Para que UCBT no genere un gran número de simulaciones aleatorias y minimizar riesgos, la variante UCT hace uso de estadísticas
+de bondad disponibles para todos los estados sucesores. MCTS cuenta con diversas fases:
+
+
+\begin{itemize}
+	\item \textbf{Selección:} Se parte del nodo raíz y en cada nivel se elige la rama más prometedora utilizando una función de utilidad como UCT. Se continúa descendiendo hasta 
+	alcanzar un nodo terminal o un nodo que aún tiene acciones sin explorar.
+	\item \textbf{Expansión:} Si el nodo seleccionado no está completamente explorado, se elige una de sus acciones no visitadas. Se crea un nuevo nodo hijo y se añade al árbol. 
+	Se crea un nuevo nodo hijo y se añade al árbol.
+	\item \textbf{Simulación:} Desde el nuevo nodo se simula una partida o secuencia completa de acciones hasta llegar a un estado final. La simulación puede ser aleatoria o 
+	guiada por heurísticas. El resultado proporciona una recompensa o valoración de la rama explorada.
+	\item \textbf{Retro-propagación:} La recompensa obtenida se propaga hacia atrás por todos los nodos recorridos durante la iteración.
+	Se actualizan sus estadísticas y esta información se utilizará en futuras selecciones para decidir qué ramas explorar.
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{image/images/image.png}
+\caption[Pasos algoritmo MCTS]{Pasos del algoritmo MCTS.}
+\label{fig:fig3SECTION2}
+{\footnotesize Fuente: Adaptado de ``Knowledge-based fast evolutionary MCTS for general video game playing'' \cite{perez2014knowledge}}
+\end{figure}
+
+\FloatBarrier
+
+MCTS selecciona la rama más prometedora, expande una acción nueva, simula el resultado y actualiza las estadísticas del camino recorrido para mejorar futuras decisiones.
+Se puede definir tres estrategias fundamentales que intervienen en distintas fases del algoritmo. Durante la fase de selección es necesario decidir 
+qué nodo del árbol debe explorarse a continuación. Esta decisión puede tomarse utilizando diferentes criterios, como elegir el nodo con mayor recompensa acumulada,
+el que haya participado en un mayor número de simulaciones exitosas o, más habitualmente, aplicar una función que equilibre exploración y explotación, como UCB.
+En la fase de expansión se determina qué nuevo nodo añadir al árbol \cite{perez2014knowledge}. Aunque lo más común es seleccionar una acción disponible de forma aleatoria,
+también puede aprovecharse conocimiento específico del problema para guiar esta elección. Finalmente, en la fase de simulación se genera una secuencia completa de
+acciones desde el nuevo nodo hasta alcanzar un estado final. Estas simulaciones pueden realizarse de forma aleatoria o incorporar heurísticas y conocimiento del
+dominio para obtener estimaciones más precisas.
+
+Actualmente existen variantes como Adaptive Branching MCTS (AB-MCTS) que introduce un mecanismo de ramificación adaptativa para mejorar la eficiencia en espacios 
+de búsqueda con alta ramificación, o Sakana AI, un sistema de inteligencia artificial que utiliza MCTS para resolver puzzles del benchmark ARC-AGI.
+
+\subsection{Síntesis de programas}
+
+La síntesis de programas es un área de investigación que se centra en la generación automática de programas a partir de especificaciones o ejemplos. 
+El objetivo es crear programas que cumplan con ciertos requisitos o resuelvan problemas específicos sin necesidad de escribir código manualmente.
+
+Existen diferentes enfoques para la síntesis de programas, como la síntesis basada en ejemplos, donde se proporcionan ejemplos de entrada y salida para que 
+el sistema genere un programa que cumpla con esos ejemplos. Otro enfoque es la síntesis basada en especificaciones, donde se proporcionan especificaciones formales del
+comportamiento deseado y el sistema genera un programa que satisfaga dichas especificaciones.
+
+\subsection{Búsqueda Guiada por Redes Neuronales}
+
+Históricamente, los algoritmos de búsqueda clásicos como A* ó MCTS, funcionaban explorando sistemáticamente las posibles acciones futuras. 
+Sin embargo, en dominios complejos como el ajedrez, o la síntesis de programas para ARC-AGI, el número de ramificaciones posibles crece de forma exponencial
+en cada paso \cite{swiechowski2023monte}, generando una explosión combinatoria que hace imposible la resolución por fuerza bruta dentro de un límite de tiempo o memoria manejable.
+
+Por otro lado, las Redes Neuronales Profundas son excelentes reconociendo patrones e intuiciones de un solo vistazo,
+pero carecen de la capacidad algorítmica para planificar deliberadamente a largo plazo o corregir sus propios errores secuenciales. La Búsqueda Guiada por Redes
+Neuronales soluciona las carencias de ambos mundos inyectando la "intuición" del aprendizaje profundo dentro de la estructura lógica de los árboles de búsqueda. 
+Esto se materializó entrenando redes neuronales para que actuaran como entes evaluadoras dentro de algoritmos como MCTS.
+
+En su versión clásica, MCTS depende de simulaciones masivas para estimar la calidad de cada rama. Sin embargo, en los enfoques híbridos modernos se incorporan redes neuronales que guían de forma explícita la exploración:
+
+\begin{itemize}
+	\item \textbf{Red de Política (\textit{Policy Network}):} En lugar de que el árbol de búsqueda explore todas las acciones legales posibles 
+	por igual, la red neuronal predice una distribución de probabilidad sobre cuáles son las acciones más prometedoras. Esto 
+	reduce drásticamente la amplitud de la búsqueda, podando inmediatamente las ramas inútiles.
+	\item \textbf{Red de Valor (\textit{Value Network} / \textit{Q-function}):} En lugar de tener que simular el juego o el programa hasta su 
+	conclusión final para saber si es exitoso, la red neuronal evalúa la calidad o ``bondad'' del estado intermedio actual. 
+	Esto reduce drásticamente la profundidad de la búsqueda.
+\end{itemize}
+
+Gracias a estas capacidades de generalización y abstracción, el modelo híbrido logra converger hacia la solución correcta a
+una velocidad de órdenes de magnitud mayor que la búsqueda clásica, haciendo tratables problemas que antes se consideraban 
+imposibles para las máquinas.
 
 \section{Abstract and Reasoning Corpus}
 
@@ -645,8 +734,6 @@ Investigado. Pendiente de redactar.
 
 \section{Primeros enfoques para resolver ARC-AGI}
 
-Investigado. Pendiente de redactar.
-
 \subsection{Domain Specific Languages (DSLs) y síntesis de programas}
 
 En 2020 Johan Sokrates Wind publicó uno de los primero intentos basado en un Lenguaje de Dominio Específico ó DSL. El uso de código estrictamente diseñado para resolver tareas específicas
@@ -654,7 +741,7 @@ de ARC-AGI permitió alcanzar una puntuación de 20\% en el benchmark. La idea d
 capaz de modificar matrices bidimensionales.
 
 Los algoritmos realizan búsquedas exhaustivas sobre el espacio de programas posibles que se puede construir cambiando núcleos de conocimiento. Esta mecánica se puede considerar
-casi fuerza bruta. Formalmente, el método evalúa iterativamente funciones unarias sobre fragmentos de las cuadrículas de entrada, formando un Grafo Acíclico Dirigido (DAG) que representa
+casi fuerza bruta. Formalmente, el método evalúa de manera iterativa funciones unarias sobre fragmentos de las cuadrículas de entrada, formando un Grafo Acíclico Dirigido (DAG) que representa
 múltiples secuencias de transformaciones.
 
 Según el propio autor, la búsqueda de nivel 4, siendo de las más altas, dura entorno a 9 horas usando solamente CPU. Este enfoque no requiere de ningún pre-entrenamiento y sus conocimientos

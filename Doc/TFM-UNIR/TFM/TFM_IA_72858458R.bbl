@@ -232,6 +232,32 @@ Newell, A.%
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
+Perez%
+, Samothrakis%
+\BCBL {}\ \BBA {} Lucas%
+}{%
+Perez%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2014}}%
+}]{%
+perez2014knowledge}
+\APACinsertmetastar {%
+perez2014knowledge}%
+\begin{APACrefauthors}%
+Perez, D.%
+, Samothrakis, S.%
+\BCBL {}\ \BBA {} Lucas, S.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2014}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Knowledge-based fast evolutionary MCTS for general video game playing} {Knowledge-based fast evolutionary mcts for general video game playing}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {2014 IEEE Conference on Computational Intelligence and Games} {2014 ieee conference on computational intelligence and games}\ (\BPGS\ 1--8).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
 Spelke%
 \ \BBA {} Kinzler%
 }{%
@@ -254,6 +280,34 @@ Spelke, E\BPBI S.%
 {\BBOQ}\APACrefatitle {Core knowledge} {Core knowledge}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Developmental science}{10}{1}{89--96}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{\'S}wiechowski%
+, Godlewski%
+, Sawicki%
+\BCBL {}\ \BBA {} Ma{\'n}dziuk%
+}{%
+{\'S}wiechowski%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2023}}%
+}]{%
+swiechowski2023monte}
+\APACinsertmetastar {%
+swiechowski2023monte}%
+\begin{APACrefauthors}%
+{\'S}wiechowski, M.%
+, Godlewski, K.%
+, Sawicki, B.%
+\BCBL {}\ \BBA {} Ma{\'n}dziuk, J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Monte Carlo tree search: A review of recent modifications and applications} {Monte carlo tree search: A review of recent modifications and applications}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Artificial Intelligence Review}{56}{3}{2497--2562}.
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%

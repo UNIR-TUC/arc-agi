@@ -11,3 +11,4 @@ BFS
 ![1780498631168](image/images/1780498631168.png)
 DFS
 ![1780498575930](image/images/1780498575930.png)
+![alt text](image/images/image.png)
