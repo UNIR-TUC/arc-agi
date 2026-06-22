@@ -334,7 +334,6 @@ los nodos con menor coste acumulado, lo que puede llevar a encontrar una soluci�
 Explora un nodo hijo antes de explorar los nodos hermanos. Repite el proceso para el resto de hijos que ya ha
 visitado. Para implementarlo se usa una pila LIFO ó \textit{Last In First Out}, el nodo más recientemente visitado es el primero en ser procesado. 
 
-
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.8\textwidth]{image/images/1780498575930.png}
@@ -381,7 +380,6 @@ es la variante más común que trata de equilibrar la exploración y explotació
 para realizar una muestra de cómo se comportan las distintas. El algoritmo del límite superior de confianza (UCB) trata de equilibrar la exploración
 y explotación de nodos. Para que UCBT no genere un gran número de simulaciones aleatorias y minimizar riesgos, la variante UCT hace uso de estadísticas
 de bondad disponibles para todos los estados sucesores. MCTS cuenta con diversas fases:
-
 
 \begin{itemize}
 	\item \textbf{Selección:} Se parte del nodo raíz y en cada nivel se elige la rama más prometedora utilizando una función de utilidad como UCT. Se continúa descendiendo hasta 
@@ -529,6 +527,8 @@ aprendizaje profundo moderno. El autor \cite{chollet2019measure} hace referencia
 \label{fig:fig3SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
+
+\FloatBarrier
 	
 \subsection{La inteligencia desde la perspectiva de la adquisición de habilidades}
 
@@ -555,6 +555,8 @@ instancia la posición del problema y el proceso técnico de una tarea según su
 \label{fig:fig4SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
+
+\FloatBarrier
 
 El proceso de la resolución de una tarea se podría dividir en dos fases:
 
@@ -610,6 +612,8 @@ generalizar a partir de los ejemplos proporcionados.
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
+\FloatBarrier
+
 \subsection{Núcleos de conocimiento aplicado en ARC-AGI}
 
 Todos los problemas planteados están diseñados espcificamente para abordar los núcleos de conocimiento. Los nucleos de conocimiento de ARC están planteados
@@ -628,6 +632,8 @@ de la entrada en diferentes objetos basándose en valores o criterios de continu
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
+\FloatBarrier
+
 Generalmente, los objetos presentes en la cuadrícula de entrada persisten en la salida, a menudo trasformando algún transformación geométrica. A pesar del ruido visual o la inclusión
 provocada por otros objetos, muchos de los objetos persisten.
 
@@ -638,6 +644,8 @@ provocada por otros objetos, muchos de los objetos persisten.
 \label{fig:fig7SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
+
+\FloatBarrier
 
 La influencia mediante el contacto es otro punto especialmente relevante, muchas tareas requieren de entender ciertas interacciones físicas, como un objeto que se desplaza hasta tocar a otro o una
 línea que se dibuja y rebota al entrar en contacto con un obstáculo.
@@ -663,6 +671,7 @@ esta capacidad como uno de los núcleos de conocimiento innato. El ser humano es
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
 
+\FloatBarrier
 
 \subsubsection{Geometría y Topología básica}
 
@@ -680,6 +689,8 @@ diversos objetos repetidamente también se incluyen en este núcleo de conocimie
 \label{fig:fig9SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
+
+\FloatBarrier
 
 \subsection{Repositorio de datos}
 
@@ -722,15 +733,100 @@ Y=
 
 \subsection{ARC-AGI-2}
 
-Investigado. Pendiente de redactar.
+La introducción de ARC-AGI-2 en 2025 supone una evolución crítica impulsada por los avances observados y por los modos de fallo identificados en los 
+sistemas de inteligencia artificial sobre el conjunto de datos original. Aunque los sistemas de IA más avanzados podían alcanzar puntuaciones elevadas
+en ARC-AGI-1, a menudo mediante búsquedas por fuerza bruta, ARC-AGI-2 fue diseñado para ser menos vulnerable a este tipo de métodos. Además, se creó
+específicamente para evaluar debilidades conocidas en los sistemas modernos de razonamiento de IA.
+
+ARC-AGI-2 propone nuevos desafíos conceptuales. Basándose en los fallos observados en los modelos de IA de vanguardia, ARC-AGI-2 incorpora tareas
+destinadas a evaluar capacidades de razonamiento nuevas y más complejas:
+
+\begin{itemize}
+	\item \textbf{Interpretación simbólica:} tareas en las que los símbolos visuales deben interpretarse como portadores de un significado semántico
+más allá de su forma, por ejemplo, cuando una figura representa una acción.
+	\item \textbf{Razonamiento composicional:} tareas que requieren descubrir y aplicar simultáneamente múltiples reglas que interactúan entre sí.
+	\item \textbf{Aplicación contextual de reglas:} tareas en las que la regla correcta depende del contexto específico dentro de la cuadrícula,
+superando la simple identificación de patrones globales superficiales.
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width= 0.8\textwidth]{image/images/1781190410892.png}
+\caption[Tarea ARC-AGI 2: cbebaa4b]{Tarea ARC-AGI 2: cbebaa4b.}
+\label{fig:fig10SECTION2}
+{\footnotesize Fuente: Adaptado de ``ARC-AGI-2: A New Challenge for Frontier AI Reasoning Systems'' \cite{chollet2025arc}}
+\end{figure}
+
+\FloatBarrier
 
 \subsection{ARC-AGI-3}
 
-Investigado. Pendiente de redactar.
+En marzo de 2026, la Fundación ARC Prize introdujo un cambio fundamental en el \textit{benchmark} ARC-AGI-3, trasladando el paradigma de evaluación de puzzles 
+estáticos a entornos interactivos. A diferencia de versiones anteriores, se coloca al agente en un juego por turnos sin instrucciones, sin objetivo explícito ni 
+reglas definidas. El agente debe explorar el entorno, deducir las mecánicas del sistema y determinar por sí mismo la meta a alcanzar.
 
-\subsection{Comparativa entre ARC-AGI-1, ARC-AGI-2 y ARC-AGI-3}
+\subsubsection{Capacidades evaluadas}
 
-Investigado. Pendiente de redactar.
+Este enfoque interactivo evalúa habilidades de razonamiento distintas a las medidas en ARC-AGI-1 y ARC-AGI-2:
+
+\begin{itemize}
+    \item \textbf{Exploración eficiente:} capacidad de interactuar con el entorno de forma estratégica en lugar de aleatoria.
+    \item \textbf{Búsqueda de objetivos:} deducción de metas cuando no existen instrucciones explícitas.
+    \item \textbf{Memoria y aprendizaje:} retención de experiencias previas para optimizar decisiones futuras.
+    \item \textbf{Mejora iterativa:} progresión en el rendimiento a lo largo de interacciones sucesivas.
+\end{itemize}
+
+La evaluación se basa en la eficiencia de las acciones del agente comparada con la eficiencia humana, promediada sobre aproximadamente 135 juegos diseñados manualmente. 
+Una puntuación del 100\% indica paridad con el desempeño humano.
+
+\subsubsection{Resultados preliminares}
+
+En el lanzamiento de marzo de 2026, todos los modelos de frontera obtuvieron puntuaciones inferiores al 1\%, 
+incluyendo GPT-5.x, Gemini 3 y Claude Opus 4.x. En contraste, humanos resolvieron prácticamente la totalidad de los juegos.
+Los enfoques más efectivos combinaron modelos basados en neuronales redes convolucionales entrenados con aprendizaje por refuerzo para predecir cambios ambientales, junto con representaciones 
+gráficas del espacio de estados. Los agentes basados únicamente en lenguaje mostraron un desempeño significativamente inferior, indicando que este dominio 
+requiere técnicas de aprendizaje por refuerzo y modelado del mundo más que ingeniería de \textit{prompts}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width= 0.8\textwidth]{image/images/1781192048875.png}
+\caption[Tarea ARC-AGI 3: ls20]{Tarea ARC-AGI 3: ls20.}
+\label{fig:fig10SECTION2}
+{\footnotesize Fuente: Adaptado de ``ARC-AGI-3: A New Challenge for Frontier Agentic Intelligence'' \cite{chollet2025arc}}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Comparativa entre sistemas ARC-AGI}
+
+\begin{table}[h]
+\centering
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{2.9cm}|p{3.1cm}|p{3.8cm}|p{4.6cm}|}
+    \hline
+    \begin{tabular}{c}Característica\end{tabular} &
+    \begin{tabular}{c}ARC-AGI-1\end{tabular} &
+    \begin{tabular}{c}ARC-AGI-2\end{tabular} &
+    \begin{tabular}{c}ARC-AGI-3\end{tabular} \\
+    \hline
+    \begin{tabular}{c}Lanzado\end{tabular} & 2019 & 2025 & 2026 \\
+    \hline
+    \begin{tabular}{c}Formato\end{tabular} & Cuadrícula estática & Cuadrícula estática (salida más difícil) & Juegos interactivos por turnos \\
+    \hline
+    \begin{tabular}{c}Requerimiento\end{tabular} & Generalización, abstracción básica & Razonamiento simbólico, composicional y contextual & Exploración, búsqueda de objetivos, aprendizaje dinámico \\
+    \hline
+    \begin{tabular}{c}Fuerza bruta\end{tabular} & Sí & No, por diseño & Nuevo paradigma \\
+    \hline
+	\begin{tabular}{c}Base humana\end{tabular} & Alta & $\sim$60--66\% individual / 100\% panel & Los humanos resuelven $\sim$todas \\
+    \hline
+	\begin{tabular}{c}E. Resolución\end{tabular} & $\sim$90--96\% & $\sim$85\% sin restricciones / $\sim$24\% con límites de competencia & $<$1\% \\
+    \hline
+\end{tabular}
+\caption{Comparación de las versiones de ARC-AGI}
+\label{tab:arc-agi-comparison}
+\end{table}
+
+\FloatBarrier
 
 \section{Primeros enfoques para resolver ARC-AGI}
 
@@ -892,6 +988,8 @@ incluyendo el impacto de la dispersión estructurada en el rendimiento.
 \label{tab:rendimiento-precision}
 \end{table}
 
+\FloatBarrier
+
 \section{Entorno de desarrollo}
 
 Se ha un amplio ecosistema de paquetes y librerías para el desarrollo y la experimentación. En la tabla \ref{tab:python-libs} se muestra una lista de las principales librerías utilizadas, 
@@ -965,7 +1063,9 @@ La idea (también llamada programación inductiva) es escribir automáticamente 
 simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente. Este método es inductivo, primero
 se define una regla generar y se ejecute 
 
-\subsection{EDA}
+\subsection{Análisis exploratorio de datos}
+
+
 
 \subsection{Técnicas de aumento de datos}
 

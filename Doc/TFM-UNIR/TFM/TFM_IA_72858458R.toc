@@ -20,47 +20,49 @@
 \contentsline {subsection}{\numberline {2.5.7}Búsqueda Guiada por Redes Neuronales}{13}{subsection.2.5.7}%
 \contentsline {section}{\numberline {2.6}Abstract and Reasoning Corpus}{14}{section.2.6}%
 \contentsline {subsection}{\numberline {2.6.1}Espectro de la generalización}{15}{subsection.2.6.1}%
-\contentsline {subsection}{\numberline {2.6.2}La inteligencia desde la perspectiva de la adquisición de habilidades}{16}{subsection.2.6.2}%
-\contentsline {subsection}{\numberline {2.6.3}ARC-AGI-1}{19}{subsection.2.6.3}%
-\contentsline {subsection}{\numberline {2.6.4}Núcleos de conocimiento aplicado en ARC-AGI}{20}{subsection.2.6.4}%
-\contentsline {subsubsection}{Objetualidad}{20}{subsubsection*.6}%
-\contentsline {subsubsection}{Orientación a objetivos}{21}{subsubsection*.7}%
-\contentsline {subsubsection}{Números y conteo}{21}{subsubsection*.8}%
-\contentsline {subsubsection}{Geometría y Topología básica}{22}{subsubsection*.9}%
-\contentsline {subsection}{\numberline {2.6.5}Repositorio de datos}{23}{subsection.2.6.5}%
-\contentsline {subsection}{\numberline {2.6.6}ARC-AGI-2}{24}{subsection.2.6.6}%
-\contentsline {subsection}{\numberline {2.6.7}ARC-AGI-3}{24}{subsection.2.6.7}%
-\contentsline {subsection}{\numberline {2.6.8}Comparativa entre ARC-AGI-1, ARC-AGI-2 y ARC-AGI-3}{24}{subsection.2.6.8}%
-\contentsline {section}{\numberline {2.7}Primeros enfoques para resolver ARC-AGI}{25}{section.2.7}%
-\contentsline {subsection}{\numberline {2.7.1}Domain Specific Languages (DSLs) y síntesis de programas}{25}{subsection.2.7.1}%
-\contentsline {subsection}{\numberline {2.7.2}Enfoque Neurosimbólico}{25}{subsection.2.7.2}%
-\contentsline {subsection}{\numberline {2.7.3}LARC}{25}{subsection.2.7.3}%
-\contentsline {section}{\numberline {2.8}Grandes Modelos de Lenguaje en ARC-AGI-1}{25}{section.2.8}%
-\contentsline {section}{\numberline {2.9}Modelos basados en la Neurodiversidad}{26}{section.2.9}%
-\contentsline {subsection}{\numberline {2.9.1}Inducción de Síntesis de programas mediante Redes Neuronales Eficientes}{26}{subsection.2.9.1}%
-\contentsline {section}{\numberline {2.10}Modelos basados en Transformers compactos}{26}{section.2.10}%
-\contentsline {section}{\numberline {2.11}Enfoques de modelos sin Pre-entrenamiento}{26}{section.2.11}%
-\contentsline {section}{\numberline {2.12}Optimización en Tiempo de Inferencia}{26}{section.2.12}%
-\contentsline {section}{\numberline {2.13}Combinación de sistemas de programas con modelos de transducción}{26}{section.2.13}%
-\contentsline {section}{\numberline {2.14}Modelos compactos basados en bucles de refinamiento iterativo}{26}{section.2.14}%
-\contentsline {subsection}{\numberline {2.14.1}Modelos de razonamientos jerárquicos}{26}{subsection.2.14.1}%
-\contentsline {subsection}{\numberline {2.14.2}Modelos de razonamientos recursivos con redes neuronales compactas}{27}{subsection.2.14.2}%
-\contentsline {section}{\numberline {2.15}Estado actual con perspectiva de eficiencia computacional}{27}{section.2.15}%
-\contentsline {chapter}{\numberline {3}Metodología}{28}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Enfoque Científico y Método de Investigación}{28}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Metodología de Desarrollo y Gestión del Proyecto}{28}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Ciclo de Vida del Modelo basado en MLOps}{29}{section.3.3}%
-\contentsline {chapter}{\numberline {4}Infraestructura y herramientas}{30}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Infraestructura de computación}{30}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Entorno de desarrollo}{31}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Utilidades externas de ARC-AGI}{33}{section.4.3}%
-\contentsline {chapter}{\numberline {5}Desarrollo}{34}{chapter.5}%
-\contentsline {subsection}{\numberline {5.0.1}EDA}{35}{subsection.5.0.1}%
-\contentsline {subsection}{\numberline {5.0.2}Técnicas de aumento de datos}{35}{subsection.5.0.2}%
-\contentsline {section}{\numberline {5.1}Arquitectura y entrenamiento}{35}{section.5.1}%
-\contentsline {chapter}{\numberline {6}Resultados}{36}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Planificación}{37}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Estudio económico}{38}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{39}{chapter.9}%
-\contentsline {section}{Referencias}{39}{section*.10}%
-\contentsline {chapter}{\numberline {A}Apéndices}{41}{appendix.Alph1}%
+\contentsline {subsection}{\numberline {2.6.2}La inteligencia desde la perspectiva de la adquisición de habilidades}{17}{subsection.2.6.2}%
+\contentsline {subsection}{\numberline {2.6.3}ARC-AGI-1}{20}{subsection.2.6.3}%
+\contentsline {subsection}{\numberline {2.6.4}Núcleos de conocimiento aplicado en ARC-AGI}{21}{subsection.2.6.4}%
+\contentsline {subsubsection}{Objetualidad}{21}{subsubsection*.6}%
+\contentsline {subsubsection}{Orientación a objetivos}{22}{subsubsection*.7}%
+\contentsline {subsubsection}{Números y conteo}{23}{subsubsection*.8}%
+\contentsline {subsubsection}{Geometría y Topología básica}{23}{subsubsection*.9}%
+\contentsline {subsection}{\numberline {2.6.5}Repositorio de datos}{24}{subsection.2.6.5}%
+\contentsline {subsection}{\numberline {2.6.6}ARC-AGI-2}{25}{subsection.2.6.6}%
+\contentsline {subsection}{\numberline {2.6.7}ARC-AGI-3}{26}{subsection.2.6.7}%
+\contentsline {subsubsection}{Capacidades evaluadas}{26}{subsubsection*.10}%
+\contentsline {subsubsection}{Resultados preliminares}{27}{subsubsection*.11}%
+\contentsline {subsection}{\numberline {2.6.8}Comparativa entre sistemas ARC-AGI}{29}{subsection.2.6.8}%
+\contentsline {section}{\numberline {2.7}Primeros enfoques para resolver ARC-AGI}{29}{section.2.7}%
+\contentsline {subsection}{\numberline {2.7.1}Domain Specific Languages (DSLs) y síntesis de programas}{29}{subsection.2.7.1}%
+\contentsline {subsection}{\numberline {2.7.2}Enfoque Neurosimbólico}{30}{subsection.2.7.2}%
+\contentsline {subsection}{\numberline {2.7.3}LARC}{30}{subsection.2.7.3}%
+\contentsline {section}{\numberline {2.8}Grandes Modelos de Lenguaje en ARC-AGI-1}{30}{section.2.8}%
+\contentsline {section}{\numberline {2.9}Modelos basados en la Neurodiversidad}{30}{section.2.9}%
+\contentsline {subsection}{\numberline {2.9.1}Inducción de Síntesis de programas mediante Redes Neuronales Eficientes}{30}{subsection.2.9.1}%
+\contentsline {section}{\numberline {2.10}Modelos basados en Transformers compactos}{30}{section.2.10}%
+\contentsline {section}{\numberline {2.11}Enfoques de modelos sin Pre-entrenamiento}{30}{section.2.11}%
+\contentsline {section}{\numberline {2.12}Optimización en Tiempo de Inferencia}{31}{section.2.12}%
+\contentsline {section}{\numberline {2.13}Combinación de sistemas de programas con modelos de transducción}{31}{section.2.13}%
+\contentsline {section}{\numberline {2.14}Modelos compactos basados en bucles de refinamiento iterativo}{31}{section.2.14}%
+\contentsline {subsection}{\numberline {2.14.1}Modelos de razonamientos jerárquicos}{31}{subsection.2.14.1}%
+\contentsline {subsection}{\numberline {2.14.2}Modelos de razonamientos recursivos con redes neuronales compactas}{31}{subsection.2.14.2}%
+\contentsline {section}{\numberline {2.15}Estado actual con perspectiva de eficiencia computacional}{31}{section.2.15}%
+\contentsline {chapter}{\numberline {3}Metodología}{32}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Enfoque Científico y Método de Investigación}{32}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Metodología de Desarrollo y Gestión del Proyecto}{32}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Ciclo de Vida del Modelo basado en MLOps}{33}{section.3.3}%
+\contentsline {chapter}{\numberline {4}Infraestructura y herramientas}{34}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Infraestructura de computación}{34}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Entorno de desarrollo}{35}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Utilidades externas de ARC-AGI}{37}{section.4.3}%
+\contentsline {chapter}{\numberline {5}Desarrollo}{38}{chapter.5}%
+\contentsline {subsection}{\numberline {5.0.1}Análisis exploratorio de datos}{39}{subsection.5.0.1}%
+\contentsline {subsection}{\numberline {5.0.2}Técnicas de aumento de datos}{39}{subsection.5.0.2}%
+\contentsline {section}{\numberline {5.1}Arquitectura y entrenamiento}{39}{section.5.1}%
+\contentsline {chapter}{\numberline {6}Resultados}{40}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Planificación}{41}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Estudio económico}{42}{chapter.8}%
+\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{43}{chapter.9}%
+\contentsline {section}{Referencias}{43}{section*.12}%
+\contentsline {chapter}{\numberline {A}Apéndices}{45}{appendix.Alph1}%
