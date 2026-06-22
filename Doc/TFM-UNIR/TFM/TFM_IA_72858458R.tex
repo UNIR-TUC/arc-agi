@@ -848,7 +848,29 @@ de poda diseñada manualmente para guiar la búsqueda \cite{wind2020dsl}.
 
 \subsection{Enfoque Neurosimbólico}
 
-Investigado. Pendiente de redactar.
+El enfoque propuesto por Simon Alford \citeyear{alford2021neurosymbolic} en el MIT, aborda el reto de la 
+inteligencia general artificial utilizando el benchmark ARC-AGI. El autor parte de la premisa de que los sistemas tradicionales de aprendizaje profundo fallan en la 
+generalización sistemática porque tienden a memorizar datos en lugar de aprender procedimientos o reglas explícitas. Para superar esto, la tesis propone un enfoque 
+neurosimbólico inspirado en la teoría de los sistema de pensamiento combinando la rapidez asociativa de las redes neuronales (Sistema 1) con la 
+capacidad estructurada y lógica del razonamiento simbólico (Sistema 2). La solución se divide en dos grandes pilares dependientes, la abstracción y el razonamiento.
+
+Para el primer pilar, la abstracción, el sistema emplea un motor de síntesis de programas llamado \textit{DreamCoder}. La clave de este motor radica en su algoritmo de
+"compresión". A medida que el agente resuelve problemas básicos combinando funciones sencillas, como rotar o espejar una  matriz, analiza los programas exitosos 
+para identificar patrones recurrentes. Luego, empaqueta estas secuencias comunes en nuevas funciones de alto nivel, ampliando así su vocabulario de comandos y logrando 
+generalizar su conocimiento hacia tareas cada vez más complejas que el desarrollador original no había anticipado. No obstante, el autor advierte que la búsqueda guiada 
+por redes neuronales estándar de DreamCoder es insuficiente para escalar y resolver programas largos o con muchas operaciones repetidas, algo muy habitual en los puzzles 
+de ARC.
+
+Para solventar esta limitación en la búsqueda, el autor desarrolla el segundo pilar, un modelo de razonamiento avanzado basado en la síntesis guiada por ejecución 
+bidireccional. En lugar de intentar predecir el código completo a ciegas, el sistema ejecuta el programa paso a paso (hacia adelante o \textit{bottom-up*}), observando los 
+resultados intermedios en la matriz para decidir la siguiente acción. Simultáneamente, el sistema emula la deducción humana trabajando hacia atrás (\textit{top-down*}) 
+mediante el uso de la semántica inversa y la inversa condicional. Esto significa que el agente analiza la imagen final deseada y deduce matemáticamente qué 
+entradas intermedias habrían sido necesarias para producirla. Todo este proceso se modela matemáticamente como un Proceso de Decisión de Markov, donde se busca 
+conectar los nodos de entrada iniciales con el nodo de salida objetivo.
+
+En conclusión, la tesis sostiene que ninguno de los dos enfoques es completamente suficiente por sí solo para dominar el \textit{benchmark ARC}. 
+La arquitectura ideal requiere la unificación de ambos sistemas: se necesita la capacidad de compresión de DreamCoder para generar abstracciones que enriquezcan el lenguaje disponible, 
+y se requiere la potencia de la búsqueda bidireccional para navegar el inmenso espacio de posibles programas combinando inteligentemente las deducciones lógicas inversas con la evaluación visual paso a paso.
 
 \subsection{LARC}
 

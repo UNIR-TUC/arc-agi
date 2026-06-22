@@ -1,60 +1,58 @@
-This is BibTeX, Version 0.99e
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: TFM_IA_72858458R.aux
-Reallocating 'name_of_file' (item size: 1) to 8 items.
 The style file: apacite.bst
-Reallocating 'name_of_file' (item size: 1) to 13 items.
-Reallocating 'glb_str_end' (item size: 4) to 20 items.
-Reallocating 'glb_str_ptr' (item size: 4) to 20 items.
-Reallocating 'global_strs' (item size: 1) to 4000000 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'wiz_functions' (item size: 4) to 6000 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'wiz_functions' (item size: 4) to 9000 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: bibliografia.bib
 apacite.bst [2013/07/21 v6.03 APA bibliography style]
 Warning--`others' not consistent with 6th ed. of the APA Manual
-You've used 16 entries,
+You've used 17 entries,
             6951 wiz_defined-function locations,
-            1359 strings with 13238 characters,
-and the built_in function-call counts, 28434 in all, are:
-= -- 3555
-> -- 229
-< -- 1320
-+ -- 1284
-- -- 37
-* -- 1745
-:= -- 5134
-add.period$ -- 69
-call.type$ -- 16
-change.case$ -- 290
+            1364 strings with 13368 characters,
+and the built_in function-call counts, 30216 in all, are:
+= -- 3807
+> -- 239
+< -- 1391
++ -- 1348
+- -- 39
+* -- 1837
+:= -- 5414
+add.period$ -- 74
+call.type$ -- 17
+change.case$ -- 307
 chr.to.int$ -- 0
-cite$ -- 32
-duplicate$ -- 704
-empty$ -- 1174
-format.name$ -- 361
-if$ -- 5507
+cite$ -- 34
+duplicate$ -- 734
+empty$ -- 1246
+format.name$ -- 375
+if$ -- 5878
 int.to.chr$ -- 0
-int.to.str$ -- 52
+int.to.str$ -- 55
 missing$ -- 0
-newline$ -- 387
-num.names$ -- 128
-pop$ -- 622
+newline$ -- 411
+num.names$ -- 136
+pop$ -- 642
 preamble$ -- 1
-purify$ -- 64
+purify$ -- 68
 quote$ -- 0
-skip$ -- 1896
+skip$ -- 2070
 stack$ -- 0
-substring$ -- 1384
-swap$ -- 402
-text.length$ -- 38
+substring$ -- 1453
+swap$ -- 422
+text.length$ -- 40
 text.prefix$ -- 0
 top$ -- 1
-type$ -- 1408
+type$ -- 1552
 warning$ -- 1
-while$ -- 126
+while$ -- 131
 width$ -- 0
-write$ -- 467
+write$ -- 493
 (There was 1 warning)
