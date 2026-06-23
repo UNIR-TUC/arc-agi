@@ -107,3 +107,7 @@ argument-hint: 'Seccion, objetivo o tarea de redaccion en LaTeX'
 
 ## Cohesión de texto
 - Mantén la coherencia y cohesión del texto, asegurando que las ideas fluyan. Evita usar ':' o 'etc.'. Trata de cohesionar las ideas con conectores adecuados y frases completas. Evita fragmentos de texto que no estén bien integrados en el flujo del documento. Evita patrones de texto que realizan a partir de resumenes de trabajos previos, como "El autor afirma que..." o "Los autores concluyen que...". En su lugar, sintetiza las ideas y conclusiones de manera que reflejen un análisis propio y una comprensión profunda del tema.
+
+## Realización de resúmenes sobre estudios previos
+- No utilices demasiados tecnicismos, expresa las ideas de manera clara y sencilla, evitando la repetición de frases como "El autor afirma que..." o "Los autores concluyen que...". En su lugar, sintetiza las ideas y conclusiones de manera que reflejen un análisis propio y una comprensión profunda del tema. El texto debe ser sencillo de leer
+para el lector.

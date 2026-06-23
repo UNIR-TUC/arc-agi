@@ -1,6 +1,36 @@
 \begin{thebibliography}{}
 
 \bibitem [\protect \citeauthoryear {%
+Ainooson%
+, Sanyal%
+, Michelson%
+, Yang%
+\BCBL {}\ \BBA {} Kunda%
+}{%
+Ainooson%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2023}}%
+}]{%
+ainooson2023neurodiversity}
+\APACinsertmetastar {%
+ainooson2023neurodiversity}%
+\begin{APACrefauthors}%
+Ainooson, J.%
+, Sanyal, D.%
+, Michelson, J\BPBI P.%
+, Yang, Y.%
+\BCBL {}\ \BBA {} Kunda, M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A neurodiversity-inspired solver for the abstraction$\backslash$\& reasoning corpus (arc) using visual imagery and program synthesis} {A neurodiversity-inspired solver for the abstraction$\backslash$\& reasoning corpus (arc) using visual imagery and program synthesis}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{arXiv preprint arXiv:2302.09425}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
 Alford%
 }{%
 Alford%
@@ -126,6 +156,34 @@ Chollet, F.%
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
+Gendron%
+, Bao%
+, Witbrock%
+\BCBL {}\ \BBA {} Dobbie%
+}{%
+Gendron%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2024}}%
+}]{%
+gendron2024largelanguagemodelsstrong}
+\APACinsertmetastar {%
+gendron2024largelanguagemodelsstrong}%
+\begin{APACrefauthors}%
+Gendron, G.%
+, Bao, Q.%
+, Witbrock, M.%
+\BCBL {}\ \BBA {} Dobbie, G.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\APACrefbtitle {Large Language Models Are Not Strong Abstract Reasoners.} {Large language models are not strong abstract reasoners.}
+\newblock
+\begin{APACrefURL} \url{https://arxiv.org/abs/2305.19555} \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
 Gonz{\'a}lez%
 }{%
 Gonz{\'a}lez%
@@ -238,6 +296,34 @@ Legg, S.%
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
+Li%
+, Xu%
+, Sanner%
+\BCBL {}\ \BBA {} Khalil%
+}{%
+Li%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2024}}%
+}]{%
+li2024tackling}
+\APACinsertmetastar {%
+li2024tackling}%
+\begin{APACrefauthors}%
+Li, W.%
+, Xu, Y.%
+, Sanner, S.%
+\BCBL {}\ \BBA {} Khalil, E\BPBI B.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Tackling the abstraction and reasoning corpus with vision transformers: the importance of 2d representation, positions, and objects} {Tackling the abstraction and reasoning corpus with vision transformers: the importance of 2d representation, positions, and objects}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{arXiv preprint arXiv:2410.06405}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
 Minsky%
 }{%
 Minsky%
@@ -283,6 +369,28 @@ Newell, A.%
 {\BBOQ}\APACrefatitle {The processes of creative thinking.} {The processes of creative thinking.}{\BBCQ}
 \newblock
 \BIn{} \APACrefbtitle {Contemporary Approaches to Creative Thinking, 1958, University of Colorado, CO, US; This paper was presented at the aforementioned symposium.} {Contemporary approaches to creative thinking, 1958, university of colorado, co, us; this paper was presented at the aforementioned symposium.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Ouellette%
+}{%
+Ouellette%
+}{%
+{\protect \APACyear {2024}}%
+}]{%
+ouellette2024towards}
+\APACinsertmetastar {%
+ouellette2024towards}%
+\begin{APACrefauthors}%
+Ouellette, S.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Towards efficient neurally-guided program induction for arc-agi} {Towards efficient neurally-guided program induction for arc-agi}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{arXiv preprint arXiv:2411.17708}{}{}{}.
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
