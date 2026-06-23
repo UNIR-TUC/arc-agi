@@ -95,3 +95,15 @@ argument-hint: 'Seccion, objetivo o tarea de redaccion en LaTeX'
 ## Documentación Fundamental
 - Si es necesario haz uso de la carpeta `Doc/Doc-markdown/` con todos los archivos de referencia y notas adicionales en formato Markdown.
 - Consulta si es necesario todas las citas disponibles en `Doc/TFM-UNIR/TFM/bibliografia.bib` y el manual de estilo `Doc/TFM-UNIR/TFM/manual_citas.md`.
+
+## Lenguaje
+- La redaccion debe ser en espanol academico, formal y preciso. Se debe evitar que el texto sugiera que es un mero resumen de un trabajo o resumen previo. El texto debe
+   ser original, con ideas propias y con un estilo de escritura que refleje un TFM/tesis UNIR. El texto debe aparentar que se han extraido ideas y conclusiones propias del autor, no solo un resumen de un trabajo previo.
+- En vez de usar 'El autor' ó 'Los autores' para referise a un trabajo citado, usa una cita narrativa con el comando `\citeA{clave}` para que el nombre del autor forme parte de la frase. Por ejemplo: "Según \citeA{Smith2020}, los resultados muestran que...". Esto ayuda a mantener un tono académico y evita la repetición de frases como "El autor afirma que...".
+
+## Extracción de conclusiones
+- Puedes aportar texto que sintetice conclusiones de ideas que apunten a la dirección del objetivo del trabajo, pero no debes inventar resultados que no estén en el trabajo original. Si el trabajo original no tiene conclusiones claras, puedes sugerir posibles implicaciones o direcciones futuras basadas en la información disponible, pero siempre dejando claro que son inferencias y no afirmaciones del autor original.
+- No aportes datos de lo que no estas completamente seguro. Si no hay información suficiente para una afirmación, es mejor omitirla o indicar que se trata de una inferencia basada en la información disponible.
+
+## Cohesión de texto
+- Mantén la coherencia y cohesión del texto, asegurando que las ideas fluyan. Evita usar ':' o 'etc.'. Trata de cohesionar las ideas con conectores adecuados y frases completas. Evita fragmentos de texto que no estén bien integrados en el flujo del documento. Evita patrones de texto que realizan a partir de resumenes de trabajos previos, como "El autor afirma que..." o "Los autores concluyen que...". En su lugar, sintetiza las ideas y conclusiones de manera que reflejen un análisis propio y una comprensión profunda del tema.
