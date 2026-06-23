@@ -859,7 +859,7 @@ Para el primer pilar, la abstracción, el sistema emplea un motor de síntesis d
 para identificar patrones recurrentes. Luego, empaqueta estas secuencias comunes en nuevas funciones de alto nivel, ampliando así su vocabulario de comandos y logrando 
 generalizar su conocimiento hacia tareas cada vez más complejas que el desarrollador original no había anticipado. No obstante, el autor advierte que la búsqueda guiada 
 por redes neuronales estándar de DreamCoder es insuficiente para escalar y resolver programas largos o con muchas operaciones repetidas, algo muy habitual en los puzzles 
-de ARC.
+de ARC-AGI \cite{alford2021neurosymbolic}.
 
 Para solventar esta limitación en la búsqueda, el autor desarrolla el segundo pilar, un modelo de razonamiento avanzado basado en la síntesis guiada por ejecución 
 bidireccional. En lugar de intentar predecir el código completo a ciegas, el sistema ejecuta el programa paso a paso (hacia adelante o \textit{bottom-up*}), observando los 
@@ -870,15 +870,43 @@ conectar los nodos de entrada iniciales con el nodo de salida objetivo.
 
 En conclusión, la tesis sostiene que ninguno de los dos enfoques es completamente suficiente por sí solo para dominar el \textit{benchmark ARC}. 
 La arquitectura ideal requiere la unificación de ambos sistemas: se necesita la capacidad de compresión de DreamCoder para generar abstracciones que enriquezcan el lenguaje disponible, 
-y se requiere la potencia de la búsqueda bidireccional para navegar el inmenso espacio de posibles programas combinando inteligentemente las deducciones lógicas inversas con la evaluación visual paso a paso.
-
-\subsection{LARC}
-
-Investigado. Pendiente de redactar.
+y se requiere la potencia de la búsqueda bidireccional para navegar el inmenso espacio de posibles programas combinando inteligentemente las deducciones lógicas inversas con la evaluación visual 
+paso a paso.
 
 \section{Grandes Modelos de Lenguaje en ARC-AGI-1}
 
-Investigado. Pendiente de redactar.
+El documento \textbf{``Large Language Models Are Not Strong Abstract Reasoners''} \cite{LLMsNotStrong2024} evalúa una de las debilidades fundamentales de los Grandes 
+Modelos de Lenguaje (LLMs): su capacidad para el razonamiento abstracto. Aunque estos modelos destacan en tareas de procesamiento de lenguaje natural (como la traducción o 
+la generación de código), 
+los autores plantean que los mecanismos detrás de este éxito son opacos y dudan de si realmente poseen capacidades cognitivas similares a las humanas o si sus resultados
+provienen de la memorización de datos. Para medir esto, utilizan el razonamiento abstracto, el cual consiste en identificar patrones generales y lógicos a partir de muy pocos
+ejemplos y aplicarlos a casos nuevos. Esta tarea es ideal para evaluar la capacidad de generalización profunda de un sistema, ya que evita las correlaciones espurias.
+
+Para llevar a cabo la evaluación, los investigadores crearon un nuevo marco de pruebas (\textit{benchmark}) adaptando conjuntos de datos visuales clásicos orientados al razonamiento (como ARC, ACRE y las matrices de Raven) a formatos textuales y simbólicos. Dividieron las tareas en preguntas de respuesta abierta (Open QA) y de opción 
+múltiple (MCQA). Sobre este marco, probaron una amplia gama de arquitecturas modernas, desde modelos de la familia GPT (incluyendo GPT-4 y GPT-3.5) hasta modelos de 
+código abierto como LLaMA, Alpaca y Zephyr.
+
+Los resultados de los experimentos revelan de manera contundente que los LLMs actuales tienen un rendimiento muy deficiente en tareas de razonamiento abstracto. En las 
+pruebas abiertas, modelos como GPT-4 y Text-Davinci-3 obtuvieron los mejores resultados, pero aún así fallaron en la gran mayoría de los puzles. Además, los autores 
+advierten que el relativo ``éxito'' de GPT-4 en pruebas clásicas como las matrices de Raven podría deberse a que dichas pruebas ya estaban incluidas en sus datos de 
+entrenamiento, más que a una verdadera capacidad de deducción. En los escenarios de opción múltiple, el rendimiento también se mantuvo cercano a la aleatoriedad, demostrando que los modelos ni siquiera son capaces de reconocer la respuesta correcta cuando se les da a elegir, lo que los hace ineficaces para tareas de auto-evaluación o auto-refinamiento.
+
+El estudio también demuestra que las técnicas de incitación (\textit{prompting}) que habitualmente mejoran el rendimiento en otras áreas del lenguaje natural no 
+funcionan en este dominio. Estrategias como la ``Cadena de Pensamiento'' (\textit{Chain-of-Thought}) o pedirle al modelo que escriba código informático para resolver 
+el problema no proporcionaron mejoras significativas. Por otro lado, al aplicar \textit{fine-tuning} a modelos como LLaMA2, se logró una precisión casi perfecta en 
+problemas similares a los del entrenamiento, pero fracasaron estrepitosamente al evaluar variaciones fuera de esa distribución (como agrupar múltiples objetos); esto 
+indica que el modelo memoriza reglas de sintaxis pero no adquiere una verdadera capacidad de abstracción composicional. Curiosamente, los modelos mostraron un mejor 
+rendimiento cuando los problemas se representaban mediante vectores numéricos (simbólicos) en lugar de texto en lenguaje natural, ya que este último introduce sesgos y 
+distracciones perjudiciales.
+
+Los Grandes Modelos de Lenguaje autorregresivos auto-supervisados actuales carecen de las propiedades fundamentales necesarias para lograr un 
+razonamiento abstracto sólido \cite{LLMsNotStrong2024}. El verdadero cuello de botella de estos sistemas no es la falta de comprensión de las instrucciones del usuario, 
+sino su incapacidad para reconocer y abstraer nuevos patrones. Para superar estas barreras y acercarse a una cognición similar a la humana, los autores postulan que la inteligencia
+artificial requerirá de nuevos enfoques enfocados específicamente en la inducción de programas y el razonamiento causal.
+
+Estas limitaciones fundamentales han motivado una línea de investigación paralela enfocada en arquitecturas alternativas y complementarias que buscan superar las 
+debilidades identificadas en los LLMs. Los siguientes enfoques exploran modelos más especializados y eficientes en términos computacionales, 
+combinando técnicas neurosimbólicas, transformers compactos y síntesis de programas mejorada, con el objetivo de lograr un razonamiento abstracto más robusto y generalizable.
 
 \section{Modelos basados en la Neurodiversidad}
 
