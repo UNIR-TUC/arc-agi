@@ -1,4 +1,5 @@
 model,author,date,solution_type,arc_agi_1,arc_agi_2,arc_agi_3,cost_per_task,total_cost
+GLM-5.2,Z.ai,2026-06-13,CoT,77.0,22.0,,0.25,
 Claude Opus 4.8 (Low),Anthropic,2026-06-01,CoT,88.0,62.0,,1.68,
 Claude Opus 4.8 (Medium),Anthropic,2026-06-01,CoT,91.0,71.0,,2.39,
 Claude Opus 4.8 (High),Anthropic,2026-06-01,CoT,92.0,72.0,1.0,2.74,$10.0K
