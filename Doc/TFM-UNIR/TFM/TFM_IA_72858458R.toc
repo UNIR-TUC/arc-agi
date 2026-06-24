@@ -39,13 +39,13 @@
 \contentsline {section}{\numberline {2.8}Grandes Modelos de Lenguaje en ARC-AGI-1}{31}{section.2.8}%
 \contentsline {section}{\numberline {2.9}Modelos basados en la Neurodiversidad}{32}{section.2.9}%
 \contentsline {subsection}{\numberline {2.9.1}Inducción de Síntesis de programas mediante Redes Neuronales Eficientes}{34}{subsection.2.9.1}%
-\contentsline {section}{\numberline {2.10}Combinación de sistemas de programas con modelos de transducción}{38}{section.2.10}%
+\contentsline {section}{\numberline {2.10}Combinación de sistemas de programas con modelos de transducción}{37}{section.2.10}%
 \contentsline {section}{\numberline {2.11}Afinamiento eficiente de modelos para ARC-AGI}{38}{section.2.11}%
 \contentsline {section}{\numberline {2.12}Enfoques de modelos sin Pre-entrenamiento}{38}{section.2.12}%
 \contentsline {section}{\numberline {2.13}Modelos basados en Transformers compactos}{38}{section.2.13}%
-\contentsline {section}{\numberline {2.14}Optimización en Tiempo de Inferencia}{39}{section.2.14}%
-\contentsline {section}{\numberline {2.15}Modelos compactos basados en bucles de refinamiento iterativo}{39}{section.2.15}%
-\contentsline {subsection}{\numberline {2.15.1}Modelos de razonamientos jerárquicos}{39}{subsection.2.15.1}%
+\contentsline {section}{\numberline {2.14}Optimización en Tiempo de Inferencia}{38}{section.2.14}%
+\contentsline {section}{\numberline {2.15}Modelos compactos basados en bucles de refinamiento iterativo}{38}{section.2.15}%
+\contentsline {subsection}{\numberline {2.15.1}Modelos de razonamientos jerárquicos}{38}{subsection.2.15.1}%
 \contentsline {subsection}{\numberline {2.15.2}Modelos de razonamientos recursivos con redes neuronales compactas}{39}{subsection.2.15.2}%
 \contentsline {section}{\numberline {2.16}Estado actual con perspectiva de eficiencia computacional}{39}{section.2.16}%
 \contentsline {chapter}{\numberline {3}Metodología}{40}{chapter.3}%
