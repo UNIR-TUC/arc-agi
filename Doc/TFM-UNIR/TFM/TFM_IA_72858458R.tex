@@ -910,16 +910,16 @@ combinando técnicas neurosimbólicas, transformers compactos y síntesis de pro
 % 2302.09425v3_visual_imagery_and_program_synthesis
 \section{Modelos basados en la Neurodiversidad}
 
-Una linea de trabajo particularmente original dentro del ecosistema ARC es la propuesta por \citeA{ainooson2023neurodiversity}, que toma como punto de 
+Una linea de trabajo particularmente original dentro del ecosistema ARC-AGI es la propuesta por \citeA{ainooson2023neurodiversity}, que toma como punto de 
 partida hallazgos de la psicología cognitiva y de la investigación sobre Neurodiversidad para replantear el modo en que un sistema artificial representa y 
-manipula regularidades visuales. Su tesis central es que muchas tareas de ARC no fallan por ausencia de potencia de calculo en sentido estricto, sino porque 
+manipula regularidades visuales. Su tesis central es que muchas tareas de ARC-AGI no fallan por ausencia de potencia de calculo en sentido estricto, sino porque 
 los sistemas habituales carecen de una forma adecuada de representar conocimiento nuclear sobre objetos, relaciones espaciales, continuidad visual y 
 transformaciones topológicas. Desde esta perspectiva, el problema no se reduce a encontrar una salida correcta, sino a disponer de una representación interna 
 capaz de operar sobre configuraciones visuales de forma flexible, composicional y cercana a la manera en que ciertos sujetos humanos resuelven problemas 
 abstractos mediante imaginería visual.
 
 El núcleo de la propuesta se articula en torno a un lenguaje de razonamiento visual denominado VIMRL, concebido como un lenguaje especializado 
-para tareas de ARC \cite{ainooson2023neurodiversity}. En lugar de depender exclusivamente de descripciones simbólicas de alto nivel, VIMRL trabaja con tipos 
+para tareas de ARC-AGI \cite{ainooson2023neurodiversity}. En lugar de depender exclusivamente de descripciones simbólicas de alto nivel, VIMRL trabaja con tipos 
 como imagen, objeto, color, número y listas de objetos, y permite construir programas que encadenan operaciones de bajo y alto nivel. Las operaciones de bajo 
 nivel realizan transformaciones explícitamente definidas sobre las rejillas, mientras que las de alto nivel analizan los ejemplos de entrenamiento para 
 inducir reglas locales que luego pueden aplicarse al caso de prueba.
@@ -928,8 +928,8 @@ Sobre esa base representacional, el solucionador explora el espacio de programas
 candidatos aquellos programas que alcanzan suficiente precisión sobre los pares de entrenamiento y priorizando después soluciones pequeñas y salidas 
 diversas \cite{ainooson2023neurodiversity}. El trabajo subraya que la dificultad principal no reside solo en definir operaciones útiles, sino en contener 
 la explosión combinatoria del espacio de búsqueda. Para ello introduce restricciones sobre profundidad, reutilización de variables, eliminación de programas 
-lógicamente equivalentes y supresión de referencias redundantes a la entrada original. Este punto es relevante para el presente TFM porque muestra una 
-tensión recurrente en ARC entre expresividad y eficiencia computacional. Cuanto más rico es el lenguaje de operaciones, mayor es la capacidad de representar 
+lógicamente equivalentes y supresión de referencias redundantes a la entrada original. Este punto es relevante porque muestra una 
+tensión recurrente en ARC-AGI entre expresividad y eficiencia computacional. Cuanto más rico es el lenguaje de operaciones, mayor es la capacidad de representar 
 conceptos abstractos, pero también crece el coste de explorar programas plausibles.
 
 Los resultados obtenidos por \citeA{ainooson2023neurodiversity} respaldan el interés de este enfoque, aunque también dejan ver sus límites. Su mejor 
@@ -967,8 +967,7 @@ se centra en comparar la rejilla que el sistema va obteniendo con la rejilla fin
 La segunda, \textit{Learning the Program Space} (LPS), desplaza la atención desde la imagen hacia el propio programa y trata de predecir qué 
 secuencia de operaciones tiene más posibilidades de resolver la tarea. La tercera, \textit{Learning the Transformation Space} (LTS), intenta 
 combinar las ventajas de las dos anteriores, porque no solo propone operaciones probables, sino que también tiene en cuenta cómo va cambiando el 
-estado parcial de la solución a medida que se ejecuta \cite{ouellette2024towards}. Esta clasificación resulta útil para el presente TFM 
-porque permite distinguir con claridad si el aprendizaje se aplica sobre la imagen, sobre el programa o sobre las transformaciones intermedias.
+estado parcial de la solución a medida que se ejecuta \cite{ouellette2024towards}.
 
 La aportación técnica principal del artículo reside en GridCoder, una implementación del paradigma LPS. En este enfoque, una arquitectura de 
 tipo \textit{Vision-Language Model} recibe pares de rejillas de entrada y salida y produce, de forma auto-regresiva, probabilidades sobre tokens que 
@@ -1020,20 +1019,99 @@ investigar modelos pequeños que razonen en bucle, ajusten dinámicamente su com
 del estado interno.
 
 % 2411.02272v4_combinning_indution_and_transduction_for_ARC
-\section{Combinación de sistemas de programas con modelos de transducción}
+% \section{Combinación de sistemas de programas con modelos de transducción}
 
-Investigado. Pendiente de redactar.
+% Investigado. Pendiente de redactar.
 
 % the_architects
 \section{Afinamiento eficiente de modelos para ARC-AGI}
 
-En 2024, un grupo de investigadores realizaron un hito histórico alcanzando una puntuación de 56\% en el concurso público de ARC Prize. \citeA{}
+En 2024, un grupo de investigadores realizaron un hito histórico alcanzando una puntuación de 56\% en el concurso público de ARC Prize. El éxito de este enfoque 
+no radica en el uso de redes neuronales de gran tamaño, ni en la sísteis de programas propiamente dicho, sino más bien en una estrategia
+de optimización extrema de  Modelos de Lenguaje Pequeños (SLM). Estos modelos no son especialmente compactos, pero con técnicas
+de optimización puede llegar a ser lo suficientemente eficientes como para poder ser ejecutada en entornos limitados.
+
+Los concursos de ARC Prize exigen que los modelos sean desplegados e inferenciados en entornos de computación especialmente limitados, con
+capacidad de computación equivalentes a dos GPUs Nvidia T4 ó en una Nvidia P100 ambos de 16 GB de memoria de capacidad. \citeA{franzen2024llm} 
+consiguen un ajuste fine inteligente, \textit{tokenizar} de manera brillante y adaptación en tiempo de prueba \textit{Test-Time Training}.
+
+El equipo realiza un proceso de pre-entrenamiento masivo a partir de muchos datos aumentados sintéticamente. Partiendo del conjunto de datos original,
+se generaron casi 400,000 mil tareas adicionales con el repositorio público de Re-ARC. Además de esto, de manera complementaria se añadió conjuntos de datos de 
+entrenamiento proporcionados por la comunidad como ARC-AGI como Concept-ARC y ARC-Heavy. Realizando una mezcla estructural con hasta más de medio millón
+de tareas, se realizó otro proceso de aumentos de datos llegando a 290 millones de tareas sintéticas. Con tal magnitud de datos, el pre-entrenamiento del
+modelo debe hacerse mediante computación en la nube acelerada de considerable potencia.
+
+% Foto de flujo pre-entrenamiento
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.65\textwidth]{image/images/image-3.png}
+\caption[Flujo de proceso de pre-entrenamiento e inferencia]{Flujo de proceso de pre-entrenamiento e inferencia.}
+\label{fig:fig12SECTION2}
+{\footnotesize Fuente: Adaptado de `The LLM ARChitect: Solving ARC-AGI Is A Matter of Perspective'' \cite{franzen2024llm}}
+\end{figure}
+
+\FloatBarrier
+
+Se hace uso de un modelo de lenguaje de Nvidia Mistral-NeMo-Minitron-8B-Base, de 8 billones de parámetros. Para que el modelo de lenguaje pueda entender
+el lenguaje de matrices 2D de ARC.AGI, el equipo desarrolló un \textit{tokenizador} personalizado reduciendo el vocabulario a 64 \textit{tokens}. Este sistema
+reduce significativamente el tamaño de la capa de \textit{embedding} para abaratar el coste de inferencia. También ayuda a evitar alucinaciones,
+pero es necesario dominar el arte de usar estructuras y marcadores concretos. Este sistema es muy sensible al uso de deliminatación de regiones
+para que el modelo sepa cuando empieza un tarea y cuando empieza otra.
+
+% Foto de encoder
+
+Para que el modelo pueda ser inferenciado en GPUs de 16 GB, el equipo realiza una cuantización del modelo de 4 bits mediante el paquete \textit{unsloth-4bit}, 
+el más bajo posible. También hace uso de LoRA ó \textit{Low-Rank Adaptation}, que es una técnica de ajuste fino eficiente para hacer viable esta arquitectura. Sin LoRA, ajustar el modelos de
+8 millones de parámetros sería imposible. Esta limitación condiciona diversas decisiones del flujo de diseño. LoRA puede conseguir la reducción de hasta
+32 veces el número de parámetros y reducir sólamente un pequeño subconjunto de parámetros del modelo entrenables \cite{franzen2024llm}.
+
+% Foto arquitectura
+
+Para la inferencia se usó el algoritmo DFS con un umbral probabilístico y poda. Otros algoritmos como GBFS ó \textit{Beam Search} provocaban baja diversidad de soluciones
+o era a nivel de memoria demasiado costoso. Tras la búsqueda, se realiza una selección de candidatos.
+
+El proceso de pre-entrenamiento se realiza usando una GPU Nvidia H100 con 1,979 TFLOPS en FP16 de precisión de 80 HB VRAM HMB. Esta capacidad de computación
+sólo está alojada en servicios de computación en la nube y es altamente costosa incluso en despliegue de \textit{cluster} optimizados.La adaptación en tiempo de prueba
+e inferencia se realiza con dos GPUs Nvidia T4 de 16 GB de VRAM durante casi 12 horas, el límite permitido por el concurso.
+
 
 % Hay que calcular el coste por tarea debugeando el modelo para toda la base de datos. Según el tiempo que tarde , se hará un cálculo estimado con mi gráfica
 % con la conversación de chatgpt
 \section{Enfoques de modelos sin Pre-entrenamiento}
 
-Investigado. Pendiente de redactar.
+Durante años la creencia de que es necesario realiza un exhaustivo pre-entrenamiento de modelos para poder desarrollar la capacidad
+de razonamiento abstracto ha sido dominante. A lo largo de \citeyear{liao2025arcagiwithoutpretraining}, se han desarrollado diferentes enfoques
+de los que se encuentra CompressARC, un decodificador VAE ó \textit{Variational Autoencoder} encargado de reconstruir una serie de datos a partir
+de una representación comprimida. El modelo realiza su aprendizaje exclusivamente en el tiempo de inferencia, no cuenta con bases de datos externas,
+su único conjunto de datos son las matrices del problema exacto que se intenta resolver en un momento determinado.
+
+\begin{quote}
+\itshape
+``The ability to compress information is equivalent to intelligence.''
+\end{quote}
+
+El modelo es realmente compacto, de tan sólo 76 mil parámetros. Este sistema de rige por el principio de longitud de descripción mínima y la comprensión
+de información. La optimización se realiza mediante redes neuronales en lugar de algoritmos de búsqueda ciegos. Las redes neuronales puede restringir
+el espacio de búsqueda\cite{liao2025arcagiwithoutpretraining}. La red neuronal incluye operaciones diseñadas a mano (sesgos inductivos) que son muy útiles 
+para transformaciones geométricas como medias, expansiones de tensores, funciones de activación SiLU, máximos acumulativos, y desplazamientos directos de píxeles.
+
+% Foto arquitectura
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.65\textwidth]{image/images/image-2.png}
+\caption[Algoritmo de compresión de CompressARC]{Algoritmo de compresión de CompressARC.}
+\label{fig:fig13SECTION2}
+{\footnotesize Fuente: Adaptado de `ARC-AGI WITHOUT PRETRAINING'' \cite{franzen2024llm}}
+\end{figure}
+
+\FloatBarrier
+
+El modelo logra generalizar y resolver el 20\% de las tareas de ARC-AGI-1. Lograr este resultado con apenas 76 mil parámetros y una GPU RTX 4070 con una precisión 
+FP16 de 116,6 TFLOPS es realmente sorprendente.
+
+\begin{center}
+\cite[p.~15]{ouellette2024towards}
+\end{center}
 
 % 2410.06405v2_ARC_With_Vision_Transformers
 % REVISAR!!
@@ -1046,29 +1124,92 @@ lo que apunta a una limitación de representación más que a un simple problema
 trabajo propone \textit{ViTARC}, una arquitectura que sustituye la representación por parches por una codificación a nivel de píxel e 
 incorpora \textit{tokens} de frontera, codificación posicional bidimensional y señales posicionales basadas en objetos. 
 Estas modificaciones elevan de forma notable el rendimiento y permiten alcanzar en torno al 75\% de acierto sobre las 400 
-tareas públicas consideradas. Desde la perspectiva de este TFM, el artículo resulta relevante porque refuerza una idea clave: 
+tareas públicas consideradas. El artículo resulta relevante porque refuerza una idea clave: 
 en transformadores pequeños, la mejora no depende solo de aumentar parámetros o datos, sino de introducir sesgos inductivos 
 que preserven explícitamente la estructura espacial y las relaciones entre objetos.
 
 % The Surprising Effectiveness of Test-Time Training for Few-Shot Learning
-\section{Optimización en Tiempo de Inferencia}
+% \section{Optimización en Tiempo de Inferencia}
 
-Investigado. Pendiente de redactar.
+% Investigado. Pendiente de redactar.
 
 
 \section{Modelos compactos basados en bucles de refinamiento iterativo}
 
-\subsection{Modelos de razonamientos jerárquicos}
+Una de las líneas más prometedoras recientes en ARC-AGI consiste en sustituir la profundidad 
+estática de una red por cómputo iterativo aplicado sobre estados latentes. En lugar de forzar 
+al modelo a producir la respuesta final en una única pasada, estos enfoques refinan progresivamente 
+una hipótesis interna y adaptan el número de pasos de inferencia a la dificultad efectiva de cada tarea. 
+Esta idea resulta especialmente valiosa en ARC-AGI, donde la dificultad no reside solo en reconocer 
+patrones visuales, sino en encadenar transformaciones simbólicas a partir de muy pocos ejemplos.
 
-Investigado. Pendiente de redactar.
+\subsection{Modelos de razonamiento jerárquico}
 
-\subsection{Modelos de razonamientos recursivos con redes neuronales compactas}
+El \textit{Hierarchical Reasoning Model} o HRM de \citeA{wang2025hierarchical} representa uno de los primeros 
+resultados convincentes dentro de esta familia. Su punto de partida es una crítica directa a los modelos de 
+profundidad fija. Aunque un transformador convencional pueda aumentar su contexto o su número de parámetros, 
+sigue realizando esencialmente un número fijo de operaciones para entradas fáciles y difíciles. HRM intenta 
+corregir esta limitación introduciendo dos módulos recurrentes acoplados que operan a escalas temporales distintas. 
+Un módulo de alto nivel mantiene una representación lenta y abstracta del problema, mientras que un módulo de bajo 
+nivel realiza actualizaciones rápidas y detalladas sobre una solución parcial. La separación entre ambos niveles 
+permite alternar entre planificación y refinamiento, reduciendo el estancamiento que suele aparecer en redes 
+recurrentes profundas cuando el estado oculto converge demasiado pronto.
 
-Investigado. Pendiente de redactar.
+% Foto arquitectura
+
+A nivel de entrenamiento, la propuesta incorpora un esquema de gradiente de un solo paso inspirado en los 
+\textit{Deep Equilibrium Models}. En la práctica, la mayor parte de las iteraciones recurrentes se ejecutan sin 
+almacenar todo el grafo completo, y únicamente el último tramo se utiliza para retro-propagación. Esta decisión reduce 
+de forma drástica el coste de memoria y hace viable incrementar la profundidad efectiva del razonamiento sin multiplicar 
+el consumo de recursos. Sobre este núcleo se añade un mecanismo de 	\textit{Adaptive Computational Time}, de manera que el 
+modelo aprende cuándo debe detener su refinamiento interno y cuándo conviene seguir computando.Con aproximadamente 27 millones de parámetros y sin 
+depender de pre-entrenamiento masivo ni de \textit{Chain-of-Thought} textual, HRM alcanza en torno al 40\% en ARC-AGI-1 y 
+muestra que es posible competir en razonamiento abstracto aumentando la profundidad de cómputo antes que la escala bruta del 
+modelo \cite{wang2025hierarchical}.
+
+\subsection{Modelos de razonamiento recursivo con redes neuronales compactas}
+
+\citeA{jolicoeur2025less} llevan esta intuición un paso más lejos con el \textit{Tiny Recursive Model} o TRM. 
+La aportación central de este trabajo consiste en mostrar que una parte importante de la mejora no proviene necesariamente 
+de mantener dos módulos distintos, sino del propio mecanismo de refinamiento recursivo. TRM simplifica el planteamiento 
+jerárquico y reutiliza una única red extremadamente pequeña para actualizar de forma iterativa sus estados latentes y su 
+respuesta candidata. El modelo conserva dos espacios internos diferenciados, uno más próximo a la respuesta decodificable y 
+otro dedicado al razonamiento latente, pero elimina buena parte de la complejidad estructural de HRM. De este modo, desplaza el foco 
+desde la sofisticación del bloque arquitectónico hacia la reutilización intensiva de un mismo bloque diminuto.
+
+% Foto arquitectura
+
+Esta simplificación es relevante por dos motivos. En primer lugar, mantiene las ventajas del refinamiento iterativo. El sistema no 
+necesita resolver la tarea de una vez, sino que puede corregir sucesivamente su hipótesis interna a lo largo de varios ciclos. En 
+segundo lugar, mejora de forma notable la eficiencia paramétrica. TRM funciona con una red de solo dos capas y alrededor de 7 millones de parámetros,
+muy por debajo de la escala habitual de los modelos de frontera. Aun así, obtiene un 45\% en ARC-AGI-1 y un 8\% en ARC-AGI-2, lo que sitúa a un 
+modelo extremadamente pequeño en una zona competitiva frente a sistemas mucho mayores \cite{jolicoeur2025less}. Desde la perspectiva de este trabajo,
+TRM refuerza una conclusión especialmente importante. En problemas de razonamiento abstracto como ARC-AGI, puede resultar más rentable invertir 
+cómputo adaptativo sobre estados latentes bien diseñados que aumentar indiscriminadamente el número de parámetros.
+
+La autora del trabajo ha realizado el pre-entrenamiento del modelo en un clúster de 8 GPUs Nvidia A100 de 80 GB VRAM, con una precisión total de 7.916 PFLOPS y
+320 GB de VRAM.La inferencia se ha realizado en una sola GPU Nvidia RTX 4090 con 24 GB de VRAM.
 
 \section{Estado actual con perspectiva de eficiencia computacional}
 
-Investigado. Pendiente de redactar.
+Desde una perspectiva estrictamente computacional, el estado actual de ARC-AGI muestra un patrón muy claro. Cada nueva generación del benchmark ha introducido 
+un precipicio de rendimiento que reduce de forma drástica la precisión de los sistemas previos. En términos agregados, el paso de ARC-AGI-1 a ARC-AGI-2 y 
+posteriormente a ARC-AGI-3 implica caídas del orden de 2.5 a 3 veces, lo que sugiere que buena parte de los avances recientes siguen dependiendo de regularidades
+explotables en una versión concreta del problema más que de una generalización robusta. Este comportamiento refuerza la idea de que el progreso en ARC no puede
+evaluarse solo por la puntuación absoluta, sino por la estabilidad del rendimiento cuando aumenta la profundidad conceptual de las tareas.
+
+Este diagnóstico abre además una tensión económica y teórica. Los modelos de frontera han logrado mejoras relevantes, pero a menudo a costa de presupuestos de
+entrenamiento e inferencia muy elevados, mientras que la cognición humana resuelve estas tareas con un consumo energético ínfimo en comparación. La diferencia
+no es solo de escala, sino de mecanismo. En el ser humano, la resolución parece apoyarse en una forma de compresión conceptual que abstrae reglas y encuentra
+trayectorias de solución eficientes. En cambio, muchos sistemas actuales aproximan ese comportamiento mediante búsqueda, paralelismo y cómputo masivo. Desde este
+punto de vista, la eficiencia no debe entenderse únicamente como reducción de coste monetario, sino como capacidad de transformar energía y cómputo en abstracciones
+reutilizables.
+
+En ese contexto, el cambio más relevante observado en 2025 no fue simplemente el escalado de parámetros, sino la consolidación de los bucles de refinamiento en
+tiempo de inferencia. Los enfoques más competitivos ya no se limitan a producir una respuesta directa, sino que encadenan ciclos de generación, verificación y
+corrección. Modelos como TRM y propuestas como CompressARC muestran que este principio puede ofrecer resultados competitivos incluso con redes muy pequeñas o
+sin pre-entrenamiento masivo, siempre que el sistema disponga de mecanismos para revisar de manera iterativa su hipótesis interna. La eficiencia computacional
+no reside en el tamaño bruto del modelo, sino en la calidad del proceso de refinamiento que es capaz de ejecutar durante la inferencia.
 
 \chapter{Metodología}
 
@@ -1230,16 +1371,15 @@ nacer o que se adquieren muy temprano en la vida, con una instrucción explícit
 
 La síntesis de programas es el enfoque serio más antiguo para ARC-AGI, y va directamente al fondo del problema, que es deducir la regla a partir de los ejemplos.
 La idea (también llamada programación inductiva) es escribir automáticamente un programa que satisfaga una especificación, y en este caso la especificación es
-simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente. Este método es inductivo, primero
-se define una regla generar y se ejecute 
+simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente.
 
 \subsection{Análisis exploratorio de datos}
 
 Pendiente de redactar.
 
-\subsection{Técnicas de aumento de datos}
+% \subsection{Técnicas de aumento de datos}
 
-Pendiente de redactar.
+% Pendiente de redactar.
 	
 \section{Arquitectura y entrenamiento}
 

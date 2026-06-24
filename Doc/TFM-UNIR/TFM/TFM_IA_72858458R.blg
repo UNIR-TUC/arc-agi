@@ -1,60 +1,60 @@
-This is BibTeX, Version 0.99e
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: TFM_IA_72858458R.aux
-Reallocating 'name_of_file' (item size: 1) to 8 items.
 The style file: apacite.bst
-Reallocating 'name_of_file' (item size: 1) to 13 items.
-Reallocating 'glb_str_end' (item size: 4) to 20 items.
-Reallocating 'glb_str_ptr' (item size: 4) to 20 items.
-Reallocating 'global_strs' (item size: 1) to 4000000 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'wiz_functions' (item size: 4) to 6000 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'wiz_functions' (item size: 4) to 9000 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: bibliografia.bib
+Warning--entry type for "liao2025arcagiwithoutpretraining" isn't style-file defined
+--line 266 of file bibliografia.bib
 apacite.bst [2013/07/21 v6.03 APA bibliography style]
 Warning--`others' not consistent with 6th ed. of the APA Manual
-You've used 21 entries,
+You've used 25 entries,
             6951 wiz_defined-function locations,
-            1381 strings with 14221 characters,
-and the built_in function-call counts, 39228 in all, are:
-= -- 4866
-> -- 322
-< -- 1907
-+ -- 1873
-- -- 47
-* -- 2455
-:= -- 7205
-add.period$ -- 90
-call.type$ -- 21
-change.case$ -- 375
+            1396 strings with 14875 characters,
+and the built_in function-call counts, 46362 in all, are:
+= -- 5769
+> -- 392
+< -- 2200
++ -- 2166
+- -- 55
+* -- 2860
+:= -- 8363
+add.period$ -- 105
+call.type$ -- 25
+change.case$ -- 443
 chr.to.int$ -- 0
-cite$ -- 42
-duplicate$ -- 971
-empty$ -- 1558
-format.name$ -- 521
-if$ -- 7488
+cite$ -- 50
+duplicate$ -- 1192
+empty$ -- 1861
+format.name$ -- 649
+if$ -- 8916
 int.to.chr$ -- 0
-int.to.str$ -- 67
+int.to.str$ -- 79
 missing$ -- 0
-newline$ -- 519
-num.names$ -- 168
-pop$ -- 798
+newline$ -- 618
+num.names$ -- 200
+pop$ -- 948
 preamble$ -- 1
-purify$ -- 84
+purify$ -- 100
 quote$ -- 0
-skip$ -- 2569
+skip$ -- 3091
 stack$ -- 0
-substring$ -- 2001
-swap$ -- 540
-text.length$ -- 48
+substring$ -- 2323
+swap$ -- 647
+text.length$ -- 56
 text.prefix$ -- 0
 top$ -- 1
-type$ -- 1872
+type$ -- 2264
 warning$ -- 1
-while$ -- 180
+while$ -- 223
 width$ -- 0
-write$ -- 638
-(There was 1 warning)
+write$ -- 764
+(There were 2 warnings)

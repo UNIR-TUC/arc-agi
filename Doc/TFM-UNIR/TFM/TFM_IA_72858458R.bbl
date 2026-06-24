@@ -168,6 +168,31 @@ Chollet, F.%
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
+Franzen%
+, Disselhoff%
+\BCBL {}\ \BBA {} Hartmann%
+}{%
+Franzen%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2024}}%
+}]{%
+franzen2024llm}
+\APACinsertmetastar {%
+franzen2024llm}%
+\begin{APACrefauthors}%
+Franzen, D.%
+, Disselhoff, J.%
+\BCBL {}\ \BBA {} Hartmann, D.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\APACrefbtitle {The LLM ARChitect: Solving ARC-AGI Is A Matter of Perspective.}
+  {The llm architect: Solving arc-agi is a matter of perspective.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
 Gendron%
 , Bao%
 , Witbrock%
@@ -272,6 +297,29 @@ Hurbans, R.%
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
+Jolicoeur-Martineau%
+}{%
+Jolicoeur-Martineau%
+}{%
+{\protect \APACyear {2025}}%
+}]{%
+jolicoeur2025less}
+\APACinsertmetastar {%
+jolicoeur2025less}%
+\begin{APACrefauthors}%
+Jolicoeur-Martineau, A.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2025}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Less is more: Recursive reasoning with tiny networks}
+  {Less is more: Recursive reasoning with tiny networks}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{arXiv preprint arXiv:2510.04871}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
 Kahneman%
 }{%
 Kahneman%
@@ -350,6 +398,33 @@ Li, W.%
   objects}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:2410.06405}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Liao%
+\ \BBA {} Gu%
+}{%
+Liao%
+\ \BBA {} Gu%
+}{%
+{\protect \APACyear {2025}}%
+}]{%
+liao2025arcagiwithoutpretraining}
+\APACinsertmetastar {%
+liao2025arcagiwithoutpretraining}%
+\begin{APACrefauthors}%
+Liao, I.%
+\BCBT {}\ \BBA {} Gu, A.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2025}{}{}.
+\newblock
+\APACrefbtitle {ARC-AGI Without Pretraining.} {Arc-agi without pretraining.}
+\newblock
+\begin{APACrefURL}
+  \url{https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html}
+  \end{APACrefURL}
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -514,6 +589,35 @@ swiechowski2023monte}%
   modifications and applications}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Artificial Intelligence Review}{56}{3}{2497--2562}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Wang%
+\ \protect \BOthers {.}}{%
+Wang%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2025}}%
+}]{%
+wang2025hierarchical}
+\APACinsertmetastar {%
+wang2025hierarchical}%
+\begin{APACrefauthors}%
+Wang, G.%
+, Li, J.%
+, Sun, Y.%
+, Chen, X.%
+, Liu, C.%
+, Wu, Y.%
+\BDBL {}Yadkori, Y\BPBI A.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2025}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Hierarchical reasoning model} {Hierarchical reasoning
+  model}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{arXiv preprint arXiv:2506.21734}{}{}{}.
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%

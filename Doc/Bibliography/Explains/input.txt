@@ -3,4 +3,4 @@ El objetivo es generar un archivo de extensión markdown con el siguiente objeti
 - Definir la arquitectura completa del sistema
 - Definir el flujo completo, desde la preparación, entrenamiento e inferencia
 - El objetivo principal del archivo es explicar de la manera más clara posible y usando el código y la documentación, por qué está diseñado el modelo y por qué de las decisiones. El texto debe ser lo mas entendible posible
-- Señalar la capacidad de computación usada mediante el cáculo pico total de precisión TFLOPS y capacidad pico de VRAM
+- Señalar la capacidad de computación usada mediante el calculo pico total de precisión TFLOPS y capacidad pico de VRAM
