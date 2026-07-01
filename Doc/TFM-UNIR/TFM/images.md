@@ -18,5 +18,10 @@ DFS
 ![alt text](image/images/image-2.png)
 ![alt text](image/images/image-3.png)
 
+TRM
+![1782939574829](image/images/1782939574829.png)
+
 Survey
-![alt text](image.png)
+![1782939723590](image/images/1782939723590.png)
+![1782939766362](image/images/1782939766362.png)
+![1782939793801](image/images/1782939793801.png)
