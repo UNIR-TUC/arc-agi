@@ -18,6 +18,10 @@
 \contentsline {figure}{\numberline {2.13}{\ignorespaces Arquitectura VLM}}{35}{figure.2.13}%
 \contentsline {figure}{\numberline {2.14}{\ignorespaces Flujo de proceso de pre-entrenamiento e inferencia}}{38}{figure.2.14}%
 \contentsline {figure}{\numberline {2.15}{\ignorespaces Algoritmo de compresión de CompressARC}}{40}{figure.2.15}%
+\contentsline {figure}{\numberline {2.16}{\ignorespaces Arquitectura TRM con proceso recursivo y eficiente en cuanto a parámetros}}{43}{figure.2.16}%
+\contentsline {figure}{\numberline {2.17}{\ignorespaces Evolución de la puntuación de ARC-AGI desde 2020}}{44}{figure.2.17}%
+\contentsline {figure}{\numberline {2.18}{\ignorespaces Comparativa de la progresión entre ARC-AGI-1 y ARC-AGI-2}}{45}{figure.2.18}%
+\contentsline {figure}{\numberline {2.19}{\ignorespaces Comparativa del coste por tarea \$ entre diferentes soluciones}}{46}{figure.2.19}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

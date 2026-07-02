@@ -16,45 +16,45 @@ Warning--entry type for "liao2025arcagiwithoutpretraining" isn't style-file defi
 --line 266 of file bibliografia.bib
 apacite.bst [2013/07/21 v6.03 APA bibliography style]
 Warning--`others' not consistent with 6th ed. of the APA Manual
-You've used 25 entries,
+You've used 26 entries,
             6951 wiz_defined-function locations,
-            1396 strings with 14875 characters,
-and the built_in function-call counts, 46362 in all, are:
-= -- 5769
-> -- 392
-< -- 2200
-+ -- 2166
-- -- 55
-* -- 2860
-:= -- 8363
-add.period$ -- 105
-call.type$ -- 25
-change.case$ -- 443
+            1401 strings with 15074 characters,
+and the built_in function-call counts, 48480 in all, are:
+= -- 6015
+> -- 415
+< -- 2311
++ -- 2278
+- -- 57
+* -- 3000
+:= -- 8757
+add.period$ -- 109
+call.type$ -- 26
+change.case$ -- 460
 chr.to.int$ -- 0
-cite$ -- 50
-duplicate$ -- 1192
-empty$ -- 1861
-format.name$ -- 649
-if$ -- 8916
+cite$ -- 52
+duplicate$ -- 1255
+empty$ -- 1941
+format.name$ -- 690
+if$ -- 9305
 int.to.chr$ -- 0
-int.to.str$ -- 79
+int.to.str$ -- 82
 missing$ -- 0
-newline$ -- 618
-num.names$ -- 200
-pop$ -- 948
+newline$ -- 646
+num.names$ -- 208
+pop$ -- 976
 preamble$ -- 1
-purify$ -- 100
+purify$ -- 104
 quote$ -- 0
-skip$ -- 3091
+skip$ -- 3228
 stack$ -- 0
-substring$ -- 2323
-swap$ -- 647
-text.length$ -- 56
+substring$ -- 2440
+swap$ -- 680
+text.length$ -- 58
 text.prefix$ -- 0
 top$ -- 1
-type$ -- 2264
+type$ -- 2344
 warning$ -- 1
-while$ -- 223
+while$ -- 237
 width$ -- 0
-write$ -- 764
+write$ -- 803
 (There were 2 warnings)
