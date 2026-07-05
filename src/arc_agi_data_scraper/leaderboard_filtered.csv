@@ -1,0 +1,69 @@
+model,author,date,solution_type,arc_agi_1,arc_agi_2,arc_agi_3,cost_per_task,total_cost,parameters_in_millions,peak_precision_tflops_fp16,vram_gb
+Stem Grad,Human,,,98.0,,,10.0,,0.0,0.0,0.0
+Human Panel,Human,,,98.0,100.0,,17.0,,0.0,0.0,0.0
+Gemini 3.1 Pro (Preview),Google,2026-02-19,CoT,98.0,77.0,,0.962,,2000000.0,5000.0,1600.0
+Gemini 3 Deep Think (2/26),Google,2026-02-12,CoT,96.0,84.0,,13.62,,2000000.0,5000.0,1600.0
+GPT-5.5 Pro (High),OpenAI,2026-04-23,CoT,96.0,84.0,,10.51,,4000000.0,10000.0,3200.0
+GPT-5.5 Pro (xHigh),OpenAI,2026-04-23,CoT,95.0,84.0,,10.76,,4000000.0,10000.0,3200.0
+GPT-5.5 (xHigh),OpenAI,2026-04-22,CoT,95.0,85.0,,1.87,,4000000.0,10000.0,3200.0
+GPT-5.5 (High),OpenAI,2026-04-22,CoT,94.0,83.0,,1.45,,4000000.0,10000.0,3200.0
+Claude 4.7 (High),Anthropic,2026-04-16,CoT,93.0,68.0,,3.17,,3500000.0,9000.0,2800.0
+Claude 4.7 (Max),Anthropic,2026-04-16,CoT,92.0,75.0,,7.43,,3500000.0,9000.0,2800.0
+Gemini 3.5 Flash (High),Google,2026-05-19,CoT,92.0,72.0,,0.85,,3000000.0,8000.0,2400.0
+Grok 4.20 (Reasoning),xAI,2026-03-09,CoT,89.0,65.0,,0.92,,2500000.0,6000.0,2000.0
+Gemini 3 Deep Think (Preview),Google,2026-02-12,CoT,87.0,45.0,,77.16,,2000000.0,5000.0,1600.0
+Gemini 3 Flash Preview (High),Google,2025-12-17,CoT,84.0,33.0,,0.231,,2000000.0,5000.0,1600.0
+"Opus 4.5 (Thinking, 64K)",Anthropic,2025-11-24,CoT,80.0,37.0,,2.4,,3000000.0,8000.0,2400.0
+Grok 4 (Refine.),J. Berman,2025-08-07,Refinement,79.0,29.0,,30.4,,2000000.0,5500.0,1600.0
+Grok 4 (Refine.),E. Pang,2025-08-07,Refinement,77.0,26.0,,3.97,,2000000.0,5500.0,1600.0
+Avg. Mturker,Human,,,77.0,,,3.0,,0.0,0.0,0.0
+GLM-5.2,Z.ai,2026-06-13,CoT,77.0,22.0,,0.25,,600000.0,1800.0,900.0
+Gemini 3 Pro,Google,2025-11-18,CoT,75.0,31.0,,0.811,,2000000.0,5000.0,1600.0
+"Opus 4.5 (Thinking, 32K)",Anthropic,2025-11-24,CoT,75.0,30.0,,1.29,,3000000.0,8000.0,2400.0
+"Opus 4.5 (Thinking, 16K)",Anthropic,2025-11-24,CoT,72.0,22.0,,0.79,,3000000.0,8000.0,2400.0
+Grok 4 (Thinking),xAI,2025-07-09,CoT,66.0,16.0,,2.17,,2000000.0,5500.0,1600.0
+Kimi K2.5,Moonshot AI,2026-01-27,CoT,65.0,11.0,,0.28,,200000.0,800.0,320.0
+GPT-5 (High),OpenAI,2025-08-07,CoT,65.0,9.0,,0.73,,2500000.0,7000.0,2000.0
+Minimax M2.5,Minimax,2026-02-12,CoT,63.0,4.0,,0.17,,200000.0,800.0,320.0
+o4-mini (High),OpenAI,2025-04-16,CoT,58.0,6.0,,0.856,,50000.0,400.0,80.0
+"Opus 4.5 (Thinking, 8K)",Anthropic,2025-11-24,CoT,58.0,13.0,,0.48,,3000000.0,8000.0,2400.0
+Deepseek V3.2,Deepseek,2025-12-01,Base LLM,57.0,4.0,,0.12,,671000.0,2500.0,800.0
+ARChitects,ARC Prize 2024,2024-11-03,Custom,56.0,2.0,,0.2,,8000.0,1979.0,80.0
+Grok 4 (Fast Reasoning),xAI,2025-10-21,CoT,48.0,5.0,,0.061,,2000000.0,5500.0,1600.0
+Claude Haiku 4.5 (Thinking 32K),Anthropic,2025-10-01,CoT,47.0,4.0,,0.377,,100000.0,500.0,160.0
+GLM-5,Z.ai,2026-02-20,CoT,44.0,4.0,,0.27,,500000.0,1500.0,800.0
+Gemini 2.5 Pro (Thinking 16K),Google,2025-06-17,CoT,41.0,4.0,,0.715,,1000000.0,2500.0,800.0
+"Opus 4.5 (Thinking, None)",Anthropic,2025-11-24,CoT,40.0,7.0,,0.22,,3000000.0,8000.0,2400.0
+Tiny Recursion Model (TRM),Bespoke,2025-10-07,Custom,40.0,6.0,,2.1,,7.0,7916.0,320.0
+Claude Haiku 4.5 (Thinking 16K),Anthropic,2025-10-01,CoT,37.0,2.0,,0.139,,100000.0,500.0,160.0
+Gemini 2.5 Pro (Thinking 32K),Google,2025-06-17,CoT,37.0,4.0,,0.757,,1000000.0,2500.0,800.0
+"Opus 4.5 (Thinking, 1K)",Anthropic,2025-11-24,CoT,35.0,9.0,,0.23,,3000000.0,8000.0,2400.0
+Gemini 2.5 Flash (Preview),Google,2025-05-20,CoT,33.0,1.0,,0.057,,1000000.0,2500.0,800.0
+Gemini 2.5 Flash (Preview) (Thinking 16K),Google,2025-05-20,CoT,33.0,2.0,,0.317,,1000000.0,2500.0,800.0
+Gemini 2.5 Pro (Preview),Google,2025-02-19,CoT,33.0,3.0,,0.813,,1000000.0,2500.0,800.0
+Hierarchical Reasoning Model (HRM),Bespoke,2025-08-07,Custom,32.0,2.0,,1.68,,27.0,6916.0,280.0
+Gemini 2.5 Flash (Preview) (Thinking 24K),Google,2025-05-20,CoT,32.0,2.0,,0.319,,1000000.0,2500.0,800.0
+"Gemini 2.5 Pro (Preview, Thinking 1K)",Google,2025-02-19,CoT,31.0,3.0,,0.804,,1000000.0,2500.0,800.0
+Gemini 2.5 Pro (Thinking 8K),Google,2025-06-17,CoT,29.0,2.0,,0.444,,1000000.0,2500.0,800.0
+Claude 3.7 (16K),Anthropic,2025-02-24,CoT,28.0,0.0,,0.51,,2000000.0,5000.0,1600.0
+Codex Mini (Latest),OpenAI,2025-05-23,CoT,27.0,1.0,,0.23,,20000.0,150.0,40.0
+Claude Haiku 4.5 (Thinking 8K),Anthropic,2025-10-01,CoT,25.0,1.0,,0.091,,100000.0,500.0,160.0
+Gemini 2.5 Flash (Preview) (Thinking 8K),Google,2025-05-20,CoT,25.0,2.0,,0.199,,1000000.0,2500.0,800.0
+Deepseek R1 (05/28),Deepseek,2025-05-28,CoT,21.0,1.0,,0.053,,671000.0,2500.0,800.0
+Claude 3.7 (8K),Anthropic,2025-02-24,CoT,21.0,0.0,,0.36,,2000000.0,5000.0,1600.0
+CompressARC,iliao2345,2025-07-20,Custom,20.0,0.0,0.0,0.083325,33.33,0.076,116.6,12.0
+Icecuber,ARC Prize 2024,2023-11-03,Custom,17.0,1.0,,0.13,,0.0,0.43,16.0
+Claude Haiku 4.5 (Thinking 1K),Anthropic,2025-10-01,CoT,16.0,1.0,,0.047,,100000.0,500.0,160.0
+Gemini 2.5 Pro (Thinking 1K),Google,2025-06-17,CoT,16.0,0.0,,0.088,,1000000.0,2500.0,800.0
+Gemini 2.5 Flash (Preview) (Thinking 1K),Google,2025-05-20,CoT,16.0,2.0,,0.03,,1000000.0,2500.0,800.0
+GPT-5 Nano (High),OpenAI,2025-08-07,CoT,16.0,2.0,,0.029,,2500000.0,7000.0,2000.0
+Deepseek R1,Deepseek,2025-01-22,CoT,15.0,1.0,,0.08,,671000.0,2500.0,800.0
+o1-mini,OpenAI,2024-09-12,CoT,14.0,0.0,,0.191,,10000.0,200.0,40.0
+Claude Haiku 4.5,Anthropic,2025-10-01,Base LLM,14.0,1.0,,0.043,,100000.0,500.0,160.0
+Claude 3.7,Anthropic,2025-02-24,Base LLM,13.0,0.0,,0.12,,2000000.0,5000.0,1600.0
+Qwen3-235b-a22b Instruct (25/07),Alibaba,2025-07-25,Base LLM,11.0,1.0,,0.004,,235000.0,1000.0,400.0
+Claude 3.7 (1K),Anthropic,2025-02-24,CoT,11.0,0.0,,0.14,,2000000.0,5000.0,1600.0
+Magistral Small,Mistral,2025-06-10,CoT,5.0,0.0,,0.049,,22000.0,400.0,80.0
+Grok 3,xAI,2025-02-19,Base LLM,5.0,0.0,,0.142,,314000.0,1000.0,320.0
+Llama 4 Maverick,Meta,2025-04-05,Base LLM,4.0,0.0,,0.012,,400000.0,1500.0,640.0
+Llama 4 Scout,Meta,2025-04-05,Base LLM,0.0,0.0,,0.006,,400000.0,1500.0,640.0

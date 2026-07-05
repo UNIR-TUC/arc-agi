@@ -1,0 +1,56 @@
+status.json
+data/
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+nupkg/
+*.nupkg
+
+# Visual Studio Code
+.vscode
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio 2015
+.vs/
+/Lantek360.Services.Identity/identityserver4_log.txt
+
+**/packages
+**/.sonarqube/*
+**/tempkey.jwk
+/Source code/Protection/list.txt
+
+**/packages/
+**.coverage
+**/publish
+**.claude
+**.codebase-memory
+**.cursor
+**.github
+**.sonarlint
+**.zed
+**docs/
+**bin/
+**obj/
+
