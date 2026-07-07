@@ -75,14 +75,14 @@
 \mainmatter
 \chapter{Introducción} % 1. Introducción
 
-Actualmente una tendencia ascendente en el campo de inteligencia artificial. El paradigma del aprendizaje profundo ha demostrado ser una herramienta de presente y de futuro. El \textit{software}
-es un elemento fundamente en la sociedad actual, y con la evolución del propio \textit{software} también evolucionan los distintos campos tecnológicos, entre ellos el de la inteligencia artificial.
+Actualmente existe una tendencia ascendente en el campo de inteligencia artificial. El paradigma del aprendizaje profundo ha demostrado ser una herramienta de presente y de futuro. El \textit{software}
+es un elemento fundamental en la sociedad actual, y con la evolución del propio \textit{software} también evolucionan los distintos campos tecnológicos, entre ellos el de la inteligencia artificial.
 
 La inteligencia artificial es un campo de estudio que se centra en la creación de sistemas capaces de realizar tareas que normalmente requieren inteligencia humana, como el aprendizaje,
 el razonamiento, la resolución de problemas, la comprensión del lenguaje natural y la percepción visual. En los últimos años, ha habido un aumento significativo en el interés y el
 desarrollo de la inteligencia artificial, lo que ha llevado a avances notables en áreas como el aprendizaje automático, el procesamiento del lenguaje natural y la visión por computadora.
 
-Cada vez se le dá más importancia a las herramientas basadas en inteligencia artificial y cada vez llega a un público más amplio. En este contexto, los mecanismos para que esta tecnología
+Cada vez se le da más importancia a las herramientas basadas en inteligencia artificial y cada vez llega a un público más amplio. En este contexto, los mecanismos para que esta tecnología
 pueda ser consumida por el público general se vuelven cada vez más importantes. En este sentido, la eficiencia en el consumo de estos recursos tecnológicos cada vez es más relevante. Con la
 llegada de más modelos de lenguaje, la necesidad de encontrar formas de medir la capacidad de generalización de estos modelos se vuelve cada vez más importante también.
 
@@ -94,8 +94,8 @@ de medir la inteligencia, permitiendo la comparación entre sistemas y humanos.
 \section{Contexto}
 
 A pesar de los avances recientes, los Grandes Modelos de Lenguaje siguen teniendo dificultades para resolver este tipo de tareas, ya que sus capacidades se derivan principalmente de
-de volúmenes masivos de datos de pre-entrenamiento y memorización probabilística. Esto evidencia que, la hipótesis de escalar los modelos sin límites insospechados, no es suficiente
-para alcanzar el razonamiento abstracto. Aumentar ciegamente la cantidad de parámetros no dota automáticamente al sistema la capacidad de resolver tareas que requieren un razonamiento
+volúmenes masivos de datos de pre-entrenamiento y memorización probabilística. Esto evidencia que, la hipótesis de escalar los modelos sin límites insospechados, no es suficiente
+para alcanzar el razonamiento abstracto. Aumentar ciegamente la cantidad de parámetros no dota automáticamente al sistema de la capacidad de resolver tareas que requieren un razonamiento
 abstracto más novedoso.
 
 ARC-AGI representa el indicador estándar por excelencia de la industria para medir el progreso real hacia la inteligencia general artificial a través de la generalización
@@ -118,7 +118,7 @@ a gran escala.
 
 \section{Objetivos}
 
-Objetivo principal El objetivo principal es diseñar y desarrollar un modelo compacto (SLM) que maximice la puntuación en la resolución del benchmark ARC-AGI-1, priorizando estrictamente la
+El objetivo principal es diseñar y desarrollar un modelo compacto (SLM) que maximice la puntuación en la resolución del benchmark ARC-AGI-1, priorizando estrictamente la
 eficiencia computacional y el rendimiento por parámetro frente a los modelos de lenguaje a gran escala.
 
 En cuanto a objetivos particulares se enumeran los siguientes:
@@ -196,12 +196,12 @@ respecto de lo inteligible algo análogo a lo que es la facultad sensitiva respe
 \section{Núcleos del conocimiento}
 
 En la teoría se ha considerado que el conocimiento humano se basa en un único sistema de aprendizaje de propósito general. Investigaciones recientes del departamento
-de Psicología de la Universidad de Harvard ha propuesto una teoría alternativa, que sugiere el conocimiento humano se basa en una serie de núcleos o módulos innatos 
-de conocimiento innatos, cada uno especializado en un dominio específico, como el espacio, los objetos, las personas, los números y el lenguaje \cite{spelke2007core}.
+de Psicología de la Universidad de Harvard ha propuesto una teoría alternativa, que sugiere que el conocimiento humano se basa en una serie de núcleos o módulos innatos 
+de conocimiento, cada uno especializado en un dominio específico, como el espacio, los objetos, las personas, los números y el lenguaje \cite{spelke2007core}.
 
 Cada sistema se define por un conjunto de principios y un conjunto de fronteras cognitivas. Estas fronteras actúan como un sello de identidad que ayuda a diversos 
 investigadores a demostrar que existe un sistema cognitivo único \cite{spelke2007core}. Por ejemplo, el sistema numérico central, se evidencia con representaciones numéricas
-poco imprecisas, esta imprecision crece de forma lineal a medida que aumenta el número representado.
+poco imprecisas, esta imprecisión crece de forma lineal a medida que aumenta el número representado.
 
 \begin{enumerate}
 \item \textbf{Sistema de representación de objetos inanimados:} Es la capacidad de percibir límites de objetos, la forma forma completo o parcial de objetos ocultos y percibir cuándo y hacia donde se moverán los objetos.
@@ -352,8 +352,8 @@ profundidad de manera iterativa, hasta que se alcance el objetivo. Es completo y
 
 \subsection{Búsqueda A*}
 
-Existen distintas variantes de algoritmos de búsquedas informadas \textit{Best Search}. La mayoría de estos algoritmos emplean una función heurística estimar el coste estimado de la ruta
-a nivel computacional más eficiente. Por ejemplo, el algoritmo el primero el mejor codicioso (GBFS) es el caso más básico, se expande aquel nodo que parece más carca del objetivo según
+Existen distintas variantes de algoritmos de búsquedas informadas \textit{Best Search}. La mayoría de estos algoritmos emplean una función heurística para estimar el coste de la ruta
+a nivel computacional más eficiente. Por ejemplo, el algoritmo el primero el mejor codicioso (GBFS) es el caso más básico, se expande aquel nodo que parece más cerca del objetivo según
 la estimación heurística.
 
 La búsqueda A* es el más utilizado de esta categoría. Se considera el coste tanto el coste acumulado desde el nodo raíz, como el coste estimado mediante heurística hasta el objetivo. Es 
@@ -432,7 +432,7 @@ en cada paso \cite{swiechowski2023monte}, generando una explosión combinatoria 
 Por otro lado, las Redes Neuronales Profundas son excelentes reconociendo patrones e intuiciones de un solo vistazo,
 pero carecen de la capacidad algorítmica para planificar deliberadamente a largo plazo o corregir sus propios errores secuenciales. La Búsqueda Guiada por Redes
 Neuronales soluciona las carencias de ambos mundos inyectando la "intuición" del aprendizaje profundo dentro de la estructura lógica de los árboles de búsqueda. 
-Esto se materializó entrenando redes neuronales para que actuaran como entes evaluadoras dentro de algoritmos como MCTS.
+Esto se materializó entrenando redes neuronales para que actuaran como entes evaluadores dentro de algoritmos como MCTS.
 
 En su versión clásica, MCTS depende de simulaciones masivas para estimar la calidad de cada rama. Sin embargo, en los enfoques híbridos modernos se incorporan redes neuronales que guían de forma explícita la exploración:
 
@@ -467,7 +467,7 @@ la inteligencia intrínseca.
 Tras los métodos tradicionales de evaluar algoritmos, la IA ha pasado a una evaluación de ``caja negra'' basada en el comportamiento que involucra la discriminación
 humana (comparación directa por o contra humanos) y pruebas de rendimiento de problemas. Se iniciaron evaluaciones metodológicas de dudosa validez,
 donde los investigadores a menudo seleccionaban los conjuntos de datos que mejor les convenían y ajustaban parámetros en exceso provocando sobre-ajustes. Esto
-llevó a situaciones donde muchos resultados publicados eran reproducibles pero difícilmente replicable \cite{hernandez2017evaluation}. En consecuencia,
+llevó a situaciones donde muchos resultados publicados eran reproducibles pero difícilmente replicables \cite{hernandez2017evaluation}. En consecuencia,
 la aparente mejora del modelo desaparecía en cuanto cambiaba ligeramente el dominio de los datos, además de una fuerte dispersión de los métodos
 en las diferentes disciplinas.
 
@@ -490,8 +490,8 @@ a la capacidad de razonamiento innata del ser humano \cite{chollet2019measure}.
 
 Los modelos que existen en la actualidad funcionan correctamente en tareas específicas, todavía están ciertamente limitados y hambrientos de datos. En situaciones en los que se desvían ligeramente de sus datos de entrenamiento,
 son incapaces de afrontar tareas que requieren un razonamiento novedoso. ARC-AGI también está pensado para medir el progreso de manera precisa y cuantitativa de la inteligencia. En este sentido, las definiciones
-que se han dado en en este trabajo en secciones anteriores puede ayudar a intuir la estructura de las pruebas de evaluación de ARC-AGI. Las tareas de evaluación no deben ser necesariamente conocidas de
-antemano, para conseguir la generalización el agente debe que ser capaz de aprender y gestionar nuevas tareas \cite{chollet2019measure}.
+que se han dado en este trabajo en secciones anteriores puede ayudar a intuir la estructura de las pruebas de evaluación de ARC-AGI. Las tareas de evaluación no deben ser necesariamente conocidas de
+antemano, para conseguir la generalización el agente debe ser capaz de aprender y gestionar nuevas tareas \cite{chollet2019measure}.
 
 \begin{quote}
 \itshape
@@ -514,7 +514,7 @@ profundizar en este artículo. Al contrario, se va a profundizar en la generaliz
 \begin{itemize}
 \item \textbf{Ausencia de generalización:} Sistemas donde no existe incertidumbre ni novedad. Entorno cerrado como un algoritmo que juega al ``tres en raya'',  iterando exhaustivamente sobre todas las jugadas posibles. No hay adaptación posible.
 \item \textbf{Generalización local o robustez:} Es la capacidad de un sistema para manejar nuevos ejemplos dentro de una distribución de datos conocida para una sola tarea o un conjunto bien definido de ellas.  Este es el nivel en el que ha operado históricamente el 
-aprendizaje profundo moderno. El autor \cite{chollet2019measure} hace referencia a un ejemplo de clasificador de gatos que, se califican gatos donde el modelo no había visto antes.
+aprendizaje profundo moderno. El autor \cite{chollet2019measure} hace referencia a un ejemplo de clasificador de gatos en el que se clasifican gatos que el modelo no había visto antes.
 \item \textbf{Generalización amplia o flexibilidad:} Es la capacidad de manejar una categoría amplia de tareas y entornos relacionados sin intervención humana adicional, incluyendo situaciones imprevistas por los creadores \cite{chollet2019measure}. Un ejemplo de esto puede ser el coche autónomo de nivel 5.
 \item \textbf{Generalización extrema o generalidad:} Sistemas abiertos capaces de manejar tareas enteramente nuevas que solo comparten características abstractas con las ya conocidas, aplicable a cualquier dominio. También se puede denominar como inteligencia general.
 \end{itemize}
@@ -543,7 +543,7 @@ François Chollet define la inteligencia no como un programa estático, sino com
 instancia la posición del problema y el proceso técnico de una tarea según su marco formal. La arquitectura del sistema se compone de tres entidades principales;
 
 \begin{itemize}
-\item \textbf{El Sistema Inteligente ($IS$)}: Es el agente que genera un programa de habilidad ($SP$) basándose la experiencia recibida.
+\item \textbf{El Sistema Inteligente ($IS$)}: Es el agente que genera un programa de habilidad ($SP$) basándose en la experiencia recibida.
 \item \textbf{La Tarea ($T$)}: Es el entorno que plantea un problema a resolver. La tarea tiene la función de puntuación (éxito o fracaso) y una función de retroalimentación que devuelve al sistema inteligente.
 \item \textbf{El programa de habilidad ($SP$)}: Artefacto producido por ($IS$), un programa ejecutable que trata de resolver la tarea y devuelve una respuesta. Representa la capacidad del sistema para gestionar el entorno o problema dado. Un sistema es más inteligente si proporciona programas de alta habilidad usando los menos recursos posibles en tareas de alta dificultad de generalización.
 \end{itemize}
@@ -582,7 +582,7 @@ este aspecto es el diseño para evitar trampas estadísticas que no requieran un
 El control de la experiencia debe ser fundamental. No se debe ``comprar'' el rendimiento de un \textit{benchmark} mediante un conjunto de datos de entrenamiento ilimitados. Si un sistema inteligente
 necesita de millones de datos de entrenamiento para generar programas de habilidad consistentes que un humando puede captar con apenas pocos ejemplos, significa que el sistema es ineficiente y no inteligente 
 aun que logre la misma puntuación. La cantidad de datos de entrenamiento sería estrictamente limitada. Por último, el \textit{benchmark} debe ser funcional de la misma forma para humanos y máquinas, de forma justa, asumiendo que
-ambos agentes poseen los mismos núcleos de rendimiento y que requiere tiempo y tamaño del entrenamiento de un humano.
+ambos agentes poseen los mismos núcleos de conocimiento y que requiere tiempo y tamaño del entrenamiento de un humano.
 
 \subsection{ARC-AGI-1}
 % 400 tareas trainning
@@ -659,7 +659,7 @@ y resulta ser una heurística útil para resolver puzzles.
 
 Diversas tareas de ARC implican contar y clasificar objetos. Las tareas pueden tener distintos tamaños y
 es especialmente relevante la comparación de magnitudes. No es sólo contar objetos o ``puntos'',
-es también identificar aquellos símbolos que aparecen en más ocasiones (concurrencia). Es necesario nociones básicas de suma y resta en cantidades pequeñas. En ARC las cantidades
+es también identificar aquellos símbolos que aparecen en más ocasiones (concurrencia). Son necesarias nociones básicas de suma y resta en cantidades pequeñas. En ARC las cantidades
 utilizadas no tienen un número mayor de 9. Esto se refleja como una capacidad innata de los humanos para la representación numérica, en secciones anteriores se ha explorado
 esta capacidad como uno de los núcleos de conocimiento innato. El ser humano es capaz de usar esta capacidad sin ninguna formación previa con limitación en la cantidad de objetos que contar.
 
@@ -675,11 +675,11 @@ esta capacidad como uno de los núcleos de conocimiento innato. El ser humano es
 
 \subsubsection{Geometría y Topología básica}
 
-La orientación espacial es un aspecto fundamental como núcleo de conocimiento. Se engloban aquellas tareas de reconocimiento de formas para la compresión de líneas u otras figuras
+La orientación espacial es un aspecto fundamental como núcleo de conocimiento. Se engloban aquellas tareas de reconocimiento de formas para la comprensión de líneas u otras figuras
 geométricas. El agente debe ser capaz de estimar con mayor probabilidad la aparición de formas regulares frente a otras formas más complejas.
 
 Las transformaciones espaciales como las simetrías y rotaciones, así como el escalado, deben ser comprendidas y aplicables. Relaciones espaciales específicamente en nociones topológicas sobre contener
-o ser contenido y estar fuera o dentro de un perímetro delimitado también será requerido en diversas tareas. El trazado de líneas o la conexión de puntos (proyecciones ortogonales) o la copia de 
+o ser contenido y estar fuera o dentro de un perímetro delimitado también serán requeridas en diversas tareas. El trazado de líneas o la conexión de puntos (proyecciones ortogonales) o la copia de 
 diversos objetos repetidamente también se incluyen en este núcleo de conocimiento.
 
 \begin{figure}[h]
@@ -694,7 +694,7 @@ diversos objetos repetidamente también se incluyen en este núcleo de conocimie
 
 \subsection{Repositorio de datos}
 
-Los datos de ARC-AGI se puede encontrar en el repositorio de GitHub \cite{githubGitHubFcholletARCAGI}. Los datos están contenidos en dos sub-directorios diferentes:
+Los datos de ARC-AGI se pueden encontrar en el repositorio de GitHub \cite{githubGitHubFcholletARCAGI}. Los datos están contenidos en dos sub-directorios diferentes:
 
 \begin{itemize}
 \item \textbf{training}: Contiene 400 tareas de entrenamiento. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son 400 archivos. Todos los archivos de este directorio
@@ -832,16 +832,16 @@ requiere técnicas de aprendizaje por refuerzo y modelado del mundo más que ing
 
 \subsection{Domain Specific Languages (DSLs) y síntesis de programas}
 
-En 2020 Johan Sokrates Wind publicó uno de los primero intentos basado en un Lenguaje de Dominio Específico ó DSL. El uso de código estrictamente diseñado para resolver tareas específicas
+En 2020 Johan Sokrates Wind publicó uno de los primero intentos basado en un Lenguaje de Dominio Específico o DSL. El uso de código estrictamente diseñado para resolver tareas específicas
 de ARC-AGI permitió alcanzar una puntuación de 20\% en el benchmark. La idea detrás de esto es codificar algoritmos de programación para crear un conjunto de programas primitivos
-capaz de modificar matrices bidimensionales.
+capaces de modificar matrices bidimensionales.
 
 Los algoritmos realizan búsquedas exhaustivas sobre el espacio de programas posibles que se puede construir cambiando núcleos de conocimiento. Esta mecánica se puede considerar
 casi fuerza bruta. Formalmente, el método evalúa de manera iterativa funciones unarias sobre fragmentos de las cuadrículas de entrada, formando un Grafo Acíclico Dirigido (DAG) que representa
 múltiples secuencias de transformaciones.
 
-Según el propio autor, la búsqueda de nivel 4, siendo de las más altas, dura entorno a 9 horas usando solamente CPU. Este enfoque no requiere de ningún pre-entrenamiento y sus conocimientos
-previos son inyectas mediante líneas de código. El espacio de búsqueda crece de manera exponencial a medida que aumenta el tamaño del DSL y para los puzzles que requieren
+Según el propio autor, la búsqueda de nivel 4, siendo de las más altas, dura en torno a 9 horas usando solamente CPU. Este enfoque no requiere de ningún pre-entrenamiento y sus conocimientos
+previos son inyectados mediante líneas de código. El espacio de búsqueda crece de manera exponencial a medida que aumenta el tamaño del DSL y para los puzzles que requieren
 de más pasos lógicos, la búsqueda simplemente sin tiempo. Otro aspecto negativo del enfoque es que si un problema de transformación no se programó específicamente, el sistema
 simplemente no es capaz de resolverlo. Escalar este enfoque significa que es necesario de capacidad humana constante para seguir añadiendo conocimientos primitivos  y heurística
 de poda diseñada manualmente para guiar la búsqueda \cite{wind2020dsl}.
@@ -1026,17 +1026,17 @@ del estado interno.
 % the_architects
 \section{Afinamiento eficiente de modelos para ARC-AGI}
 
-En 2024, un grupo de investigadores realizaron un hito histórico alcanzando una puntuación de 56\% en el concurso público de ARC Prize. El éxito de este enfoque 
-no radica en el uso de redes neuronales de gran tamaño, ni en la sísteis de programas propiamente dicho, sino más bien en una estrategia
+En 2024, un grupo de investigadores realizó un hito histórico alcanzando una puntuación de 56\% en el concurso público de ARC Prize. El éxito de este enfoque 
+no radica en el uso de redes neuronales de gran tamaño, ni en la síntesis de programas propiamente dicho, sino más bien en una estrategia
 de optimización extrema de  Modelos de Lenguaje Pequeños (SLM). Estos modelos no son especialmente compactos, pero con técnicas
-de optimización puede llegar a ser lo suficientemente eficientes como para poder ser ejecutada en entornos limitados.
+de optimización pueden llegar a ser lo suficientemente eficientes como para poder ser ejecutados en entornos limitados.
 
 Los concursos de ARC Prize exigen que los modelos sean desplegados e inferenciados en entornos de computación especialmente limitados, con
 capacidad de computación equivalentes a dos GPUs Nvidia T4 ó en una Nvidia P100 ambos de 16 GB de memoria de capacidad. \citeA{franzen2024llm} 
 consiguen un ajuste fine inteligente, \textit{tokenizar} de manera brillante y adaptación en tiempo de prueba \textit{Test-Time Training}.
 
 El equipo realiza un proceso de pre-entrenamiento masivo a partir de muchos datos aumentados sintéticamente. Partiendo del conjunto de datos original,
-se generaron casi 400,000 mil tareas adicionales con el repositorio público de Re-ARC. Además de esto, de manera complementaria se añadió conjuntos de datos de 
+se generaron casi 400.000 tareas adicionales con el repositorio público de Re-ARC. Además de esto, de manera complementaria se añadió conjuntos de datos de 
 entrenamiento proporcionados por la comunidad como ARC-AGI como Concept-ARC y ARC-Heavy. Realizando una mezcla estructural con hasta más de medio millón
 de tareas, se realizó otro proceso de aumentos de datos llegando a 290 millones de tareas sintéticas. Con tal magnitud de datos, el pre-entrenamiento del
 modelo debe hacerse mediante computación en la nube acelerada de considerable potencia.
@@ -1055,22 +1055,22 @@ modelo debe hacerse mediante computación en la nube acelerada de considerable p
 Se hace uso de un modelo de lenguaje de Nvidia Mistral-NeMo-Minitron-8B-Base, de 8 billones de parámetros. Para que el modelo de lenguaje pueda entender
 el lenguaje de matrices 2D de ARC.AGI, el equipo desarrolló un \textit{tokenizador} personalizado reduciendo el vocabulario a 64 \textit{tokens}. Este sistema
 reduce significativamente el tamaño de la capa de \textit{embedding} para abaratar el coste de inferencia. También ayuda a evitar alucinaciones,
-pero es necesario dominar el arte de usar estructuras y marcadores concretos. Este sistema es muy sensible al uso de deliminatación de regiones
-para que el modelo sepa cuando empieza un tarea y cuando empieza otra.
+pero es necesario dominar el arte de usar estructuras y marcadores concretos. Este sistema es muy sensible al uso de delimitación de regiones
+para que el modelo sepa cuándo empieza una tarea y cuándo empieza otra.
 
 % Foto de encoder
 
 Para que el modelo pueda ser inferenciado en GPUs de 16 GB, el equipo realiza una cuantización del modelo de 4 bits mediante el paquete \textit{unsloth-4bit}, 
 el más bajo posible. También hace uso de LoRA ó \textit{Low-Rank Adaptation}, que es una técnica de ajuste fino eficiente para hacer viable esta arquitectura. Sin LoRA, ajustar el modelos de
 8 millones de parámetros sería imposible. Esta limitación condiciona diversas decisiones del flujo de diseño. LoRA puede conseguir la reducción de hasta
-32 veces el número de parámetros y reducir sólamente un pequeño subconjunto de parámetros del modelo entrenables \cite{franzen2024llm}.
+32 veces el número de parámetros y reducir solamente un pequeño subconjunto de parámetros del modelo entrenables \cite{franzen2024llm}.
 
 % Foto arquitectura
 
 Para la inferencia se usó el algoritmo DFS con un umbral probabilístico y poda. Otros algoritmos como GBFS ó \textit{Beam Search} provocaban baja diversidad de soluciones
 o era a nivel de memoria demasiado costoso. Tras la búsqueda, se realiza una selección de candidatos.
 
-El proceso de pre-entrenamiento se realiza usando una GPU Nvidia H100 con 1,979 TFLOPS en FP16 de precisión de 80 HB VRAM HMB. Esta capacidad de computación
+El proceso de pre-entrenamiento se realiza usando una GPU Nvidia H100 con 1,979 TFLOPs en FP16 de precisión de 80 HB VRAM HMB. Esta capacidad de computación
 sólo está alojada en servicios de computación en la nube y es altamente costosa incluso en despliegue de \textit{cluster} optimizados.La adaptación en tiempo de prueba
 e inferencia se realiza con dos GPUs Nvidia T4 de 16 GB de VRAM durante casi 12 horas, el límite permitido por el concurso.
 
@@ -1079,9 +1079,9 @@ e inferencia se realiza con dos GPUs Nvidia T4 de 16 GB de VRAM durante casi 12 
 % con la conversación de chatgpt
 \section{Enfoques de modelos sin Pre-entrenamiento}
 
-Durante años la creencia de que es necesario realiza un exhaustivo pre-entrenamiento de modelos para poder desarrollar la capacidad
+Durante años la creencia de que es necesario realizar un exhaustivo pre-entrenamiento de modelos para poder desarrollar la capacidad
 de razonamiento abstracto ha sido dominante. A lo largo de \citeyear{liao2025arcagiwithoutpretraining}, se han desarrollado diferentes enfoques
-de los que se encuentra CompressARC, un decodificador VAE ó \textit{Variational Autoencoder} encargado de reconstruir una serie de datos a partir
+de los que se encuentra CompressARC, un decodificador VAE o \textit{Variational Autoencoder} encargado de reconstruir una serie de datos a partir
 de una representación comprimida. El modelo realiza su aprendizaje exclusivamente en el tiempo de inferencia, no cuenta con bases de datos externas,
 su único conjunto de datos son las matrices del problema exacto que se intenta resolver en un momento determinado.
 
@@ -1090,8 +1090,8 @@ su único conjunto de datos son las matrices del problema exacto que se intenta 
 ``The ability to compress information is equivalent to intelligence.''
 \end{quote}
 
-El modelo es realmente compacto, de tan sólo 76 mil parámetros. Este sistema de rige por el principio de longitud de descripción mínima y la comprensión
-de información. La optimización se realiza mediante redes neuronales en lugar de algoritmos de búsqueda ciegos. Las redes neuronales puede restringir
+El modelo es realmente compacto, de tan sólo 76 mil parámetros. Este sistema se rige por el principio de longitud de descripción mínima y la comprensión
+de información. La optimización se realiza mediante redes neuronales en lugar de algoritmos de búsqueda ciegos. Las redes neuronales pueden restringir
 el espacio de búsqueda\cite{liao2025arcagiwithoutpretraining}. La red neuronal incluye operaciones diseñadas a mano (sesgos inductivos) que son muy útiles 
 para transformaciones geométricas como medias, expansiones de tensores, funciones de activación SiLU, máximos acumulativos, y desplazamientos directos de píxeles.
 
@@ -1107,7 +1107,7 @@ para transformaciones geométricas como medias, expansiones de tensores, funcion
 \FloatBarrier
 
 El modelo logra generalizar y resolver el 20\% de las tareas de ARC-AGI-1. Lograr este resultado con apenas 76 mil parámetros y una GPU RTX 4070 con una precisión 
-FP16 de 116,6 TFLOPS es realmente sorprendente.
+FP16 de 116,6 TFLOPs es realmente sorprendente.
 
 \begin{center}
 \cite[p.~15]{ouellette2024towards}
@@ -1193,8 +1193,8 @@ modelo extremadamente pequeño en una zona competitiva frente a sistemas mucho m
 TRM refuerza una conclusión especialmente importante. En problemas de razonamiento abstracto como ARC-AGI, puede resultar más rentable invertir 
 cómputo adaptativo sobre estados latentes bien diseñados que aumentar indiscriminadamente el número de parámetros.
 
-La autora del trabajo ha realizado el pre-entrenamiento del modelo en un clúster de 8 GPUs Nvidia A100 de 80 GB VRAM, con una precisión total de 7.916 PFLOPS y
-320 GB de VRAM.La inferencia se ha realizado en una sola GPU Nvidia RTX 4090 con 24 GB de VRAM.
+La autora del trabajo ha realizado el pre-entrenamiento del modelo en un clúster de 8 GPUs Nvidia A100 de 80 GB VRAM, con una precisión total de 7.916 PFLOPs y
+320 GB de VRAM. La inferencia se ha realizado en una sola GPU Nvidia RTX 4090 con 24 GB de VRAM.
 
 \section{Estado actual con perspectiva de eficiencia computacional}
 
@@ -1240,7 +1240,7 @@ no reside en el tamaño bruto del modelo, sino en la calidad del proceso de refi
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.65\textwidth]{image/images/1782939793801.png}
-\caption[Comparativa del coste por tarea \$ entre diferentes soluciones]{Comparativa del coste por tarea \$ entre diferentes soluciones. El tamaño de los circulos
+\caption[Comparativa del coste por tarea \$ entre diferentes soluciones]{Comparativa del coste por tarea \$ entre diferentes soluciones. El tamaño de los círculos
 representan el tamaño en parámetros de cada modelo.}
 \label{fig:fig19SECTION2}
 {\footnotesize Fuente: Adaptado de ``The ARC of Progress towards AGI: A Living Survey of Abstraction and Reasoning'' \cite{vahdati2026arc}}
@@ -1309,7 +1309,7 @@ Para el desarrollo y experimentación de este proyecto, se ha utilizado una esta
 	\item Memoria Principal (RAM): El sistema dispone de aproximadamente 96 GB de memoria RAM disponible.
 \end{itemize}
 
-El componente central para el entrenamiento, este proyecto es la GPU AMD Radeon RX 9070 XT. Esta GPU de arquitectura avanzada está equipada con 64 Unidades de Cómputo, 4096 Stream Processors y 
+El componente central para el entrenamiento de este proyecto es la GPU AMD Radeon RX 9070 XT. Esta GPU de arquitectura avanzada está equipada con 64 Unidades de Cómputo, 4096 Stream Processors y 
 cuenta con 128 aceleradores de IA dedicados específicamente a optimizar las cargas de trabajo de aprendizaje profundo. Su consumo típico (Typical Board Power) es de 304 W.
 
 Para las tareas de Inteligencia Artificial, las dos métricas más críticas son la memoria de vídeo (VRAM) y el rendimiento en diferentes precisiones matemáticas. La tarjeta cuenta con 16 GB de 
