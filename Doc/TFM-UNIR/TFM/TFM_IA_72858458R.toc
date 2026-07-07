@@ -46,20 +46,20 @@
 \contentsline {subsection}{\numberline {2.13.1}Modelos de razonamiento jerárquico}{41}{subsection.2.13.1}%
 \contentsline {subsection}{\numberline {2.13.2}Modelos de razonamiento recursivo con redes neuronales compactas}{42}{subsection.2.13.2}%
 \contentsline {section}{\numberline {2.14}Estado actual con perspectiva de eficiencia computacional}{44}{section.2.14}%
-\contentsline {chapter}{\numberline {3}Metodología}{47}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Enfoque Científico y Método de Investigación}{47}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Metodología de Desarrollo y Gestión del Proyecto}{47}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Ciclo de Vida del Modelo basado en MLOps}{48}{section.3.3}%
-\contentsline {chapter}{\numberline {4}Infraestructura y herramientas}{49}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Infraestructura de computación}{49}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Entorno de desarrollo}{50}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Utilidades externas de ARC-AGI}{52}{section.4.3}%
-\contentsline {chapter}{\numberline {5}Desarrollo}{53}{chapter.5}%
-\contentsline {subsection}{\numberline {5.0.1}Análisis exploratorio de datos}{53}{subsection.5.0.1}%
-\contentsline {section}{\numberline {5.1}Arquitectura y entrenamiento}{54}{section.5.1}%
-\contentsline {chapter}{\numberline {6}Resultados}{55}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Planificación}{56}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Estudio económico}{57}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{58}{chapter.9}%
-\contentsline {section}{Referencias}{58}{section*.12}%
-\contentsline {chapter}{\numberline {A}Apéndices}{60}{appendix.Alph1}%
+\contentsline {chapter}{\numberline {3}Metodología}{48}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Enfoque Científico y Método de Investigación}{48}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Metodología de Desarrollo y Gestión del Proyecto}{48}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Ciclo de Vida del Modelo basado en MLOps}{49}{section.3.3}%
+\contentsline {chapter}{\numberline {4}Infraestructura y herramientas}{50}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Infraestructura de computación}{50}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Entorno de desarrollo}{51}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Utilidades externas de ARC-AGI}{53}{section.4.3}%
+\contentsline {chapter}{\numberline {5}Desarrollo}{54}{chapter.5}%
+\contentsline {subsection}{\numberline {5.0.1}Análisis exploratorio de datos}{57}{subsection.5.0.1}%
+\contentsline {section}{\numberline {5.1}Arquitectura y entrenamiento}{57}{figure.5.2}%
+\contentsline {chapter}{\numberline {6}Resultados}{58}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Planificación}{59}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Estudio económico}{60}{chapter.8}%
+\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{61}{chapter.9}%
+\contentsline {section}{Referencias}{61}{section*.12}%
+\contentsline {chapter}{\numberline {A}Apéndices}{63}{appendix.Alph1}%

@@ -4,6 +4,8 @@
 
 \usepackage{placeins}
 \usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{afterpage}
 \numberwithin{equation}{chapter}
 %\usepackage{caption}
 \numberwithin{figure}{chapter}
@@ -1251,7 +1253,29 @@ representan el tamaño en parámetros de cada modelo.}
 El coste por tarea es un indicador especialmente relevante para medir la eficiencia de los diferentes modelos. También existen diferentes sistemas como TRM que suponen
 un coste especialmente elevado tendiendo en cuenta el poco tamaño del modelo. El tamaño del modelo no siempre es un indicador de coste equivalente. Este sistema tiene
 pocos parámetros pero su proceso de entrenamiento requiere una desmesurada capacidad de cómputo cómo se ha podido ver en la sección anterior. Esta capacidad
-de computación no está al alcance de la mayoría de investigadores y es un factor limitante para la reproducibilidad de los resultados.
+de computación no está al alcance de la mayoría de investigadores y es un factor limitante para la reproducibilidad de los resultados. La figura \ref{fig:fig20SECTION1} muestra 
+una comparativa de coste por tarea entre diferentes modelos, donde el tamaño de los círculos representa la capacidad computacional en TFLOPs FP16 usada en cada modelo. Esta
+representación es más fiel a la realidad que el tamaño del modelo, ya que un modelo pequeño puede requerir una gran capacidad de cómputo para su entrenamiento y ajuste fino.
+
+\afterpage{%
+\clearpage
+\begin{landscape}
+    \begin{figure}[p]
+        \centering
+        \vspace*{\fill} % Centra verticalmente la imagen junto con el texto inferior
+        \includegraphics[width=\linewidth, height=0.85\textheight, keepaspectratio]{/home/asier/repos/arc-agi/src/arc_agi_data_scraper/images/tflops_models_cost_light_large_font.png}
+        
+        \vspace{0.5cm}
+        \caption[Comparativa del coste por tarea entre modelos]{Comparativa del coste por tarea entre modelos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
+        \label{fig:fig20SECTION1}
+		{\footnotesize Fuente: Elaboración propia}
+        \vspace*{\fill}
+    \end{figure}
+\end{landscape}
+\clearpage
+}
+
+\FloatBarrier
 
 \chapter{Metodología}
 
@@ -1414,6 +1438,76 @@ nacer o que se adquieren muy temprano en la vida, con una instrucción explícit
 La síntesis de programas es el enfoque serio más antiguo para ARC-AGI, y va directamente al fondo del problema, que es deducir la regla a partir de los ejemplos.
 La idea (también llamada programación inductiva) es escribir automáticamente un programa que satisfaga una especificación, y en este caso la especificación es
 simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente.
+
+\FloatBarrier
+
+% Insertar la imagen en la siguiente página en orientación horizontal
+% \afterpage{%
+% \clearpage
+% \begin{landscape}  % Rotar la página en horizontal
+%     \begin{figure}[p]  % 'p' asegura que la imagen ocupe una página completa
+%         \centering
+%         \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{/home/asier/repos/arc-agi/src/arc_agi_data_scraper/images/tflops_models_cost_light.png}
+% 		\caption[Comparativa del coste por tarea \$ entre diferentes soluciones]{Comparativa del coste por tarea \$ entre diferentes soluciones. El tamaño de los círculos
+% 		representan el tamaño en parámetros de cada modelo.}
+% 		\label{fig:fig1SECTION5}
+%     \end{figure}
+% \end{landscape}
+% \clearpage
+% }
+
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=1\textwidth]{/home/asier/repos/arc-agi/src/arc_agi_data_scraper/images/tflops_models_cost_light.png}
+% \caption[Comparativa del coste por tarea \$ entre diferentes soluciones]{Comparativa del coste por tarea \$ entre diferentes soluciones. El tamaño de los círculos
+% representan el tamaño en parámetros de cada modelo.}
+% \label{fig:fig1SECTION5}
+% {\footnotesize Fuente: Adaptado de ``The ARC of Progress towards AGI: A Living Survey of Abstraction and Reasoning'' \cite{vahdati2026arc}}
+% \end{figure}
+
+\afterpage{%
+\clearpage
+\begin{landscape}
+    \begin{figure}[p]
+        \centering
+        \vspace*{\fill} % Centra verticalmente la imagen junto con el texto inferior
+        \includegraphics[width=\linewidth, height=0.85\textheight, keepaspectratio]{/home/asier/repos/arc-agi/src/arc_agi_data_scraper/images/compact_tflops_cost_light.png}
+        
+        \vspace{0.5cm}
+        \caption[Comparativa del coste por tarea \$ entre modelos compactos]{Comparativa del coste por tarea \$ entre modelos compactos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
+        \label{fig:fig1SECTION5}
+		{\footnotesize Fuente: Elaboración propia}
+        \vspace*{\fill}
+    \end{figure}
+\end{landscape}
+\clearpage
+}
+
+\FloatBarrier
+
+Este es un texto de prueba.
+
+\afterpage{%
+\clearpage
+\begin{landscape}
+    \begin{figure}[p]
+        \centering
+        \vspace*{\fill} % Centra verticalmente la imagen junto con el texto inferior
+        \includegraphics[width=\linewidth, height=0.85\textheight, keepaspectratio]{/home/asier/repos/arc-agi/src/arc_agi_data_scraper/images/cost_models_cost_light.png}
+        
+        \vspace{0.5cm}
+        \caption[Comparativa del coste por tarea \$ entre diferentes soluciones]{Comparativa del coste por tarea \$ entre diferentes soluciones. El tamaño de los círculos representan el tamaño en parámetros de cada modelo.}
+        \label{fig:fig2SECTION5}
+		{\footnotesize Fuente: Elaboración propia}
+        \vspace*{\fill}
+    \end{figure}
+\end{landscape}
+\clearpage
+}
+
+\FloatBarrier
+
+Este es un texto de prueba.
 
 \subsection{Análisis exploratorio de datos}
 
