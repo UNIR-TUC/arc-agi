@@ -452,7 +452,7 @@ Gracias a estas capacidades de generalización y abstracción, el modelo híbrid
 una velocidad de órdenes de magnitud mayor que la búsqueda clásica, haciendo tratables problemas que antes se consideraban 
 imposibles para las máquinas.
 
-\section{Abstract and Reasoning Corpus}
+\section{Abstract and Reasoning Corpus}\label{sec:arc}
 
 Los sistemas de evaluación de la inteligencia artificial han ido evolucionando a lo largo del tiempo. La investigación de esta área de ha centrado
 históricamente en comprobar si las máquinas realizan bien tareas específicas, siendo una evaluación orientada a tareas y no una evaluación de 
@@ -833,7 +833,7 @@ requiere técnicas de aprendizaje por refuerzo y modelado del mundo más que ing
 
 \section{Primeros enfoques para resolver ARC-AGI}
 
-\subsection{Domain Specific Languages (DSLs) y síntesis de programas}
+\subsection{Domain Specific Languages (DSLs) y síntesis de programas}\label{sec:DSL}
 
 En 2020 Johan Sokrates Wind publicó uno de los primero intentos basado en un Lenguaje de Dominio Específico o DSL. El uso de código estrictamente diseñado para resolver tareas específicas
 de ARC-AGI permitió alcanzar una puntuación de 20\% en el benchmark. La idea detrás de esto es codificar algoritmos de programación para crear un conjunto de programas primitivos
@@ -1438,22 +1438,46 @@ nacer o que se adquieren muy temprano en la vida, con una instrucción explícit
 
 La síntesis de programas es el enfoque serio más antiguo para ARC-AGI, y va directamente al fondo del problema, que es deducir la regla a partir de los ejemplos.
 La idea (también llamada programación inductiva) es escribir automáticamente un programa que satisfaga una especificación, y en este caso la especificación es
-simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente.
+simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente, nada más. Este enfoque es inductivo,
+parte de una regla general y busca deducir la regla a partir de los ejemplos. El otro enfoque es transductivo, que es evitar generar un programa general e intentar
+predecir la salida directamente a partir de los ejemplos de entrada. Las soluciones Domain Specific Languages (DSLs) como se ha visto en la sección \ref{sec:DSL},
+el espacio de psobiles programas que se pueden generar es inmenso, computacionalmente costoso para CPU y poco práctico.
+
+Resolver el benchmark ARC-AGI requiere de un enfoque meticuloso y una comprensión profunda de los principios subyacentes que rigen la inteligencia general. Es necesario establecer
+una serie de desarrollos básicos previos:
+
+\begin{enumerate}
+	\item \textbf{Preparación de datos:} Tratamiento del corpus ARC-AGI, definiendo las rutinas de visualización y codificación espacial necesarias. Existen ya herramientas externas que permiten realizar esta tarea de forma más eficiente y rápida.
+	\item \textbf{DSL básico:} Un lenguaje de programación específico del dominio (DSL) básico para empezar a realizar transformaciones.
+	\item \textbf{Pruebas y elección de algoritmos de búsqueda:} Evaluación de diferentes estrategias de búsqueda.
+	\item \textbf{Herramientas de visualización tras pruebas:} Herramientas que permitan de forma rápida analizar los resultados de las pruebas y la evolución de los modelos.
+	\item \textbf{Bucles de retroalimentación:} Preparar un sistema de retroalimentación que permita mejorar el modelo de forma iterativa.
+\end{enumerate}
+
+Como se ha visto en la sección \ref{sec:arc}, el espíritu de ARC-AGI es encontrar soluciones que sean lo más eficientes posible, no solo en términos de precisión, sino también en términos de coste computacional. La inteligencia
+no se debe comprar con datos ni con cómputo masivo. Este trabajo se construye a partir de este espírito de la norma y se ha estudiado numerosos modelos y soluciones para tratar de buscar un enfoque de acuerdo con este principio.
+
+Dejando al margen los grandes modelos de lenguaje y los modelos de frontera, se han estudiado diferentes enfoques de modelos compactos y eficientes. 
+La figura \ref{fig:fig1SECTION5} muestra una comparativa del coste por tarea entre diferentes modelos compactos, donde el tamaño de los círculos representa la capacidad computacional en TFLOPs FP16 usada en cada modelo.
+Esta representación es más fiel a la realidad que el porpio tamaño del modelo, ya que un modelo pequeño puede requerir una gran capacidad de cómputo para su entrenamiento y ajuste fino.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.85\textwidth]{../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light.png}
 	\caption[Comparativa del coste por tarea entre modelos compactos]{Comparativa del coste por tarea entre modelos compactos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
-	\label{fig:fig2SECTION5}
+	\label{fig:fig1SECTION5}
 	{\footnotesize Fuente: Elaboración propia}
 \end{figure}
 
 \FloatBarrier
 
-% Borrar
-La síntesis de programas es el enfoque serio más antiguo para ARC-AGI, y va directamente al fondo del problema, que es deducir la regla a partir de los ejemplos.
-La idea (también llamada programación inductiva) es escribir automáticamente un programa que satisfaga una especificación, y en este caso la especificación es
-simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente.
+Algunas soluciones como los modelos TRM requieren de una capacidad de cómputo muy elevada y no que no está al alcance de cualquier investigador. Por otra parte, este enfoque también se encuentra en el filo
+del espírito de ARC-AGI, ya que es necesario realizar pre-entrenamientos sin ningún límite de capacidad de computación para posteriormente realizar ajustes finos e inferencia
+en la las GPUs obligadas por los órganos de ARC-PRIZE. La diferencia de la capacidad de cómputo usada para el modelo TRM en comparación al modelo de CompressARC es de 7.916 PFLOPs frente a 116,6 TFLOPs, 
+lo que supone una diferencia de más de 67 veces. En cuestión de eficiencia computacional es realmente destacable el modelo de CompressARC.
+
+En la siguiente imagen \ref{fig:fig2SECTION5} se puede observar también la comparativa de diferentes modelos compactos desde la perspectiva de coste por tarea, otra comparativa
+que busca un punto de vista desde la eficiencia.
 
 
 \begin{figure}[h]
@@ -1466,12 +1490,6 @@ simplemente los pares de matrices. Se busca un programa que convierta la entrada
 
 \FloatBarrier
 	
-% Borrar
-La síntesis de programas es el enfoque serio más antiguo para ARC-AGI, y va directamente al fondo del problema, que es deducir la regla a partir de los ejemplos.
-La idea (también llamada programación inductiva) es escribir automáticamente un programa que satisfaga una especificación, y en este caso la especificación es
-simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente.
-
-\FloatBarrier
 
 % Insertar la imagen en la siguiente página en orientación horizontal
 % \afterpage{%
@@ -1517,7 +1535,6 @@ simplemente los pares de matrices. Se busca un programa que convierta la entrada
 
 % \FloatBarrier
 
-Este es un texto de prueba.
 
 % \afterpage{%
 % \clearpage
@@ -1537,8 +1554,8 @@ Este es un texto de prueba.
 % \clearpage
 % }
 
-
-Este es un texto de prueba.
+Dado el análisis y las evidencias presentadas, se ha decidido optar por el enfoque presentado por \citeauthor{liao2025arcagiwithoutpretraining}, CompressARC. En las sigueintes
+secciones se analizará con detalle este enfoque y se presentará una variante propia que se ajusta a las limitaciones de hardware y a los objetivos de eficiencia computacional del proyecto.
 
 \subsection{Análisis exploratorio de datos}
 
