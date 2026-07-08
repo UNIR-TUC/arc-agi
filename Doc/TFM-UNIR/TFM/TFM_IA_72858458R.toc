@@ -55,11 +55,11 @@
 \contentsline {section}{\numberline {4.2}Entorno de desarrollo}{51}{section.4.2}%
 \contentsline {section}{\numberline {4.3}Utilidades externas de ARC-AGI}{53}{section.4.3}%
 \contentsline {chapter}{\numberline {5}Desarrollo}{54}{chapter.5}%
-\contentsline {subsection}{\numberline {5.0.1}Análisis exploratorio de datos}{56}{subsection.5.0.1}%
-\contentsline {section}{\numberline {5.1}Arquitectura y entrenamiento}{56}{section.5.1}%
-\contentsline {chapter}{\numberline {6}Resultados}{57}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Planificación}{58}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Estudio económico}{59}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{60}{chapter.9}%
-\contentsline {section}{Referencias}{60}{section*.12}%
-\contentsline {chapter}{\numberline {A}Apéndices}{62}{appendix.Alph1}%
+\contentsline {subsection}{\numberline {5.0.1}Análisis exploratorio de datos}{57}{subsection.5.0.1}%
+\contentsline {section}{\numberline {5.1}Arquitectura y entrenamiento}{57}{section.5.1}%
+\contentsline {chapter}{\numberline {6}Resultados}{58}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Planificación}{59}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Estudio económico}{60}{chapter.8}%
+\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{61}{chapter.9}%
+\contentsline {section}{Referencias}{61}{section*.12}%
+\contentsline {chapter}{\numberline {A}Apéndices}{63}{appendix.Alph1}%
