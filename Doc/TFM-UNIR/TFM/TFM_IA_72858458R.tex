@@ -1554,20 +1554,109 @@ que busca un punto de vista desde la eficiencia.
 % \clearpage
 % }
 
-Dado el análisis y las evidencias presentadas, se ha decidido optar por el enfoque presentado por \citeauthor{liao2025arcagiwithoutpretraining}, CompressARC. En las sigueintes
+Dado el análisis y las evidencias presentadas, se ha decidido optar por el enfoque presentado por \citeauthor{liao2025arcagiwithoutpretraining}, CompressARC. En las siguientes
 secciones se analizará con detalle este enfoque y se presentará una variante propia que se ajusta a las limitaciones de hardware y a los objetivos de eficiencia computacional del proyecto.
 
 \subsection{Análisis exploratorio de datos}
 
-Pendiente de redactar.
+Los datos de entrada del benchmark ARC-AGI se presentan en forma de pares de matrices, donde cada par consiste en una matriz de entrada y su correspondiente matriz de salida.
+El análisis exploratorio de datos (EDA) es un paso crucial para comprender la naturaleza de estos datos y para identificar patrones, tendencias y posibles anomalías que puedan influir en el diseño del modelo. Los
+datos típicamente se presentan en archivos de lenguaje de texto simple JSON, que contienen representaciones de las matrices en formato de listas anidadas. Cada matriz puede variar en tamaño y contenido,
+lo que introduce un nivel adicional de complejidad en el análisis.
+
+Los datos se componen de 5 archivos:
+
+\begin{itemize}
+	\item \textbf{train\_challenges:} Tareas para el entrenamiento. 400 tareas de entrenamiento, cada una con 3 ejemplos de entrada (o más) y salida. Estas tareas son públicas y se pueden usar para entrenar modelos de lenguaje.
+	\item \textbf{train\_solutions:} Soluciones correspondientes a las tareas de entrenamiento. 400 soluciones de entrenamiento, también son públicas.
+	\item \textbf{evaluation\_challenges:} Tareas para la evaluación. 400 tareas de evaluación, cada una con 3 ejemplos de entrada (o más) y salida. Estas tareas son públicas y se pueden usar para evaluar modelos de lenguaje.
+	\item \textbf{evaluation\_solutions:} Soluciones correspondientes a las tareas de evaluación. 400 soluciones de evaluación, también son públicas.
+	\item \textbf{test\_challenges:} Tareas adicionales para el \textit{test} privado final de ARC-PRIZE. Estas tareas suelen ser nuevas y totalmente privadas hasta que no son inferenciados en una máquina de evaluación oficial. La idea es que los modelos no puedan sobre-ajustarse a estas tareas y que la evaluación final sea lo más objetiva posible. No se dispone de las soluciones de estas tareas, ya que son privadas y solo se pueden evaluar en la máquina oficial de ARC-PRIZE.
+\end{itemize}
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.65\textwidth]{image/images/1783612131205.png}
+	\caption[Ejemplo de tarea desde el editor de código]{Ejemplo de tarea desde el editor de código.}
+	\label{fig:fig3SECTION5}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
+
+Los datos típicamente se presentan en pares de matrices y está compuesto por valores enteros que representan colores en una paleta de 10 colores.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.65\textwidth]{image/images/1783612283422.png}
+	\caption[Valor asignado a cada color]{Valor asignado a cada color en la paleta de 10 colores.}
+	\label{fig:fig4SECTION5}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
+
+Cada tarea está identificada por un identificador único de 8 caracteres alfanuméricos. En los conjuntos de datos se pueden encontrar las diferentes tareas, que pueden ser especialmente
+diferentes entre sí.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.90\textwidth]{image/images/1783613717007.png}
+	\caption[Tarea 045e512c]{Tarea con identificador único 045e512c.}
+	\label{fig:fig5SECTION5}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.90\textwidth]{image/images/1783613736665.png}
+	\caption[Tarea 06df4c85]{Tarea con identificador único 06df4c85.}
+	\label{fig:fig6SECTION5}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.90\textwidth]{image/images/1783613758618.png}
+	\caption[Tarea 0dfd9992]{Tarea con identificador único 0dfd9992.}
+	\label{fig:fig7SECTION5}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.90\textwidth]{image/images/1783613832670.png}
+	\caption[Tarea 05a7bcf2]{Tarea con identificador único 05a7bcf2.}
+	\label{fig:fig8SECTION5}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
 
 % \subsection{Técnicas de aumento de datos}
 
 % Pendiente de redactar.
 	
-\section{Arquitectura y entrenamiento}
+\section{Arquitectura}
 
-Pendiente de redactar.
+Tal como se ha adelantado en capítulos anteriores, el diseño de la arquitectura propuesta en este trabajo se 
+fundamenta en los principios de \textit{CompressARC} \cite{liao2025arcagiwithoutpretraining}. Esta elección responde a la necesidad de encontrar 
+un equilibrio entre la expresividad del modelo y la eficiencia computacional, evitando el pre-entrenamiento masivo en favor de una optimización centrada en 
+el tiempo de inferencia (\textit{Test-Time Training}). 
+
+% Partiendo de esta base, se ha desarrollado una evolución de dicha arquitectura con el objetivo de mejorar la capacidad de síntesis de programas y la resolución de transformaciones 
+% complejas en el \textit{benchmark} ARC-AGI-1. Esta propuesta se centra en refinamientos específicos dentro del espacio latente y en el uso optimizado de sistemas 
+% multitemporales (\textit{multitensors}), buscando una arquitectura que no solo sea compacta en parámetros, sino también más robusta ante la diversidad de tareas planteadas. 
+% En las siguientes secciones se detallan los componentes, capas y el proceso iterativo que conforman el núcleo de esta solución.
+
+
 
 % Conversación chatGPT https://chatgpt.com/share/6a260857-7178-83eb-89a4-2001dce06c2d
 % Coste actual por hora de 5070 TI https://cloud.vast.ai/?utm_source=getdeploying.com&utm_medium=paid&utm_content=nvidia-rtx-5070-ti

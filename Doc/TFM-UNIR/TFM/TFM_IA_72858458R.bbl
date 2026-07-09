@@ -25,11 +25,7 @@ Ainooson, J.%
 \newblock
 \APACrefYearMonthDay{2023}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {A neurodiversity-inspired solver for the
-  abstraction$\backslash$\& reasoning corpus (arc) using visual imagery and
-  program synthesis} {A neurodiversity-inspired solver for the
-  abstraction$\backslash$\& reasoning corpus (arc) using visual imagery and
-  program synthesis}.{\BBCQ}
+{\BBOQ}\APACrefatitle {A neurodiversity-inspired solver for the abstraction$\backslash$\& reasoning corpus (arc) using visual imagery and program synthesis} {A neurodiversity-inspired solver for the abstraction$\backslash$\& reasoning corpus (arc) using visual imagery and program synthesis}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:2302.09425}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -52,9 +48,7 @@ Alford, S.%
 \APACrefYear{2021}.
 \unskip\
 \newblock
-\APACrefbtitle {A neurosymbolic approach to abstraction and reasoning} {A
-  neurosymbolic approach to abstraction and reasoning}\ \APACtypeAddressSchool
-  {\BUPhD}{}{}.
+\APACrefbtitle {A neurosymbolic approach to abstraction and reasoning} {A neurosymbolic approach to abstraction and reasoning}\ \APACtypeAddressSchool {\BUPhD}{}{}.
 \unskip\
 \newblock
 \APACaddressSchool {}{Massachusetts Institute of Technology}.
@@ -102,10 +96,7 @@ Chollet, F.%
 \newblock
 \APACrefYearMonthDay{2019{\protect \BCnt {1}}}{}{}.
 \newblock
-\APACrefbtitle {{G}it{H}ub - fchollet/{A}{R}{C}-{A}{G}{I}: {T}he {A}bstraction
-  and {R}easoning {C}orpus --- github.com.} {{G}it{H}ub -
-  fchollet/{A}{R}{C}-{A}{G}{I}: {T}he {A}bstraction and {R}easoning {C}orpus
-  --- github.com.}
+\APACrefbtitle {{G}it{H}ub - fchollet/{A}{R}{C}-{A}{G}{I}: {T}he {A}bstraction and {R}easoning {C}orpus --- github.com.} {{G}it{H}ub - fchollet/{A}{R}{C}-{A}{G}{I}: {T}he {A}bstraction and {R}easoning {C}orpus --- github.com.}
 \newblock
 \APAChowpublished {\url{https://github.com/fchollet/{A}{R}{C}-{A}{G}{I}}}.
 \newblock
@@ -129,8 +120,7 @@ Chollet, F.%
 \newblock
 \APACrefYearMonthDay{2019{\protect \BCnt {2}}}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {On the measure of intelligence} {On the measure of
-  intelligence}.{\BBCQ}
+{\BBOQ}\APACrefatitle {On the measure of intelligence} {On the measure of intelligence}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:1911.01547}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -160,9 +150,7 @@ Chollet, F.%
 \newblock
 \APACrefYearMonthDay{2025}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Arc-agi-2: A new challenge for frontier ai reasoning
-  systems} {Arc-agi-2: A new challenge for frontier ai reasoning
-  systems}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Arc-agi-2: A new challenge for frontier ai reasoning systems} {Arc-agi-2: A new challenge for frontier ai reasoning systems}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:2505.11831}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -188,8 +176,7 @@ Franzen, D.%
 \newblock
 \APACrefYearMonthDay{2024}{}{}.
 \newblock
-\APACrefbtitle {The LLM ARChitect: Solving ARC-AGI Is A Matter of Perspective.}
-  {The llm architect: Solving arc-agi is a matter of perspective.}
+\APACrefbtitle {The LLM ARChitect: Solving ARC-AGI Is A Matter of Perspective.} {The llm architect: Solving arc-agi is a matter of perspective.}
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -215,8 +202,7 @@ Gendron, G.%
 \newblock
 \APACrefYearMonthDay{2024}{}{}.
 \newblock
-\APACrefbtitle {Large Language Models Are Not Strong Abstract Reasoners.}
-  {Large language models are not strong abstract reasoners.}
+\APACrefbtitle {Large Language Models Are Not Strong Abstract Reasoners.} {Large language models are not strong abstract reasoners.}
 \newblock
 \begin{APACrefURL} \url{https://arxiv.org/abs/2305.19555} \end{APACrefURL}
 \PrintBackRefs{\CurrentBib}
@@ -238,9 +224,7 @@ Gonz{\'a}lez, R.%
 \newblock
 \APACrefYearMonthDay{2011}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Descartes: las intuiciones modales y la inteligencia
-  artificial cl{\'a}sica} {Descartes: las intuiciones modales y la inteligencia
-  artificial cl{\'a}sica}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Descartes: las intuiciones modales y la inteligencia artificial cl{\'a}sica} {Descartes: las intuiciones modales y la inteligencia artificial cl{\'a}sica}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Alpha (Osorno)}{}{32}{181--198}.
 \PrintBackRefs{\CurrentBib}
@@ -262,9 +246,7 @@ Hern{\'a}ndez-Orallo, J.%
 \newblock
 \APACrefYearMonthDay{2017}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Evaluation in artificial intelligence: from
-  task-oriented to ability-oriented measurement} {Evaluation in artificial
-  intelligence: from task-oriented to ability-oriented measurement}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Evaluation in artificial intelligence: from task-oriented to ability-oriented measurement} {Evaluation in artificial intelligence: from task-oriented to ability-oriented measurement}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Artificial Intelligence Review}{48}{3}{397--447}.
 \PrintBackRefs{\CurrentBib}
@@ -286,12 +268,7 @@ Hurbans, R.%
 \newblock
 \APACrefYear{2020}.
 \newblock
-\APACrefbtitle {Grokking Artificial Intelligence Algorithms: Understand and
-  apply the core algorithms of deep learning and artificial intelligence in
-  this friendly illustrated guide including exercises and examples} {Grokking
-  artificial intelligence algorithms: Understand and apply the core algorithms
-  of deep learning and artificial intelligence in this friendly illustrated
-  guide including exercises and examples}.
+\APACrefbtitle {Grokking Artificial Intelligence Algorithms: Understand and apply the core algorithms of deep learning and artificial intelligence in this friendly illustrated guide including exercises and examples} {Grokking artificial intelligence algorithms: Understand and apply the core algorithms of deep learning and artificial intelligence in this friendly illustrated guide including exercises and examples}.
 \newblock
 \APACaddressPublisher{}{Manning}.
 \PrintBackRefs{\CurrentBib}
@@ -313,8 +290,7 @@ Jolicoeur-Martineau, A.%
 \newblock
 \APACrefYearMonthDay{2025}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Less is more: Recursive reasoning with tiny networks}
-  {Less is more: Recursive reasoning with tiny networks}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Less is more: Recursive reasoning with tiny networks} {Less is more: Recursive reasoning with tiny networks}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:2510.04871}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -336,8 +312,7 @@ Kahneman, D.%
 \newblock
 \APACrefYearMonthDay{2011}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Thinking, fast and slow} {Thinking, fast and
-  slow}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Thinking, fast and slow} {Thinking, fast and slow}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Farrar, Straus and Giroux}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -361,11 +336,9 @@ Legg, S.%
 \newblock
 \APACrefYearMonthDay{2007}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {A collection of definitions of intelligence} {A
-  collection of definitions of intelligence}.{\BBCQ}
+{\BBOQ}\APACrefatitle {A collection of definitions of intelligence} {A collection of definitions of intelligence}.{\BBCQ}
 \newblock
-\APACjournalVolNumPages{Frontiers in Artificial Intelligence and
-  applications}{157}{}{17}.
+\APACjournalVolNumPages{Frontiers in Artificial Intelligence and applications}{157}{}{17}.
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -391,11 +364,7 @@ Li, W.%
 \newblock
 \APACrefYearMonthDay{2024}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Tackling the abstraction and reasoning corpus with
-  vision transformers: the importance of 2d representation, positions, and
-  objects} {Tackling the abstraction and reasoning corpus with vision
-  transformers: the importance of 2d representation, positions, and
-  objects}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Tackling the abstraction and reasoning corpus with vision transformers: the importance of 2d representation, positions, and objects} {Tackling the abstraction and reasoning corpus with vision transformers: the importance of 2d representation, positions, and objects}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:2410.06405}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -422,9 +391,7 @@ Liao, I.%
 \newblock
 \APACrefbtitle {ARC-AGI Without Pretraining.} {Arc-agi without pretraining.}
 \newblock
-\begin{APACrefURL}
-  \url{https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html}
-  \end{APACrefURL}
+\begin{APACrefURL} \url{https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html} \end{APACrefURL}
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -444,9 +411,7 @@ Minsky, M.%
 \newblock
 \APACrefYearMonthDay{1968}{}{}.
 \newblock
-\APACrefbtitle {Matter, Mind, and Models in: ML Minsky (ed.): Semantic
-  Information Processing.} {Matter, mind, and models in: Ml minsky (ed.):
-  Semantic information processing.}
+\APACrefbtitle {Matter, Mind, and Models in: ML Minsky (ed.): Semantic Information Processing.} {Matter, mind, and models in: Ml minsky (ed.): Semantic information processing.}
 \newblock
 \APACaddressPublisher{}{MIT Press}.
 \PrintBackRefs{\CurrentBib}
@@ -472,14 +437,9 @@ Newell, A.%
 \newblock
 \APACrefYearMonthDay{1962}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {The processes of creative thinking.} {The processes of
-  creative thinking.}{\BBCQ}
+{\BBOQ}\APACrefatitle {The processes of creative thinking.} {The processes of creative thinking.}{\BBCQ}
 \newblock
-\BIn{} \APACrefbtitle {Contemporary Approaches to Creative Thinking, 1958,
-  University of Colorado, CO, US; This paper was presented at the
-  aforementioned symposium.} {Contemporary approaches to creative thinking,
-  1958, university of colorado, co, us; this paper was presented at the
-  aforementioned symposium.}
+\BIn{} \APACrefbtitle {Contemporary Approaches to Creative Thinking, 1958, University of Colorado, CO, US; This paper was presented at the aforementioned symposium.} {Contemporary approaches to creative thinking, 1958, university of colorado, co, us; this paper was presented at the aforementioned symposium.}
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -499,9 +459,7 @@ Ouellette, S.%
 \newblock
 \APACrefYearMonthDay{2024}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Towards efficient neurally-guided program induction for
-  arc-agi} {Towards efficient neurally-guided program induction for
-  arc-agi}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Towards efficient neurally-guided program induction for arc-agi} {Towards efficient neurally-guided program induction for arc-agi}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:2411.17708}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -527,13 +485,9 @@ Perez, D.%
 \newblock
 \APACrefYearMonthDay{2014}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Knowledge-based fast evolutionary MCTS for general video
-  game playing} {Knowledge-based fast evolutionary mcts for general video game
-  playing}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Knowledge-based fast evolutionary MCTS for general video game playing} {Knowledge-based fast evolutionary mcts for general video game playing}.{\BBCQ}
 \newblock
-\BIn{} \APACrefbtitle {2014 IEEE Conference on Computational Intelligence and
-  Games} {2014 ieee conference on computational intelligence and games}\
-  (\BPGS\ 1--8).
+\BIn{} \APACrefbtitle {2014 IEEE Conference on Computational Intelligence and Games} {2014 ieee conference on computational intelligence and games}\ (\BPGS\ 1--8).
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -584,9 +538,7 @@ swiechowski2023monte}%
 \newblock
 \APACrefYearMonthDay{2023}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Monte Carlo tree search: A review of recent
-  modifications and applications} {Monte carlo tree search: A review of recent
-  modifications and applications}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Monte Carlo tree search: A review of recent modifications and applications} {Monte carlo tree search: A review of recent modifications and applications}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{Artificial Intelligence Review}{56}{3}{2497--2562}.
 \PrintBackRefs{\CurrentBib}
@@ -614,9 +566,7 @@ Vahdati, S.%
 \newblock
 \APACrefYearMonthDay{2026}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {The ARC of Progress towards AGI: A Living Survey of
-  Abstraction and Reasoning} {The arc of progress towards agi: A living survey
-  of abstraction and reasoning}.{\BBCQ}
+{\BBOQ}\APACrefatitle {The ARC of Progress towards AGI: A Living Survey of Abstraction and Reasoning} {The arc of progress towards agi: A living survey of abstraction and reasoning}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:2603.13372}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -644,8 +594,7 @@ Wang, G.%
 \newblock
 \APACrefYearMonthDay{2025}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {Hierarchical reasoning model} {Hierarchical reasoning
-  model}.{\BBCQ}
+{\BBOQ}\APACrefatitle {Hierarchical reasoning model} {Hierarchical reasoning model}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{arXiv preprint arXiv:2506.21734}{}{}{}.
 \PrintBackRefs{\CurrentBib}
@@ -667,8 +616,7 @@ Waxman, W.%
 \newblock
 \APACrefYear{2014}.
 \newblock
-\APACrefbtitle {Kant's anatomy of the intelligent mind} {Kant's anatomy of the
-  intelligent mind}.
+\APACrefbtitle {Kant's anatomy of the intelligent mind} {Kant's anatomy of the intelligent mind}.
 \newblock
 \APACaddressPublisher{}{OUP USA}.
 \PrintBackRefs{\CurrentBib}
@@ -690,8 +638,7 @@ Wind, J\BPBI S.%
 \newblock
 \APACrefYearMonthDay{2020}{}{}.
 \newblock
-{\BBOQ}\APACrefatitle {DSL solution to the ARC challenge} {Dsl solution to the
-  arc challenge}.{\BBCQ}
+{\BBOQ}\APACrefatitle {DSL solution to the ARC challenge} {Dsl solution to the arc challenge}.{\BBCQ}
 \newblock
 \APACjournalVolNumPages{URL https://github. com/top-quarks/ARC-solution}{}{}{}.
 \PrintBackRefs{\CurrentBib}

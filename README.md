@@ -122,70 +122,70 @@ Deep Learning
 
 ### ARC-AGI-1 Semi-Private Eval (Ranking por rendimiento)
 
-| Modelo/Sistema | Score | Costo/Tarea | Notas |
-|----------------|-------|-------------|-------|
-| **o3-preview (high)** | 87.5% | $4,560 | 172x compute, 5.7B tokens |
-| **Ensemble Kaggle** | ~81% | - | Combinación de soluciones |
-| **o3-preview (low)** | 75.7% | $200 | Primer puesto leaderboard 2024 |
-| **o3 (high)** | 60.8% | $0.50 | - |
-| **o3-pro (high)** | 59.3% | $4.16 | - |
-| **o4-mini (high)** | 58.7% | $0.406 | - |
-| **Claude 3.5 + EvoTTC** | 53.6% | - | Evolutionary Test-Time Compute |
-| **the ARChitects (2024)** | 53.5% | - | Ganador Kaggle ARC Prize 2024 |
-| **o3 (medium)** | 53% | $2.52 | - |
-| **SOAR** | 52% | - | Self-Improving Evolutionary Program Synthesis |
-| **TTT MIT/Cornell** | 47.5% | - | Test-Time Training |
-| **TRM (7M params)** | 45% | - | 🆕 Tiny Recursive Model - Paper Award 1st |
-| **o3 (low)** | 41% | $1.22 | - |
-| **Claude Sonnet 4 (16k)** | 40% | $0.366 | - |
-| **o4-mini (medium)** | 42% | $0.23 | - |
-| **Claude Opus 4 (16k)** | 35.7% | $1.25 | - |
-| **o1 (high)** | 35% | $1.31 | - |
-| **Gemini 2.5 Flash** | 33.3% | $0.037 | Mejor balance costo/rendimiento |
-| **Gemini 2.5 Pro** | 33% | $0.569 | - |
-| **o1 (medium)** | 31% | $0.79 | - |
-| **DeepSeek R1 (5/28)** | 21.2% | $0.046 | Actualizado |
-| **o4-mini (low)** | 21% | $0.05 | - |
-| **o1 (low)** | 20.5% | $0.43 | - |
-| **CompressARC (76K)** | 20-34% | - | Sin pretraining, MDL-based |
-| **Grok 3 Mini (low)** | 16.5% | $0.0099 | - |
-| **DeepSeek R1** | 15.8% | $0.06 | Open source |
-| **DeepSeek R1-Zero** | 14% | $0.11 | Sin SFT, solo RL |
-| **Claude 3.5 Sonnet** | 14% | - | Base, sin técnicas adicionales |
-| **Grok 3** | 5.5% | $0.0093 | - |
-| **GPT-4o** | 5% | - | Base LLM |
-| **Llama 4 Maverick** | 4.4% | $0.0078 | - |
-| **GPT-4** | ~0% | - | Base LLM |
-| **GPT-3** | 0% | - | Base LLM |
-| **Humanos** | ~85% | ~$5 | Referencia humana |
+| Modelo/Sistema                  | Score  | Costo/Tarea | Notas                                         |
+| ------------------------------- | ------ | ----------- | --------------------------------------------- |
+| **o3-preview (high)**     | 87.5%  | $4,560      | 172x compute, 5.7B tokens                     |
+| **Ensemble Kaggle**       | ~81%   | -           | Combinación de soluciones                    |
+| **o3-preview (low)**      | 75.7%  | $200        | Primer puesto leaderboard 2024                |
+| **o3 (high)**             | 60.8%  | $0.50       | -                                             |
+| **o3-pro (high)**         | 59.3%  | $4.16       | -                                             |
+| **o4-mini (high)**        | 58.7%  | $0.406      | -                                             |
+| **Claude 3.5 + EvoTTC**   | 53.6%  | -           | Evolutionary Test-Time Compute                |
+| **the ARChitects (2024)** | 53.5%  | -           | Ganador Kaggle ARC Prize 2024                 |
+| **o3 (medium)**           | 53%    | $2.52       | -                                             |
+| **SOAR**                  | 52%    | -           | Self-Improving Evolutionary Program Synthesis |
+| **TTT MIT/Cornell**       | 47.5%  | -           | Test-Time Training                            |
+| **TRM (7M params)**       | 45%    | -           | 🆕 Tiny Recursive Model - Paper Award 1st     |
+| **o3 (low)**              | 41%    | $1.22       | -                                             |
+| **Claude Sonnet 4 (16k)** | 40%    | $0.366      | -                                             |
+| **o4-mini (medium)**      | 42%    | $0.23       | -                                             |
+| **Claude Opus 4 (16k)**   | 35.7%  | $1.25       | -                                             |
+| **o1 (high)**             | 35%    | $1.31       | -                                             |
+| **Gemini 2.5 Flash**      | 33.3%  | $0.037      | Mejor balance costo/rendimiento               |
+| **Gemini 2.5 Pro**        | 33%    | $0.569      | -                                             |
+| **o1 (medium)**           | 31%    | $0.79       | -                                             |
+| **DeepSeek R1 (5/28)**    | 21.2%  | $0.046      | Actualizado                                   |
+| **o4-mini (low)**         | 21%    | $0.05       | -                                             |
+| **o1 (low)**              | 20.5%  | $0.43       | -                                             |
+| **CompressARC (76K)**     | 20-34% | -           | Sin pretraining, MDL-based                    |
+| **Grok 3 Mini (low)**     | 16.5%  | $0.0099     | -                                             |
+| **DeepSeek R1**           | 15.8%  | $0.06       | Open source                                   |
+| **DeepSeek R1-Zero**      | 14%    | $0.11       | Sin SFT, solo RL                              |
+| **Claude 3.5 Sonnet**     | 14%    | -           | Base, sin técnicas adicionales               |
+| **Grok 3**                | 5.5%   | $0.0093     | -                                             |
+| **GPT-4o**                | 5%     | -           | Base LLM                                      |
+| **Llama 4 Maverick**      | 4.4%   | $0.0078     | -                                             |
+| **GPT-4**                 | ~0%    | -           | Base LLM                                      |
+| **GPT-3**                 | 0%     | -           | Base LLM                                      |
+| **Humanos**               | ~85%   | ~$5         | Referencia humana                             |
 
 ### ARC-AGI-2 (lanzado Marzo 2025)
 
-| Modelo/Sistema | Score | Costo/Tarea | Notas |
-|----------------|-------|-------------|-------|
-| **Poetiq (Gemini 3 Pro Ref)** | 54% | $31 | 🆕 SOTA refinement solution |
-| **Claude Opus 4.5 (64k)** | 37.6% | $2.20 | 🆕 SOTA comercial verificado |
-| **Gemini 3 Pro** | 31% | $0.81 | Baseline |
-| **NVARC (Kaggle 1st)** | 24.03% | $0.20 | 🆕 SOTA Kaggle 2025 |
-| **the ARChitects** | 16.53% | - | 2D-aware masked-diffusion |
-| **MindsAI** | 12.64% | - | Test-time training |
-| **Claude Opus 4 (16k)** | 8.6% | $1.93 | - |
-| **TRM (7M params)** | 8% | - | 🆕 Tiny Recursive Model |
-| **o3 (high)** | 6.5% | $0.834 | - |
-| **o4-mini (high)** | 6.1% | $0.856 | - |
-| **Claude Sonnet 4 (16k)** | 5.9% | $0.486 | - |
-| **o3-pro (high)** | 4.9% | $7.55 | - |
-| **CompressARC (76K)** | 4% | - | Sin pretraining |
-| **Gemini 2.5 Pro** | 3.8% | $0.813 | - |
-| **o3 (medium)** | 2.9% | - | - |
-| **o4-mini (medium)** | 2.3% | - | - |
-| **o3 (low)** | 1.9% | - | - |
-| **o4-mini (low)** | 1.6% | - | - |
-| **DeepSeek R1** | 1.3% | $0.08 | - |
-| **Grok 3 Mini (low)** | 0.4% | $0.013 | - |
-| **Grok 3** | 0% | $0.14 | - |
-| **Llama 4 Maverick** | 0% | $0.012 | - |
-| **Humanos** | >95% | - | Sin entrenamiento previo |
+| Modelo/Sistema                      | Score  | Costo/Tarea | Notas                        |
+| ----------------------------------- | ------ | ----------- | ---------------------------- |
+| **Poetiq (Gemini 3 Pro Ref)** | 54%    | $31         | 🆕 SOTA refinement solution  |
+| **Claude Opus 4.5 (64k)**     | 37.6%  | $2.20       | 🆕 SOTA comercial verificado |
+| **Gemini 3 Pro**              | 31%    | $0.81       | Baseline                     |
+| **NVARC (Kaggle 1st)**        | 24.03% | $0.20       | 🆕 SOTA Kaggle 2025          |
+| **the ARChitects**            | 16.53% | -           | 2D-aware masked-diffusion    |
+| **MindsAI**                   | 12.64% | -           | Test-time training           |
+| **Claude Opus 4 (16k)**       | 8.6%   | $1.93       | -                            |
+| **TRM (7M params)**           | 8%     | -           | 🆕 Tiny Recursive Model      |
+| **o3 (high)**                 | 6.5%   | $0.834      | -                            |
+| **o4-mini (high)**            | 6.1%   | $0.856      | -                            |
+| **Claude Sonnet 4 (16k)**     | 5.9%   | $0.486      | -                            |
+| **o3-pro (high)**             | 4.9%   | $7.55       | -                            |
+| **CompressARC (76K)**         | 4%     | -           | Sin pretraining              |
+| **Gemini 2.5 Pro**            | 3.8%   | $0.813      | -                            |
+| **o3 (medium)**               | 2.9%   | -           | -                            |
+| **o4-mini (medium)**          | 2.3%   | -           | -                            |
+| **o3 (low)**                  | 1.9%   | -           | -                            |
+| **o4-mini (low)**             | 1.6%   | -           | -                            |
+| **DeepSeek R1**               | 1.3%   | $0.08       | -                            |
+| **Grok 3 Mini (low)**         | 0.4%   | $0.013      | -                            |
+| **Grok 3**                    | 0%     | $0.14       | -                            |
+| **Llama 4 Maverick**          | 0%     | $0.012      | -                            |
+| **Humanos**                   | >95%   | -           | Sin entrenamiento previo     |
 
 ---
 
@@ -208,25 +208,26 @@ Deep Learning
 ### Papers con resultados ARC-AGI
 
 1. **"Less is More: Recursive Reasoning with Tiny Networks"** (Oct 2025)
+
    - Autor: Alexia Jolicoeur-Martineau
    - arXiv: 2510.04871
    - Resultado: TRM (7M params) → ARC-AGI-1: 45%, ARC-AGI-2: 8%
    - 🏆 Paper Award 1st Place - ARC Prize 2025
-
 2. **"Small Language Models for Efficient Agentic Tool Calling"** (Dec 2025)
+
    - Autores: Jhandi, Kazi, Subramanian, Sendas
    - arXiv: 2512.15943
    - Resultado: OPT-350M fine-tuned → ToolBench: 77.55% (vs ChatGPT-CoT: 26%)
-
 3. **"On the Measure of Intelligence"** (2019)
+
    - Autor: François Chollet
    - arXiv: 1911.01547
    - Introduce ARC-AGI benchmark
-
 4. **"The Surprising Effectiveness of Test-Time Training for Abstract Reasoning"** (2024)
+
    - MIT/Cornell
    - Resultado: ARC-AGI-1: 47.5%
-  
+
 ## Enlaces imprescindibles
 
 https://arahim3.github.io/arc-agi-guide/
@@ -254,7 +255,6 @@ https://www.kaggle.com/code/allegich/arc-agi-2025-starter-notebook-eda
 
 https://www.kaggle.com/code/iliao2345/arc-agi-without-pretraining/notebook?scriptVersionId=232760209
 
-
 ---
 
 ## Tabla comparativa (Convergencias 2025 en ARC-AGI)
@@ -268,30 +268,30 @@ Fuentes (PDFs en este repo):
 
 Leyenda: ✅ = central / explícito en el enfoque; ◻️ = aparece como técnica relacionada o compatible.
 
-| Técnica / Metodología (qué aporta) | Convergencia (forma del loop) | ARC Prize 2025 report | HRM (2506.21734) | TRM (2510.04871) | Thesis proposal |
-|---|---|---:|---:|---:|---:|
-| Refinement loop por tarea (iterar hasta cumplir demos) | Programa o modelo se refina con feedback | ✅ | ◻️ | ✅ | ✅ |
-| Test-time compute scaling (más pasos = más fiabilidad) | Más iteraciones/muestras por task | ✅ | ✅ | ✅ | ✅ |
-| Test-time training (TTT) / fine-tuning por puzzle | Refinamiento en **espacio de pesos** | ✅ | ✅ (entrena desde cero por task) | ✅ (entrena por task) | ✅ |
-| Zero-pretraining (entrenar desde inicialización aleatoria) | Todo el “aprendizaje” sucede en test | ✅ | ✅ | ✅ | ✅ |
-| Razonamiento iterativo en latente (estado que se actualiza) | Refinar **estado/solución** paso a paso | ◻️ | ✅ | ✅ | ✅ |
-| Deep supervision / multi-step improvement | Optimizar para mejorar en varios pasos | ◻️ | ✅ | ✅ | ◻️ |
-| Halting / early-stopping aprendido (ACT o similar) | Ajustar compute a la dificultad | ◻️ | ✅ | ✅ (simplificado) | ◻️ |
-| Ensemble / voto sobre variantes | Explorar múltiples propuestas y seleccionar | ✅ | ✅ (voto top-2 en ARC) | ◻️ | ◻️ |
-| Data augmentation por simetrías 2D (dihedral, color perm, etc.) | Invariancias del dominio para generalizar | ✅ | ✅ | ✅ | ◻️ |
-| “Synthesis > prediction” (resolver generando procedimiento) | Output como resultado de un “programa” | ✅ | ✅ | ✅ | ✅ |
-| Búsqueda + verificación (explore/verify) | Candidatos → score/verifier → refinar | ✅ | ◻️ | ◻️ | ✅ |
-| Verificadores / harness de aplicación (layer externo) | Refinamiento a nivel orquestación | ✅ | ◻️ | ◻️ | ◻️ |
-| Regularización/criterios de compresión (MDL/description length) | Refina maximizando parsimonia | ✅ | ◻️ | ◻️ | ◻️ |
+| Técnica / Metodología (qué aporta)                             | Convergencia (forma del loop)                 | ARC Prize 2025 report |                 HRM (2506.21734) |      TRM (2510.04871) | Thesis proposal |
+| ----------------------------------------------------------------- | --------------------------------------------- | --------------------: | -------------------------------: | --------------------: | --------------: |
+| Refinement loop por tarea (iterar hasta cumplir demos)            | Programa o modelo se refina con feedback      |                    ✅ |                             ◻️ |                    ✅ |              ✅ |
+| Test-time compute scaling (más pasos = más fiabilidad)          | Más iteraciones/muestras por task            |                    ✅ |                               ✅ |                    ✅ |              ✅ |
+| Test-time training (TTT) / fine-tuning por puzzle                 | Refinamiento en**espacio de pesos**     |                    ✅ | ✅ (entrena desde cero por task) | ✅ (entrena por task) |              ✅ |
+| Zero-pretraining (entrenar desde inicialización aleatoria)       | Todo el “aprendizaje” sucede en test        |                    ✅ |                               ✅ |                    ✅ |              ✅ |
+| Razonamiento iterativo en latente (estado que se actualiza)       | Refinar**estado/solución** paso a paso |                  ◻️ |                               ✅ |                    ✅ |              ✅ |
+| Deep supervision / multi-step improvement                         | Optimizar para mejorar en varios pasos        |                  ◻️ |                               ✅ |                    ✅ |            ◻️ |
+| Halting / early-stopping aprendido (ACT o similar)                | Ajustar compute a la dificultad               |                  ◻️ |                               ✅ |     ✅ (simplificado) |            ◻️ |
+| Ensemble / voto sobre variantes                                   | Explorar múltiples propuestas y seleccionar  |                    ✅ |           ✅ (voto top-2 en ARC) |                  ◻️ |            ◻️ |
+| Data augmentation por simetrías 2D (dihedral, color perm, etc.)  | Invariancias del dominio para generalizar     |                    ✅ |                               ✅ |                    ✅ |            ◻️ |
+| “Synthesis > prediction” (resolver generando procedimiento)     | Output como resultado de un “programa”      |                    ✅ |                               ✅ |                    ✅ |              ✅ |
+| Búsqueda + verificación (explore/verify)                        | Candidatos → score/verifier → refinar       |                    ✅ |                             ◻️ |                  ◻️ |              ✅ |
+| Verificadores / harness de aplicación (layer externo)            | Refinamiento a nivel orquestación            |                    ✅ |                             ◻️ |                  ◻️ |            ◻️ |
+| Regularización/criterios de compresión (MDL/description length) | Refina maximizando parsimonia                 |                    ✅ |                             ◻️ |                  ◻️ |            ◻️ |
 
 ### Dónde “vive” el refinamiento (vista unificadora)
 
-| Espacio | Qué se refina | Ejemplos típicos |
-|---|---|---|
-| Pesos (weight space) | Un solver “compilado” en pesos para ese puzzle | TTT / zero-pretraining (HRM, TRM), NVARC-style |
-| Estado latente / solución parcial | La solución candidata y/o el estado de razonamiento | HRM (dos módulos), TRM (y + z) |
-| Programas explícitos | Código (Python/DSL) o pseudo-programas | Evolución / program synthesis + verificación |
-| “Programa en lenguaje” | CoT como traza optimizable con feedback | Reasoning models + verifiers + retries |
+| Espacio                            | Qué se refina                                       | Ejemplos típicos                              |
+| ---------------------------------- | ---------------------------------------------------- | ---------------------------------------------- |
+| Pesos (weight space)               | Un solver “compilado” en pesos para ese puzzle     | TTT / zero-pretraining (HRM, TRM), NVARC-style |
+| Estado latente / solución parcial | La solución candidata y/o el estado de razonamiento | HRM (dos módulos), TRM (y + z)                |
+| Programas explícitos              | Código (Python/DSL) o pseudo-programas              | Evolución / program synthesis + verificación |
+| “Programa en lenguaje”           | CoT como traza optimizable con feedback              | Reasoning models + verifiers + retries         |
 
 ### Nota práctica (por qué converge todo)
 
@@ -309,5 +309,3 @@ QUÉ ES LO QUE QUEREMOS CONSEGUIR?
 CÓMO NOS VAMOS A COMPARAR AL RESPECTO DE OTROS MODELOS? QUÉ MÉTRICAS DE EVALUACIÓN? MATRIZ PARA PONDERAR? O MULTIPLICADOR
 
 https://archive.org/details/aristoteles-de-anima_202106/page/n3/mode/2up
-
-

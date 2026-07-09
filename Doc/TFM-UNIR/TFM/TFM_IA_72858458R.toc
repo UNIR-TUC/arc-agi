@@ -1,6 +1,6 @@
 \babel@toc {spanish}{}\relax 
-\contentsline {chapter}{Resumen}{\es@scroman {vii}}{chapter*.4}%
-\contentsline {chapter}{Abstract}{\es@scroman {viii}}{chapter*.5}%
+\contentsline {chapter}{Resumen}{\es@scroman {viii}}{chapter*.4}%
+\contentsline {chapter}{Abstract}{\es@scroman {ix}}{chapter*.5}%
 \contentsline {chapter}{\numberline {1}Introducción}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Contexto}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Justificación}{2}{section.1.2}%
@@ -56,10 +56,10 @@
 \contentsline {section}{\numberline {4.3}Utilidades externas de ARC-AGI}{53}{section.4.3}%
 \contentsline {chapter}{\numberline {5}Desarrollo}{54}{chapter.5}%
 \contentsline {subsection}{\numberline {5.0.1}Análisis exploratorio de datos}{57}{subsection.5.0.1}%
-\contentsline {section}{\numberline {5.1}Arquitectura y entrenamiento}{57}{section.5.1}%
-\contentsline {chapter}{\numberline {6}Resultados}{58}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Planificación}{59}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Estudio económico}{60}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{61}{chapter.9}%
-\contentsline {section}{Referencias}{61}{section*.12}%
-\contentsline {chapter}{\numberline {A}Apéndices}{63}{appendix.Alph1}%
+\contentsline {section}{\numberline {5.1}Arquitectura}{61}{section.5.1}%
+\contentsline {chapter}{\numberline {6}Resultados}{62}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Planificación}{63}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Estudio económico}{64}{chapter.8}%
+\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{65}{chapter.9}%
+\contentsline {section}{Referencias}{65}{section*.12}%
+\contentsline {chapter}{\numberline {A}Apéndices}{67}{appendix.Alph1}%
