@@ -29,7 +29,7 @@ color_list = np.array([
 def convert_color(grid):  # grid dims must end in c
     return np.clip(np.matmul(grid, color_list), 0, 255).astype(np.uint8)
 
-def plot_problem(logger):
+def plot_problem(logger, task_name=None):
     """
     Draw a plot of an ARC-AGI problem, and save it in plots/
     Args:
@@ -90,10 +90,12 @@ def plot_problem(logger):
                         color=(59/255, 59/255, 59/255),
                         linewidth=0.3)
     plt.axis('off')
-    plt.savefig('plots/' + logger.task.task_name + '_problem.png', bbox_inches='tight', pad_inches=0)
+    if task_name is None:
+        task_name = logger.task.task_name
+    plt.savefig('plots/' + task_name + '_problem.png', bbox_inches='tight', pad_inches=0)
     plt.close()
 
-def plot_solution(logger, fname=None):
+def plot_solution(logger, fname=None, task_name=None):
     """
     Draw a plot of a model's solution to an ARC-AGI problem, and save it in plots/
     Draws four plots: A model output sample, the mean of samples, and the top two most common samples.
@@ -182,7 +184,9 @@ def plot_solution(logger, fname=None):
         ax.text((2*n_y+8)*solution_num+4+n_y-0.5, -3, solution_label, size='xx-small', ha='center', va='center')
     plt.axis('off')
     if fname is None:
-        fname = 'plots/' + logger.task.task_name + '_solutions.pdf'
+        if task_name is None:
+            task_name = logger.task.task_name
+        fname = 'plots/' + task_name + '_solutions.pdf'
     plt.savefig(fname, bbox_inches='tight', pad_inches=0)
     plt.close()
 

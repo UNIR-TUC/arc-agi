@@ -39,9 +39,11 @@ if __name__ == "__main__":
 
     # Some interesting tasks: 272f95fa, 6d75e8bb, 6cdd2623, 41e4d17e, 2bee17df
     # 228f6490, 508bd3b6, 2281f1f4, ecdecbb3
-    split = input('Enter which split you want to find the task in (training, evaluation, test): ')
-    task_name = input('Enter which task you want to analyze (eg. 272f95fa): ')
-    folder = task_name + '/'
+    # split = input('Enter which split you want to find the task in (training, evaluation, test): ')
+    split = 'training'
+    # task_name = input('Enter which task you want to analyze (eg. 272f95fa): ')
+    task_name = '272f95fa'
+    folder = 'results/' + task_name + '/'
     print('Performing a training run on task', task_name,
           'and placing the results in', folder)
     os.makedirs(folder, exist_ok=True)
@@ -61,9 +63,11 @@ if __name__ == "__main__":
         # Plot solutions every 50 steps
         if (train_step+1) % 50 == 0:
             visualization.plot_solution(train_history_logger,
-                fname=folder + task_name + '_at_' + str(train_step+1) + ' steps.png')
+                fname=folder + task_name + '_at_' + str(train_step+1) + ' steps.png',
+                task_name=task_name)
             visualization.plot_solution(train_history_logger,
-                fname=folder + task_name + '_at_' + str(train_step+1) + ' steps.pdf')
+                fname=folder + task_name + '_at_' + str(train_step+1) + ' steps.pdf',
+                task_name=task_name)
 
     # Save the metrics, model weights, and learned representations.
     np.savez(folder + task_name + '_KL_curves.npz',
