@@ -1,21 +1,34 @@
 """
-This script solves as many puzzles as possible at the same time, trying to saturate your GPU(s). First,
-it measures the amount of memory that each puzzle takes to solve, and then it schedules the puzzles in
-a way that saturates your GPU memory. It does this by running a "server" in parallelize_runs() that
-tracks each GPU's usage and greedily schedules jobs on the GPUs to fit under each GPU's budget.
+Parallel ARC-AGI task solver.
+
+Solves as many puzzles as possible simultaneously by saturating GPU VRAM.
+
+Phase 1 — runs 2 iterations on every puzzle to measure its VRAM footprint.
+Phase 2 — greedy scheduler packs puzzles onto GPUs under the safe memory budget
+           and trains each for 2000 iterations.
+
+After Phase 2 the script saves:
+  predictions_{split}.npz      — logger data for list_solved_puzzles.py
+  submission_{split}.json      — Kaggle-format predictions
+  arc_training_{split}_*.log   — full log (DEBUG to file, INFO to console)
+  last_results.txt             — live-updating list of solved tasks
+
+Usage
+-----
+  python parallel_train.py                    # run training + evaluation + test
+  python parallel_train.py --split training   # run one split only
 """
 
 # We run 2 steps of every puzzle to determine how much memory each puzzle uses.
 # We run 2000 steps per task at optimal puzzle parallelization under memory constraint.
-# We have changed layers.direction_share() to make it run faster, and got something like a 5-10% speedup.
+# We have changed layers.direction_share() to make it run faster, ~5-10% speedup.
 
 import os
 import sys
 import time
 import json
-import importlib
+import argparse
 import multiprocessing
-from multiprocessing import Pool
 
 import numpy as np
 import torch
@@ -29,130 +42,438 @@ import layers
 import solution_selection
 import visualization
 import solve_task
+import arc_logging
 
-# Getting all the task names, setting defaults and constants
+# ── Global PyTorch settings (must run at import time for the main process) ──
 multiprocessing.set_start_method('spawn', force=True)
 torch.set_default_dtype(torch.float32)
 torch.set_default_device('cuda')
 torch.backends.cudnn.benchmark = True
 torch.backends.cuda.matmul.allow_tf32 = True
 
-# Function that can spawn processes thata solve a puzzle, and schedule them on GPUs to take up each GPUs quota
-# "quota/usage" here is just a number per puzzle/GPU given to the function. It can be memory, or job count, or
-# anything.
-def parallelize_runs(gpu_quotas, task_usages, n_iterations, verbose=False):
+
+# ── Core scheduler ───────────────────────────────────────────────────────────
+
+def parallelize_runs(
+    gpu_quotas,
+    task_usages,
+    n_iterations,
+    task_names,
+    split,
+    n_tasks,
+    n_gpus,
+    n_cpus,
+    collect_logger_data=False,
+    track_progress=False,
+    arc_logger=None,
+    solutions_json=None,
+    task_original_idx=None,
+    n_original_tasks=None,
+    quiet=False,
+    verbose=False,
+):
     """
-    Runs a server that spawns processes to solve many ARC-AGI tasks in parallel.
+    Spawn worker processes to solve ARC-AGI tasks, greedily filling GPU memory.
+
     Args:
-        gpu_quotas (list[float]): The max quota that each GPU has to use.
-        task_usages (list[float]): The amount of quota that each task uses.
-        n_iterations (int): The number of training iterations to use to solve each puzzle.
-        verbose (bool): Whether or not to print tqdm bars to show progress.
+        gpu_quotas (list[float])     : available quota per GPU (bytes or task-slots).
+        task_usages (list[float])    : quota consumed by each task.
+        n_iterations (int)           : training steps per task.
+        task_names (list[str])       : puzzle names in scheduling order.
+        split (str)                  : 'training' | 'evaluation' | 'test'.
+        n_tasks (int)                : len(task_names).
+        n_gpus (int)                 : number of CUDA devices.
+        n_cpus (int)                 : CPU core count (caps concurrent processes).
+        collect_logger_data (bool)   : if True, store solution logs for predictions.npz.
+        track_progress (bool)        : if True, workers report step % to main process.
+        arc_logger (ArcLogger|None)  : logger; None silences per-task events.
+        solutions_json (dict|None)   : ground-truth solutions for solved-status check.
+        task_original_idx (dict|None): task_name → index in the original JSON order.
+        n_original_tasks (int|None)  : total tasks in original order (for display).
+        quiet (bool)                 : task-start/finish events go to DEBUG not INFO.
+        verbose (bool)               : print raw status to stdout.
+
     Returns:
-        Dict[str, int]: The max memory allocated for every puzzle.
-        Dict[str, list[Dict[str, list[list[int]]]]]: The guessed solution for every puzzle.
-        float: The amount of time taken to solve all the puzzles in parallel.
+        memory_dict    (dict[str, int])  : peak VRAM per task (bytes).
+        solutions_dict (dict)            : Kaggle-format predictions per task.
+        loggers_data   (dict)            : logger data per task (empty if not collected).
+        time_taken     (float)           : wall-clock seconds.
     """
     t = time.time()
     gpu_quotas = gpu_quotas[:]
-    tasks_started = [False for i in range(n_tasks)]
-    tasks_finished = [False for i in range(n_tasks)]
-    processes = [None for i in range(n_tasks)]
-    process_gpu_ids = [None for i in range(n_tasks)]
+    n_disp = n_original_tasks if n_original_tasks is not None else n_tasks
+
+    tasks_started    = [False] * n_tasks
+    tasks_finished   = [False] * n_tasks
+    processes        = [None]  * n_tasks
+    process_gpu_ids  = [None]  * n_tasks
+    task_start_times = [None]  * n_tasks
+    task_last_pct    = {}   # task_name → last 10%-bucket logged
 
     with multiprocessing.Manager() as manager:
 
-        # Construct structures for inter-process communication
-        memory_dict = manager.dict()
+        # ── Shared inter-process structures ──────────────────────────────
+        memory_dict    = manager.dict()
         solutions_dict = manager.dict()
-        error_queue = manager.Queue()
+        error_queue    = manager.Queue()
+        _loggers_dict  = manager.dict() if collect_logger_data else None
+        _progress_dict = manager.dict() if track_progress       else None
 
-        # Job monitoring loop
+        # ── Main monitoring loop ──────────────────────────────────────────
         while not all(tasks_finished):
 
-            # Scan for errors
+            # Check for errors propagated from workers
             if not error_queue.empty():
                 raise ValueError(error_queue.get())
 
-            # If a job finishes, release its quota
+            # ── Detect finished tasks ─────────────────────────────────
             for i in range(n_tasks):
                 if tasks_started[i] and not tasks_finished[i]:
                     processes[i].join(timeout=0)
                     if not processes[i].is_alive():
                         tasks_finished[i] = True
                         gpu_quotas[process_gpu_ids[i]] += task_usages[i]
+
+                        elapsed  = time.time() - task_start_times[i]
+                        peak_mb  = memory_dict.get(task_names[i], 0) / 1024**2
+                        orig_idx = (task_original_idx.get(task_names[i], i)
+                                    if task_original_idx else i)
+
+                        # Check whether this task was solved
+                        solved_info = _check_solved(
+                            task_names[i], solutions_json, solutions_dict
+                        )
+
+                        if arc_logger is not None:
+                            arc_logger.log_task_finished(
+                                task_names[i], orig_idx, n_disp,
+                                elapsed, peak_mb, solved_info, quiet=quiet,
+                            )
+                            if solved_info is not None:
+                                arc_logger.write_solved_result(
+                                    task_names[i], orig_idx, solved_info
+                                )
+
                         if verbose:
-                            print(task_names[i], 'finished on gpu', process_gpu_ids[i],
-                                  'New quota is', gpu_quotas[process_gpu_ids[i]])
-            
-            # If there is enough quota to start a new job, do it
+                            status = f'[SOLVED @{solved_info}]' if solved_info else ''
+                            print(task_names[i], 'finished on gpu',
+                                  process_gpu_ids[i],
+                                  f'quota={gpu_quotas[process_gpu_ids[i]]:.0f}',
+                                  status)
+
+            # ── Log training progress for running tasks ───────────────
+            if _progress_dict is not None and arc_logger is not None:
+                for i in range(n_tasks):
+                    if tasks_started[i] and not tasks_finished[i]:
+                        name   = task_names[i]
+                        step   = int(_progress_dict.get(name, 0))
+                        bucket = int(step / max(n_iterations, 1) * 10) * 10
+                        if bucket > task_last_pct.get(name, -1):
+                            task_last_pct[name] = bucket
+                            arc_logger.log_task_progress(name, step, n_iterations)
+
+            # ── Schedule new tasks ────────────────────────────────────
             for gpu_id in range(n_gpus):
                 for i in range(n_tasks):
+                    if tasks_started[i]:
+                        continue
                     enough_quota = gpu_quotas[gpu_id] >= task_usages[i]
-                    enough_cpus = sum(map(int, tasks_started)) - sum(map(int, tasks_finished)) < n_cpus
-                    if not tasks_started[i] and enough_quota and enough_cpus:
+                    running = (sum(map(int, tasks_started))
+                               - sum(map(int, tasks_finished)))
+                    enough_cpus = running < n_cpus
+                    if enough_quota and enough_cpus:
                         gpu_quotas[gpu_id] -= task_usages[i]
-                        args = (task_names[i], split, 1e20, n_iterations, gpu_id, memory_dict, solutions_dict, error_queue)
-                        p = multiprocessing.Process(target=solve_task.solve_task, args=args)
+                        task_start_times[i] = time.time()
+
+                        orig_idx = (task_original_idx.get(task_names[i], i)
+                                    if task_original_idx else i)
+
+                        worker_args = (
+                            task_names[i], split, 1e20, n_iterations,
+                            gpu_id, memory_dict, solutions_dict, error_queue,
+                            _loggers_dict, _progress_dict,
+                        )
+                        p = multiprocessing.Process(
+                            target=solve_task.solve_task, args=worker_args
+                        )
                         p.start()
-                        processes[i] = p
-                        tasks_started[i] = True
+                        processes[i]       = p
+                        tasks_started[i]   = True
                         process_gpu_ids[i] = gpu_id
+
+                        if arc_logger is not None:
+                            arc_logger.log_task_started(
+                                task_names[i], orig_idx, n_disp, gpu_id,
+                                quiet=quiet,
+                            )
                         if verbose:
-                            print(task_names[i], 'started on gpu', process_gpu_ids[i],
-                                  'New quota is', gpu_quotas[process_gpu_ids[i]])
+                            print(task_names[i], 'started on gpu', gpu_id,
+                                  f'quota={gpu_quotas[gpu_id]:.0f}')
+
             time.sleep(1)
 
-        # Scan for errors
+        # Final error scan
         if not error_queue.empty():
             raise ValueError(error_queue.get())
 
-        # Save the solutions in the server process
-        memory_dict = dict(memory_dict)
-        solutions_dict = dict(solutions_dict)
+        # ── Collect results before Manager shuts down ─────────────────
+        memory_dict_out    = dict(memory_dict)
+        solutions_dict_out = dict(solutions_dict)
+        loggers_data = dict(_loggers_dict) if _loggers_dict is not None else {}
 
     time_taken = time.time() - t
+    if arc_logger is not None:
+        arc_logger.debug(f'parallelize_runs done in {time_taken:.1f}s')
     if verbose:
         print('All jobs finished in', time_taken, 'seconds.')
-    return memory_dict, solutions_dict, time_taken
 
+    return memory_dict_out, solutions_dict_out, loggers_data, time_taken
+
+
+# ── Per-split runner ─────────────────────────────────────────────────────────
+
+def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None):
+    """
+    Execute the full two-phase pipeline for one split and save all outputs.
+
+    Args:
+        demo_n (int|None): if set, use only the first demo_n tasks (smoke-test mode).
+
+    Returns:
+        n_solved (int)         : tasks solved (always 0 for 'test').
+        n_tasks (int)          : total tasks in this split.
+        elapsed_sec (float)    : wall-clock seconds.
+        predictions_file (str) : path to the saved .npz file.
+    """
+    split_start = time.time()
+
+    # ── Load challenge names in original JSON order ──────────────────
+    with open(f'dataset/arc-agi_{split}_challenges.json', 'r') as f:
+        problems = json.load(f)
+    original_task_names = list(problems.keys())
+    del problems
+
+    if demo_n is not None:
+        n_total_in_split = len(original_task_names)
+        original_task_names = original_task_names[:demo_n]
+        arc_logger.warning(
+            f'DEMO MODE — running {len(original_task_names)} of '
+            f'{n_total_in_split} tasks in the {split} split'
+        )
+
+    n_tasks = len(original_task_names)
+
+    arc_logger.log_run_start(n_tasks, n_gpus)
+
+    # ── Phase 1: measure VRAM footprint (2 iterations per task) ──────
+    arc_logger.log_phase(
+        f'Phase 1 — Memory measurement  (2 iterations × {n_tasks} tasks)'
+    )
+    gpu_memory_quotas = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
+    gpu_task_quotas   = [int(q // (4 * 1024**3)) for q in gpu_memory_quotas]
+
+    memory_dict, _, _, t_p1 = parallelize_runs(
+        gpu_task_quotas,
+        [1] * n_tasks,
+        2,
+        original_task_names,
+        split,
+        n_tasks, n_gpus, n_cpus,
+        arc_logger=arc_logger,
+        n_original_tasks=n_tasks,
+        quiet=True,       # phase-1 task events → DEBUG only (not cluttering console)
+        verbose=True,
+    )
+    arc_logger.info(f'Phase 1 complete in {t_p1:.1f}s')
+
+    # Sort tasks by decreasing VRAM so the greedy scheduler fills GPUs tightly
+    sorted_tasks      = sorted(memory_dict.items(), key=lambda x: x[1], reverse=True)
+    sorted_names      = [name for name, _ in sorted_tasks]
+    sorted_mem_usages = [mem  for _, mem  in sorted_tasks]
+
+    # Map task_name → original JSON index (used in log messages)
+    task_original_idx = {name: idx for idx, name in enumerate(original_task_names)}
+
+    # ── Phase 2: full 2000-step training ─────────────────────────────
+    n_steps = 2000
+    safe_gpu_memory_quotas = [q - 4 * 1024**3 for q in gpu_memory_quotas]
+
+    arc_logger.log_phase(
+        f'Phase 2 — Full training  ({n_steps} iterations × {n_tasks} tasks)'
+    )
+
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+        safe_gpu_memory_quotas,
+        sorted_mem_usages,
+        n_steps,
+        sorted_names,
+        split,
+        n_tasks, n_gpus, n_cpus,
+        collect_logger_data=True,
+        track_progress=True,
+        arc_logger=arc_logger,
+        solutions_json=solutions_json,
+        task_original_idx=task_original_idx,
+        n_original_tasks=n_tasks,
+        quiet=False,
+        verbose=True,
+    )
+    arc_logger.info(f'Phase 2 complete in {t_p2:.1f}s')
+
+    # ── Save predictions_{split}.npz in original JSON task order ─────
+    predictions_file = f'predictions_{split}.npz'
+    contrib_logs, picks_histories = [], []
+    missing = 0
+    for name in original_task_names:
+        if name in loggers_data:
+            contrib_logs.append(loggers_data[name]['solution_contributions_log'])
+            picks_histories.append(loggers_data[name]['solution_picks_history'])
+        else:
+            arc_logger.warning(f'No logger data for task {name} — empty placeholder inserted')
+            contrib_logs.append([])
+            picks_histories.append([])
+            missing += 1
+
+    np.savez(
+        predictions_file,
+        solution_contribution_logs=np.array(contrib_logs,    dtype=object),
+        solution_picks_histories  =np.array(picks_histories, dtype=object),
+    )
+    arc_logger.info(
+        f'Saved {predictions_file}'
+        + (f'  ({missing} tasks with missing data)' if missing else '')
+    )
+
+    # ── Save submission_{split}.json (Kaggle format) ─────────────────
+    submission_file = f'submission_{split}.json'
+    with open(submission_file, 'w') as f:
+        json.dump(solutions_dict, f, indent=4)
+    arc_logger.info(f'Saved {submission_file}')
+
+    # ── Count solved tasks ────────────────────────────────────────────
+    n_solved = 0
+    if solutions_json is not None:
+        for task_name, pred in solutions_dict.items():
+            true_sol = solutions_json.get(task_name)
+            if true_sol and pred and _check_all_examples(pred, true_sol) is not None:
+                n_solved += 1
+
+    elapsed = time.time() - split_start
+    arc_logger.log_run_summary(n_solved, n_tasks, elapsed, predictions_file)
+    arc_logger.finalize_results(n_solved, n_tasks, elapsed)
+
+    return n_solved, n_tasks, elapsed, predictions_file
+
+
+# ── Solved-status helpers ─────────────────────────────────────────────────────
+
+def _check_solved(task_name, solutions_json, solutions_dict):
+    """Return 1 if attempt_1 correct, 2 if attempt_2 correct, None otherwise."""
+    if solutions_json is None:
+        return None
+    true_sol = solutions_json.get(task_name)
+    if true_sol is None:
+        return None
+    pred = solutions_dict.get(task_name)
+    if not pred:
+        return None
+    return _check_all_examples(pred, true_sol)
+
+
+def _check_all_examples(pred, true_sol):
+    """Check guess@1 then guess@2 across every test example."""
+    try:
+        if all(pred[j]['attempt_1'] == true_sol[j] for j in range(len(true_sol))):
+            return 1
+        if all(pred[j]['attempt_2'] == true_sol[j] for j in range(len(true_sol))):
+            return 2
+    except (IndexError, KeyError, TypeError):
+        pass
+    return None
+
+
+# ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
-    start_time = time.time()
 
+    parser = argparse.ArgumentParser(
+        description='Parallel ARC-AGI task solver — generates predictions.npz.'
+    )
+    parser.add_argument(
+        '--split',
+        type=str,
+        choices=['training', 'evaluation', 'test', 'all'],
+        default='all',
+        help=(
+            'Dataset split to train.  '
+            '"all" runs training → evaluation → test in sequence.  '
+            'Default: all'
+        ),
+    )
+    parser.add_argument(
+        '--demo',
+        type=int,
+        default=None,
+        metavar='N',
+        help=(
+            'Smoke-test mode: run only the first N tasks per split.  '
+            'Example: --demo 20 finishes in ~40 min instead of ~20 h.'
+        ),
+    )
+    args = parser.parse_args()
+
+    splits_to_run = (
+        ['training', 'evaluation', 'test'] if args.split == 'all'
+        else [args.split]
+    )
+
+    overall_start = time.time()
     n_cpus = multiprocessing.cpu_count()
     n_gpus = torch.cuda.device_count()
 
-    # Find all the puzzle names
-    split = "training"
-    with open(f'dataset/arc-agi_{split}_challenges.json', 'r') as f:
-        problems = json.load(f)
-    task_names = list(problems.keys())
-    del problems
-    n_tasks = len(task_names)
+    # Initialise the shared results file once for the whole run
+    results_file = 'last_results.txt'
+    arc_logging.init_results_file(results_file)
 
-    # Measuring the amount of memory used for every task
-    gpu_memory_quotas = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
+    print(f'\nStarting ARC-AGI parallel training — splits: {splits_to_run}')
+    print(f'GPUs: {n_gpus}   CPU cores: {n_cpus}\n')
 
-    gpu_task_quotas = [int(gpu_memory_quota // (4 * 1024**3)) for gpu_memory_quota in gpu_memory_quotas]
-    task_usages = [1 for i in range(n_tasks)]
-    memory_dict, _, _ = parallelize_runs(gpu_task_quotas, task_usages, 2, verbose=True)
+    total_solved = 0
+    total_tasks  = 0
 
-    # Sort the tasks by decreasing memory usage
-    tasks = sorted(memory_dict.items(), key=lambda x: x[1], reverse=True)
-    task_names, task_memory_usages = zip(*tasks)
+    for split in splits_to_run:
 
-    # Computing the solution for every task, while saturating memory
-    n_steps = 2000
-    safe_gpu_memory_quotas = [memory_quota - 4 * 1024**3 for memory_quota in gpu_memory_quotas]
-    _, solutions_dict, time_taken = parallelize_runs(safe_gpu_memory_quotas, task_memory_usages, n_steps, verbose=True)
+        # Load ground-truth solutions (not available for 'test')
+        solutions_json = None
+        solutions_path = f'dataset/arc-agi_{split}_solutions.json'
+        if os.path.exists(solutions_path):
+            with open(solutions_path, 'r') as f:
+                solutions_json = json.load(f)
 
-    # Format the solutions and put into submission file
-    with open('submission.json', 'w') as f:
-        json.dump(solutions_dict, f, indent=4)
+        # Per-split logger (separate .log file, shared last_results.txt)
+        arc_logger = arc_logging.ArcLogger(
+            split, log_dir='.', results_file=results_file
+        )
 
-    with open("submission.json", "r") as f:
-        contents = json.load(f)
-    print(len(contents.keys()), 'puzzles solved.')
-    print(n_steps, 'steps per puzzle.')
-    print(time_taken, 'seconds.')
+        n_solved, n_tasks, elapsed, pred_file = run_split(
+            split, n_gpus, n_cpus, arc_logger, solutions_json,
+            demo_n=args.demo,
+        )
+        total_solved += n_solved
+        total_tasks  += n_tasks
+
+        print(
+            f'\n[{split}] done — {n_solved}/{n_tasks} solved in '
+            f'{elapsed:.1f}s.  Predictions: {pred_file}\n'
+        )
+
+    overall_elapsed = time.time() - overall_start
+    print(
+        f'All splits complete — {total_solved}/{total_tasks} tasks solved  '
+        f'in {overall_elapsed:.1f}s ({overall_elapsed / 3600:.2f}h)'
+    )
+
+    with open('timing_result.txt', 'w') as f:
+        f.write(f'Splits run   : {", ".join(splits_to_run)}\n')
+        f.write(f'Total solved : {total_solved}/{total_tasks}\n')
+        f.write(f'Total time   : {overall_elapsed:.1f}s\n')

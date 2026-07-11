@@ -24,7 +24,8 @@ import visualization
 A script that solves one puzzle, to be imported and used with parallel_train.py and multiprocessing.
 """
 
-def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_dict, solutions_dict, error_queue):
+def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_dict, solutions_dict, error_queue,
+               loggers_dict=None, progress_dict=None):
     """
     Solves a puzzle.
     Args:
@@ -39,6 +40,10 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
             inter-process shared dict that we can store the solution in.
         error_queue (multiprocessing.Queue[Exception]): An inter-process shared queue to
             put errors in when an exception occurs.
+        loggers_dict (multiprocessing.Dict, optional): Shared dict to store
+            solution_contributions_log and solution_picks_history for predictions.npz.
+        progress_dict (multiprocessing.Dict, optional): Shared dict updated every 100
+            training steps so the parent process can log percentage progress.
     """
 
     try:  # Error catching block that puts errors on the error_queue
@@ -63,6 +68,8 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         # Training loop
         for train_step in range(n_train_iterations):
             train.take_step(task, model, optimizer, train_step, train_history_logger)
+            if progress_dict is not None and train_step % 100 == 0:
+                progress_dict[task_name] = train_step
             if time.time() > time_limit:
                 break
 
@@ -72,6 +79,14 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
             attempt_1 = [list(row) for row in train_history_logger.solution_most_frequent[example_num]]
             attempt_2 = [list(row) for row in train_history_logger.solution_second_most_frequent[example_num]]
             example_list.append({'attempt_1': attempt_1, 'attempt_2': attempt_2})
+
+        # Store logger data for predictions.npz before cleanup
+        if loggers_dict is not None:
+            loggers_dict[task_name] = {
+                'solution_contributions_log': train_history_logger.solution_contributions_log,
+                'solution_picks_history':     train_history_logger.solution_picks_history,
+            }
+
         del task
         del model
         del optimizer

@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # split = input('Enter which split you want to find the task in (training, evaluation, test): ')
     split = 'training'
     # task_name = input('Enter which task you want to analyze (eg. 272f95fa): ')
-    task_name = '272f95fa'
+    task_name = '6d75e8bb'
     folder = 'results/' + task_name + '/'
     print('Performing a training run on task', task_name,
           'and placing the results in', folder)
