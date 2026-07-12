@@ -10,7 +10,7 @@ Phase 2 — greedy scheduler packs puzzles onto GPUs under the safe memory budge
 After Phase 2 the script saves:
   predictions_{split}.npz      — logger data for list_solved_puzzles.py
   submission_{split}.json      — Kaggle-format predictions
-  arc_training_{split}_*.log   — full log (DEBUG to file, INFO to console)
+    .log/arc_training_{split}_*.log  — full log (DEBUG to file, INFO to console)
   last_results.txt             — live-updating list of solved tasks
 
 Usage
@@ -440,7 +440,9 @@ if __name__ == '__main__':
     n_gpus = torch.cuda.device_count()
 
     # Initialise the shared results file once for the whole run
-    results_file = 'last_results.txt'
+    current_date_time = time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime())
+    print(f'ARC-AGI parallel training started at {current_date_time}')
+    results_file = f'results_{current_date_time}.txt'
     arc_logging.init_results_file(results_file)
 
     print(f'\nStarting ARC-AGI parallel training — splits: {splits_to_run}')
@@ -458,7 +460,7 @@ if __name__ == '__main__':
             with open(solutions_path, 'r') as f:
                 solutions_json = json.load(f)
 
-        # Per-split logger (separate .log file, shared last_results.txt)
+        # Per-split logger (.log directory, shared last_results.txt)
         arc_logger = arc_logging.ArcLogger(
             split, log_dir='.', results_file=results_file
         )
