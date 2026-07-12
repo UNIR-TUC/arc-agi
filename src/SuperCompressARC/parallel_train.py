@@ -296,7 +296,15 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None):
 
     # ── Phase 2: full 2000-step training ─────────────────────────────
     n_steps = 2000
-    safe_gpu_memory_quotas = [q - 4 * 1024**3 for q in gpu_memory_quotas]
+    # Re-read free VRAM now that all Phase 1 subprocesses have exited, so
+    # the budget reflects the true available memory at Phase 2 start.
+    gpu_memory_quotas_p2  = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
+    safe_gpu_memory_quotas = [q - 4 * 1024**3 for q in gpu_memory_quotas_p2]
+    arc_logger.debug(
+        f'Phase 2 free VRAM: '
+        + ', '.join(f'GPU{i}={gpu_memory_quotas_p2[i]/1024**3:.2f} GB'
+                   for i in range(n_gpus))
+    )
 
     arc_logger.log_phase(
         f'Phase 2 — Full training  ({n_steps} iterations × {n_tasks} tasks)'
