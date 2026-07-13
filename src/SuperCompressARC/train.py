@@ -146,6 +146,7 @@ if __name__ == "__main__":
     # Train the models one by one
     for i, (task, model, optimizer, train_history_logger) in enumerate(zip(tasks, models, optimizers, train_history_loggers)):
         n_iterations = 2000
+        # n_iterations = 1500
         for train_step in range(n_iterations):
             take_step(task, model, optimizer, train_step, train_history_logger)
         visualization.plot_solution(train_history_logger)
