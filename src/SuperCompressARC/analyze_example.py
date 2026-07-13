@@ -1,5 +1,7 @@
+import csv
 import os
 import pickle
+import time
 from tqdm import tqdm
 
 import numpy as np
@@ -37,6 +39,13 @@ torch.set_default_device('cuda')
 
 if __name__ == "__main__":
 
+    # Change RUN_LABEL between runs to distinguish baseline vs optimised results.
+    # Workflow:
+    #   1. git stash  →  RUN_LABEL = 'baseline'  →  run
+    #   2. git stash pop  →  RUN_LABEL = 'optimised'  →  run
+    #   3. Load both CSVs into a DataFrame to plot comparisons.
+    RUN_LABEL = 'baseline'
+
     # Some interesting tasks: 272f95fa, 6d75e8bb, 6cdd2623, 41e4d17e, 2bee17df
     # 228f6490, 508bd3b6, 2281f1f4, ecdecbb3
     # split = input('Enter which split you want to find the task in (training, evaluation, test): ')
@@ -52,14 +61,36 @@ if __name__ == "__main__":
     task = preprocessing.preprocess_tasks(split, [task_name])[0]
     model = arc_compressor.ARCCompressor(task)
     optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
-    train_history_logger = solution_selection.Logger(task)
+    try:
+        train_history_logger = solution_selection.Logger(
+            task, tracking_interval=1, enable_curves=True
+        )
+    except TypeError:
+        # Compatibility with the pre-optimisation Logger (no extra params).
+        train_history_logger = solution_selection.Logger(task)
     visualization.plot_problem(train_history_logger)
 
-    # Perform training for 1500 iterations
+    # ── Training with per-step CPU / wall-clock profiling ────────────────────
     n_iterations = 1500
+    WARMUP_STEPS = 20   # skip first N steps (CUDA / JIT warm-up)
+    step_profile  = []  # (step, wall_s, cpu_s)
+
+    t_wall = time.perf_counter()
+    t_cpu  = time.process_time()
+
     for train_step in tqdm(range(n_iterations)):
         train.take_step(task, model, optimizer, train_step, train_history_logger)
-        
+
+        # Flush GPU so each slice covers one complete step (CPU work + GPU kernels).
+        torch.cuda.synchronize()
+        t_wall_now = time.perf_counter()
+        t_cpu_now  = time.process_time()
+
+        if train_step >= WARMUP_STEPS:
+            step_profile.append((train_step, t_wall_now - t_wall, t_cpu_now - t_cpu))
+
+        t_wall, t_cpu = t_wall_now, t_cpu_now
+
         # Plot solutions every 50 steps
         if (train_step+1) % 50 == 0:
             visualization.plot_solution(train_history_logger,
@@ -68,6 +99,32 @@ if __name__ == "__main__":
             visualization.plot_solution(train_history_logger,
                 fname=folder + task_name + '_at_' + str(train_step+1) + ' steps.pdf',
                 task_name=task_name)
+
+    # ── Timing summary ────────────────────────────────────────────────────────
+    wall_arr  = np.array([r[1] for r in step_profile])
+    cpu_arr   = np.array([r[2] for r in step_profile])
+    cpu_ratio = cpu_arr / np.maximum(wall_arr, 1e-9)
+
+    print(f'\n{"="*62}')
+    print(f'  Performance Summary — label: {RUN_LABEL}')
+    print(f'  Task: {task_name}   Steps profiled: {len(step_profile)}')
+    print(f'{"="*62}')
+    print(f'  Wall time / step : {wall_arr.mean()*1e3:7.2f} ms  ±  {wall_arr.std()*1e3:.2f} ms')
+    print(f'  CPU  time / step : {cpu_arr.mean()*1e3:7.2f} ms  ±  {cpu_arr.std()*1e3:.2f} ms')
+    print(f'  CPU / wall ratio : {cpu_ratio.mean()*100:6.1f} %')
+    print(f'  Throughput       : {1/wall_arr.mean():7.1f} steps/sec')
+    print(f'  Total wall time  : {wall_arr.sum():7.1f} s  (profiled steps)')
+    print(f'{"="*62}\n')
+
+    # ── Export CSV ────────────────────────────────────────────────────────────
+    csv_path = os.path.join(folder, f'{task_name}_step_times_{RUN_LABEL}.csv')
+    with open(csv_path, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['step', 'wall_s', 'cpu_s', 'cpu_pct'])
+        for step, wall_s, cpu_s in step_profile:
+            writer.writerow([step, f'{wall_s:.6f}', f'{cpu_s:.6f}',
+                             f'{cpu_s / max(wall_s, 1e-9) * 100:.1f}'])
+    print(f'  Step timing saved → {csv_path}')
 
     # Save the metrics, model weights, and learned representations.
     np.savez(folder + task_name + '_KL_curves.npz',
@@ -185,7 +242,7 @@ if __name__ == "__main__":
         if len(orig_shape) == 3:
             tensor = np.reshape(tensor, (-1, orig_shape[-1]))
             U, S, Vh = np.linalg.svd(tensor)  # Get top 3 principal components
-            for component_num in range(3):
+            for component_num in range(min(3, U.shape[1])):
                 component = np.reshape(U[:,component_num], orig_shape[:-1])
                 component = component / np.max(np.abs(component))
                 strength = S[component_num] / tensor.shape[0]  # Calculate component strength
@@ -256,7 +313,7 @@ if __name__ == "__main__":
         elif len(orig_shape) == 4 and dims[3] == 1 and dims[4] == 1:
             tensor = np.reshape(tensor, (-1, orig_shape[-1]))
             U, S, Vh = np.linalg.svd(tensor)  # Get the top 3 principal components
-            for component_num in range(3):
+            for component_num in range(min(3, U.shape[1])):
                 component = np.reshape(U[:,component_num], orig_shape[:-1])
                 component = component / np.max(np.abs(component))
                 strength = S[component_num] / tensor.shape[0]
