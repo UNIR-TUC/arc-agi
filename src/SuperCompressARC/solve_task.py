@@ -87,6 +87,14 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
                 'solution_picks_history':     train_history_logger.solution_picks_history,
             }
 
+        # Measure actual GPU memory BEFORE cleanup: includes HIP/CUDA context +
+        # PyTorch reserved allocator pool + active tensors.  Much more accurate
+        # than max_memory_allocated(), which misses the per-process context overhead
+        # (~200-400 MB on ROCm/RDNA4) that caused Phase 2 to schedule too many tasks.
+        torch.cuda.synchronize()
+        free_now, total_vram = torch.cuda.mem_get_info()
+        task_peak_memory = total_vram - free_now
+
         del task
         del model
         del optimizer
@@ -94,12 +102,8 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         torch.cuda.empty_cache()
         gc.collect()
 
-        # Store the result.
-        # Use max_memory_reserved() (not max_memory_allocated()) so the measurement
-        # includes the allocator's cache pages.  When many subprocesses run concurrently
-        # each one holds its own cache, so the scheduler must account for the full
-        # reserved footprint to avoid OOM.
-        memory_dict[task_name] = torch.cuda.max_memory_reserved()
+        # Store the result
+        memory_dict[task_name] = task_peak_memory
         solutions_dict[task_name] = example_list
 
     except Exception as e:  # If error, write to the error queue

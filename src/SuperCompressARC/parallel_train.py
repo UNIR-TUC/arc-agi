@@ -270,7 +270,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None):
         f'Phase 1 — Memory measurement  (2 iterations × {n_tasks} tasks)'
     )
     gpu_memory_quotas = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
-    gpu_task_quotas   = [int(q // (4 * 1024**3)) for q in gpu_memory_quotas]
+    gpu_task_quotas   = [1] * n_gpus  # one task at a time → clean individual measurements
 
     memory_dict, _, _, t_p1 = parallelize_runs(
         gpu_task_quotas,
@@ -296,13 +296,16 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None):
 
     # ── Phase 2: full 2000-step training ─────────────────────────────
     n_steps = 2000
-    # Re-read free VRAM now that all Phase 1 subprocesses have exited, so
-    # the budget reflects the true available memory at Phase 2 start.
-    gpu_memory_quotas_p2  = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
-    safe_gpu_memory_quotas = [q - 4 * 1024**3 for q in gpu_memory_quotas_p2]
+
+    # Phase 1 measurements now capture `total_vram - free_now` (solve_task.py),
+    # which already includes the per-process HIP/CUDA context (~470 MB each).
+    # The original 4 GB margin was compensating for that unmeasured overhead;
+    # 1 GB now suffices: system/display GPU use (~90 MB idle) + allocator
+    # fragmentation + measurement variance.
+    safe_gpu_memory_quotas = [q - 1 * 1024**3 for q in gpu_memory_quotas]
     arc_logger.debug(
         f'Phase 2 free VRAM: '
-        + ', '.join(f'GPU{i}={gpu_memory_quotas_p2[i]/1024**3:.2f} GB'
+        + ', '.join(f'GPU{i}={safe_gpu_memory_quotas[i]/1024**3:.2f} GB'
                    for i in range(n_gpus))
     )
 
