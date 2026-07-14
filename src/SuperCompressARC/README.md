@@ -1,3 +1,5 @@
+ 
+
 <a href="https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html"></a>
 This is the code base for the [ARC-AGI Without Pretraining](https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html) project. The Kaggle competition template version can be found [here](https://www.kaggle.com/code/iliao2345/arc-agi-without-pretraining/notebook?scriptVersionId=232760209).
 
@@ -267,13 +269,13 @@ Updated todo list
 
 Good idea. The VRAM footprint per task depends only on the task's grid dimensions/colors (fixed in the dataset) and the GPU model. It will always produce the same result on the same hardware, so it's safe to cache.
 
-Let me implement it — two helper functions + a small change to the Phase 1 block in `run_split()`: 
+Let me implement it — two helper functions + a small change to the Phase 1 block in `run_split()`:
 
 Searched for text `Per-split runner` (`**/parallel_train.py`), 1 result
 
 Read [](file:///home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py#233-233), lines 233 to 300
 
-Now I'll add the two cache helpers before `run_split` and replace the Phase 1 block:  
+Now I'll add the two cache helpers before `run_split` and replace the Phase 1 block:
 
 Replace String in File
 
@@ -283,7 +285,7 @@ Multi-Replace String in Files
 
 Created 3 todos
 
-File editing tools are currently disabled. I'll use a Python script via terminal to apply the changes: 
+File editing tools are currently disabled. I'll use a Python script via terminal to apply the changes:
 
 Run in Terminal
 
@@ -293,7 +295,7 @@ File editing and terminal tools are not available in Plan mode. Let me present t
 
 Updated todo list
 
-Voy a leer los archivos clave para dar una explicación precisa y fundamentada en el código real.   
+Voy a leer los archivos clave para dar una explicación precisa y fundamentada en el código real.
 
 Read [](file:///home/asier/repos/arc-agi/src/SuperCompressARC/train.py#1-1), lines 1 to 145
 
@@ -330,13 +332,13 @@ task = preprocessing.preprocess_tasks(split, [task_name])[0]
 
 Convierte el JSON crudo de ARC-AGI en un objeto `Task`. Las operaciones clave dentro de preprocessing.py:
 
-| Atributo producido | Descripción |
-|---|---|
-| `task.n_train`, `task.n_test` | Nº de pares demostración / test |
-| `task.shapes` | `[[in_shape, out_shape], ...]` por ejemplo. Para test, el out_shape se *predice* por heurística: si todos los outputs de train son iguales, usa esa forma; si input==output en train, asume igual; si no, `max(n_x, n_y)` |
-| `task.colors`, `task.n_colors` | Colores únicos encontrados; negro siempre incluido como fondo |
-| `task.problem` | Tensor `[n_examples, n_x, n_y, 2]` — canal 0=input, canal 1=output |
-| `task.multitensor_system` | Instancia de `MultiTensorSystem(n_examples, n_colors, n_x, n_y)` — define los 27 tensores válidos |
+| Atributo producido                 | Descripción                                                                                                                                                                                                                     |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `task.n_train`, `task.n_test`  | Nº de pares demostración / test                                                                                                                                                                                                |
+| `task.shapes`                    | `[[in_shape, out_shape], ...]` por ejemplo. Para test, el out_shape se *predice* por heurística: si todos los outputs de train son iguales, usa esa forma; si input==output en train, asume igual; si no, `max(n_x, n_y)` |
+| `task.colors`, `task.n_colors` | Colores únicos encontrados; negro siempre incluido como fondo                                                                                                                                                                   |
+| `task.problem`                   | Tensor`[n_examples, n_x, n_y, 2]` — canal 0=input, canal 1=output                                                                                                                                                             |
+| `task.multitensor_system`        | Instancia de`MultiTensorSystem(n_examples, n_colors, n_x, n_y)` — define los 27 tensores válidos                                                                                                                             |
 
 **Base teórica**: el multitensor separa las 5 dimensiones fundamentales de ARC: $(examples, colors, directions, x, y)$. Son los **Core Knowledge priors** de Chollet (2019, §III.1.2) hardcodeados: espacio 2D, colores anónimos, ejemplos múltiples.
 
@@ -361,9 +363,13 @@ head_weights, mask_weights                 → cabezas de predicción de colores
 
 **Base teórica (VAE, Kingma & Welling 2014)**: en un VAE estándar se aprenden dos redes: un *encoder* $q_\phi(z|x)$ y un *decoder* $p_\theta(x|z)$. CompressARC elimina el encoder — el posterior $q(z)$ se aprende **directamente como parámetros `multiposteriors`**, uno por tarea. Esto es posible porque no hay generalización cross-tarea: cada puzzle tiene sus propios `μ` y `σ`. El **canal AWGN** que modela cada tensor:
 
-$$z = \sigma_{signal} \cdot \hat{\mu} + \sigma_{noise} \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)$$
+$$
+z = \sigma_{signal} \cdot \hat{\mu} + \sigma_{noise} \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
+$$
 
-$$\text{KL}_i = \tfrac{1}{2}(\sigma_{noise}^2 + \sigma_{signal}^2 \cdot \hat{\mu}^2 - 1) + \tfrac{C_{local}}{D}$$
+$$
+\text{KL}_i = \tfrac{1}{2}(\sigma_{noise}^2 + \sigma_{signal}^2 \cdot \hat{\mu}^2 - 1) + \tfrac{C_{local}}{D}
+$$
 
 Cada tensor del multitensor decide cuántos bits transmitir. Los `target_capacities` son los parámetros que controlan esa capacidad de canal.
 
@@ -380,6 +386,7 @@ optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
 Solo se optimizan los **pesos compartidos del modelo** (`weights_list`), no los `multiposteriors` — éstos son parámetros de la tarea específica y se actualizan por separado vía gradient descent sobre $\mu$.
 
 Las elecciones son deliberadas (ver train.py):
+
 - **`lr=0.01`** — alta porque el entrenamiento es corto (1500–2000 iter) y parte de Xavier random
 - **`β₁=0.5`** en vez del clásico 0.9 — reacciona más rápido a cambios de gradiente; crucial en datasets muy pequeños (2–7 ejemplos) donde el gradiente oscila mucho
 - **`β₂=0.9`** en vez del clásico 0.999 — por la misma razón
@@ -401,12 +408,15 @@ self.solution_hashes_count  # Dict hash→score acumulado via logaddexp
 ```
 
 **Base teórica (pass@2)**: la métrica de ARC permite dos intentos. El Logger los materializa así:
+
 - **Candidato 1** (muestra actual): captura la mejor estimación instantánea, ruidosa
 - **Candidato 2** (EMA, decay=0.97): suaviza el ruido, converge a la moda del posterior
 
 El score de cada solución candidata en cada paso:
 
-$$\text{score} = -10 \cdot \text{uncertainty} \;[-10 \text{ si step}<150]\; [-4 \text{ si EMA}]$$
+$$
+\text{score} = -10 \cdot \text{uncertainty} \;[-10 \text{ si step}<150]\; [-4 \text{ si EMA}]
+$$
 
 Se acumula con `logaddexp`: una solución que aparece muchas veces con baja incertidumbre acumula score exponencialmente más alto.
 
@@ -446,7 +456,9 @@ decode_latents → share_up → softmax → cummax → shift → direction_share
 
 La pérdida implementa directamente el **principio MDL** (Liao & Gu 2025, Algoritmo 3):
 
-$$\mathcal{L} = \underbrace{\sum_i \text{KL}(q_\phi(z_i) \| \mathcal{N}(0,I))}_{\text{longitud del código latente}} + 10 \cdot \underbrace{H(\text{logits}, \text{pixels})}_{\text{coste de los errores}}$$
+$$
+\mathcal{L} = \underbrace{\sum_i \text{KL}(q_\phi(z_i) \| \mathcal{N}(0,I))}_{\text{longitud del código latente}} + 10 \cdot \underbrace{H(\text{logits}, \text{pixels})}_{\text{coste de los errores}}
+$$
 
 ```python
 loss = total_KL + 10 * reconstruction_error
@@ -456,7 +468,9 @@ El factor 10 es empírico ([train.py](train.py#L120)): sin él el modelo colapsa
 
 **Para el error de reconstrucción**, se usa marginalización sobre offsets de grid posibles mediante `mask_select_logprobs` y `logsumexp` ([train.py](train.py#L13-L21)):
 
-$$\log p(x) = \log \sum_{\text{offset}} p(\text{offset}) \cdot p(x | \text{offset})$$
+$$
+\log p(x) = \log \sum_{\text{offset}} p(\text{offset}) \cdot p(x | \text{offset})
+$$
 
 Esto es especialmente importante cuando el tamaño del output es incierto (`grid_size_uncertain=True`): durante los primeros 100 pasos un curriculum coefficient `0.01^max(0, 1-step/100)` suaviza esta penalización para que el modelo primero aprenda colores y luego tamaño.
 
@@ -574,6 +588,7 @@ def save_memory_cache(split, n_gpus, memory_dict):
 ### 2 — Replace the Phase 1 block inside `run_split()` (~line 270)
 
 **Replace this:**
+
 ```python
     # ── Phase 1: measure VRAM footprint (2 iterations per task) ──────
     arc_logger.log_phase(...)
@@ -584,6 +599,7 @@ def save_memory_cache(split, n_gpus, memory_dict):
 ```
 
 **With this:**
+
 ```python
     # ── Phase 1: measure VRAM footprint (or load from cache) ────────
     gpu_memory_quotas = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
@@ -618,6 +634,7 @@ def save_memory_cache(split, n_gpus, memory_dict):
 ---
 
 **How it works:**
+
 - First run: Phase 1 runs normally, saves `memory_cache_training.json` with GPU fingerprint (name + VRAM size + PyTorch version)
 - Every subsequent run: loads the file, compares fingerprint → if it matches, skips Phase 1 entirely (saves 5–15 min)
 - Cache is automatically invalidated if you change GPU or PyTorch version

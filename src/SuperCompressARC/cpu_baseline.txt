@@ -1,0 +1,9 @@
+==============================================================
+  Performance Summary — label: baseline
+  Task: 6d75e8bb   Steps profiled: 1480
+==============================================================
+  Wall time / step :  578.24 ms  ±  32.03 ms
+  CPU  time / step :  764.29 ms  ±  168.64 ms
+  CPU / wall ratio :  131.2 %
+  Throughput       :     1.7 steps/sec
+  Total wall time  :   855.8 s  (profiled steps)

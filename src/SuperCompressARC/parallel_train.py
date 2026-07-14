@@ -10,7 +10,7 @@ Phase 2 — greedy scheduler packs puzzles onto GPUs under the safe memory budge
 After Phase 2 the script saves:
   predictions_{split}.npz      — logger data for list_solved_puzzles.py
   submission_{split}.json      — Kaggle-format predictions
-  arc_training_{split}_*.log   — full log (DEBUG to file, INFO to console)
+    .log/arc_training_{split}_*.log  — full log (DEBUG to file, INFO to console)
   last_results.txt             — live-updating list of solved tasks
 
 Usage
@@ -296,12 +296,18 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None):
 
     # ── Phase 2: full 2000-step training ─────────────────────────────
     n_steps = 2000
+
     # Phase 1 measurements now capture `total_vram - free_now` (solve_task.py),
     # which already includes the per-process HIP/CUDA context (~470 MB each).
     # The original 4 GB margin was compensating for that unmeasured overhead;
     # 1 GB now suffices: system/display GPU use (~90 MB idle) + allocator
     # fragmentation + measurement variance.
     safe_gpu_memory_quotas = [q - 1 * 1024**3 for q in gpu_memory_quotas]
+    arc_logger.debug(
+        f'Phase 2 free VRAM: '
+        + ', '.join(f'GPU{i}={safe_gpu_memory_quotas[i]/1024**3:.2f} GB'
+                   for i in range(n_gpus))
+    )
 
     arc_logger.log_phase(
         f'Phase 2 — Full training  ({n_steps} iterations × {n_tasks} tasks)'
@@ -437,7 +443,9 @@ if __name__ == '__main__':
     n_gpus = torch.cuda.device_count()
 
     # Initialise the shared results file once for the whole run
-    results_file = 'last_results.txt'
+    current_date_time = time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime())
+    print(f'ARC-AGI parallel training started at {current_date_time}')
+    results_file = f'results_{current_date_time}.txt'
     arc_logging.init_results_file(results_file)
 
     print(f'\nStarting ARC-AGI parallel training — splits: {splits_to_run}')
@@ -455,7 +463,7 @@ if __name__ == '__main__':
             with open(solutions_path, 'r') as f:
                 solutions_json = json.load(f)
 
-        # Per-split logger (separate .log file, shared last_results.txt)
+        # Per-split logger (.log directory, shared last_results.txt)
         arc_logger = arc_logging.ArcLogger(
             split, log_dir='.', results_file=results_file
         )

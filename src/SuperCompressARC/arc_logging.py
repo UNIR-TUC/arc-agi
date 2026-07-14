@@ -1,8 +1,9 @@
 """
 Logging infrastructure for parallel ARC-AGI training runs.
 
-Writes every event to a timestamped .log file (DEBUG level, i.e. all detail)
-and mirrors key events to the terminal (INFO level).
+Writes every event to a timestamped .log file inside a project-root `.log`
+directory (DEBUG level, i.e. all detail) and mirrors key events to the
+terminal (INFO level).
 
 Solved tasks are appended in real time to `last_results.txt` so you can
 monitor progress without waiting for the full run to finish.
@@ -17,16 +18,22 @@ import torch
 
 class ArcLogger:
     """
-    Per-split logger.  Creates one .log file per split.
+    Per-split logger. Creates one .log file per split.
     All loggers in a run share the same `last_results.txt`.
     """
 
     def __init__(self, split, log_dir='.', results_file='last_results.txt'):
         self.split = split
-        self.log_dir = log_dir
+        project_root = os.path.dirname(os.path.abspath(__file__))
+        default_log_dir = os.path.join(project_root, '.log')
+        self.log_dir = default_log_dir if log_dir in (None, '', '.') else log_dir
         self.results_file = results_file
         timestamp = time.strftime('%Y%m%d_%H%M%S')
-        self.log_file = os.path.join(log_dir, f'arc_training_{split}_{timestamp}.log')
+        os.makedirs(self.log_dir, exist_ok=True)
+        self.log_file = os.path.join(
+            self.log_dir,
+            f'arc_training_{split}_{timestamp}.log',
+        )
         self._setup_logger(split, timestamp)
 
     # ------------------------------------------------------------------
