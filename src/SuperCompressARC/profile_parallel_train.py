@@ -15,7 +15,20 @@ This tool must NEVER worsen the very bottleneck it measures. Therefore it:
   * never instruments or imports the training hot loop,
   * samples at a coarse interval (>= 1 s by default),
   * lowers its own scheduling priority so it does not steal CPU from workers,
-  * reads GPU stats via a short-lived `rocm-smi`/`nvidia-smi` call (best effort).
+  * reads GPU stats preferentially via direct /sys/class/drm reads (no subprocess, no
+    SMI-tool ioctl surface), falling back to a short-lived `rocm-smi`/`nvidia-smi` call
+    only if sysfs is unavailable, and samples GPU stats on its own slow cadence
+    (`--gpu-interval`, default 20 s) decoupled from the 1 s CPU/process loop.
+
+GPU sampling safety note
+-------------------------
+Earlier versions of this harness polled `rocm-smi` every second for the whole run. On
+this host (AMD RDNA4 + ROCm) that was observed to coincide with full kernel panics when
+combined with many concurrent worker processes churning VRAM — repeated external SMI
+subprocess spawns (fork/exec + ioctl-heavy queries), occasionally killed mid-query by the
+`timeout=`, are suspected to destabilize the amdgpu driver under heavy concurrent load.
+GPU sampling now prefers lightweight sysfs reads and runs far less often; use
+`--gpu-mode off` to disable it completely if instability recurs.
 
 What it measures
 ----------------
@@ -55,6 +68,7 @@ The comparison prints deltas and FAILS LOUDLY if the CPU bottleneck got worse
 
 import argparse
 import csv
+import glob
 import json
 import os
 import shutil
@@ -122,6 +136,83 @@ def _sample_gpu(vendor, path):
                     sum(mems) if mems else None)
     except Exception:
         return None, None
+    return None, None
+
+
+# ── GPU sampling via sysfs (preferred: no subprocess, no SMI ioctl surface) ──
+
+def _detect_gpu_sysfs():
+    """Return a list of AMD GPU device dirs under /sys/class/drm, or [] if none found.
+
+    Reading sysfs attributes directly avoids spawning an external SMI tool (no fork/exec,
+    no ioctl-heavy queries) and is far less likely to contend with the amdgpu driver while
+    many worker processes are concurrently allocating/freeing VRAM.
+    """
+    device_dirs = []
+    try:
+        for entry in sorted(glob.glob('/sys/class/drm/card[0-9]*')):
+            device_dir = os.path.join(entry, 'device')
+            vendor_path = os.path.join(device_dir, 'vendor')
+            vram_path = os.path.join(device_dir, 'mem_info_vram_used')
+            if not (os.path.exists(vendor_path) and os.path.exists(vram_path)):
+                continue
+            with open(vendor_path) as f:
+                vendor_id = f.read().strip()
+            if vendor_id.lower() == '0x1002':  # AMD
+                device_dirs.append(device_dir)
+    except Exception:
+        return []
+    return device_dirs
+
+
+def _sample_gpu_sysfs(device_dirs):
+    """Return (util_percent, mem_used_mb) aggregated over GPUs via sysfs, or (None, None).
+
+    Pure file reads, wrapped defensively: a missing/unreadable attribute on one GPU must
+    never crash the harness nor block sampling.
+    """
+    utils, mems = [], []
+    for device_dir in device_dirs:
+        try:
+            with open(os.path.join(device_dir, 'mem_info_vram_used')) as f:
+                mems.append(int(f.read().strip()) / 1024**2)
+        except Exception:
+            pass
+        try:
+            with open(os.path.join(device_dir, 'gpu_busy_percent')) as f:
+                utils.append(float(f.read().strip()))
+        except Exception:
+            pass
+    return (max(utils) if utils else None, sum(mems) if mems else None)
+
+
+def _detect_gpu_source(mode):
+    """Resolve --gpu-mode to a concrete (source_type, payload) sampling source.
+
+    source_type is one of 'sysfs', 'smi', or None (no GPU sampling). 'auto' prefers the
+    low-risk sysfs path and only falls back to spawning an SMI tool if sysfs is unavailable.
+    """
+    if mode == 'off':
+        return None, None
+    if mode in ('auto', 'sysfs'):
+        device_dirs = _detect_gpu_sysfs()
+        if device_dirs:
+            return 'sysfs', device_dirs
+        if mode == 'sysfs':
+            return None, None
+    vendor, path = _detect_gpu_tool()
+    if vendor:
+        return 'smi', (vendor, path)
+    return None, None
+
+
+def _sample_gpu_unified(source_type, payload):
+    """Dispatch to the resolved GPU sampling source. Never raises."""
+    if source_type == 'sysfs':
+        return _sample_gpu_sysfs(payload)
+    if source_type == 'smi':
+        vendor, path = payload
+        return _sample_gpu(vendor, path)
     return None, None
 
 
@@ -211,11 +302,16 @@ def run_and_profile(args, passthrough):
     json_path = f'{prefix}_summary.json'
 
     n_cores = psutil.cpu_count(logical=True)
-    gpu_vendor, gpu_path = _detect_gpu_tool()
+    gpu_source_type, gpu_payload = _detect_gpu_source(args.gpu_mode)
+    gpu_label = {
+        'sysfs': 'sysfs(amdgpu)',
+        'smi': f'smi({gpu_payload[0] if gpu_payload else "?"})',
+    }.get(gpu_source_type, 'off')
 
     cmd = [sys.executable, '-u', 'parallel_train.py'] + passthrough
     print(f'[profiler] launching: {" ".join(cmd)}')
-    print(f'[profiler] cores={n_cores}  gpu={gpu_vendor or "n/a"}  interval={args.interval}s')
+    print(f'[profiler] cores={n_cores}  gpu={gpu_label}  '
+          f'interval={args.interval}s  gpu_interval={args.gpu_interval}s')
 
     _lower_own_priority()
 
@@ -233,6 +329,7 @@ def run_and_profile(args, passthrough):
     workers_series = []
     gpu_util_series = []
     gpu_mem_series = []
+    last_gpu_sample_t = -float('inf')
 
     try:
         while child.poll() is None:
@@ -244,8 +341,15 @@ def run_and_profile(args, passthrough):
             sys_cpu = sum(percore) / len(percore) if percore else 0.0
             n_workers, tree_cpu, tree_rss = tracker.sample()
             vmem = psutil.virtual_memory()
-            gpu_util, gpu_mem = (_sample_gpu(gpu_vendor, gpu_path)
-                                 if gpu_vendor else (None, None))
+
+            # GPU sampling runs on its own slow cadence (default 20s), decoupled from
+            # the 1s CPU/process loop, to avoid contending with the GPU driver.
+            if (gpu_source_type is not None
+                    and (t_rel - last_gpu_sample_t) >= args.gpu_interval):
+                last_gpu_sample_t = t_rel
+                gpu_util, gpu_mem = _sample_gpu_unified(gpu_source_type, gpu_payload)
+            else:
+                gpu_util, gpu_mem = None, None
 
             rows.append({
                 't_rel': round(t_rel, 2),
@@ -350,7 +454,7 @@ def run_and_profile(args, passthrough):
             'host_mem_used_max_pct': max((r['host_mem_used_pct'] for r in rows), default=0.0),
         },
         'gpu': {
-            'vendor': gpu_vendor,
+            'vendor': gpu_label,
             'util_mean_pct': round(statistics.mean(gpu_util_series), 1) if gpu_util_series else None,
             'util_max_pct': round(max(gpu_util_series), 1) if gpu_util_series else None,
             'mem_max_mb': round(max(gpu_mem_series), 1) if gpu_mem_series else None,
@@ -462,6 +566,16 @@ def main():
                         help='Sampling interval in seconds (>=1 recommended). Default: 1.0')
     parser.add_argument('--saturation-threshold', type=float, default=90.0,
                         help='System CPU %% considered "saturated". Default: 90')
+    parser.add_argument('--gpu-interval', type=float, default=20.0,
+                        help='Seconds between GPU samples, decoupled from --interval. Kept '
+                             'coarse on purpose: frequent external GPU polling concurrent with '
+                             'heavy VRAM churn has been observed to destabilize the GPU driver '
+                             'on this host. Default: 20.0')
+    parser.add_argument('--gpu-mode', choices=['auto', 'sysfs', 'smi', 'off'], default='auto',
+                        help='GPU sampling method. "sysfs" reads /sys/class/drm directly (no '
+                             'subprocess, safest); "smi" spawns rocm-smi/nvidia-smi; "auto" '
+                             'prefers sysfs and falls back to smi; "off" disables GPU sampling '
+                             'entirely. Default: auto')
     parser.add_argument('--compare', nargs=2, metavar=('BEFORE.json', 'AFTER.json'),
                         help='Compare two summary JSONs instead of running a new profile.')
     parser.add_argument('passthrough', nargs=argparse.REMAINDER,

@@ -646,7 +646,7 @@ Completed: *Implement caching for Phase 1 VRAM measurements* (1/3)
 
 ```python
 # Without implementation
-python profile_parallel_train.py --label baseline  -- --split training --demo 20
+python profile_parallel_train.py --label baseline -- --split training --demo 20
 # With implementation
 python profile_parallel_train.py --label optimized -- --split training --demo 20
 # After two runnings
