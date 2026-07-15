@@ -103,6 +103,8 @@ La idea central es **inteligencia = compresión** (principio MDL, *Minimum Descr
       - [9.6.3 Paralelización extendida con 16 GB VRAM y 94 GB RAM](#963-paralelización-extendida-con-16-gb-vram-y-94-gb-ram)
     - [9.7 Eje E: profundidad adaptativa y razonamiento iterativo](#97-eje-e-profundidad-adaptativa-y-razonamiento-iterativo)
     - [9.8 Síntesis: presupuesto de cómputo, roadmap experimental y riesgos](#98-síntesis-presupuesto-de-cómputo-roadmap-experimental-y-riesgos)
+    - [9.9 Eje F: interpretabilidad activa como mecanismo de control](#99-eje-f-interpretabilidad-activa-como-mecanismo-de-control)
+    - [9.10 Eje G: compresión explícita de θ (MDL completo)](#910-eje-g-compresión-explícita-de-θ-mdl-completo)
   - [10. Referencias](#10-referencias)
     - [Papers](#papers)
     - [Archivos del repositorio](#archivos-del-repositorio)
@@ -222,6 +224,8 @@ Estas dos perspectivas suelen ser **complementarias**: cuando la red se aproxima
 ### 4.1 El multitensor — estructura de datos central
 
 El `MultiTensorSystem` ([multitensor_systems.py:11-93](multitensor_systems.py)) define **5 dimensiones binarias** y mantiene un tensor independiente por cada combinación válida.
+
+> **Nota sobre la documentación del paper**: el Apéndice C del paper Liao & Gu describe el multitensor con **4 dimensiones** (`examples, colors, x, y`) y **16 tensores** ($2^4$) como simplificación expositiva. La **implementación real** ([multitensor_systems.py:9](multitensor_systems.py), `NUM_DIMENSIONS = 5`) añade la dimensión `directions` → **5 dimensiones y 27 tensores válidos**. Este documento describe siempre el código real.
 
 | Índice | Dimensión | Longitud típica | Significado |
 |--------|-----------|-----------------|-------------|
@@ -783,8 +787,12 @@ La siguiente tabla cataloga las mejoras propuestas, su coste estimado de impleme
 | 8 | Constantes mágicas en pass@2 (§8.4.2) | Clasificador entrenado para seleccionar candidatos | Bajo | Bajo | Mejora marginal, pero "fruta a baja altura" |
 | 9 | Iteraciones fijas (§8.4.1) | Criterio de parada adaptativo (estabilidad EMA) | Bajo | Bajo | Reasigna cómputo; mismo total compute → más puzzles resueltos |
 | 10 | 0,04 % de utilización GPU (§8.4.4) | Fusionar kernels con Triton / torch.compile | Medio | **Alto** indirecto | Desbloquea ×10–×100 más experimentos por unidad de tiempo |
+| 11 | θ no contabilizado / equilibrio circular (§8.1.3, §8.2.5) | Compresión explícita de θ: cuantización + entropy coding o prior gaussiano-como-KL (Eje G, §9.10) | Bajo-Medio | Medio (habilitador) | Cierra el bucle MDL; **precondición** para escalar ejes A/E sin violar MDL; responde a la evidencia de la ablación F.5 |
+| 12 | Colapso frágil e impredecible de tensores (§8.2.4) | Interpretabilidad activa: monitorización de KL por-tensor + PCA con intervención dirigida (Eje F, §9.9) | Bajo-Medio | Medio | Convierte el diagnóstico post-hoc del Apéndice I en control online; estabiliza y explica los fallos |
 
 **Recomendación de priorización**: las mejoras #1 (copia de formas), #2 (compresión cross-puzzle) y #6 (slot-based object representation) son las que más probablemente cierran el gap del 20 % a algo cercano al 40 % alcanzado por HRM. Las mejoras #3 y #10 deberían hacerse primero por su bajo coste-alta-rentabilidad: la primera estabiliza resultados, la segunda multiplica la velocidad de iteración para todo lo demás.
+
+> **Caveat transversal (Apéndice F.5)**: la ablación F.5 del paper muestra que **aumentar parámetros no mejora proporcionalmente, y a veces empeora**. Por ello la mejora #11 (compresión de θ) es *habilitadora* de las mejoras que añaden capacidad (#1, #6, #4): sin contabilizar θ no hay forma principiada de decidir cuánta capacidad nueva "paga" su coste MDL.
 
 ---
 
@@ -852,6 +860,8 @@ El repositorio actual está escrito asumiendo CUDA: `parallel_train.py:38-39` in
 ### 9.3 Eje A: expansión del scope del lenguaje de programas
 
 Este eje ataca la limitación fundamental (§8.1.1, §8.3): el espacio de programas representables por la arquitectura actual **no contiene** soluciones para grandes familias de puzzles ARC. Añadir primitivas amplía el scope (Chollet 2019 §I.3.2) y, si la primitiva está bien elegida, reduce la longitud de descripción de las tareas que la usan **más** de lo que aumenta θ → MDL-positivo.
+
+**Refuerzo desde la documentación del paper**: el Apéndice C describe el multitensor como "un tensor por cada subconjunto de dimensiones"; por eso **añadir una nueva dimensión** (p.ej. `slots`, §9.3.2) es una extensión *nativa* del formato, no un parche externo. Además, la ablación del **Apéndice F.4** (sustituir las operaciones especializadas por capas lineales genéricas degrada la precisión) confirma que las primitivas nuevas de este eje deben ser **estructurales** —con el sesgo inductivo geométrico o simbólico correcto— y no MLPs genéricos. Nótese que el paper simplifica la exposición a 4 dimensiones/16 tensores, mientras que la implementación real usa 5 dimensiones/27 tensores (ver [§4.1](#41-el-multitensor--estructura-de-datos-central)).
 
 #### 9.3.1 Operador de copia/replicación basado en cross-attention
 
@@ -952,6 +962,8 @@ Apéndice K.3 del paper Liao & Gu sugiere exactamente esto, con la mejora de **s
 
 **Impacto esperado**: el Apéndice K.3 del paper estima que rescatar 4–6 tensores más subiría el pass@2 promedio ~3–5 puntos. Combinado con multi-seed (§9.4.2), debería **eliminar la varianza** entre runs (actualmente alta — los autores reconocen "lucky runs").
 
+**Evidencia empírica y fundamento REC**: la §5.2.1 y la Figura 6 de este documento muestran un caso donde un tensor crítico (`[color, direction, channel]`) casi colapsa y se **rescata** alrededor de la iteración 200, momento a partir del cual aparecen las muestras correctas — evidencia directa de que el colapso es reversible y de que un floor lo estabilizaría. Además, la interpretación por **Relative Entropy Coding** (Apéndice B del paper) da fundamento al free-bits: como la KL de cada tensor son los **bits reales** de su semilla, forzar un mínimo $\tau$ equivale a reservar un presupuesto de información no-negativo, y al hacer $\tau \to 0$ la pérdida converge exactamente al MDL óptimo. El free-bits no es, por tanto, una heurística sino una modificación *principiada* de la trayectoria de optimización.
+
 #### 9.4.2 Ensemble multi-semilla en paralelo (free pass@N → pass@2)
 
 **Problema atacado**: §8.1.2 (la trayectoria depende fuertemente de la semilla; runs distintas resuelven puzzles distintos).
@@ -1033,6 +1045,8 @@ Dos arquitecturas candidatas:
 
 **Impacto esperado**: difícil de estimar a priori; literatura de meta-learning sobre ARC (Akyürek et al. 2024, *test-time training*) reporta saltos del 20 % al ~50 % cuando se permite training adicional sobre el corpus. Riesgo de overfitting al split de training si no se cuida el regularizador sobre $\Delta\theta_p$.
 
+**Caveat MDL (Apéndice F.5)**: la ablación F.5 del paper muestra que **aumentar el número de parámetros no mejora proporcionalmente y a veces empeora** la generalización (memorización). Por tanto la ganancia de este eje **no** debe buscarse aumentando la capacidad bruta de $\theta_{\text{shared}}$, sino en la **compresión conjunta** (menos bits agregados por puzzle vía $\Delta\theta_p$ de bajo rango). Este eje sólo es MDL-positivo si $|\theta_{\text{shared}}| + \sum_p|\Delta\theta_p| < \sum_p |\theta_p|$, y ese balance sólo es auditable cuando θ se contabiliza explícitamente (ver [§9.10](#910-eje-g-compresión-explícita-de-θ-mdl-completo)).
+
 ### 9.6 Eje D: eficiencia computacional y aprovechamiento del silicio
 
 Este eje no cambia la matemática del modelo; cambia **cómo** se ejecuta. Es el habilitador silencioso de todos los demás ejes: cada factor de speedup permite más experimentos, más semillas, más iteraciones.
@@ -1111,6 +1125,8 @@ Propuesta recomendada: empezar por **Universal Transformer + ACT** (combinables)
 
 **Riesgo**: el entrenamiento de halting heads con straight-through es notoriamente inestable (literatura ACT). Mitigación: bucear en variantes recientes como **PonderNet** (Banino et al. 2021) que reformula ACT como problema variacional con KL — encaja perfectamente con la pérdida MDL de CompressARC.
 
+**Caveat MDL (Apéndice F.5)**: la ablación F.5 confirma que subir parámetros no rinde por sí solo; por eso la vía recomendada aquí es el **Universal Transformer con weight-tying**, que **reduce** θ (76 K → ~19 K) mientras aumenta la profundidad efectiva. Añadir profundidad con pesos independientes por capa sería anti-MDL salvo que θ se comprima explícitamente (ver [§9.10](#910-eje-g-compresión-explícita-de-θ-mdl-completo)).
+
 ### 9.8 Síntesis: presupuesto de cómputo, roadmap experimental y riesgos
 
 La siguiente tabla integra los cinco ejes con su coste de cómputo cuantificado sobre el hardware disponible y su dependencia con otros ejes. "Wall-clock por puzzle" asume que los ejes habilitadores (D) ya están activos; "VRAM extra por puzzle" se suma al baseline ~0,7 GB.
@@ -1124,6 +1140,8 @@ La siguiente tabla integra los cinco ejes con su coste de cómputo cuantificado 
 | B | Multi-seed ensembling (×4) | +2 GB | +300 % | 0 (×4 instances) | ±0 paralelo | +10–15 | VRAM (D) |
 | B | Curriculum sobre demo pairs | 0 | 0 | 0 | ±0 | +1–2 | — |
 | B | Selección pass@2 aprendida | <1 MB | trivial | +50 | ±0 | +0,5–1 | — |
+| G | Compresión explícita de θ (§9.10) | 0 | +5 % | ~0 (regulariza θ) | ×1,02 | +1–3 (habilitador de A/E) | — |
+| F | Interpretabilidad activa: KL+PCA online (§9.9) | <5 MB | +2 % | +30 | ±0 | +2–4 | KL floor (B) |
 | A | Copia/replicación (cross-attn) | +5 MB | +5 % | +3 K | ×1,05 | +5–8 | BF16 (D) |
 | A | Slot attention (objetos) | +10 MB | +10 % | +4 K | ×1,1 | +8–12 | BF16 (D) |
 | A | Conteo + VQ | +1 MB | +2 % | +2 K | ×1,02 | +3–5 | — |
@@ -1135,8 +1153,8 @@ Leyenda: ±0 = sin cambio relevante. Las cifras de Δ pass@2 son estimaciones co
 **Roadmap experimental recomendado (orden de ejecución):**
 
 1. **Fase 0 — habilitadores (1–2 semanas)**: activar BF16 (§9.6.1), `torch.compile` (§9.6.2), ampliar paralelización (§9.6.3). Resultado: wall-clock ÷ 5–10 sin cambiar el modelo. Validación: reproducir el 20 % baseline en ~20 h.
-2. **Fase 1 — robustez (1 semana)**: KL floor (§9.4.1), curriculum (§9.4.3), selección aprendida (§9.4.4). Resultado: pass@2 estable ~22–24 % (varianza-baja).
-3. **Fase 2 — ensembling (días)**: multi-seed × 4 (§9.4.2). Resultado: pass@2 ~30–35 % en eval. **Hito psicológico**: igualar o superar HRM sin tocar la arquitectura.
+2. **Fase 1 — robustez (1 semana)**: KL floor (§9.4.1), curriculum (§9.4.3), selección aprendida (§9.4.4) y **compresión de θ (Eje G, §9.10)** como cimiento MDL que habilita el escalado posterior de forma principista. Resultado: pass@2 estable ~22–24 % (varianza-baja).
+3. **Fase 2 — ensembling + diagnóstico (días)**: multi-seed × 4 (§9.4.2) e **interpretabilidad activa (Eje F, §9.9)** para selección de semilla y rescate dirigido de tensores críticos. Resultado: pass@2 ~30–35 % en eval. **Hito psicológico**: igualar o superar HRM sin tocar la arquitectura.
 4. **Fase 3 — primitivas (2–4 semanas, una por experimento)**: conteo (§9.3.3) → cross-attention de copia (§9.3.1) → slot attention (§9.3.2). Cada una validada A/B contra fase 2. Resultado acumulado esperable: pass@2 ~38–42 %.
 5. **Fase 4 — recurrencia (3–6 semanas)**: Universal Transformer + ACT/PonderNet (§9.7). Resultado: pass@2 ~45–50 %. Es la apuesta de mayor riesgo y mayor recompensa.
 6. **Fase 5 — meta-aprendizaje (6–8 semanas, opcional)**: LoRA cross-puzzle (§9.5). Discusión filosófica obligatoria sobre el paradigma "sin pretraining". Si se acepta, pass@2 potencialmente >50 % con honestidad sobre el cambio de paradigma.
@@ -1149,7 +1167,61 @@ Leyenda: ±0 = sin cambio relevante. Las cifras de Δ pass@2 son estimaciones co
 - **Recompilations en `torch.compile`**: el multitensor genera shapes variables; con `dynamic=True` el problema se controla, pero la primera iteración de cada puzzle puede tener 30–60 s de overhead. Aceptable en wall-clock por puzzle de 5–20 min.
 - **Dependencia de ROCm 7.2.3**: si AMD rompe compatibilidad en versiones futuras, hay que pinear la versión y documentar.
 
-**Conclusión del marco**: el hardware disponible permite, con esta hoja de ruta, **un orden de magnitud más de experimentos por unidad de tiempo** que el baseline (factor 5–15× wall-clock) y **margen para ~20–25 puntos extra de pass@2** sin abandonar la filosofía MDL, o **30–40 puntos** si se acepta el meta-aprendizaje cross-puzzle del eje C. El techo realista combinando todos los ejes ortogonales (D + B + A + E) sin C se estima en **40–45 % pass@2**, cerrando casi totalmente la brecha con HRM mientras se preserva el principio compresivo del paper original.
+**Conclusión del marco**: el hardware disponible permite, con esta hoja de ruta, **un orden de magnitud más de experimentos por unidad de tiempo** que el baseline (factor 5–15× wall-clock) y **margen para ~20–25 puntos extra de pass@2** sin abandonar la filosofía MDL, o **30–40 puntos** si se acepta el meta-aprendizaje cross-puzzle del eje C. El techo realista combinando todos los ejes ortogonales (D + B + A + E), con **F y G como cimientos MDL**, y sin C, se estima en **40–45 % pass@2**, cerrando casi totalmente la brecha con HRM mientras se preserva el principio compresivo del paper original.
+
+---
+
+### 9.9 Eje F: interpretabilidad activa como mecanismo de control
+
+Los ejes A–E modifican la arquitectura o el flujo de optimización. Este eje F propone algo distinto: usar la **interpretabilidad** que el propio paper demuestra (Apéndice I y §5.2.1 de este documento) no como análisis *post-hoc*, sino como una **señal de control en línea** durante el entrenamiento por inferencia. Es la contraparte *dirigida y diagnóstica* del Eje B, cuyo KL floor (§9.4.1) es un regularizador global e indiscriminado.
+
+**Problema atacado**: §8.2.4 (posterior collapse frágil e impredecible). El Apéndice K.3 del paper documenta que la mayoría de los tensores del multitensor `z` caen a KL ≈ 0 y no se recuperan; si uno de los pocos supervivientes es el crítico, el puzzle falla. Hoy no hay ningún mecanismo que *observe* esto mientras ocurre ni que *intervenga*.
+
+**Marco teórico**: el paper ya provee las dos herramientas de observación necesarias, sólo que las usa después de entrenar:
+
+- **KL por-tensor** ([layers.py:58-123](layers.py) devuelve `KL_amounts` / `KL_names`, agregados en [train.py](train.py)): la trayectoria temporal de la KL de cada uno de los 27 tensores indica cuánta información transporta cada uno y permite detectar colapsos inminentes (pendiente de KL fuertemente negativa hacia 0).
+- **PCA de la salida media de la capa de decodificación** por tensor (la técnica exacta usada en la §5.2.1): revela cuántos conceptos codifica cada tensor y cuáles son *estructuralmente* relevantes para la tarea concreta.
+
+La propuesta convierte estas observaciones en un **lazo de control** que, en tiempo de entrenamiento:
+
+1. **Monitoriza** la trayectoria de `KL_amounts` por tensor y marca los que están colapsando (KL → 0 con pendiente negativa sostenida).
+2. **Interviene** de forma *dirigida* sobre esos tensores concretos —no sobre todos—: aplicar un free-bits selectivo $\tau_i$ sólo a los tensores marcados (a diferencia del $\tau$ uniforme del §9.4.1), reasignar capacidad (`target_capacity`) desde tensores saturados hacia los que colapsan, o reiniciar el `mean` / `local_capacity_adjustment` de un tensor ya muerto.
+3. **Selecciona semilla / early-stop**: en combinación con el ensemble multi-semilla (§9.4.2), continúa la run cuyos tensores *estructuralmente relevantes* (según PCA) siguen vivos, y detiene tempranamente las runs donde ya colapsaron.
+
+**MDL accounting**: la fase de *monitorización* no añade ni un bit a θ (sólo lee cantidades ya calculadas). Las *intervenciones* deben respetar la restricción transversal del §9: el free-bits selectivo converge al MDL igual que el global cuando $\tau_i \to 0$; la reasignación de capacidad es un reparto interno del mismo presupuesto de KL; y la selección de semilla es MDL-neutra a efectos de pass@2 (mismo argumento que §9.4.2).
+
+**Coste sobre RX 9070 XT**: la monitorización de 27 trayectorias escalares es despreciable. La PCA por tensor (matrices pequeñas, `decoding_dim=4` u 8/16 canales) se ejecuta cada K iteraciones en la CPU (i9-12900K) sin frenar la GPU. Coste efectivo ≈ 0.
+
+**Impacto esperado**: +2–4 puntos pass@2 por reducción de fallos por colapso y —tanto o más importante— un **diagnóstico explicable** de *por qué* falla un puzzle concreto, lo que acelera el diseño de los ejes A y E. Depende de tener el KL floor del §9.4.1 disponible como mecanismo de intervención.
+
+**Riesgo**: intervenir de forma demasiado agresiva puede impedir la compresión legítima (mantener vivos tensores que *deben* morir). Mitigación: activar la intervención sólo cuando la PCA indica que el tensor que colapsa es estructuralmente relevante, y siempre con $\tau_i$ decreciente para converger al MDL.
+
+### 9.10 Eje G: compresión explícita de θ (MDL completo)
+
+Todos los ejes anteriores asumen —siguiendo al paper— que los pesos θ del modelo se transmiten *sin comprimir*. El propio paper reconoce esto como una omisión: el **Apéndice K.4** lo califica de *"somewhat reckless"* y el **Apéndice B** deja claro que la longitud de descripción total se reparte entre **arquitectura + pesos θ + semillas**, de modo que dejar θ fuera del presupuesto **sesga** el objetivo. Este eje G cierra ese hueco, y por eso es la **precondición transversal** que legitima escalar los ejes A y E.
+
+**Problema atacado**: §8.1.3 (θ no se comprime) y §8.2.5 (equilibrio circular: como θ no entra en la pérdida, no es posible ni penalizar ni recompensar su tamaño, y las decisiones de "modelo pequeño" o "4 capas" quedan sin fundamento MDL propio).
+
+**Marco teórico**: añadir a la pérdida un término diferenciable que aproxime la **longitud de código de θ**, de forma análoga a como la KL aproxima la longitud del código de `z`:
+
+$$\mathcal{L} = \underbrace{\text{KL}(z)}_{\text{código de } z} + 10\cdot\text{reconstruction} + \lambda\cdot\underbrace{L(\theta)}_{\text{código de } \theta}$$
+
+Dos materializaciones compatibles con MDL:
+
+1. **Prior gaussiano como KL sobre θ** (equivalente MDL de un L2): modelar cada peso como transmitido bajo un prior $\mathcal{N}(0,\sigma_\theta^2)$ con ruido de cuantización; el número de bits es entonces $\approx \tfrac{1}{2}\log(1+\theta^2/\sigma_{\text{ruido}}^2)$, exactamente la misma forma AWGN que ya usa `channel_layer` para `z` ([layers.py:58-123](layers.py)). Reutiliza la maquinaria existente.
+2. **Cuantización + entropy coding** (K.4): discretizar θ a una rejilla y contabilizar su entropía; la pérdida penaliza distribuciones de pesos de alta entropía. Más fiel a "bits reales del programa" pero requiere straight-through.
+
+**Consecuencia clave — desbloquea el escalado principista**: una vez θ está en la balanza, el optimizador **decide por sí mismo** cuánta capacidad merece la pena. Esto responde directamente a la ablación del **Apéndice F.5** (subir parámetros no ayuda, a veces empeora): con θ contabilizado, añadir una primitiva del Eje A o profundidad del Eje E sólo baja la pérdida si su reducción en KL(z) + reconstrucción supera su coste $L(\theta)$. El equilibrio circular de §8.2.5 se rompe y "modelo pequeño" pasa de ser una elección manual a ser un **resultado emergente** de la optimización.
+
+**MDL accounting**: este eje *es* contabilidad MDL; no añade parámetros netos (introduce $\sigma_\theta$ / $\lambda$, escalares). Su efecto es regularizador: reduce el θ efectivo y, por tanto, mejora la generalización por presión compresiva.
+
+**Coste sobre RX 9070 XT**: un término elementwise sobre los ~76 K pesos por iteración ⇒ ~$10^5$ FLOPs, despreciable frente al forward pass. VRAM extra ≈ 0.
+
+**Impacto esperado**: +1–3 puntos pass@2 directos por regularización, pero su valor real es **habilitador**: sin él, los ejes A (nuevas primitivas) y E (más profundidad con pesos independientes) son formalmente anti-MDL y no se pueden auditar. Por eso en el roadmap (§9.8) se sitúa en la fase de cimientos, junto al KL floor.
+
+**Riesgo**: un $\lambda$ mal calibrado puede sobre-comprimir θ y matar capacidad útil (el mismo dilema que el β = 10 de §8.1.4). Mitigación: schedule creciente de $\lambda$ (empezar en 0, subir lentamente) y auditar la balanza $L(\theta)$ vs KL(z) como indica la restricción transversal del §9.
+
+**Relación con el Eje C**: la compresión de θ es también el fundamento de la compresión cross-puzzle (§9.5); compartir $\theta_{\text{shared}}$ sólo es MDL-positivo si se contabilizan $|\theta_{\text{shared}}|$ y $|\Delta\theta_p|$, exactamente lo que este eje introduce.
 
 ---
 
