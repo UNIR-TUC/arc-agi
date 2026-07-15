@@ -641,3 +641,14 @@ def save_memory_cache(split, n_gpus, memory_dict):
 - To force re-measurement: `rm memory_cache_training.json`
 
 Completed: *Implement caching for Phase 1 VRAM measurements* (1/3)
+
+## Profiler
+
+```python
+# Without implementation
+python profile_parallel_train.py --label baseline  -- --split training --demo 20
+# With implementation
+python profile_parallel_train.py --label optimized -- --split training --demo 20
+# After two runnings
+python profile_parallel_train.py --compare .profile/baseline_summary.json .profile/optimized_summary.json
+```

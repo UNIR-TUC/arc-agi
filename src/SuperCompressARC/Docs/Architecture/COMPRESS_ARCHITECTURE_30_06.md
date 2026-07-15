@@ -1152,6 +1152,7 @@ Leyenda: ±0 = sin cambio relevante. Las cifras de Δ pass@2 son estimaciones co
 
 **Roadmap experimental recomendado (orden de ejecución):**
 
+0. **Fase −1 — desatascar la CPU (PRIORIDAD 0, Eje H §9.11)**: ajustar concurrencia, eliminar syncs GPU→CPU del hot path, vectorizar los bucles de offset y aplicar `torch.compile`. **Debe ir antes que nada**: la CPU satura al ~100 % en carga real (≈13 tareas) y todos los ejes siguientes heredan ese cuello de botella. Semánticamente neutro (no cambia arquitectura ni resultados). Validación con [profile_parallel_train.py](profile_parallel_train.py). Resultado: CPU no saturada, throughput agregado ×3–×10.
 1. **Fase 0 — habilitadores (1–2 semanas)**: activar BF16 (§9.6.1), `torch.compile` (§9.6.2), ampliar paralelización (§9.6.3). Resultado: wall-clock ÷ 5–10 sin cambiar el modelo. Validación: reproducir el 20 % baseline en ~20 h.
 2. **Fase 1 — robustez (1 semana)**: KL floor (§9.4.1), curriculum (§9.4.3), selección aprendida (§9.4.4) y **compresión de θ (Eje G, §9.10)** como cimiento MDL que habilita el escalado posterior de forma principista. Resultado: pass@2 estable ~22–24 % (varianza-baja).
 3. **Fase 2 — ensembling + diagnóstico (días)**: multi-seed × 4 (§9.4.2) e **interpretabilidad activa (Eje F, §9.9)** para selección de semilla y rescate dirigido de tensores críticos. Resultado: pass@2 ~30–35 % en eval. **Hito psicológico**: igualar o superar HRM sin tocar la arquitectura.
@@ -1222,6 +1223,63 @@ Dos materializaciones compatibles con MDL:
 **Riesgo**: un $\lambda$ mal calibrado puede sobre-comprimir θ y matar capacidad útil (el mismo dilema que el β = 10 de §8.1.4). Mitigación: schedule creciente de $\lambda$ (empezar en 0, subir lentamente) y auditar la balanza $L(\theta)$ vs KL(z) como indica la restricción transversal del §9.
 
 **Relación con el Eje C**: la compresión de θ es también el fundamento de la compresión cross-puzzle (§9.5); compartir $\theta_{\text{shared}}$ sólo es MDL-positivo si se contabilizan $|\theta_{\text{shared}}|$ y $|\Delta\theta_p|$, exactamente lo que este eje introduce.
+
+---
+
+### 9.11 Eje H: eliminación del cuello de botella de CPU (dispatch, sincronización y sobre-concurrencia) — **PRIORIDAD 0**
+
+> **Este eje tiene prioridad de implementación sobre todos los demás** (D, B, A, E, C, F, G) por una razón empírica y otra lógica:
+>
+> - **Empírica**: en las ejecuciones de carga alta con [parallel_train.py](parallel_train.py) (≈13 tareas concurrentes probadas), la **CPU del host se satura al ~100 % de forma constante** mientras la GPU queda infrautilizada (coherente con el 0,04 % de pico de cómputo medido en §6.3 y §8.4.4). El throughput agregado no está limitado por la GPU sino por la **capacidad del host de alimentarla**.
+> - **Lógica**: todos los ejes A–G (y las fases del roadmap §9.8) **heredan** el coste de este cuello de botella. Cada semilla extra (§9.4.2), cada primitiva nueva (Eje A) y cada iteración adicional (Eje E) añade más operaciones coordinadas por Python: si el host ya está saturado, esas mejoras rinden por debajo de su potencial o directamente no caben. Este eje es, por tanto, un **habilitador de orden 0**, incluso anterior a la Fase 0 (habilitadores de silicio del Eje D).
+
+**Restricción absoluta**: este eje **no cambia la arquitectura ni el flujo de cómputo** (§4, §5). No toca el multitensor, ni las 4 capas, ni la pérdida, ni la selección pass@2. Todas las transformaciones propuestas son **semánticamente neutras** (mismos números, distinta forma de calcularlos) o de **coordinación de procesos** (cuántas tareas concurrentes). El núcleo permanece intacto.
+
+#### 9.11.1 Diagnóstico: ¿por qué la CPU está al 100 %?
+
+El cuello de botella **no es la matemática pesada** (esa ya corre en PyTorch/ROCm y es diminuta). Es la **sobrecarga de Python orquestando miles de operaciones tensoriales minúsculas por iteración**, multiplicada por ~13 procesos concurrentes, más **sincronizaciones GPU→CPU** que serializan el pipeline. Se identifican cuatro focos concretos, todos en el camino caliente que corre 2000 veces × 13 tareas:
+
+| # | Foco (archivo:símbolo) | Patrón que delata el problema | Coste por iteración |
+|---|------------------------|-------------------------------|---------------------|
+| H1 | [train.py](train.py) `take_step` — bucle de reconstrucción | **Bucles Python anidados alrededor de ops tensoriales**: `for example_num` × `for in_out_mode` × `for x_offset` × `for y_offset` (hasta 30×30 = **900 iteraciones**), cada una con *slicing* + `cross_entropy` (un kernel diminuto). En modo `grid_size_uncertain`, `mask_select_logprobs` se re-invoca en dos bucles `for length in range(1, n+1)` (≈30+30), cada uno con su propio bucle de offsets → **O(n²) lanzamientos** por ejemplo | cientos–miles de kernels |
+| H2 | [solution_selection.py](solution_selection.py) `Logger.log` | **Sincronizaciones GPU→CPU en el hot path**: `float(KL_amount.detach().sum().cpu().numpy())` se ejecuta para los **27 tensores** de KL cada iteración, más `total_KL`, `reconstruction_error`, `loss` → ≥30 `.cpu()` que **fuerzan `cudaSynchronize` y matan el solapamiento asíncrono** | ≥30 syncs |
+| H3 | [solution_selection.py](solution_selection.py) `_postprocess_solution`/`best_crop` | Corre **dos veces por iteración** (muestra + EMA); `_best_slice_point` tiene un **bucle Python de offsets** que construye listas de ops diminutas; luego `.cpu().numpy().tolist()` + **triple bucle Python anidado** para recolorear píxeles | 2× por iter |
+| H4 | [layers.py](layers.py) `@multify` / `direction_share` | **Muchísimas llamadas pequeñas a PyTorch**: el decorador `@multify` ([multitensor_systems.py](multitensor_systems.py)) reconstruye en Python la lista de argumentos e itera sobre **27 tensores por cada llamada de capa**; `direction_share` hace `for d1 in range(8): for d2 in range(8)` = **64 `affine` (matmuls 8×8)** por tensor direccional por capa. 4 capas amplifican todo ×4 | miles de dispatch |
+
+**Veredicto sobre la naturaleza del problema** (respuesta directa a las preguntas del análisis): es una **mezcla dominada por dos factores**:
+
+1. **Sobrecarga de Python coordinando demasiadas operaciones pequeñas** (H1, H4) → *demasiados kernel launches pequeños hacia GPU*. Es el factor primario.
+2. **Exceso de procesos concurrentes** (13) compitiendo por los núcleos del host mientras cada uno está *CPU-bound* haciendo dispatch → satura la CPU y **agrava** el factor 1.
+3. Contribuyen en segundo orden las **sincronizaciones GPU→CPU** (H2, H3) y la lógica de scheduling/progreso/IPC de [parallel_train.py](parallel_train.py) (marginal: el tick de 1 s y el `Manager.dict` son baratos comparados con el hot loop).
+
+#### 9.11.2 Estrategia: optimizar el dispatch actual **antes** que reescribir a kernels nativos
+
+Hay dos estrategias posibles y su relación coste/beneficio es asimétrica:
+
+- **(A) Convertir muchos pasos pequeños coordinados por Python en menos operaciones más grandes** (vectorización / batching / eliminación de syncs / menos concurrencia). **Bajo coste, alto beneficio.** Ataca la causa raíz (presión de CPU por dispatch). No requiere tocar CUDA/Triton ni la arquitectura.
+- **(B) Mover los hot loops a kernels nativos (Triton/C++/CUDA) o fused ops.** **Alto coste, beneficio condicionado.** Si la matemática pesada ya corre en PyTorch/ROCm —que es el caso—, una **reescritura de lenguaje no ataca el cuello de botella real** (que es el *número* de operaciones y syncs, no su coste unitario). Sólo tiene sentido **después** de (A), y sólo para los 1–2 puntos que sigan calientes tras medir.
+
+**Conclusión operativa**: priorizar **(A)** casi en su totalidad. **(B)** queda relegado a un último paso quirúrgico y focalizado (p. ej. fusionar el scan `cummax` diagonal, §9.6.2), guiado por el perfilado, no por intuición.
+
+#### 9.11.3 Plan de acción ordenado por coste/beneficio (todo semánticamente neutro)
+
+1. **Ajustar la concurrencia a la capacidad real del host** *(coste trivial, efecto inmediato)*. Añadir a [parallel_train.py](parallel_train.py) un tope configurable de procesos concurrentes (`--max-workers`, hoy limitado sólo por `n_cpus` y memoria) y barrer 4→8→13 midiendo throughput agregado con el script de §9.11.4. Si la CPU satura, **menos tareas concurrentes pueden dar más throughput total** (menos contención de dispatch). No cambia el resultado de ninguna tarea, sólo cuántas corren a la vez.
+2. **Perfilar para localizar los hot loops reales** *(coste bajo)*: usar el script de la sección 9.11.4 (métricas de sistema/proceso, no intrusivo) y un perfilado puntual de una sola tarea (`cProfile`/`torch.profiler`) para confirmar H1–H4 con números antes de tocar código.
+3. **Eliminar las sincronizaciones GPU→CPU del hot path (H2)** *(bajo coste, alto beneficio)*: acumular los escalares de KL/pérdida en **tensores en GPU** y volcarlos a CPU **una sola vez al final** (o cada N pasos), en lugar de ≥30 `.cpu()` por iteración. Mismo valor logueado, sin `cudaSynchronize` por iteración.
+4. **Vectorizar los bucles de offset (H1)** *(coste medio, alto beneficio)*: reemplazar los bucles Python `x_offset × y_offset` y `mask_select_logprobs` por operaciones tensoriales batcheadas (p. ej. `unfold`/`as_strided` para generar todos los crops a la vez y un único `cross_entropy` con reducción por offset). Resultado numéricamente idéntico al `logsumexp` actual, con **un** kernel en vez de cientos.
+5. **Aligerar el postprocesado del logger (H3)** *(coste medio)*: correr `_postprocess_solution` con menos frecuencia (no es necesario en cada uno de los 2000 pasos para la selección pass@2 —basta cada K— o diferir el recoloreo Python) y vectorizar `_best_slice_point`. Mantiene la lógica de scoring.
+6. **`torch.compile` sobre el `forward` y `take_step` (H4)** *(coste medio)*: `torch.compile(mode='reduce-overhead', dynamic=True)` con backend Inductor→Triton-ROCm (ver §9.6.2 y restricciones ROCm de §9.2) fusiona secuencias y **reduce drásticamente el número de kernel launches** que Python debe coordinar, atacando H4 sin reescribir a mano. Requiere `dynamic=True` por las formas variables del multitensor.
+7. **Sólo entonces**, valorar **kernels personalizados** (Triton/C++/CUDA) para el punto más caliente que quede tras 1–6, típicamente el scan diagonal de `cummax` (§9.6.2). Focalizado, no global.
+
+**MDL accounting**: cero impacto. Este eje no añade ni un bit a θ ni cambia KL(z) ni la reconstrucción; sólo cambia **cómo** se ejecutan operaciones cuyo resultado es idéntico. Es MDL-neutro por construcción.
+
+**Impacto esperado**: reducción de la saturación de CPU del ~100 % a un régimen no saturado y **factor de throughput agregado ×3–×10** en el split completo sin tocar la arquitectura, combinable multiplicativamente con los habilitadores de silicio del Eje D (BF16, §9.6.1). Es la palanca de mejor relación coste/beneficio de todo el documento porque **desbloquea la velocidad de iteración de la que dependen todos los demás ejes**.
+
+**Riesgos**: (i) reducir demasiado la concurrencia infrautilizaría VRAM —se ajusta empíricamente con el script §9.11.4; (ii) `torch.compile` con `dynamic=True` sufre recompilaciones al inicio de cada tarea (30–60 s), amortizadas en 2000 iteraciones; (iii) mover syncs al final cambia *cuándo* se observan las métricas, no su valor —hay que preservar el volcado final íntegro.
+
+#### 9.11.4 Instrumentación de medición (contrato con el script de perfilado)
+
+Para ejecutar los pasos 1–7 con evidencia y no "a ciegas", este eje se apoya en un script de perfilado **externo y de bajo overhead** ([profile_parallel_train.py](profile_parallel_train.py)) que envuelve a [parallel_train.py](parallel_train.py) y muestrea —sin instrumentar el hot loop— las métricas necesarias: velocidad de entrenamiento y recursos por tarea concurrente, carga/uso/comportamiento de CPU (global y por núcleo), concurrencia efectiva de workers a lo largo del tiempo, VRAM/GPU y una **comparativa antes/después**. Su diseño (muestreo ≥1 s, proceso único de baja prioridad, sin tocar el código de entrenamiento) garantiza que **medir no agrave el cuello de botella**. Ver detalle de uso en su docstring.
 
 ---
 
