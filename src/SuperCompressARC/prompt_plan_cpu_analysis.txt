@@ -1,0 +1,55 @@
+Quiero que analices un muy probable cuello de botella de CPU en un sistema de entrenamiento paralelo con parallel_train.py. El sistema es capaz de correr
+en paralelo hasta 13 tareas hasta el momento, pero es el entrenamiento es lento y la CPU marca constatemente un uso intensivo del 100%.
+
+Contexto importante:
+- El sistema ejecuta múltiples modelos/tareas en paralelo sobre GPU.
+- En las ejecuciones reales de carga alta, la CPU se mantiene prácticamente al 100% durante casi toda la ejecución.
+- Sospecho que hay un cuello de botella en CPU que limita el throughput total del sistema.
+- Quiero un análisis técnico centrado en localizar y gestionar los hot loops reales y en decidir si conviene optimizar con vectorización, fused ops, compilación o kernels nativos focalizados.
+
+Aclaración crítica:
+- La conclusión operativa a tener en cuenta es que, en la carga real completa, la CPU está prácticamente saturada al 100% de forma constante.
+
+Lo que necesito de ti:
+1. Explica si el problema parece ser principalmente:
+   - sobrecarga de Python coordinando demasiadas operaciones pequeñas,
+   - exceso de procesos concurrentes compitiendo por CPU,
+   - demasiados kernel launches pequeños hacia GPU,
+   - lógica de scheduling/progreso/IPC,
+   - o una mezcla de varios factores.
+
+2. Diferencia claramente entre:
+   - optimizar las partes calientes actuales,
+   - y mover solo los hot loops a kernels nativos o fused ops.
+   Quiero que expliques cuál de estas estrategias tiene mejor relación coste/beneficio.
+
+3. Pon el foco en este criterio:
+   - si la matemática pesada ya corre en PyTorch/CUDA, una reescritura completa de lenguaje puede no atacar el cuello de botella real;
+   - en cambio, convertir muchos pasos pequeños coordinados por Python en menos operaciones más grandes puede reducir mucho la presión de CPU.
+
+4. Quiero que señales específicamente qué tipo de patrones suelen delatar este problema:
+   - bucles Python anidados alrededor de operaciones tensoriales,
+   - slicing repetido,
+   - muchas llamadas pequeñas a PyTorch,
+   - cálculos repetidos por offset/ejemplo,
+   - demasiada concurrencia para la capacidad real del host.
+
+5. Propón un plan priorizado de optimización, por ejemplo:
+   - reducir paralelismo si la CPU no puede alimentar bien a todas las tareas,
+   - perfilar para encontrar hot loops reales,
+   - vectorizar bucles Python,
+   - agrupar operaciones pequeñas en operaciones tensoriales más grandes,
+   - probar torch.compile o mecanismos similares,
+   - y solo después valorar kernels personalizados en Triton/C++/CUDA para los puntos más calientes.
+
+6. Se puede crear un script a medida que mida métricas concretas cuando se ejecuta parallel_train.py, con esto se quiere obtener información tipo:
+   - la velocidad de entrenamiento y los recursos que se destinan a cada tarea en paralelo
+   - carga, uso y comportamiento de la cpu
+
+Formato de respuesta esperado:
+- Explicación clara, técnica pero fácil de seguir.
+- No quiero una investigación académica enorme.
+- Quiero una evaluación práctica de ingeniería.
+- Introducir en el archivo [INTRODUCIR_ARCHIVO_ARQUITECTURA] un nuevo Eje de mejora adicional o implementarlo en un eje existente que ya contenga este problema y que tenga máxima prioridad para modificar:
+  1. Python/PyTorch optimizando hot loops,
+  2. mover solo partes críticas a kernels nativos,

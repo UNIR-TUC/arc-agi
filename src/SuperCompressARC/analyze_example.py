@@ -51,7 +51,8 @@ if __name__ == "__main__":
     # split = input('Enter which split you want to find the task in (training, evaluation, test): ')
     split = 'training'
     # task_name = input('Enter which task you want to analyze (eg. 272f95fa): ')
-    task_name = '6d75e8bb'
+    # task_name = '6d75e8bb'
+    task_name = '007bbfb7'
     folder = 'results/' + task_name + '/'
     print('Performing a training run on task', task_name,
           'and placing the results in', folder)
@@ -71,7 +72,7 @@ if __name__ == "__main__":
     visualization.plot_problem(train_history_logger)
 
     # ── Training with per-step CPU / wall-clock profiling ────────────────────
-    n_iterations = 1500
+    n_iterations = 2000
     WARMUP_STEPS = 20   # skip first N steps (CUDA / JIT warm-up)
     step_profile  = []  # (step, wall_s, cpu_s)
 
