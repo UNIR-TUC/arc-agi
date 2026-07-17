@@ -25,7 +25,7 @@ A script that solves one puzzle, to be imported and used with parallel_train.py 
 """
 
 def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_dict, solutions_dict, error_queue,
-               loggers_dict=None, progress_dict=None):
+               loggers_dict=None, progress_dict=None, postprocess_stride=1):
     """
     Solves a puzzle.
     Args:
@@ -44,6 +44,8 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
             solution_contributions_log and solution_picks_history for predictions.npz.
         progress_dict (multiprocessing.Dict, optional): Shared dict updated every 100
             training steps so the parent process can log percentage progress.
+        postprocess_stride (int): Run full pass@2 candidate postprocessing every N
+            training steps instead of every step (Eje H, H3). Default 1 (no change).
     """
 
     try:  # Error catching block that puts errors on the error_queue
@@ -61,7 +63,7 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         # Set up the training
         model = arc_compressor.ARCCompressor(task)
         optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
-        train_history_logger = solution_selection.Logger(task)
+        train_history_logger = solution_selection.Logger(task, postprocess_stride=postprocess_stride)
         train_history_logger.solution_most_frequent = tuple(((0, 0), (0, 0)) for example_num in range(task.n_test))
         train_history_logger.solution_second_most_frequent = tuple(((0, 0), (0, 0)) for example_num in range(task.n_test))
 
@@ -72,6 +74,10 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
                 progress_dict[task_name] = train_step
             if time.time() > time_limit:
                 break
+
+        # Batch-convert accumulated GPU scalar tensors to floats in a single sync
+        # (Eje H, H2) instead of one sync per training step.
+        train_history_logger.materialize_curves()
 
         # Get the solution
         example_list = []

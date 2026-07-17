@@ -12,8 +12,9 @@ class Logger:
     """
     ema_decay = 0.97
 
-    def __init__(self, task):
+    def __init__(self, task, postprocess_stride=1):
         self.task = task
+        self.postprocess_stride = postprocess_stride
         self.KL_curves = {}
         self.total_KL_curve = []
         self.reconstruction_error_curve = []
@@ -42,14 +43,31 @@ class Logger:
         if train_step == 0:
             self.KL_curves = {KL_name: [] for KL_name in KL_names}
 
+        # Eje H, H2: accumulate as detached GPU tensors instead of syncing to CPU
+        # every step (`.cpu().numpy()` forces a cudaSynchronize). Call
+        # materialize_curves() once (e.g. at the end of training) to convert to
+        # plain floats in a single batched sync.
         for KL_amount, KL_name in zip(KL_amounts, KL_names):
-            self.KL_curves[KL_name].append(float(KL_amount.detach().sum().cpu().numpy()))
+            self.KL_curves[KL_name].append(KL_amount.detach().sum())
 
-        self.total_KL_curve.append(float(total_KL.detach().cpu().numpy()))
-        self.reconstruction_error_curve.append(float(reconstruction_error.detach().cpu().numpy()))
-        self.loss_curve.append(float(loss.detach().cpu().numpy()))
+        self.total_KL_curve.append(total_KL.detach())
+        self.reconstruction_error_curve.append(reconstruction_error.detach())
+        self.loss_curve.append(loss.detach())
 
         self._track_solution(train_step, logits.detach(), x_mask.detach(), y_mask.detach())
+
+    def materialize_curves(self):
+        """Convert accumulated GPU scalar tensors into plain Python floats in a
+        single batched host sync (Eje H, H2), instead of syncing on every
+        training step. Idempotent: a no-op if a curve is empty or already
+        materialized."""
+        for name, values in self.KL_curves.items():
+            if values and isinstance(values[0], torch.Tensor):
+                self.KL_curves[name] = torch.stack(values).cpu().tolist()
+        for attr in ('total_KL_curve', 'reconstruction_error_curve', 'loss_curve'):
+            values = getattr(self, attr)
+            if values and isinstance(values[0], torch.Tensor):
+                setattr(self, attr, torch.stack(values).cpu().tolist())
 
     def _track_solution(self, train_step, logits, x_mask, y_mask):
         """Postprocess and score solutions and keep track of the top two solutions with highest scores."""
@@ -61,27 +79,39 @@ class Logger:
         self.ema_x_mask = self.ema_decay * self.ema_x_mask + (1 - self.ema_decay) * self.current_x_mask
         self.ema_y_mask = self.ema_decay * self.ema_y_mask + (1 - self.ema_decay) * self.current_y_mask
 
-        solution_contributions = []
-        for logits, x_mask_set, y_mask_set in [  # Add two potential solutions: sample and mean.
-            (self.current_logits, self.current_x_mask, self.current_y_mask),
-            (self.ema_logits, self.ema_x_mask, self.ema_y_mask)
-        ]:
+        # Eje H, H3: the expensive part below (argmax/uncertainty, then a
+        # .cpu().numpy() sync + Python pixel-recoloring loops, run twice per
+        # call) only needs to happen every `postprocess_stride` steps for the
+        # pass@2 evidence to converge; always run on step 0 so a valid solution
+        # exists from the start.
+        if self.postprocess_stride <= 1 or train_step % self.postprocess_stride == 0:
+            solution_contributions = []
+            for logits, x_mask_set, y_mask_set in [  # Add two potential solutions: sample and mean.
+                (self.current_logits, self.current_x_mask, self.current_y_mask),
+                (self.ema_logits, self.ema_x_mask, self.ema_y_mask)
+            ]:
 
-            # Get the solution and the score.
-            solution, uncertainty = self._postprocess_solution(logits, x_mask_set, y_mask_set)
-            hashed_solution = hash(solution)
-            score = -10*uncertainty
-            if train_step < 150:
-                score = score - 10
-            if logits is self.ema_logits:
-                score = score - 4
+                # Get the solution and the score.
+                solution, uncertainty = self._postprocess_solution(logits, x_mask_set, y_mask_set)
+                hashed_solution = hash(solution)
+                score = -10*uncertainty
+                if train_step < 150:
+                    score = score - 10
+                if logits is self.ema_logits:
+                    score = score - 4
 
-            # Accumulate scores for solutions.
-            solution_contributions.append((hashed_solution, score))
-            self.solution_hashes_count[hashed_solution] = float(np.logaddexp(
-                self.solution_hashes_count.get(hashed_solution, -np.inf), score))
+                # Accumulate scores for solutions.
+                solution_contributions.append((hashed_solution, score))
+                self.solution_hashes_count[hashed_solution] = float(np.logaddexp(
+                    self.solution_hashes_count.get(hashed_solution, -np.inf), score))
 
-            self._update_most_frequent_solutions(hashed_solution, solution)
+                self._update_most_frequent_solutions(hashed_solution, solution)
+        else:
+            # Neutral no-op contribution: np.logaddexp(x, -inf) == x exactly, so
+            # downstream re-accumulators (plot_accuracy.py, list_solved_puzzles.py)
+            # that logaddexp-sum every logged iteration are unaffected, and the
+            # log stays one entry per iteration.
+            solution_contributions = [(0, -np.inf), (0, -np.inf)]
 
         self.solution_contributions_log.append(solution_contributions)
         self.solution_picks_history.append([hash(sol) for sol in [

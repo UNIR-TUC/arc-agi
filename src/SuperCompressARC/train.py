@@ -23,14 +23,19 @@ torch.manual_seed(0)
 def mask_select_logprobs(mask, length):
     """
     Figure out the unnormalized log probability of taking each slice given the output mask.
+
+    Vectorized (Eje H, H1): logprob(offset) = -sum(mask[:offset]) +
+    sum(mask[offset:offset+length]) - sum(mask[offset+length:]). With
+    prefix = cumsum(mask) prepended with a 0 and total = prefix[-1]:
+        sum(mask[offset:offset+length]) = prefix[offset+length] - prefix[offset]
+        sum(mask[offset+length:])        = total - prefix[offset+length]
+    so logprob(offset) = 2*prefix[offset+length] - 2*prefix[offset] - total, for every
+    offset at once via one cumsum + vectorized slicing instead of a Python loop.
     """
-    logprobs = []
-    for offset in range(mask.shape[0]-length+1):
-        logprob = -torch.sum(mask[:offset])
-        logprob = logprob + torch.sum(mask[offset:offset+length])
-        logprob = logprob - torch.sum(mask[offset+length:])
-        logprobs.append(logprob)
-    logprobs = torch.stack(logprobs, dim=0)
+    n_offsets = mask.shape[0] - length + 1
+    prefix = torch.cat([torch.zeros_like(mask[:1]), torch.cumsum(mask, dim=0)], dim=0)
+    total = prefix[-1]
+    logprobs = 2*prefix[length:length+n_offsets] - 2*prefix[:n_offsets] - total
     log_partition = torch.logsumexp(logprobs, dim=0)
     return log_partition, logprobs
 
@@ -86,16 +91,24 @@ def take_step(task, model, optimizer, train_step, train_history_logger):
                 x_log_partition = torch.logsumexp(torch.stack(x_log_partitions, dim=0), dim=0)
                 y_log_partition = torch.logsumexp(torch.stack(y_log_partitions, dim=0), dim=0)
 
-            # Given that we have the correct grid size, get the reconstruction error of getting the colors right
-            logprobs = [[] for x_offset in range(x_logprobs.shape[0])]  # x, y
-            for x_offset in range(x_logprobs.shape[0]):
-                for y_offset in range(y_logprobs.shape[0]):
-                    logprob = x_logprobs[x_offset] - x_log_partition + y_logprobs[y_offset] - y_log_partition  # given the correct grid size,
-                    logits_crop = logits_slice[:,x_offset:x_offset+output_shape[0],y_offset:y_offset+output_shape[1]]  # c, x, y
-                    target_crop = problem_slice[:output_shape[0],:output_shape[1]]  # x, y
-                    logprob = logprob - torch.nn.functional.cross_entropy(logits_crop[None,...], target_crop[None,...], reduction='sum')  # calculate the error for the colors.
-                    logprobs[x_offset].append(logprob)
-            logprobs = torch.stack([torch.stack(logprobs_, dim=0) for logprobs_ in logprobs], dim=0)  # x, y
+            # Given that we have the correct grid size, get the reconstruction error of
+            # getting the colors right. Vectorized (Eje H, H1): target_crop does not
+            # depend on (x_offset, y_offset) -- it is always the same ground-truth crop --
+            # so every candidate logits crop can be batched against it in a single
+            # cross_entropy call via `unfold`, instead of up to 900 tiny per-pair calls.
+            n_x_offsets = x_logprobs.shape[0]
+            n_y_offsets = y_logprobs.shape[0]
+            target_crop = problem_slice[:output_shape[0],:output_shape[1]]  # x, y
+            logits_crops = logits_slice.unfold(1, output_shape[0], 1).unfold(2, output_shape[1], 1)
+            # logits_crops: (color, n_x_offsets, n_y_offsets, out_x, out_y)
+            logits_crops = logits_crops.permute(1, 2, 0, 3, 4).reshape(
+                n_x_offsets*n_y_offsets, logits_slice.shape[0], output_shape[0], output_shape[1])
+            target_batch = target_crop.unsqueeze(0).expand(n_x_offsets*n_y_offsets, -1, -1)
+            ce = torch.nn.functional.cross_entropy(logits_crops, target_batch, reduction='none')
+            ce_sum = ce.sum(dim=(1, 2)).reshape(n_x_offsets, n_y_offsets)
+            logprobs = (x_logprobs[:,None] - x_log_partition
+                        + y_logprobs[None,:] - y_log_partition
+                        - ce_sum)  # x, y
             if grid_size_uncertain:
                 coefficient = 0.1**max(0, 1-train_step/100)
             else:
@@ -149,6 +162,7 @@ if __name__ == "__main__":
         # n_iterations = 1500
         for train_step in range(n_iterations):
             take_step(task, model, optimizer, train_step, train_history_logger)
+        train_history_logger.materialize_curves()
         visualization.plot_solution(train_history_logger)
         solution_selection.save_predictions(train_history_loggers[:i+1])
         solution_selection.plot_accuracy(true_solution_hashes)

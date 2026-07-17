@@ -94,6 +94,7 @@ def parallelize_runs(
     n_original_tasks=None,
     quiet=False,
     verbose=False,
+    postprocess_stride=1,
 ):
     """
     Spawn worker processes to solve ARC-AGI tasks, greedily filling GPU memory.
@@ -115,6 +116,8 @@ def parallelize_runs(
         n_original_tasks (int|None)  : total tasks in original order (for display).
         quiet (bool)                 : task-start/finish events go to DEBUG not INFO.
         verbose (bool)               : print raw status to stdout.
+        postprocess_stride (int)     : run full pass@2 postprocessing every N steps
+            (Eje H, H3) instead of every step. Forwarded to solve_task.solve_task.
 
     Returns:
         memory_dict    (dict[str, int])  : peak VRAM per task (bytes).
@@ -225,7 +228,7 @@ def parallelize_runs(
                         worker_args = (
                             task_names[i], split, 1e20, n_iterations,
                             gpu_id, memory_dict, solutions_dict, error_queue,
-                            _loggers_dict, _progress_dict,
+                            _loggers_dict, _progress_dict, postprocess_stride,
                         )
                         p = multiprocessing.Process(
                             target=solve_task.solve_task, args=worker_args
@@ -318,12 +321,17 @@ def save_memory_cache(split, n_gpus, memory_dict):
 
 # ── Per-split runner ─────────────────────────────────────────────────────────
 
-def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None):
+def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
+              postprocess_stride=4):
     """
     Execute the full two-phase pipeline for one split and save all outputs.
 
     Args:
         demo_n (int|None): if set, use only the first demo_n tasks (smoke-test mode).
+        postprocess_stride (int): Phase 2 only — run full pass@2 postprocessing every
+            N steps instead of every step (Eje H, H3). Default 4. Phase 1's 2-step
+            memory measurement always uses the Logger default (1) since it's too
+            short to matter.
 
     Returns:
         n_solved (int)         : tasks solved (always 0 for 'test').
@@ -397,7 +405,8 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None):
     task_original_idx = {name: idx for idx, name in enumerate(original_task_names)}
 
     # ── Phase 2: full 2000-step training ─────────────────────────────
-    n_steps = 2000
+    # n_steps = 2000
+    n_steps = 1500
 
     # Phase 1 measurements now capture `total_vram - free_now` (solve_task.py),
     # which already includes the per-process HIP/CUDA context (~470 MB each).
@@ -430,6 +439,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None):
         n_original_tasks=n_tasks,
         quiet=False,
         verbose=True,
+        postprocess_stride=postprocess_stride,
     )
     arc_logger.info(f'Phase 2 complete in {t_p2:.1f}s')
 
@@ -533,6 +543,30 @@ if __name__ == '__main__':
             'Example: --demo 20 finishes in ~40 min instead of ~20 h.'
         ),
     )
+    parser.add_argument(
+        '--max-workers',
+        type=int,
+        default=None,
+        metavar='N',
+        help=(
+            'Cap on concurrent task processes (Eje H, §9.11.3 step 1). Default: '
+            'all logical CPU cores, same as before. Lowering this can increase '
+            'aggregate throughput and reduce CPU dispatch contention when the '
+            'host is CPU-bound rather than GPU-bound — sweep e.g. 4/8/12/16 with '
+            'profile_parallel_train.py to find the sweet spot for this host.'
+        ),
+    )
+    parser.add_argument(
+        '--postprocess-stride',
+        type=int,
+        default=4,
+        metavar='K',
+        help=(
+            'Run full pass@2 candidate postprocessing/scoring every K training '
+            'steps instead of every step (Eje H, H3). Reduces GPU->CPU syncs and '
+            'Python-side recoloring overhead. Default: 4.'
+        ),
+    )
     args = parser.parse_args()
 
     splits_to_run = (
@@ -541,7 +575,7 @@ if __name__ == '__main__':
     )
 
     overall_start = time.time()
-    n_cpus = multiprocessing.cpu_count()
+    n_cpus = args.max_workers if args.max_workers else multiprocessing.cpu_count()
     n_gpus = torch.cuda.device_count()
 
     # Initialise the shared results file once for the whole run
@@ -573,6 +607,7 @@ if __name__ == '__main__':
         n_solved, n_tasks, elapsed, pred_file = run_split(
             split, n_gpus, n_cpus, arc_logger, solutions_json,
             demo_n=args.demo,
+            postprocess_stride=args.postprocess_stride,
         )
         total_solved += n_solved
         total_tasks  += n_tasks
