@@ -119,7 +119,7 @@ La idea central es **inteligencia = compresión** (principio MDL, *Minimum Descr
     - [9.8 Síntesis: presupuesto de cómputo, roadmap experimental y riesgos](#98-síntesis-presupuesto-de-cómputo-roadmap-experimental-y-riesgos)
     - [9.9 Eje F: interpretabilidad activa como mecanismo de control](#99-eje-f-interpretabilidad-activa-como-mecanismo-de-control)
     - [9.10 Eje G: compresión explícita de θ (MDL completo)](#910-eje-g-compresión-explícita-de-θ-mdl-completo)
-    - [9.11 Eje H: eliminación del cuello de botella de CPU (dispatch, sincronización y sobre-concurrencia) — **PRIORIDAD 0**](#911-eje-h-eliminación-del-cuello-de-botella-de-cpu-dispatch-sincronización-y-sobre-concurrencia--prioridad-0)
+    - [9.11 Eje H: eliminación del cuello de botella de CPU (dispatch, sincronización y sobre-concurrencia) — **PRIORIDAD 0** (RESUELTO)](#911-eje-h-eliminación-del-cuello-de-botella-de-cpu-dispatch-sincronización-y-sobre-concurrencia--prioridad-0-resuelto)
       - [9.11.1 Diagnóstico: ¿por qué la CPU está al 100 %?](#9111-diagnóstico-por-qué-la-cpu-está-al-100-)
       - [9.11.2 Estrategia: optimizar el dispatch actual **antes** que reescribir a kernels nativos](#9112-estrategia-optimizar-el-dispatch-actual-antes-que-reescribir-a-kernels-nativos)
       - [9.11.3 Plan de acción ordenado por coste/beneficio (todo semánticamente neutro)](#9113-plan-de-acción-ordenado-por-costebeneficio-todo-semánticamente-neutro)
@@ -1887,7 +1887,7 @@ Dos materializaciones compatibles con MDL:
 
 ---
 
-### 9.11 Eje H: eliminación del cuello de botella de CPU (dispatch, sincronización y sobre-concurrencia) — **PRIORIDAD 0**
+### 9.11 Eje H: eliminación del cuello de botella de CPU (dispatch, sincronización y sobre-concurrencia) — **PRIORIDAD 0** (RESUELTO)
 
 > **Este eje tiene prioridad de implementación sobre todos los demás** (D, B, A, E, C, F, G) por una razón empírica y otra lógica:
 >

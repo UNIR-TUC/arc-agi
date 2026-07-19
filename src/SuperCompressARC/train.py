@@ -1,3 +1,4 @@
+import argparse
 import time
 
 import numpy as np
@@ -10,6 +11,7 @@ import multitensor_systems
 import layers
 import solution_selection
 import visualization
+import runtime_config
 
 
 """
@@ -18,6 +20,7 @@ This file trains a model for every ARC-AGI task in a split.
 
 np.random.seed(0)
 torch.manual_seed(0)
+runtime_config.apply_torch_backend_settings()
 
 
 def mask_select_logprobs(mask, length):
@@ -39,7 +42,8 @@ def mask_select_logprobs(mask, length):
     log_partition = torch.logsumexp(logprobs, dim=0)
     return log_partition, logprobs
 
-def take_step(task, model, optimizer, train_step, train_history_logger):
+def take_step(task, model, optimizer, train_step, train_history_logger,
+              mixed_precision='off'):
     """
     Runs a forward pass of the model on the ARC-AGI task.
     Args:
@@ -52,71 +56,73 @@ def take_step(task, model, optimizer, train_step, train_history_logger):
     """
 
     optimizer.zero_grad()
-    logits, x_mask, y_mask, KL_amounts, KL_names, = model.forward()
-    logits = torch.cat([torch.zeros_like(logits[:,:1,:,:]), logits], dim=1)  # add black color to logits
+    with runtime_config.autocast_context(mixed_precision):
+        logits, x_mask, y_mask, KL_amounts, KL_names, = model.forward()
+        logits = torch.cat([torch.zeros_like(logits[:,:1,:,:]), logits], dim=1)  # add black color to logits
 
-    # Compute the total KL loss
-    total_KL = 0
-    for KL_amount in KL_amounts:
-        total_KL = total_KL + torch.sum(KL_amount)
+        # Compute the total KL loss. Keep the accumulation in FP32 even when
+        # the forward pass uses autocast: KL is the MDL accounting term.
+        total_KL = torch.zeros((), device=logits.device, dtype=torch.float32)
+        for KL_amount in KL_amounts:
+            total_KL = total_KL + torch.sum(KL_amount.float())
 
-    # Compute the reconstruction error
-    reconstruction_error = 0
-    for example_num in range(task.n_examples):  # sum over examples
-        for in_out_mode in range(2):  # sum over in/out grid per example
-            if example_num >= task.n_train and in_out_mode == 1:
-                continue
+        # Compute the reconstruction error
+        reconstruction_error = torch.zeros((), device=logits.device, dtype=torch.float32)
+        for example_num in range(task.n_examples):  # sum over examples
+            for in_out_mode in range(2):  # sum over in/out grid per example
+                if example_num >= task.n_train and in_out_mode == 1:
+                    continue
 
-            # Determine whether the grid size is already known.
-            # If not, there is an extra term in the reconstruction error, corresponding to
-            # the probability of reconstructing the correct grid size.
-            grid_size_uncertain = not (task.in_out_same_size or task.all_out_same_size and in_out_mode==1 or task.all_in_same_size and in_out_mode==0)
-            if grid_size_uncertain:
-                coefficient = 0.01**max(0, 1-train_step/100)
-            else:
-                coefficient = 1
-            logits_slice = logits[example_num,:,:,:,in_out_mode]  # color, x, y
-            problem_slice = task.problem[example_num,:,:,in_out_mode]  # x, y
-            output_shape = task.shapes[example_num][in_out_mode]
-            x_log_partition, x_logprobs = mask_select_logprobs(coefficient*x_mask[example_num,:,in_out_mode], output_shape[0])
-            y_log_partition, y_logprobs = mask_select_logprobs(coefficient*y_mask[example_num,:,in_out_mode], output_shape[1])
-            # Account for probability of getting right grid size, if grid size is not known
-            if grid_size_uncertain:
-                x_log_partitions = []
-                y_log_partitions = []
-                for length in range(1, x_mask.shape[1]+1):
-                    x_log_partitions.append(mask_select_logprobs(coefficient*x_mask[example_num,:,in_out_mode], length)[0])
-                for length in range(1, y_mask.shape[1]+1):
-                    y_log_partitions.append(mask_select_logprobs(coefficient*y_mask[example_num,:,in_out_mode], length)[0])
-                x_log_partition = torch.logsumexp(torch.stack(x_log_partitions, dim=0), dim=0)
-                y_log_partition = torch.logsumexp(torch.stack(y_log_partitions, dim=0), dim=0)
+                # Determine whether the grid size is already known.
+                # If not, there is an extra term in the reconstruction error, corresponding to
+                # the probability of reconstructing the correct grid size.
+                grid_size_uncertain = not (task.in_out_same_size or task.all_out_same_size and in_out_mode==1 or task.all_in_same_size and in_out_mode==0)
+                if grid_size_uncertain:
+                    coefficient = 0.01**max(0, 1-train_step/100)
+                else:
+                    coefficient = 1
+                logits_slice = logits[example_num,:,:,:,in_out_mode]  # color, x, y
+                problem_slice = task.problem[example_num,:,:,in_out_mode]  # x, y
+                output_shape = task.shapes[example_num][in_out_mode]
+                x_log_partition, x_logprobs = mask_select_logprobs(coefficient*x_mask[example_num,:,in_out_mode], output_shape[0])
+                y_log_partition, y_logprobs = mask_select_logprobs(coefficient*y_mask[example_num,:,in_out_mode], output_shape[1])
+                # Account for probability of getting right grid size, if grid size is not known
+                if grid_size_uncertain:
+                    x_log_partitions = []
+                    y_log_partitions = []
+                    for length in range(1, x_mask.shape[1]+1):
+                        x_log_partitions.append(mask_select_logprobs(coefficient*x_mask[example_num,:,in_out_mode], length)[0])
+                    for length in range(1, y_mask.shape[1]+1):
+                        y_log_partitions.append(mask_select_logprobs(coefficient*y_mask[example_num,:,in_out_mode], length)[0])
+                    x_log_partition = torch.logsumexp(torch.stack(x_log_partitions, dim=0), dim=0)
+                    y_log_partition = torch.logsumexp(torch.stack(y_log_partitions, dim=0), dim=0)
 
-            # Given that we have the correct grid size, get the reconstruction error of
-            # getting the colors right. Vectorized (Eje H, H1): target_crop does not
-            # depend on (x_offset, y_offset) -- it is always the same ground-truth crop --
-            # so every candidate logits crop can be batched against it in a single
-            # cross_entropy call via `unfold`, instead of up to 900 tiny per-pair calls.
-            n_x_offsets = x_logprobs.shape[0]
-            n_y_offsets = y_logprobs.shape[0]
-            target_crop = problem_slice[:output_shape[0],:output_shape[1]]  # x, y
-            logits_crops = logits_slice.unfold(1, output_shape[0], 1).unfold(2, output_shape[1], 1)
-            # logits_crops: (color, n_x_offsets, n_y_offsets, out_x, out_y)
-            logits_crops = logits_crops.permute(1, 2, 0, 3, 4).reshape(
-                n_x_offsets*n_y_offsets, logits_slice.shape[0], output_shape[0], output_shape[1])
-            target_batch = target_crop.unsqueeze(0).expand(n_x_offsets*n_y_offsets, -1, -1)
-            ce = torch.nn.functional.cross_entropy(logits_crops, target_batch, reduction='none')
-            ce_sum = ce.sum(dim=(1, 2)).reshape(n_x_offsets, n_y_offsets)
-            logprobs = (x_logprobs[:,None] - x_log_partition
-                        + y_logprobs[None,:] - y_log_partition
-                        - ce_sum)  # x, y
-            if grid_size_uncertain:
-                coefficient = 0.1**max(0, 1-train_step/100)
-            else:
-                coefficient = 1
-            logprob = torch.logsumexp(coefficient*logprobs, dim=(0,1))/coefficient  # Aggregate for all possible grid sizes
-            reconstruction_error = reconstruction_error - logprob
+                # Given that we have the correct grid size, get the reconstruction error of
+                # getting the colors right. Vectorized (Eje H, H1): target_crop does not
+                # depend on (x_offset, y_offset) -- it is always the same ground-truth crop --
+                # so every candidate logits crop can be batched against it in a single
+                # cross_entropy call via `unfold`, instead of up to 900 tiny per-pair calls.
+                n_x_offsets = x_logprobs.shape[0]
+                n_y_offsets = y_logprobs.shape[0]
+                target_crop = problem_slice[:output_shape[0],:output_shape[1]]  # x, y
+                logits_crops = logits_slice.unfold(1, output_shape[0], 1).unfold(2, output_shape[1], 1)
+                # logits_crops: (color, n_x_offsets, n_y_offsets, out_x, out_y)
+                logits_crops = logits_crops.permute(1, 2, 0, 3, 4).reshape(
+                    n_x_offsets*n_y_offsets, logits_slice.shape[0], output_shape[0], output_shape[1])
+                target_batch = target_crop.unsqueeze(0).expand(n_x_offsets*n_y_offsets, -1, -1)
+                ce = torch.nn.functional.cross_entropy(logits_crops, target_batch, reduction='none')
+                ce_sum = ce.float().sum(dim=(1, 2)).reshape(n_x_offsets, n_y_offsets)
+                logprobs = (x_logprobs[:,None] - x_log_partition
+                            + y_logprobs[None,:] - y_log_partition
+                            - ce_sum)  # x, y
+                if grid_size_uncertain:
+                    coefficient = 0.1**max(0, 1-train_step/100)
+                else:
+                    coefficient = 1
+                logprob = torch.logsumexp(coefficient*logprobs, dim=(0,1))/coefficient  # Aggregate for all possible grid sizes
+                reconstruction_error = reconstruction_error - logprob.float()
 
-    loss = total_KL + 10*reconstruction_error
+    loss = total_KL.float() + 10*reconstruction_error.float()
     loss.backward()
     optimizer.step()
     optimizer.zero_grad()
@@ -134,10 +140,24 @@ def take_step(task, model, optimizer, train_step, train_history_logger):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Sequential ARC-AGI trainer.')
+    parser.add_argument('--split', choices=['training', 'evaluation', 'test'], default='training')
+    parser.add_argument('--demo', type=int, default=None, metavar='N',
+                        help='Run only the first N tasks in the split.')
+    parser.add_argument('--n-iterations', type=int, default=2000)
+    parser.add_argument('--mixed-precision', choices=runtime_config.MIXED_PRECISION_CHOICES,
+                        default='off')
+    parser.add_argument('--compile-forward', choices=runtime_config.COMPILE_FORWARD_CHOICES,
+                        default='off')
+    parser.add_argument('--float32-matmul-precision', choices=runtime_config.MATMUL_PRECISION_CHOICES,
+                        default='high')
+    args = parser.parse_args()
+
+    runtime_config.apply_torch_backend_settings(args.float32_matmul_precision)
     start_time = time.time()
 
-    task_nums = list(range(400))
-    split = "training"  # "training", "evaluation, or "test"
+    task_nums = list(range(400)) if args.demo is None else list(range(args.demo))
+    split = args.split
 
     # Preprocess all tasks, make models, optimizers, and loggers. Make plots.
     tasks = preprocessing.preprocess_tasks(split, task_nums)
@@ -146,6 +166,7 @@ if __name__ == "__main__":
     train_history_loggers = []
     for task in tasks:
         model = arc_compressor.ARCCompressor(task)
+        runtime_config.compile_model_forward(model, args.compile_forward)
         models.append(model)
         optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
         optimizers.append(optimizer)
@@ -158,10 +179,9 @@ if __name__ == "__main__":
 
     # Train the models one by one
     for i, (task, model, optimizer, train_history_logger) in enumerate(zip(tasks, models, optimizers, train_history_loggers)):
-        n_iterations = 2000
-        # n_iterations = 1500
-        for train_step in range(n_iterations):
-            take_step(task, model, optimizer, train_step, train_history_logger)
+        for train_step in range(args.n_iterations):
+            take_step(task, model, optimizer, train_step, train_history_logger,
+                      mixed_precision=args.mixed_precision)
         train_history_logger.materialize_curves()
         visualization.plot_solution(train_history_logger)
         solution_selection.save_predictions(train_history_loggers[:i+1])

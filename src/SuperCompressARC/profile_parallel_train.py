@@ -40,6 +40,8 @@ What it measures
       - per-worker lifetime, mean CPU%, peak RSS  -> "resources per parallel task".
   * Worker completions over time  -> task throughput proxy.
   * GPU utilization and VRAM (best effort, if rocm-smi/nvidia-smi is available).
+    * Eje D metrics: runtime flags, GPU/CPU balance, GPU utilization per worker,
+        tree CPU per worker, and VRAM per worker.
 
 Outputs
 -------
@@ -78,6 +80,27 @@ import sys
 import time
 
 import psutil
+
+
+def _passthrough_value(args, flag, default=None):
+    prefix = flag + '='
+    for i, arg in enumerate(args):
+        if arg == flag and i + 1 < len(args):
+            return args[i + 1]
+        if arg.startswith(prefix):
+            return arg[len(prefix):]
+    return default
+
+
+def _extract_eje_d_config(passthrough):
+    return {
+        'mixed_precision': _passthrough_value(passthrough, '--mixed-precision', 'off'),
+        'compile_forward': _passthrough_value(passthrough, '--compile-forward', 'off'),
+        'compile_phase1': '--compile-phase1' in passthrough,
+        'float32_matmul_precision': _passthrough_value(
+            passthrough, '--float32-matmul-precision', 'high'
+        ),
+    }
 
 
 # ── GPU sampling (best effort, vendor-agnostic) ──────────────────────────────
@@ -329,6 +352,8 @@ def run_and_profile(args, passthrough):
     workers_series = []
     gpu_util_series = []
     gpu_mem_series = []
+    tree_cpu_series = []
+    tree_rss_series = []
     last_gpu_sample_t = -float('inf')
 
     try:
@@ -366,6 +391,8 @@ def run_and_profile(args, passthrough):
             sys_cpu_series.append(sys_cpu)
             percore_series.append(percore)
             workers_series.append(n_workers)
+            tree_cpu_series.append(tree_cpu)
+            tree_rss_series.append(tree_rss)
             if gpu_util is not None:
                 gpu_util_series.append(gpu_util)
             if gpu_mem is not None:
@@ -420,6 +447,32 @@ def run_and_profile(args, passthrough):
 
     completed = [r for r in worker_records if tracker.workers[r['pid']]['end'] is not None]
     worker_lifetimes = [r['lifetime_s'] for r in completed if r['lifetime_s'] > 0]
+    mean_workers = statistics.mean(workers_series) if workers_series else 0
+    max_workers = max(workers_series) if workers_series else 0
+    mean_tree_cpu = statistics.mean(tree_cpu_series) if tree_cpu_series else None
+    mean_gpu_util = statistics.mean(gpu_util_series) if gpu_util_series else None
+    max_gpu_mem = max(gpu_mem_series) if gpu_mem_series else None
+
+    eje_d_metrics = {
+        'config': _extract_eje_d_config(passthrough),
+        'tree_cpu_mean_pct': round(mean_tree_cpu, 1) if mean_tree_cpu is not None else None,
+        'tree_cpu_per_worker_pct': (
+            round(mean_tree_cpu / mean_workers, 1)
+            if mean_tree_cpu is not None and mean_workers else None
+        ),
+        'gpu_util_per_worker_pct': (
+            round(mean_gpu_util / mean_workers, 1)
+            if mean_gpu_util is not None and mean_workers else None
+        ),
+        'gpu_cpu_balance': (
+            round(mean_gpu_util / statistics.mean(sys_cpu_series), 3)
+            if mean_gpu_util is not None and sys_cpu_series and statistics.mean(sys_cpu_series) else None
+        ),
+        'vram_per_max_worker_mb': (
+            round(max_gpu_mem / max_workers, 1)
+            if max_gpu_mem is not None and max_workers else None
+        ),
+    }
 
     summary = {
         'label': args.label,
@@ -439,8 +492,8 @@ def run_and_profile(args, passthrough):
             'saturation_fraction': round(sat_fraction, 3),
         },
         'concurrency': {
-            'mean_workers': round(statistics.mean(workers_series), 2) if workers_series else 0,
-            'max_workers': max(workers_series) if workers_series else 0,
+            'mean_workers': round(mean_workers, 2) if workers_series else 0,
+            'max_workers': max_workers,
             'workers_completed': len(completed),
         },
         'throughput': {
@@ -455,10 +508,11 @@ def run_and_profile(args, passthrough):
         },
         'gpu': {
             'vendor': gpu_label,
-            'util_mean_pct': round(statistics.mean(gpu_util_series), 1) if gpu_util_series else None,
+            'util_mean_pct': round(mean_gpu_util, 1) if gpu_util_series else None,
             'util_max_pct': round(max(gpu_util_series), 1) if gpu_util_series else None,
-            'mem_max_mb': round(max(gpu_mem_series), 1) if gpu_mem_series else None,
+            'mem_max_mb': round(max_gpu_mem, 1) if gpu_mem_series else None,
         },
+        'eje_d': eje_d_metrics,
         'workers': worker_records,
     }
 
@@ -470,7 +524,7 @@ def run_and_profile(args, passthrough):
 
 
 def _print_summary(s, csv_path, json_path):
-    c, cc, tp, g = s['cpu'], s['concurrency'], s['throughput'], s['gpu']
+    c, cc, tp, g, d = s['cpu'], s['concurrency'], s['throughput'], s['gpu'], s['eje_d']
     print('\n' + '=' * 66)
     print(f'  PROFILE SUMMARY — {s["label"]}   (return code {s["return_code"]})')
     print('=' * 66)
@@ -488,6 +542,13 @@ def _print_summary(s, csv_path, json_path):
     if g['vendor']:
         print(f'  GPU util mean / max  : {g["util_mean_pct"]} / {g["util_max_pct"]} %'
               f'   VRAM max {g["mem_max_mb"]} MB')
+        print(f'  Eje D config         : mp={d["config"]["mixed_precision"]}  '
+            f'compile={d["config"]["compile_forward"]}  '
+            f'matmul={d["config"]["float32_matmul_precision"]}')
+        print(f'  Eje D balance        : gpu/cpu={d["gpu_cpu_balance"]}  '
+            f'gpu/worker={d["gpu_util_per_worker_pct"]}%  '
+            f'cpu/worker={d["tree_cpu_per_worker_pct"]}%  '
+            f'vram/max-worker={d["vram_per_max_worker_mb"]} MB')
     print('-' * 66)
     print(f'  time series : {csv_path}')
     print(f'  summary     : {json_path}')
@@ -539,6 +600,18 @@ def compare(before_path, after_path):
          a['concurrency']['mean_workers'], 'higher')
     line('gpu_util_mean_pct', b['gpu']['util_mean_pct'],
          a['gpu']['util_mean_pct'], 'higher', ' %')
+
+    print('\n  Eje D hardware balance:')
+    print(f'  before config: {b.get("eje_d", {}).get("config")}')
+    print(f'  after  config: {a.get("eje_d", {}).get("config")}')
+    line('gpu_cpu_balance', b.get('eje_d', {}).get('gpu_cpu_balance'),
+         a.get('eje_d', {}).get('gpu_cpu_balance'), 'higher')
+    line('gpu_util_per_worker', b.get('eje_d', {}).get('gpu_util_per_worker_pct'),
+         a.get('eje_d', {}).get('gpu_util_per_worker_pct'), 'higher', ' %')
+    line('tree_cpu_per_worker', b.get('eje_d', {}).get('tree_cpu_per_worker_pct'),
+         a.get('eje_d', {}).get('tree_cpu_per_worker_pct'), 'lower', ' %')
+    line('vram_per_max_worker', b.get('eje_d', {}).get('vram_per_max_worker_mb'),
+         a.get('eje_d', {}).get('vram_per_max_worker_mb'), 'lower', ' MB')
 
     print('=' * 66)
     # Guardrail: the optimization must not increase CPU pressure (Eje H §9.11.3).

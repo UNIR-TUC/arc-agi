@@ -19,13 +19,15 @@ import multitensor_systems
 import layers
 import solution_selection
 import visualization
+import runtime_config
 
 """
 A script that solves one puzzle, to be imported and used with parallel_train.py and multiprocessing.
 """
 
 def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_dict, solutions_dict, error_queue,
-               loggers_dict=None, progress_dict=None, postprocess_stride=1):
+               loggers_dict=None, progress_dict=None, postprocess_stride=1,
+               mixed_precision='off', compile_forward='off', float32_matmul_precision='high'):
     """
     Solves a puzzle.
     Args:
@@ -46,12 +48,16 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
             training steps so the parent process can log percentage progress.
         postprocess_stride (int): Run full pass@2 candidate postprocessing every N
             training steps instead of every step (Eje H, H3). Default 1 (no change).
+        mixed_precision (str): 'off', 'bf16', or 'fp16' autocast mode.
+        compile_forward (str): torch.compile mode for ARCCompressor.forward, or 'off'.
+        float32_matmul_precision (str): torch.set_float32_matmul_precision setting.
     """
 
     try:  # Error catching block that puts errors on the error_queue
 
         torch.set_default_device('cuda')
         torch.cuda.set_device(gpu_id)
+        runtime_config.apply_torch_backend_settings(float32_matmul_precision)
         torch.cuda.reset_peak_memory_stats()  # Measure the memory used.
 
         # Get the task
@@ -62,6 +68,7 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
 
         # Set up the training
         model = arc_compressor.ARCCompressor(task)
+        runtime_config.compile_model_forward(model, compile_forward)
         optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
         train_history_logger = solution_selection.Logger(task, postprocess_stride=postprocess_stride)
         train_history_logger.solution_most_frequent = tuple(((0, 0), (0, 0)) for example_num in range(task.n_test))
@@ -69,7 +76,8 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
 
         # Training loop
         for train_step in range(n_train_iterations):
-            train.take_step(task, model, optimizer, train_step, train_history_logger)
+            train.take_step(task, model, optimizer, train_step, train_history_logger,
+                            mixed_precision=mixed_precision)
             if progress_dict is not None and train_step % 100 == 0:
                 progress_dict[task_name] = train_step
             if time.time() > time_limit:

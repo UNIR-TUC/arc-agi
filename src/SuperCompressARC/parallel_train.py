@@ -44,13 +44,13 @@ import solution_selection
 import visualization
 import solve_task
 import arc_logging
+import runtime_config
 
 # ── Global PyTorch settings (must run at import time for the main process) ──
 multiprocessing.set_start_method('spawn', force=True)
 torch.set_default_dtype(torch.float32)
 torch.set_default_device('cuda')
-torch.backends.cudnn.benchmark = True
-torch.backends.cuda.matmul.allow_tf32 = True
+runtime_config.apply_torch_backend_settings()
 
 
 # ── Live terminal progress line ──────────────────────────────────────────────
@@ -95,6 +95,9 @@ def parallelize_runs(
     quiet=False,
     verbose=False,
     postprocess_stride=1,
+    mixed_precision='off',
+    compile_forward='off',
+    float32_matmul_precision='high',
 ):
     """
     Spawn worker processes to solve ARC-AGI tasks, greedily filling GPU memory.
@@ -118,6 +121,9 @@ def parallelize_runs(
         verbose (bool)               : print raw status to stdout.
         postprocess_stride (int)     : run full pass@2 postprocessing every N steps
             (Eje H, H3) instead of every step. Forwarded to solve_task.solve_task.
+        mixed_precision (str)        : Eje D autocast mode forwarded to workers.
+        compile_forward (str)        : Eje D torch.compile mode forwarded to workers.
+        float32_matmul_precision (str): torch matmul precision forwarded to workers.
 
     Returns:
         memory_dict    (dict[str, int])  : peak VRAM per task (bytes).
@@ -229,6 +235,7 @@ def parallelize_runs(
                             task_names[i], split, 1e20, n_iterations,
                             gpu_id, memory_dict, solutions_dict, error_queue,
                             _loggers_dict, _progress_dict, postprocess_stride,
+                            mixed_precision, compile_forward, float32_matmul_precision,
                         )
                         p = multiprocessing.Process(
                             target=solve_task.solve_task, args=worker_args
@@ -277,7 +284,7 @@ def _cache_path(split):
     return f'memory_cache_{split}.json'
 
 
-def _gpu_fingerprint(n_gpus):
+def _gpu_fingerprint(n_gpus, runtime_options=None):
     return {
         'n_gpus':            n_gpus,
         'gpu_names':         [torch.cuda.get_device_name(i) for i in range(n_gpus)],
@@ -286,10 +293,11 @@ def _gpu_fingerprint(n_gpus):
             for i in range(n_gpus)
         ],
         'torch_version':     torch.__version__,
+        'runtime_options':   runtime_options or {},
     }
 
 
-def load_memory_cache(split, n_gpus, required_task_names):
+def load_memory_cache(split, n_gpus, required_task_names, runtime_options=None):
     """Return {task_name: mem_bytes} from disk if the cache matches the
     current GPU fingerprint and covers every required task, else None."""
     path = _cache_path(split)
@@ -298,7 +306,7 @@ def load_memory_cache(split, n_gpus, required_task_names):
     try:
         with open(path, 'r') as f:
             cache = json.load(f)
-        if cache.get('fingerprint') != _gpu_fingerprint(n_gpus):
+        if cache.get('fingerprint') != _gpu_fingerprint(n_gpus, runtime_options):
             return None
         measurements = cache.get('measurements', {})
         if not all(name in measurements for name in required_task_names):
@@ -308,10 +316,10 @@ def load_memory_cache(split, n_gpus, required_task_names):
         return None
 
 
-def save_memory_cache(split, n_gpus, memory_dict):
+def save_memory_cache(split, n_gpus, memory_dict, runtime_options=None):
     path = _cache_path(split)
     cache = {
-        'fingerprint':  _gpu_fingerprint(n_gpus),
+        'fingerprint':  _gpu_fingerprint(n_gpus, runtime_options),
         'created_at':   time.strftime('%Y-%m-%d %H:%M:%S'),
         'measurements': {k: int(v) for k, v in memory_dict.items()},
     }
@@ -322,7 +330,8 @@ def save_memory_cache(split, n_gpus, memory_dict):
 # ── Per-split runner ─────────────────────────────────────────────────────────
 
 def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
-              postprocess_stride=4):
+              postprocess_stride=4, mixed_precision='off', compile_forward='off',
+              compile_phase1=False, float32_matmul_precision='high'):
     """
     Execute the full two-phase pipeline for one split and save all outputs.
 
@@ -332,6 +341,11 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             N steps instead of every step (Eje H, H3). Default 4. Phase 1's 2-step
             memory measurement always uses the Logger default (1) since it's too
             short to matter.
+        mixed_precision (str): Eje D autocast mode for Phase 1 and Phase 2.
+        compile_forward (str): Eje D torch.compile mode for Phase 2.
+        compile_phase1 (bool): also compile Phase 1 memory probes. Off by default
+            because two iterations rarely amortize compilation overhead.
+        float32_matmul_precision (str): torch.set_float32_matmul_precision setting.
 
     Returns:
         n_solved (int)         : tasks solved (always 0 for 'test').
@@ -358,12 +372,24 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     n_tasks = len(original_task_names)
 
     arc_logger.log_run_start(n_tasks, n_gpus)
+    memory_runtime_options = runtime_config.runtime_options_dict(
+        mixed_precision=mixed_precision,
+        compile_forward=compile_forward if compile_phase1 else 'off',
+        float32_matmul_precision=float32_matmul_precision,
+    )
+    arc_logger.info(
+        f'Eje D runtime — mixed_precision={mixed_precision}, '
+        f'compile_forward={compile_forward}, compile_phase1={compile_phase1}, '
+        f'float32_matmul_precision={float32_matmul_precision}'
+    )
 
     # ── Phase 1: measure VRAM footprint (2 iterations per task), or load
     #    from a cached measurement keyed to the current GPU fingerprint ──
     gpu_memory_quotas = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
 
-    cached_memory_dict = load_memory_cache(split, n_gpus, original_task_names)
+    cached_memory_dict = load_memory_cache(
+        split, n_gpus, original_task_names, memory_runtime_options,
+    )
     if cached_memory_dict is not None:
         arc_logger.log_phase(
             f'Phase 1 — SKIPPED — loaded {len(cached_memory_dict)} task '
@@ -391,9 +417,12 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             n_original_tasks=n_tasks,
             quiet=True,       # phase-1 task events → DEBUG only (not cluttering console)
             verbose=True,
+            mixed_precision=mixed_precision,
+            compile_forward=compile_forward if compile_phase1 else 'off',
+            float32_matmul_precision=float32_matmul_precision,
         )
         arc_logger.info(f'Phase 1 complete in {t_p1:.1f}s')
-        save_memory_cache(split, n_gpus, memory_dict)
+        save_memory_cache(split, n_gpus, memory_dict, memory_runtime_options)
         arc_logger.info(f'Saved Phase 1 measurements to {_cache_path(split)}')
 
     # Sort tasks by decreasing VRAM so the greedy scheduler fills GPUs tightly
@@ -440,6 +469,9 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         quiet=False,
         verbose=True,
         postprocess_stride=postprocess_stride,
+        mixed_precision=mixed_precision,
+        compile_forward=compile_forward,
+        float32_matmul_precision=float32_matmul_precision,
     )
     arc_logger.info(f'Phase 2 complete in {t_p2:.1f}s')
 
@@ -567,7 +599,32 @@ if __name__ == '__main__':
             'Python-side recoloring overhead. Default: 4.'
         ),
     )
+    parser.add_argument(
+        '--mixed-precision',
+        choices=runtime_config.MIXED_PRECISION_CHOICES,
+        default='off',
+        help='Eje D: enable CUDA/ROCm autocast in each training step. BF16 is recommended on RDNA4.',
+    )
+    parser.add_argument(
+        '--compile-forward',
+        choices=runtime_config.COMPILE_FORWARD_CHOICES,
+        default='off',
+        help='Eje D: compile ARCCompressor.forward in each worker with torch.compile.',
+    )
+    parser.add_argument(
+        '--compile-phase1',
+        action='store_true',
+        help='Also compile Phase 1 memory probes. Usually slower because Phase 1 has only 2 iterations.',
+    )
+    parser.add_argument(
+        '--float32-matmul-precision',
+        choices=runtime_config.MATMUL_PRECISION_CHOICES,
+        default='high',
+        help='Eje D: torch.set_float32_matmul_precision setting. Default: high.',
+    )
     args = parser.parse_args()
+
+    runtime_config.apply_torch_backend_settings(args.float32_matmul_precision)
 
     splits_to_run = (
         ['training', 'evaluation', 'test'] if args.split == 'all'
@@ -608,6 +665,10 @@ if __name__ == '__main__':
             split, n_gpus, n_cpus, arc_logger, solutions_json,
             demo_n=args.demo,
             postprocess_stride=args.postprocess_stride,
+            mixed_precision=args.mixed_precision,
+            compile_forward=args.compile_forward,
+            compile_phase1=args.compile_phase1,
+            float32_matmul_precision=args.float32_matmul_precision,
         )
         total_solved += n_solved
         total_tasks  += n_tasks
