@@ -30,18 +30,18 @@ La ruta caliente queda asi:
 
 ```text
 parallel_train.py
-	parallelize_runs(...)
-		multiprocessing.Process(target=solve_task.solve_task, ...)
-			solve_task.py
-				model = arc_compressor.ARCCompressor(task)
-				for train_step in range(n_train_iterations):
-						train.take_step(task, model, optimizer, train_step, logger, ...)
-							model.forward()
-								layers.decode_latents(...)
-								share_up -> softmax -> cummax -> shift -> direction_share
-								-> nonlinear -> share_down -> normalize    x4
-							loss = total_KL + 10 * reconstruction_error
-							backward + optimizer.step
+    parallelize_runs(...)
+        multiprocessing.Process(target=solve_task.solve_task, ...)
+            solve_task.py
+                model = arc_compressor.ARCCompressor(task)
+                for train_step in range(n_train_iterations):
+                        train.take_step(task, model, optimizer, train_step, logger, ...)
+                            model.forward()
+                                layers.decode_latents(...)
+                                share_up -> softmax -> cummax -> shift -> direction_share
+                                -> nonlinear -> share_down -> normalize    x4
+                            loss = total_KL + 10 * reconstruction_error
+                            backward + optimizer.step
 ```
 
 El Eje H ya habia reducido parte del cuello de botella de CPU mediante:
@@ -128,14 +128,14 @@ Aplica ajustes compartidos por runners secuenciales y paralelos:
 
 ```python
 def apply_torch_backend_settings(float32_matmul_precision='high'):
-		if float32_matmul_precision:
-				torch.set_float32_matmul_precision(float32_matmul_precision)
-		if hasattr(torch.backends, 'cudnn'):
-				torch.backends.cudnn.benchmark = True
-		cuda_backend = getattr(torch.backends, 'cuda', None)
-		cuda_matmul = getattr(cuda_backend, 'matmul', None)
-		if cuda_matmul is not None and hasattr(cuda_matmul, 'allow_tf32'):
-				cuda_matmul.allow_tf32 = True
+        if float32_matmul_precision:
+                torch.set_float32_matmul_precision(float32_matmul_precision)
+        if hasattr(torch.backends, 'cudnn'):
+                torch.backends.cudnn.benchmark = True
+        cuda_backend = getattr(torch.backends, 'cuda', None)
+        cuda_matmul = getattr(cuda_backend, 'matmul', None)
+        if cuda_matmul is not None and hasattr(cuda_matmul, 'allow_tf32'):
+                cuda_matmul.allow_tf32 = True
 ```
 
 Notas:
@@ -150,10 +150,10 @@ Encapsula precision mixta:
 
 ```python
 def autocast_context(mixed_precision):
-		if mixed_precision == 'off':
-				return contextlib.nullcontext()
-		dtype = torch.bfloat16 if mixed_precision == 'bf16' else torch.float16
-		return torch.autocast(device_type='cuda', dtype=dtype)
+        if mixed_precision == 'off':
+                return contextlib.nullcontext()
+        dtype = torch.bfloat16 if mixed_precision == 'bf16' else torch.float16
+        return torch.autocast(device_type='cuda', dtype=dtype)
 ```
 
 Decisiones:
@@ -168,15 +168,15 @@ Compila el metodo `forward` del modelo:
 
 ```python
 def compile_model_forward(model, compile_forward):
-		if compile_forward == 'off':
-				return False
-		if not hasattr(torch, 'compile'):
-				return False
-		kwargs = {'dynamic': True}
-		if compile_forward != 'default':
-				kwargs['mode'] = compile_forward
-		model.forward = torch.compile(model.forward, **kwargs)
-		return True
+        if compile_forward == 'off':
+                return False
+        if not hasattr(torch, 'compile'):
+                return False
+        kwargs = {'dynamic': True}
+        if compile_forward != 'default':
+                kwargs['mode'] = compile_forward
+        model.forward = torch.compile(model.forward, **kwargs)
+        return True
 ```
 
 Razon tecnica:
@@ -192,7 +192,7 @@ Razon tecnica:
 
 ```python
 def take_step(task, model, optimizer, train_step, train_history_logger,
-							mixed_precision='off'):
+                            mixed_precision='off'):
 ```
 
 El forward y el calculo de la reconstruccion se ejecutan dentro de:
@@ -206,7 +206,7 @@ La parte importante es que los escalares MDL se fuerzan a FP32:
 ```python
 total_KL = torch.zeros((), device=logits.device, dtype=torch.float32)
 for KL_amount in KL_amounts:
-		total_KL = total_KL + torch.sum(KL_amount.float())
+        total_KL = total_KL + torch.sum(KL_amount.float())
 
 reconstruction_error = torch.zeros((), device=logits.device, dtype=torch.float32)
 ...
@@ -228,12 +228,12 @@ Tambien se anadio CLI al entrenamiento secuencial:
 
 ```bash
 python train.py \
-	--split training \
-	--demo 1 \
-	--n-iterations 2000 \
-	--mixed-precision bf16 \
-	--compile-forward off \
-	--float32-matmul-precision high
+    --split training \
+    --demo 1 \
+    --n-iterations 2000 \
+    --mixed-precision bf16 \
+    --compile-forward off \
+    --float32-matmul-precision high
 ```
 
 Esto permite comprobar que el Eje D no depende exclusivamente del scheduler paralelo.
@@ -244,10 +244,10 @@ La firma de `solve_task` ahora recibe las opciones del Eje D:
 
 ```python
 def solve_task(...,
-							 postprocess_stride=1,
-							 mixed_precision='off',
-							 compile_forward='off',
-							 float32_matmul_precision='high'):
+                             postprocess_stride=1,
+                             mixed_precision='off',
+                             compile_forward='off',
+                             float32_matmul_precision='high'):
 ```
 
 Dentro del worker:
@@ -271,7 +271,7 @@ Y cada iteracion pasa el modo de precision:
 
 ```python
 train.take_step(task, model, optimizer, train_step, train_history_logger,
-								mixed_precision=mixed_precision)
+                                mixed_precision=mixed_precision)
 ```
 
 ### 4.4 `parallel_train.py`
@@ -288,10 +288,10 @@ Los argumentos se pasan en `worker_args`:
 
 ```python
 worker_args = (
-		task_names[i], split, 1e20, n_iterations,
-		gpu_id, memory_dict, solutions_dict, error_queue,
-		_loggers_dict, _progress_dict, postprocess_stride,
-		mixed_precision, compile_forward, float32_matmul_precision,
+        task_names[i], split, 1e20, n_iterations,
+        gpu_id, memory_dict, solutions_dict, error_queue,
+        _loggers_dict, _progress_dict, postprocess_stride,
+        mixed_precision, compile_forward, float32_matmul_precision,
 )
 ```
 
@@ -308,12 +308,12 @@ Uso recomendado inicial:
 
 ```bash
 python parallel_train.py \
-	--split training \
-	--demo 20 \
-	--max-workers 8 \
-	--mixed-precision bf16 \
-	--compile-forward off \
-	--float32-matmul-precision high
+    --split training \
+    --demo 20 \
+    --max-workers 8 \
+    --mixed-precision bf16 \
+    --compile-forward off \
+    --float32-matmul-precision high
 ```
 
 #### Phase 1 y cache de VRAM
@@ -322,13 +322,13 @@ La cache de medicion de VRAM ahora incluye las opciones de runtime:
 
 ```python
 def _gpu_fingerprint(n_gpus, runtime_options=None):
-		return {
-				'n_gpus': n_gpus,
-				'gpu_names': [...],
-				'gpu_vram_total_gb': [...],
-				'torch_version': torch.__version__,
-				'runtime_options': runtime_options or {},
-		}
+        return {
+                'n_gpus': n_gpus,
+                'gpu_names': [...],
+                'gpu_vram_total_gb': [...],
+                'torch_version': torch.__version__,
+                'runtime_options': runtime_options or {},
+        }
 ```
 
 Esto evita mezclar mediciones incompatibles. Por ejemplo, una medicion FP32 no deberia reutilizarse automaticamente para BF16 si el footprint cambia.
@@ -337,9 +337,9 @@ El runtime usado por Phase 1 se calcula asi:
 
 ```python
 memory_runtime_options = runtime_config.runtime_options_dict(
-		mixed_precision=mixed_precision,
-		compile_forward=compile_forward if compile_phase1 else 'off',
-		float32_matmul_precision=float32_matmul_precision,
+        mixed_precision=mixed_precision,
+        compile_forward=compile_forward if compile_phase1 else 'off',
+        float32_matmul_precision=float32_matmul_precision,
 )
 ```
 
@@ -358,24 +358,24 @@ Extrae los flags pasados a `parallel_train.py`:
 
 ```python
 def _extract_eje_d_config(passthrough):
-		return {
-				'mixed_precision': _passthrough_value(...),
-				'compile_forward': _passthrough_value(...),
-				'compile_phase1': '--compile-phase1' in passthrough,
-				'float32_matmul_precision': _passthrough_value(...),
-		}
+        return {
+                'mixed_precision': _passthrough_value(...),
+                'compile_forward': _passthrough_value(...),
+                'compile_phase1': '--compile-phase1' in passthrough,
+                'float32_matmul_precision': _passthrough_value(...),
+        }
 ```
 
 Guarda en el resumen JSON:
 
 ```python
 eje_d_metrics = {
-		'config': _extract_eje_d_config(passthrough),
-		'tree_cpu_mean_pct': ...,
-		'tree_cpu_per_worker_pct': ...,
-		'gpu_util_per_worker_pct': ...,
-		'gpu_cpu_balance': ...,
-		'vram_per_max_worker_mb': ...,
+        'config': _extract_eje_d_config(passthrough),
+        'tree_cpu_mean_pct': ...,
+        'tree_cpu_per_worker_pct': ...,
+        'gpu_util_per_worker_pct': ...,
+        'gpu_cpu_balance': ...,
+        'vram_per_max_worker_mb': ...,
 }
 ```
 
@@ -477,11 +477,11 @@ runtime_config.apply_torch_backend_settings('high')
 print('cuda_available', torch.cuda.is_available())
 task = preprocessing.preprocess_tasks('training', ['272f95fa'])[0]
 for precision in ('off', 'bf16'):
-		model = arc_compressor.ARCCompressor(task)
-		optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
-		logger = solution_selection.Logger(task, postprocess_stride=999)
-		train.take_step(task, model, optimizer, 0, logger, mixed_precision=precision)
-		print(precision, len(logger.loss_curve), type(logger.loss_curve[-1]).__name__)
+        model = arc_compressor.ARCCompressor(task)
+        optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
+        logger = solution_selection.Logger(task, postprocess_stride=999)
+        train.take_step(task, model, optimizer, 0, logger, mixed_precision=precision)
+        print(precision, len(logger.loss_curve), type(logger.loss_curve[-1]).__name__)
 PY
 ```
 
@@ -547,60 +547,60 @@ No debe activarse por defecto hasta demostrar amortizacion en runs largos.
 
 ```bash
 python train.py \
-	--split training \
-	--demo 1 \
-	--n-iterations 2000 \
-	--mixed-precision off \
-	--compile-forward off \
-	--float32-matmul-precision highest
+    --split training \
+    --demo 1 \
+    --n-iterations 2000 \
+    --mixed-precision off \
+    --compile-forward off \
+    --float32-matmul-precision highest
 ```
 
 ### 6.2 Entrenamiento secuencial BF16
 
 ```bash
 python train.py \
-	--split training \
-	--demo 1 \
-	--n-iterations 2000 \
-	--mixed-precision bf16 \
-	--compile-forward off \
-	--float32-matmul-precision high
+    --split training \
+    --demo 1 \
+    --n-iterations 2000 \
+    --mixed-precision bf16 \
+    --compile-forward off \
+    --float32-matmul-precision high
 ```
 
 ### 6.3 Entrenamiento paralelo baseline
 
 ```bash
 python parallel_train.py \
-	--split training \
-	--demo 20 \
-	--max-workers 8 \
-	--mixed-precision off \
-	--compile-forward off \
-	--float32-matmul-precision highest
+    --split training \
+    --demo 20 \
+    --max-workers 8 \
+    --mixed-precision off \
+    --compile-forward off \
+    --float32-matmul-precision highest
 ```
 
 ### 6.4 Entrenamiento paralelo BF16
 
 ```bash
 python parallel_train.py \
-	--split training \
-	--demo 20 \
-	--max-workers 8 \
-	--mixed-precision bf16 \
-	--compile-forward off \
-	--float32-matmul-precision high
+    --split training \
+    --demo 20 \
+    --max-workers 8 \
+    --mixed-precision bf16 \
+    --compile-forward off \
+    --float32-matmul-precision high
 ```
 
 ### 6.5 Entrenamiento paralelo con `torch.compile` experimental
 
 ```bash
 python parallel_train.py \
-	--split training \
-	--demo 16 \
-	--max-workers 2 \
-	--mixed-precision bf16 \
-	--compile-forward reduce-overhead \
-	--float32-matmul-precision high
+    --split training \
+    --demo 16 \
+    --max-workers 2 \
+    --mixed-precision bf16 \
+    --compile-forward reduce-overhead \
+    --float32-matmul-precision high
 ```
 
 No activar inicialmente:
@@ -621,26 +621,26 @@ Baseline:
 
 ```bash
 python profile_parallel_train.py --label d_baseline --gpu-mode sysfs -- \
-	--split training --demo 20 --max-workers 8 \
-	--mixed-precision off --compile-forward off \
-	--float32-matmul-precision highest
+    --split training --demo 20 --max-workers 8 \
+    --mixed-precision off --compile-forward off \
+    --float32-matmul-precision highest
 ```
 
 BF16:
 
 ```bash
 python profile_parallel_train.py --label d_bf16 --gpu-mode sysfs -- \
-	--split training --demo 20 --max-workers 8 \
-	--mixed-precision bf16 --compile-forward off \
-	--float32-matmul-precision high
+    --split training --demo 20 --max-workers 8 \
+    --mixed-precision bf16 --compile-forward off \
+    --float32-matmul-precision high
 ```
 
 Comparacion:
 
 ```bash
 python profile_parallel_train.py --compare \
-	.profile/d_baseline_summary.json \
-	.profile/d_bf16_summary.json
+    .profile/d_baseline_summary.json \
+    .profile/d_bf16_summary.json
 ```
 
 ### 7.2 Prueba profunda de `torch.compile`
@@ -651,18 +651,18 @@ La prueba profunda debe medir amortizacion en paralelo, no solo si compila.
 
 ```bash
 python profile_parallel_train.py --label compile_off_1w --gpu-mode sysfs -- \
-	--split training --demo 1 --max-workers 1 \
-	--mixed-precision off \
-	--compile-forward off \
-	--float32-matmul-precision high
+    --split training --demo 1 --max-workers 1 \
+    --mixed-precision off \
+    --compile-forward off \
+    --float32-matmul-precision high
 ```
 
 ```bash
 python profile_parallel_train.py --label compile_on_1w --gpu-mode sysfs -- \
-	--split training --demo 1 --max-workers 1 \
-	--mixed-precision off \
-	--compile-forward reduce-overhead \
-	--float32-matmul-precision high
+    --split training --demo 1 --max-workers 1 \
+    --mixed-precision off \
+    --compile-forward reduce-overhead \
+    --float32-matmul-precision high
 ```
 
 Objetivo: comprobar si el coste de compilacion ya destruye la run mas pequena.
@@ -671,18 +671,18 @@ Objetivo: comprobar si el coste de compilacion ya destruye la run mas pequena.
 
 ```bash
 python profile_parallel_train.py --label compile_off_4tasks_1w --gpu-mode sysfs -- \
-	--split training --demo 4 --max-workers 1 \
-	--mixed-precision off \
-	--compile-forward off \
-	--float32-matmul-precision high
+    --split training --demo 4 --max-workers 1 \
+    --mixed-precision off \
+    --compile-forward off \
+    --float32-matmul-precision high
 ```
 
 ```bash
 python profile_parallel_train.py --label compile_on_4tasks_1w --gpu-mode sysfs -- \
-	--split training --demo 4 --max-workers 1 \
-	--mixed-precision off \
-	--compile-forward reduce-overhead \
-	--float32-matmul-precision high
+    --split training --demo 4 --max-workers 1 \
+    --mixed-precision off \
+    --compile-forward reduce-overhead \
+    --float32-matmul-precision high
 ```
 
 Objetivo: comprobar si PyTorch/Inductor reutiliza algo entre tareas o si cada tarea paga el coste completo.
@@ -691,21 +691,21 @@ Objetivo: comprobar si PyTorch/Inductor reutiliza algo entre tareas o si cada ta
 
 ```bash
 for W in 2 4 8; do
-	python profile_parallel_train.py --label compile_off_w${W} --gpu-mode sysfs -- \
-		--split training --demo 16 --max-workers ${W} \
-		--mixed-precision off \
-		--compile-forward off \
-		--float32-matmul-precision high
+    python profile_parallel_train.py --label compile_off_w${W} --gpu-mode sysfs -- \
+        --split training --demo 16 --max-workers ${W} \
+        --mixed-precision off \
+        --compile-forward off \
+        --float32-matmul-precision high
 
-	python profile_parallel_train.py --label compile_on_w${W} --gpu-mode sysfs -- \
-		--split training --demo 16 --max-workers ${W} \
-		--mixed-precision off \
-		--compile-forward reduce-overhead \
-		--float32-matmul-precision high
+    python profile_parallel_train.py --label compile_on_w${W} --gpu-mode sysfs -- \
+        --split training --demo 16 --max-workers ${W} \
+        --mixed-precision off \
+        --compile-forward reduce-overhead \
+        --float32-matmul-precision high
 
-	python profile_parallel_train.py --compare \
-		.profile/compile_off_w${W}_summary.json \
-		.profile/compile_on_w${W}_summary.json
+    python profile_parallel_train.py --compare \
+        .profile/compile_off_w${W}_summary.json \
+        .profile/compile_on_w${W}_summary.json
 done
 ```
 
@@ -720,18 +720,18 @@ Interpretacion:
 
 ```bash
 python profile_parallel_train.py --label bf16_compile_off_w4 --gpu-mode sysfs -- \
-	--split training --demo 16 --max-workers 4 \
-	--mixed-precision bf16 \
-	--compile-forward off \
-	--float32-matmul-precision high
+    --split training --demo 16 --max-workers 4 \
+    --mixed-precision bf16 \
+    --compile-forward off \
+    --float32-matmul-precision high
 ```
 
 ```bash
 python profile_parallel_train.py --label bf16_compile_on_w4 --gpu-mode sysfs -- \
-	--split training --demo 16 --max-workers 4 \
-	--mixed-precision bf16 \
-	--compile-forward reduce-overhead \
-	--float32-matmul-precision high
+    --split training --demo 16 --max-workers 4 \
+    --mixed-precision bf16 \
+    --compile-forward reduce-overhead \
+    --float32-matmul-precision high
 ```
 
 Esta es la prueba mas importante en la practica: no pregunta si compile mejora FP32, sino si mejora sobre el candidato realista BF16.
@@ -814,24 +814,24 @@ Configuracion candidata inicial:
 
 ```bash
 python parallel_train.py \
-	--split training \
-	--demo 20 \
-	--max-workers 8 \
-	--mixed-precision bf16 \
-	--compile-forward off \
-	--float32-matmul-precision high
+    --split training \
+    --demo 20 \
+    --max-workers 8 \
+    --mixed-precision bf16 \
+    --compile-forward off \
+    --float32-matmul-precision high
 ```
 
 Configuracion experimental de compile:
 
 ```bash
 python parallel_train.py \
-	--split training \
-	--demo 16 \
-	--max-workers 2 \
-	--mixed-precision bf16 \
-	--compile-forward reduce-overhead \
-	--float32-matmul-precision high
+    --split training \
+    --demo 16 \
+    --max-workers 2 \
+    --mixed-precision bf16 \
+    --compile-forward reduce-overhead \
+    --float32-matmul-precision high
 ```
 
 No usar de entrada:
@@ -891,4 +891,3 @@ Decision tecnica final:
 BF16 + matmul_precision='high' es la mejora practica inicial.
 torch.compile queda disponible como experimento controlado, no como default.
 ```
-
