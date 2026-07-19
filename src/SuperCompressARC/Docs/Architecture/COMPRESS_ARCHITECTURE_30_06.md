@@ -30,6 +30,10 @@ La idea central es **inteligencia = compresión** (principio MDL, *Minimum Descr
   - [Tabla de contenidos](#tabla-de-contenidos)
   - [1. Contexto: ARC-AGI y el problema de la inteligencia general](#1-contexto-arc-agi-y-el-problema-de-la-inteligencia-general)
   - [2. Principio fundamental: MDL ≡ inteligencia](#2-principio-fundamental-mdl--inteligencia)
+    - [2.1 Vocabulario mínimo antes de empezar](#21-vocabulario-mínimo-antes-de-empezar)
+    - [2.2 De un programa ideal a la aproximación que ejecuta CompressARC](#22-de-un-programa-ideal-a-la-aproximación-que-ejecuta-compressarc)
+    - [2.3 Intuición de MDL: una regla corta vence a una lista larga](#23-intuición-de-mdl-una-regla-corta-vence-a-una-lista-larga)
+    - [2.4 Qué aprende y qué no puede mirar el sistema](#24-qué-aprende-y-qué-no-puede-mirar-el-sistema)
   - [3. Decisiones de diseño justificadas](#3-decisiones-de-diseño-justificadas)
     - [3.1 ¿Por qué un modelo pequeño (~76 K parámetros)?](#31-por-qué-un-modelo-pequeño-76-k-parámetros)
     - [3.2 ¿Por qué un VAE y no un Transformer?](#32-por-qué-un-vae-y-no-un-transformer)
@@ -42,15 +46,25 @@ La idea central es **inteligencia = compresión** (principio MDL, *Minimum Descr
     - [3.9 ¿Por qué Adam con `lr=0.01` y `betas=(0.5, 0.9)`?](#39-por-qué-adam-con-lr001-y-betas05-09)
     - [3.10 ¿Por qué dos predicciones (pass@2) y por qué una de ellas es EMA?](#310-por-qué-dos-predicciones-pass2-y-por-qué-una-de-ellas-es-ema)
   - [4. Arquitectura completa del sistema](#4-arquitectura-completa-del-sistema)
+    - [4.0 Mapa del sistema: de una tarea al conjunto de candidatos](#40-mapa-del-sistema-de-una-tarea-al-conjunto-de-candidatos)
     - [4.1 El multitensor — estructura de datos central](#41-el-multitensor--estructura-de-datos-central)
+      - [4.1.1 Cómo leer una representación multitensor](#411-cómo-leer-una-representación-multitensor)
     - [4.2 Equivarianzas explícitas](#42-equivarianzas-explícitas)
+      - [4.2.1 Qué significa que una regla sea equivariante](#421-qué-significa-que-una-regla-sea-equivariante)
     - [4.3 Capa de decodificación (VAE)](#43-capa-de-decodificación-vae)
+      - [4.3.1 Del ruido al estado inicial de la red](#431-del-ruido-al-estado-inicial-de-la-red)
     - [4.4 Capas centrales — orden y propósito](#44-capas-centrales--orden-y-propósito)
+      - [4.4.1 Una actualización residual, paso a paso](#441-una-actualización-residual-paso-a-paso)
     - [4.5 Cabezas lineales y postprocesamiento de máscaras](#45-cabezas-lineales-y-postprocesamiento-de-máscaras)
+      - [4.5.1 De puntuaciones continuas a una cuadrícula discreta](#451-de-puntuaciones-continuas-a-una-cuadrícula-discreta)
   - [5. Flujo completo del sistema](#5-flujo-completo-del-sistema)
+    - [5.0 Ejemplo guiado: seguir una tarea pequeña](#50-ejemplo-guiado-seguir-una-tarea-pequeña)
     - [5.1 Preprocesamiento](#51-preprocesamiento)
+      - [5.1.1 Del JSON a los tensores y las máscaras](#511-del-json-a-los-tensores-y-las-máscaras)
     - [5.2 Entrenamiento por inferencia](#52-entrenamiento-por-inferencia)
+      - [5.2.1 Una iteración de optimización, sin saltos](#521-una-iteración-de-optimización-sin-saltos)
     - [5.3 Postprocesamiento y selección pass@2](#53-postprocesamiento-y-selección-pass2)
+      - [5.3.1 Por qué se acumulan candidatos en vez de usar el último](#531-por-qué-se-acumulan-candidatos-en-vez-de-usar-el-último)
     - [5.4 Entrenamiento paralelo a escala](#54-entrenamiento-paralelo-a-escala)
   - [6. Capacidad de cómputo](#6-capacidad-de-cómputo)
     - [6.1 Hardware de referencia (RTX 4070)](#61-hardware-de-referencia-rtx-4070)
@@ -105,6 +119,12 @@ La idea central es **inteligencia = compresión** (principio MDL, *Minimum Descr
     - [9.8 Síntesis: presupuesto de cómputo, roadmap experimental y riesgos](#98-síntesis-presupuesto-de-cómputo-roadmap-experimental-y-riesgos)
     - [9.9 Eje F: interpretabilidad activa como mecanismo de control](#99-eje-f-interpretabilidad-activa-como-mecanismo-de-control)
     - [9.10 Eje G: compresión explícita de θ (MDL completo)](#910-eje-g-compresión-explícita-de-θ-mdl-completo)
+    - [9.11 Eje H: eliminación del cuello de botella de CPU (dispatch, sincronización y sobre-concurrencia) — **PRIORIDAD 0**](#911-eje-h-eliminación-del-cuello-de-botella-de-cpu-dispatch-sincronización-y-sobre-concurrencia--prioridad-0)
+      - [9.11.1 Diagnóstico: ¿por qué la CPU está al 100 %?](#9111-diagnóstico-por-qué-la-cpu-está-al-100-)
+      - [9.11.2 Estrategia: optimizar el dispatch actual **antes** que reescribir a kernels nativos](#9112-estrategia-optimizar-el-dispatch-actual-antes-que-reescribir-a-kernels-nativos)
+      - [9.11.3 Plan de acción ordenado por coste/beneficio (todo semánticamente neutro)](#9113-plan-de-acción-ordenado-por-costebeneficio-todo-semánticamente-neutro)
+      - [9.11.4 Instrumentación de medición (contrato con el script de perfilado)](#9114-instrumentación-de-medición-contrato-con-el-script-de-perfilado)
+  - [Glosario rápido](#glosario-rápido)
   - [10. Referencias](#10-referencias)
     - [Papers](#papers)
     - [Archivos del repositorio](#archivos-del-repositorio)
@@ -148,6 +168,192 @@ $$\mathcal{L} = \underbrace{D_{\text{KL}}\big(\mathcal{N}(\mu,\Sigma) \,\|\, \ma
 El factor 10 es un balanceo empírico (ver [train.py:120](train.py)). Minimizar esta cantidad equivale a buscar **la descripción más corta posible** de los ejemplos.
 
 Generalización al test: como la cuadrícula de test se procesa por las mismas capas con los mismos pesos aprendidos durante el entrenamiento, la regla descubierta se aplica automáticamente.
+
+### 2.1 Vocabulario mínimo antes de empezar
+
+Esta sección introduce los términos necesarios para seguir el resto del documento.
+No presupone experiencia previa con redes neuronales.
+
+**Cuadrícula, píxel y color.** Una tarea ARC es una colección de dibujos muy
+pequeños. Cada dibujo es una cuadrícula; cada casilla es un **píxel**; y cada
+número es una etiqueta de color, no una cantidad que se pueda sumar. Por ejemplo:
+
+```text
+Entrada                  Salida observada
+0 0 0                    0 0 0
+0 2 0       regla        0 1 0
+0 0 0       posible      0 0 0
+```
+
+Aquí `0`, `1` y `2` significan colores. Una explicación breve de los dos
+ejemplos sería: "cambiar cada píxel de color 2 por color 1". El objetivo de
+ARC no es recibir esa frase: es deducir una regla equivalente a partir de
+varios pares entrada-salida y aplicarla a una entrada cuya salida está oculta.
+
+**Ejemplo de demostración y ejemplo de test.** Una tarea contiene normalmente
+entre dos y siete demostraciones completas y una o más entradas de test. Una
+demostración incluye su entrada y su salida; el test incluye solo la entrada.
+El programa debe producir la salida que falta. Por tanto, el test no es un
+examen posterior a un entrenamiento con miles de tareas: forma parte de la
+misma tarea, pero conserva su respuesta escondida.
+
+**Tensor.** Un tensor es una tabla de números con uno o más ejes. Una lista es
+un tensor de un eje; una matriz como la cuadrícula anterior es un tensor de dos
+ejes: fila y columna. Si apilamos tres cuadrículas de $3 \times 3$, obtenemos
+un tensor de forma `[3, 3, 3]`: `ejemplo × fila × columna`. La palabra
+"forma" (*shape*) solo enumera cuántas posiciones tiene cada eje.
+
+**Parámetro.** Un parámetro es un número que el programa puede ajustar. En una
+red neuronal, muchos parámetros forman matrices de pesos. Al principio son
+valores aleatorios; durante el entrenamiento cambian para que las predicciones
+se parezcan más a las demostraciones. CompressARC crea parámetros nuevos para
+cada tarea: no conserva los ajustados para resolver la tarea anterior.
+
+**Entrenamiento e inferencia.** Entrenar significa ajustar parámetros usando
+datos conocidos. Inferir significa producir una predicción con los parámetros
+actuales. En este proyecto ambos ocurren dentro de la resolución de una única
+tarea: se entrenan los parámetros con las demostraciones y, durante esas mismas
+iteraciones, se generan predicciones para el test. Por ello se habla de
+*aprendizaje durante la inferencia* (*test-time learning*).
+
+**Probabilidad, logit y `argmax`.** En lugar de elegir directamente un color,
+la red emite un **logit**, una puntuación para cada color posible. Si para un
+píxel los logits fueran `[0.2, 3.1, -0.8]`, el color de índice `1` sería el
+más probable. La operación `argmax` selecciona precisamente el índice de la
+puntuación mayor. Los logits permiten entrenar el modelo de forma gradual antes
+de convertirlos en colores discretos.
+
+**VAE, latente y KL.** Un *variational autoencoder* (VAE) es un modelo que
+genera datos a partir de un código interno aleatorio llamado **latente**. En
+CompressARC, ese código se llama $z$. La cantidad **KL** mide cuánto debe
+alejarse la distribución de $z$ del ruido normal de referencia para transportar
+información específica de la tarea. Menor KL significa que se necesitó menos
+información adicional. Las secciones siguientes explican por qué ese coste se
+interpreta como longitud de descripción.
+
+### 2.2 De un programa ideal a la aproximación que ejecuta CompressARC
+
+El paper no empieza proponiendo una red neuronal. Empieza con una pregunta de
+compresión: "¿cuál sería el programa autónomo más corto que imprime una tarea
+ARC completa, incluida una salida de test que todavía no conocemos?". La idea
+evoluciona en tres pasos.
+
+```mermaid
+flowchart TD
+    A[Algoritmo 1: programa plantilla] --> B[Semilla para el latente z]
+    A --> C[Pesos de una red equivariante]
+    A --> D[Semilla para corregir la reconstrucción]
+    B --> E[Imprimir la tarea completa]
+    C --> E
+    D --> E
+
+    E --> F[Algoritmo 2: buscar la combinación más corta]
+    F --> G{Problema: enumerar semillas y ejecutar REC es inviable}
+    G --> H[Algoritmo 3: sustituir la búsqueda por optimización diferenciable]
+    H --> I[layers.channel_layer: muestrea z y calcula KL]
+    I --> J[ARCCompressor.forward: genera logits y máscaras]
+    J --> K[train.take_step: minimiza KL + 10 x reconstrucción]
+```
+
+1. **Algoritmo 1: una plantilla de programa.** El programa contiene una
+   arquitectura fija, unos pesos y dos fuentes de aleatoriedad o *semillas*.
+   La primera genera el código latente $z$. La segunda fuerza los pequeños
+   errores que aún queden para que el programa imprima exactamente las
+   cuadrículas conocidas. Si la regla de la tarea está bien capturada, ambas
+   semillas necesitan pocos bits.
+2. **Algoritmo 2: la búsqueda ideal.** En principio se podrían probar muchas
+   semillas y pesos, medir la longitud total de cada programa y guardar el más
+   corto. La técnica de *Relative Entropy Coding* (REC) justifica que el coste
+   medio de modificar la primera semilla se relacione con KL. Sin embargo,
+   realizar esa búsqueda y REC literalmente tiene un coste computacional
+   impracticable.
+3. **Algoritmo 3: CompressARC.** El código sustituye esa búsqueda discreta por
+   descenso por gradiente. `layers.channel_layer` crea una muestra de $z$ y su
+   coste KL; `ARCCompressor.forward()` transforma $z$ en predicciones; y
+   `train.take_step()` ajusta los parámetros para reducir la suma de costes.
+   No se ejecuta REC: se optimiza una aproximación diferenciable de la longitud
+   que REC requeriría.
+
+La red no "traduce" una regla escrita en lenguaje natural. Sus pesos y sus
+latentes son una forma numérica de representar una explicación compacta que
+permite reconstruir las demostraciones. El paper usa la metáfora de *code golf*:
+resolver equivale a escribir el programa más corto que reproduce los datos.
+
+### 2.3 Intuición de MDL: una regla corta vence a una lista larga
+
+MDL significa *Minimum Description Length* o **longitud mínima de
+descripción**. Su principio es sencillo: entre dos explicaciones que describen
+correctamente los datos conocidos, se prefiere la que necesita menos
+información para expresarse.
+
+Volvamos al ejemplo anterior. Supongamos que hay cuatro demostraciones y en
+todas el color `2` pasa a `1`, mientras que todo lo demás se conserva.
+
+```text
+Descripción A: memorizar las cuatro cuadrículas de salida
+  "la salida 1 es ..., la salida 2 es ..., la salida 3 es ..."
+
+Descripción B: guardar una regla
+  "reemplazar 2 por 1; conservar el resto"
+```
+
+La descripción B es más corta y también puede aplicarse a una quinta cuadrícula
+nunca vista. Esta es la intuición que conecta compresión y generalización: una
+regla que elimina redundancia en las demostraciones tiene más posibilidades de
+seguir funcionando cuando cambia la entrada de test.
+
+CompressARC reparte el coste de describir una tarea en dos términos:
+
+$$
+\mathcal{L} =
+\underbrace{D_{\mathrm{KL}}\big(q(z)\,\|\,\mathcal{N}(0,I)\big)}_{
+  ext{información que debe llevar el latente}}
++ 10 \cdot
+\underbrace{H(\text{logits}, \text{píxeles conocidos})}_{
+  ext{información necesaria para corregir la reconstrucción}}
+$$
+
+- **KL:** compara el latente aprendido con ruido normal estándar. Si el modelo
+  necesita alterar mucho ese ruido para codificar detalles de la tarea, el
+  coste aumenta.
+- **Reconstrucción o cross-entropy:** penaliza que el modelo asigne baja
+  puntuación al color que realmente aparece en un píxel conocido. Si la red ya
+  produce el color correcto con mucha probabilidad, hace falta poca información
+  adicional para corregirlo.
+- **Factor 10:** el código implementa `total_KL + 10 * reconstruction_error`.
+  Es un equilibrio empírico: da prioridad suficiente a reconstruir las
+  demostraciones sin eliminar la presión de compresión. No es una constante
+  deducida directamente de MDL.
+
+Esta pérdida es una aproximación útil, no una prueba de que se haya encontrado
+la explicación más corta entre todos los programas imaginables. Solo busca la
+explicación más corta dentro de la familia que puede expresar esta arquitectura
+y dentro de la trayectoria que alcanza el optimizador.
+
+### 2.4 Qué aprende y qué no puede mirar el sistema
+
+Cada tarea produce un objeto `Task` independiente en
+`preprocessing.py`. Sus pares de demostración incluyen entrada y salida; para
+las entradas de test, `Task._create_problem_tensor()` deja sin rellenar el
+canal de salida. En `train.take_step()`, el bucle omite explícitamente el modo
+de salida de cada ejemplo de test al calcular la reconstrucción.
+
+Por tanto, la optimización puede usar:
+
+- las entradas y salidas de las demostraciones;
+- las entradas de test, sus tamaños y los colores que contienen;
+- las regularidades que la arquitectura ya incorpora, como desplazamientos y
+  simetrías.
+
+No puede usar la cuadrícula objetivo del test para reducir la pérdida. Esa
+salida se genera como una consecuencia de haber comprimido las demostraciones
+con una regla que también actúa sobre la entrada de test.
+
+> **Lectura del flujo.** En las secciones 4 y 5 se seguirá exactamente este
+> recorrido: convertir JSON en tensores y máscaras, generar un latente,
+> transformarlo con cuatro bloques, medir la pérdida solo sobre datos visibles y
+> seleccionar dos respuestas finales. Cada término técnico se introduce antes
+> de usarse en detalle.
 
 ---
 
@@ -221,6 +427,43 @@ Estas dos perspectivas suelen ser **complementarias**: cuando la red se aproxima
 
 ## 4. Arquitectura completa del sistema
 
+### 4.0 Mapa del sistema: de una tarea al conjunto de candidatos
+
+Antes de inspeccionar capas individuales, conviene situarlas dentro del
+recorrido completo. Cada caja del diagrama representa una responsabilidad, no
+un modelo distinto. `Task` prepara datos de una única tarea; `ARCCompressor`
+construye una red nueva para ella; y `Logger` conserva las mejores respuestas
+generadas durante su optimización.
+
+```mermaid
+flowchart LR
+  A[JSON de una tarea ARC] --> B[Task en preprocessing.py]
+  B --> C[Cuadrículas, colores, formas y máscaras]
+  C --> D[MultiTensorSystem]
+  D --> E[Latentes z por multitensor]
+  E --> F[Cuatro bloques residuales]
+  F --> G[Head de colores y máscaras x/y]
+  G --> H[Logits para input y output]
+  H --> I[train.take_step calcula la pérdida]
+  I --> J[Adam actualiza pesos y latentes]
+  H --> K[Logger: muestra actual y media EMA]
+  K --> L[Dos soluciones pass@2]
+  J --> E
+```
+
+| Parte | Estructura real | Responsabilidad sencilla |
+| --- | --- | --- |
+| Preparación | `preprocessing.Task` | Leer la tarea, uniformar tamaños y ocultar las salidas de test. |
+| Representación | `MultiTensorSystem` | Mantener vistas de la tarea con distintos ejes relevantes. |
+| Generación | `layers.decode_latents` | Convertir ruido y parámetros ajustables en un estado inicial. |
+| Razonamiento geométrico | `ARCCompressor.forward` | Intercambiar y transformar información durante cuatro bloques. |
+| Predicción | `head_weights`, `mask_weights` | Puntuar colores y decidir qué zona de la cuadrícula es válida. |
+| Aprendizaje y elección | `train.take_step`, `Logger` | Actualizar parámetros y seleccionar dos soluciones robustas. |
+
+Un detalle importante: el ciclo `J → E` no reutiliza el modelo de otra tarea.
+Solo representa las 2 000 actualizaciones que refinan el mismo modelo mientras
+resuelve una tarea concreta.
+
 ### 4.1 El multitensor — estructura de datos central
 
 El `MultiTensorSystem` ([multitensor_systems.py:11-93](multitensor_systems.py)) define **5 dimensiones binarias** y mantiene un tensor independiente por cada combinación válida.
@@ -272,6 +515,64 @@ graph TD
 
 **El decorador `@multify`** ([multitensor_systems.py](multitensor_systems.py)) toma una función `f(dims, x, ...)` que opera sobre un tensor individual y la promueve a una función que opera sobre **todo el multitensor**, aplicándola a cada uno de los 27 tensores válidos con el `dims` correspondiente. Esto permite que el código de las capas sea genérico.
 
+#### 4.1.1 Cómo leer una representación multitensor
+
+Un tensor no es más que una colección de valores organizada por ejes. El
+multitensor es una colección de esas colecciones. Su propósito es evitar que
+todo el conocimiento tenga que ocupar una cuadrícula completa cuando quizá solo
+depende del color o de la posición de una fila.
+
+Partamos de dos demostraciones, cada una con una cuadrícula de $3 \times 3$ y
+dos colores no negros. Un tensor de cuadrícula podría tener la forma:
+
+```text
+[ejemplo, color, x, y, canal]
+[2,       2,     3, 3, 16]
+```
+
+La lectura es: para cada una de las 2 demostraciones, para cada uno de los 2
+colores, para cada una de las 9 posiciones y para cada uno de los 16 números de
+representación interna, hay un valor. El último eje, **canal**, no es una nueva
+coordenada del dibujo: contiene rasgos que la red aprende, como ocurre con las
+capas de una imagen en visión por computador.
+
+Pero una regla como "el color rojo pasa a azul" no necesita saber la posición
+de cada píxel. Puede vivir en un tensor más pequeño:
+
+```text
+[ejemplo, color, canal]
+[2,       2,     16]
+```
+
+Y una regla como "la fila central es especial" puede vivir en otro:
+
+```text
+[ejemplo, x, canal]
+[2,       3, 16]
+```
+
+El multitensor guarda simultáneamente estas vistas y otras compatibles. Las
+operaciones `share_up` y `share_down` permiten que un hallazgo pequeño, por
+ejemplo una relación entre colores, se comunique con una vista grande que sí
+incluye posiciones. No son 27 copias independientes de la cuadrícula: son 27
+niveles de detalle para expresar regularidades con el menor espacio posible.
+
+Las dos reglas de validez del código se entienden con ejemplos:
+
+- `[0, 1, 0, 0, 0]` es válido: representa información que depende solo del
+  color, como una tabla color → color.
+- `[1, 0, 0, 1, 0]` es válido: representa una señal por fila dentro de cada
+  ejemplo, por ejemplo la probabilidad de que una fila pertenezca a la salida.
+- `[0, 0, 0, 1, 0]` es inválido: tendría filas sin indicar a qué ejemplo
+  pertenecen.
+- `[1, 0, 0, 0, 0]` es inválido: sería solo un número por ejemplo y no tiene
+  ningún eje informativo adicional según `dims_valid`.
+
+El Apéndice C del paper usa una explicación simplificada de cuatro ejes y 16
+tensores. La implementación de este repositorio es la fuente de verdad para
+el comportamiento real: añade `directions`, usa cinco ejes binarios y conserva
+las 27 combinaciones que pasan `MultiTensorSystem.dims_valid()`.
+
 ### 4.2 Equivarianzas explícitas
 
 CompressARC implementa **tres equivarianzas estructurales** mediante *weight tying* en la inicialización (ver [initializers.py:100-146](initializers.py)).
@@ -283,6 +584,44 @@ CompressARC implementa **tres equivarianzas estructurales** mediante *weight tyi
 | **Permutación de colores** | La dimensión `colors` se trata como **anónima**: ningún peso depende del índice de color (la cabeza emite logits por color, pero el orden interno es irrelevante) | A toda la red (estructural, no por weight tying) |
 
 Estas tres equivarianzas reducen drásticamente la longitud de descripción del modelo y, por tanto, su KL efectiva.
+
+#### 4.2.1 Qué significa que una regla sea equivariante
+
+Una **simetría** es una transformación que cambia la apariencia de una
+cuadrícula sin cambiar la naturaleza de la regla. Girar un dibujo 90 grados o
+intercambiar los nombres de dos colores son ejemplos habituales en ARC. Una
+función es **equivariante** si transforma su resultado de la misma manera que
+se transformó la entrada.
+
+```text
+Entrada original        Entrada girada       Salida esperada girada
+0 2 0                   0 0 0                0 0 0
+0 2 0      girar        2 2 2   regla        1 1 1
+0 0 0                   0 0 0                0 0 0
+```
+
+Si la regla era "prolongar una línea hacia abajo", después de girar el dibujo
+la misma regla geométrica debe prolongar una línea hacia la derecha. No se pide
+que la salida sea idéntica a la original; se pide que gire de forma coherente.
+Eso es equivarianza. La **invariancia**, en contraste, exigiría que el resultado
+no cambiase tras la transformación, algo distinto.
+
+CompressARC incorpora parte de este comportamiento sin tener que aprenderlo de
+cero:
+
+- `Initializer.symmetrize_xy()` comparte los pesos de las vistas que cambian
+  los ejes `x` e `y`. Ayuda a que tratar filas y columnas tenga el mismo coste
+  paramétrico.
+- `Initializer.symmetrize_direction_sharing()` comparte los pesos de
+  comunicación entre las ocho direcciones compatibles con rotaciones y
+  reflexiones del cuadrado.
+- La red opera sobre los colores como categorías anónimas: no recibe un peso
+  reservado para "el color número 2" por el hecho de ser el número 2.
+
+El propio comentario de `ARCCompressor.__init__()` advierte que simetrizar todas
+las operaciones es difícil. Por tanto, esta arquitectura induce equivarianza
+en componentes importantes, pero no debe interpretarse como una demostración
+de equivarianza perfecta de punta a punta para toda transformación imaginable.
 
 ### 4.3 Capa de decodificación (VAE)
 
@@ -307,6 +646,44 @@ $$\text{KL} = \tfrac{1}{2}(\sigma_{\text{noise}}^2 + \sigma_{\text{signal}}^2 \c
 6. Una capa `affine` proyecta $z$ del espacio latente (`decoding_dim=4`) al espacio del residual stream (`channel_dim_fn(dims)`).
 
 **¿Por qué este esquema?** Porque permite que **cada tensor del multitensor decida cuánta información transmitir** (cuánta KL gastar), y dentro de cada tensor, **cada elemento decida si es "señal" o "ruido"** (mediante `local_capacity_adjustment`). El optimizador asignará automáticamente más capacidad a los tensores y elementos que ayuden a reducir la reconstrucción y dejará en ruido los irrelevantes. **Esta es la verdadera "compresión" del modelo.**
+
+#### 4.3.1 Del ruido al estado inicial de la red
+
+La palabra "decodificar" puede sugerir que existe un texto oculto que se
+traduce, pero aquí significa otra cosa: convertir un código numérico aleatorio
+en los primeros valores con los que trabajará la red. Para cada una de las 27
+vistas del multitensor, `decode_latents()` hace el siguiente recorrido:
+
+```mermaid
+flowchart LR
+    A[mean y ajuste local aprendidos] --> B[Normalizar mean]
+    B --> C[Combinar señal y ruido aleatorio]
+    C --> D[Latente z de 4 canales]
+    D --> E[affine]
+    E --> F[Estado residual de 8 o 16 canales]
+    C --> G[Coste KL de esta vista]
+```
+
+- **`mean`:** es una tabla de parámetros ajustables, con la forma de la vista
+  correspondiente. Indica en qué dirección debe desviarse el código respecto
+  al ruido genérico.
+- **Ruido:** `torch.randn(...)` crea valores aleatorios normales. Mantener una
+  parte de ruido evita que el código se convierta en una tabla de memoria sin
+  coste.
+- **Señal frente a ruido:** `local_capacity_adjustment` controla, posición a
+  posición, cuánto pesa la señal aprendida frente al ruido. `target_capacity`
+  controla una capacidad global para esa vista.
+- **KL:** se calcula al mismo tiempo. Si una vista necesita transportar mucha
+  señal específica, aporta más a la pérdida. Si no resulta útil, puede quedar
+  cerca del ruido y aportar poco.
+- **`affine`:** es una transformación lineal sobre el último eje. Convierte los
+  4 canales del latente en los 8 o 16 canales que usa el flujo residual.
+
+Una analogía útil es una emisora con ruido: `mean` es el mensaje que se quiere
+emitir, `local_capacity_adjustment` decide la intensidad de cada parte de la
+señal y KL factura cuánta información distinguible se ha transmitido. La red
+posterior solo recibe la mezcla $z$; debe usar su estructura para reconstruir
+las cuadrículas visibles y proponer las ocultas.
 
 ### 4.4 Capas centrales — orden y propósito
 
@@ -342,6 +719,66 @@ Cada operación está envuelta por **`add_residual`** ([layers.py:38-56](layers.
 
 Las capas direccionales (`cummax`, `shift`) sólo se aplican a tensores que contienen `direction + x + y` (con o sin `color`), gracias al decorador `only_do_for_certain_shapes((1,1,1,1,1), (1,0,1,1,1))`. Para el resto, son la identidad.
 
+#### 4.4.1 Una actualización residual, paso a paso
+
+Las operaciones de la tabla no sustituyen de golpe el estado de la red. Cada
+una se envuelve mediante `add_residual()`, que mantiene una copia de la
+representación anterior y suma una propuesta de cambio. Para una operación
+genérica, la idea es:
+
+```text
+estado_nuevo = estado_anterior
+             + proyectar_salida(
+                 operación_especializada(
+                   proyectar_entrada(estado_anterior)))
+```
+
+El código de `layers.add_residual` implementa exactamente esa suma final
+`return x + z`. Las proyecciones `affine` cambian solo el eje de canales; no
+mezclan arbitrariamente filas, columnas o ejemplos. La operación especializada
+es la que aporta una capacidad concreta, como desplazar información o calcular
+máximos acumulados.
+
+```mermaid
+flowchart LR
+    A[Estado residual x] --> B[Proyección de entrada]
+    B --> C[Operación especializada]
+    C --> D[Proyección de salida]
+    A --> E[Suma]
+    D --> E
+    E --> F[Estado residual actualizado]
+```
+
+Un ejemplo de intuición espacial ayuda a leer la secuencia completa. Supongamos
+que una demostración contiene un punto rojo y la salida prolonga una línea desde
+ese punto hasta un borde:
+
+```text
+Entrada                  Posible salida
+0 0 0 0 0                0 0 0 0 0
+0 0 2 0 0                0 0 2 0 0
+0 0 0 0 0                0 0 2 0 0
+0 0 0 0 0                0 0 2 0 0
+```
+
+- `share_up` puede llevar una señal resumida sobre el color o el ejemplo a una
+  vista que incluye coordenadas de píxel.
+- `softmax` transforma puntuaciones en comparaciones relativas a lo largo de
+  ejes presentes, lo que permite seleccionar posiciones o colores de modo suave.
+- `cummax` propaga un máximo siguiendo una dirección y es útil para detectar
+  que ya apareció una señal antes en ese recorrido.
+- `shift` pone a disposición de un píxel información de su vecino inmediato.
+- `direction_share` intercambia información entre las ocho orientaciones, por
+  ejemplo entre la dirección vertical y sus diagonales cercanas.
+- `share_down` devuelve resúmenes de esas vistas espaciales a vistas más
+  compactas; `normalize` mantiene escalas numéricas comparables.
+
+Ninguna de estas operaciones codifica por sí sola "dibujar una línea". Los
+pesos aprendidos deciden qué señales son relevantes y las cuatro repeticiones
+componen operaciones elementales. Además, `cummax` y `shift` se limitan a las
+dos formas que contienen dirección, `x` e `y`; en las demás vistas actúan como
+identidad, tal como impone `only_do_for_certain_shapes`.
+
 ### 4.5 Cabezas lineales y postprocesamiento de máscaras
 
 Tras los 4 bloques, el residual stream produce tres salidas ([arc_compressor.py:131-142](arc_compressor.py)):
@@ -354,9 +791,87 @@ Tras los 4 bloques, el residual stream produce tres salidas ([arc_compressor.py:
 
 **`postprocess_mask`** ([layers.py:557-583](layers.py)) añade un sumando de $-1000$ a los índices más allá del máximo observado en `task.shapes`, garantizando que el modelo no prediga grids más grandes de lo permitido por la tarea.
 
+#### 4.5.1 De puntuaciones continuas a una cuadrícula discreta
+
+Después de los cuatro bloques todavía no existe una respuesta ARC, porque el
+estado residual contiene números continuos. Las tres cabezas convierten esos
+números en decisiones de salida:
+
+1. La **cabeza de color** entrega una puntuación por color, por píxel y por
+  modo (`input` u `output`). `train.take_step()` añade después una columna de
+  logits cero para el negro, que se trata como color de fondo de referencia.
+2. Las **máscaras `x` e `y`** entregan una puntuación por fila y columna. Sirven
+  para recortar el área que el sistema considera perteneciente a la cuadrícula
+  de salida si su tamaño no se conoce de antemano.
+3. `postprocess_mask()` descarta de forma determinista índices imposibles. Una
+  puntuación muy negativa, como `-1000`, hace que elegir esos índices sea
+  prácticamente imposible.
+
+Para un solo píxel, supongamos que la cabeza produce estos logits después de
+añadir el negro:
+
+```text
+color real:       negro   rojo   azul
+logit:              0.0    4.2   1.1
+probabilidad:      baja    alta  muy baja
+argmax:                    rojo
+```
+
+`argmax` transforma esa elección en el índice de color que ARC espera. Las
+máscaras actúan de manera análoga sobre filas y columnas. Si la mejor región es
+filas `0..2` y columnas `0..4`, el postprocesado conserva exactamente ese
+rectángulo y descarta el padding usado internamente para que todas las
+cuadrículas compartan un tamaño máximo.
+
 ---
 
 ## 5. Flujo completo del sistema
+
+### 5.0 Ejemplo guiado: seguir una tarea pequeña
+
+El siguiente caso es **sintético**: sirve para entender los datos y el flujo,
+no para afirmar que una ejecución concreta de CompressARC siempre descubra esta
+regla. Las dos demostraciones sugieren que cada píxel de color `2` debe pasar a
+color `1`; los demás se conservan.
+
+```text
+Demostración 1             Demostración 1
+entrada                    salida
+0 2 0                      0 1 0
+0 0 0                      0 0 0
+
+Demostración 2             Demostración 2
+entrada                    salida
+2 0 2                      1 0 1
+0 0 0                      0 0 0
+
+Test
+entrada                    salida que debe proponer el sistema
+0 2 2                      ? ? ?
+2 0 0                      ? ? ?
+```
+
+El camino de esta tarea por el sistema es el siguiente:
+
+```mermaid
+flowchart TD
+  A[Dos demostraciones y una entrada de test] --> B[Task lee formas y colores]
+  B --> C[Padding y máscaras para el tamaño máximo]
+  C --> D[Latentes de 27 vistas multitensor]
+  D --> E[Forward: cuatro bloques]
+  E --> F[Logits de color y máscaras de salida]
+  F --> G[Comparar solo las dos demostraciones conocidas]
+  G --> H[Actualizar parámetros]
+  H --> E
+  F --> I[Convertir salida de test en candidata]
+  I --> J[Acumular evidencia para pass@2]
+```
+
+El paso clave está entre `F` y `G`: los logits de salida de las demostraciones
+se comparan con sus colores correctos, pero los logits de salida del test no se
+comparan con nada porque la respuesta no está disponible. Aun así, el forward
+calcula ambos. El ajuste que ayuda a explicar las demostraciones modifica la
+predicción producida para el test por los mismos pesos y latentes.
 
 ### 5.1 Preprocesamiento
 
@@ -374,6 +889,54 @@ Implementado en [preprocessing.py](preprocessing.py). La clase `Task` ([preproce
 - `problem`: tensor `[n_examples, n_x, n_y, 2]` con índices de color (canal 0 = input, canal 1 = output).
 - `masks`: tensor `[n_examples, n_x, n_y, 2]` con 1 dentro del grid y 0 fuera.
 - `solution_hash`: hash de la tupla del output ground-truth, usado para comprobar correctitud sin exponer la solución al modelo.
+
+#### 5.1.1 Del JSON a los tensores y las máscaras
+
+El archivo original de ARC es JSON y contiene listas anidadas de números. Una
+lista puede tener un tamaño distinto de otra, pero una GPU necesita normalmente
+tablas rectangulares. `Task` resuelve esta diferencia creando una cuadrícula de
+tamaño máximo y usando **padding** y **máscaras** para señalar qué zona es real.
+
+| Dato del JSON | Atributo de `Task` | Para qué se usa |
+| --- | --- | --- |
+| `train` y `test` | `n_train`, `n_test`, `n_examples` | Separar demostraciones completas de entradas con salida oculta. |
+| Tamaño de cada entrada/salida | `shapes` | Inferir o limitar el tamaño de la salida. |
+| Colores presentes | `colors`, `n_colors` | Convertir etiquetas ARC en índices internos; se incluye siempre `0` como negro. |
+| Cuadrículas conocidas | `problem` | Calcular la reconstrucción de entradas y salidas de demostración. |
+| Zona válida de cada grid | `masks` | Ignorar padding y restringir operaciones espaciales. |
+| Solución de evaluación, cuando existe | `solution`, `solution_hash` | Medir resultados fuera de la pérdida del modelo. |
+
+Para la tarea sintética anterior, el formato conceptual sería:
+
+```text
+shapes = [
+  [[2, 3], [2, 3]],  # demostración 1: input y output
+  [[2, 3], [2, 3]],  # demostración 2
+  [[2, 3], [2, 3]],  # test: se predice la forma por la heurística
+]
+
+problem[ejemplo, x, y, modo]
+modo 0 = input
+modo 1 = output
+```
+
+En los dos primeros ejemplos, `problem[..., 1]` contiene el output conocido.
+En el ejemplo de test, `_create_problem_tensor()` no rellena ese canal. Los
+ceros que pudieran existir en el almacenamiento no representan una respuesta
+conocida: la condición `if example_num >= task.n_train and in_out_mode == 1`
+de `train.take_step()` evita que esa región contribuya a la pérdida.
+
+La forma de la salida se determina antes de entrenar con una cascada sencilla:
+
+1. Si todas las demostraciones conservan tamaño, la salida de test conserva el
+  tamaño de su input.
+2. Si todas las salidas de demostración tienen el mismo tamaño, se adopta ese
+  tamaño para el test.
+3. Si ninguna regla anterior aplica, se reserva el tamaño máximo observado y
+  las máscaras `x` e `y` deben localizar el rectángulo de salida.
+
+Esto no equivale a conocer la solución: solo evita pedir al modelo una forma
+imposible o desperdiciar capacidad fuera de los límites observados.
 
 ### 5.2 Entrenamiento por inferencia
 
@@ -406,6 +969,57 @@ $$\mathcal{L} = \text{total\_KL} + 10 \cdot \text{reconstruction\_error}$$
 | Precisión | FP32 + TF32 matmul | [arc_compressor.py:10](arc_compressor.py), [parallel_train.py:39](parallel_train.py) |
 | cuDNN benchmark | True | [parallel_train.py:38](parallel_train.py) |
 
+#### 5.2.1 Una iteración de optimización, sin saltos
+
+Una **iteración** es una oportunidad de corregir ligeramente los parámetros.
+No es una demostración nueva ni una respuesta final. El bucle de
+`train.take_step()` se puede leer así; el pseudocódigo conserva el orden del
+archivo, aunque omite detalles de offsets y tensores para centrarse en el flujo.
+
+```python
+# Pseudocódigo didáctico de train.take_step(...)
+optimizer.zero_grad()                     # olvida gradientes del paso anterior
+logits, x_mask, y_mask, kls, names = model.forward()
+logits = add_fixed_black_logit(logits)    # el negro tiene logit de referencia 0
+
+total_kl = sum(each_kl.sum() for each_kl in kls)
+reconstruction = 0
+
+for example in all_examples:
+    for mode in (input, output):
+        if example_is_test and mode_is_output:
+            continue                      # nunca mira la salida de test
+        reconstruction += negative_log_probability_of_known_grid(
+            logits, x_mask, y_mask, task.problem, task.shapes
+        )
+
+loss = total_kl + 10 * reconstruction
+loss.backward()                           # calcula cómo cambiar cada parámetro
+optimizer.step()                          # Adam aplica el cambio
+logger.log(...)                           # registra candidatos, no gradientes
+```
+
+La pérdida une dos preguntas complementarias:
+
+- **¿Cuánta información específica está usando el modelo?** La respuesta es
+  `total_KL`, la suma de los costes procedentes de cada latente multitensor.
+- **¿Qué tan bien reproduce los datos visibles?** La respuesta es
+  `reconstruction_error`, que combina el color correcto y, si la forma es
+  incierta, la probabilidad de elegir su recorte correcto.
+
+Cuando la forma no puede inferirse por las heurísticas, el código considera
+varios desplazamientos y tamaños posibles para el recorte. `mask_select_logprobs`
+asigna una puntuación a cada candidato: favorece índices dentro de la máscara y
+penaliza los que quedan fuera. `torch.logsumexp` agrega las posibilidades sin
+elegir de forma brusca una sola al inicio del entrenamiento.
+
+Durante los primeros 100 pasos, los términos de máscara reciben un coeficiente
+menor si la forma es incierta. Esta pequeña secuencia de aprendizaje evita que
+el modelo tenga que resolver color y tamaño con la misma intensidad desde el
+primer gradiente. Después de `loss.backward()`, PyTorch calcula derivadas; Adam
+usa esas derivadas y su historial para actualizar tanto los pesos de las capas
+como los parámetros de los posteriores latentes.
+
 ### 5.3 Postprocesamiento y selección pass@2
 
 Cada llamada a `Logger.log` ([solution_selection.py:40-91](solution_selection.py)) registra **dos candidatos**:
@@ -423,6 +1037,53 @@ Para cada candidato:
 - El score se acumula con `np.logaddexp` en `solution_hashes_count[hash]`: así una solución que aparece **muchas veces con bajo `uncertainty`** acumula mucho score.
 
 Al terminar las 2000 iteraciones, las dos soluciones con mayor `solution_hashes_count` se asignan a `solution_most_frequent` (attempt_1) y `solution_second_most_frequent` (attempt_2) y se entregan en formato Kaggle.
+
+#### 5.3.1 Por qué se acumulan candidatos en vez de usar el último
+
+Un forward de CompressARC contiene ruido en sus latentes, de modo que una buena
+predicción puede aparecer en un paso y empeorar en el siguiente. Elegir solo el
+último resultado desperdiciaría esa evidencia temporal. `Logger` registra dos
+candidatas en **cada** iteración:
+
+```mermaid
+flowchart LR
+  A[Logits y máscaras del forward] --> B[Predicción actual]
+  A --> C[Actualizar media exponencial EMA]
+  C --> D[Predicción suavizada]
+  B --> E[argmax, recorte e incertidumbre]
+  D --> E
+  E --> F[Score de cada cuadrícula]
+  F --> G[logaddexp por solución repetida]
+  G --> H[Conservar las dos mejores]
+```
+
+La **media móvil exponencial** o EMA (*exponential moving average*) mezcla el
+estado actual con el histórico:
+
+$$
+\operatorname{EMA}_t = 0.97 \cdot \operatorname{EMA}_{t-1}
++ 0.03 \cdot \operatorname{actual}_t
+$$
+
+El valor `0.97` está definido en `Logger.ema_decay`. Una EMA no es una tercera
+red: es una versión suavizada de los logits y máscaras producidos por la misma
+red a lo largo del tiempo.
+
+Para transformar una candidata en una cuadrícula ARC, `_postprocess_solution()`
+realiza tres operaciones: selecciona con `argmax` el color mejor puntuado por
+píxel, usa las máscaras para elegir el mejor recorte y convierte los índices
+internos de vuelta a los valores de `task.colors`. Calcula además una medida de
+incertidumbre por píxel mediante `logsumexp(logits) - max(logits)`: una
+diferencia pequeña indica que un color domina claramente; una grande indica que
+varios colores compiten.
+
+El score empieza como `-10 * uncertainty`. Se penalizan los primeros 150 pasos
+y, cuando hay empate, la alternativa EMA. Finalmente `np.logaddexp` acumula el
+score de una misma cuadrícula sin perder precisión numérica. Por eso una
+respuesta que reaparece muchas veces con baja incertidumbre puede superar una
+respuesta espectacular pero aislada. Al terminar, el sistema entrega las dos
+cuadrículas distintas con mejor evidencia acumulada: esa es su estrategia para
+la métrica oficial `pass@2`.
 
 ### 5.4 Entrenamiento paralelo a escala
 
@@ -1282,6 +1943,58 @@ Hay dos estrategias posibles y su relación coste/beneficio es asimétrica:
 Para ejecutar los pasos 1–7 con evidencia y no "a ciegas", este eje se apoya en un script de perfilado **externo y de bajo overhead** ([profile_parallel_train.py](profile_parallel_train.py)) que envuelve a [parallel_train.py](parallel_train.py) y muestrea —sin instrumentar el hot loop— las métricas necesarias: velocidad de entrenamiento y recursos por tarea concurrente, carga/uso/comportamiento de CPU (global y por núcleo), concurrencia efectiva de workers a lo largo del tiempo, VRAM/GPU y una **comparativa antes/después**. Su diseño (muestreo ≥1 s, proceso único de baja prioridad, sin tocar el código de entrenamiento) garantiza que **medir no agrave el cuello de botella**. Ver detalle de uso en su docstring.
 
 ---
+
+## Glosario rápido
+
+- **Adam:** optimizador que transforma los gradientes calculados por PyTorch en
+  actualizaciones de parámetros. Este proyecto lo configura con `lr=0.01` y
+  `betas=(0.5, 0.9)`.
+- **`argmax`:** operación que devuelve la posición del valor mayor. Aquí
+  convierte los logits de color de un píxel en una etiqueta ARC discreta.
+- **Canal:** último eje de una representación interna. No es un color ni una
+  coordenada espacial; contiene varios rasgos numéricos que la red puede usar.
+- **Cross-entropy o error de reconstrucción:** coste que aumenta si el modelo
+  da poca puntuación al color que aparece en una celda conocida.
+- **EMA:** media móvil exponencial. Es una versión suavizada de logits y
+  máscaras anteriores, no un segundo modelo entrenado de forma independiente.
+- **Equivarianza:** propiedad por la que una transformación de la entrada, como
+  girar la cuadrícula, provoca la transformación coherente de la salida.
+- **Gradiente:** indicación matemática de cómo debe variar cada parámetro para
+  reducir la pérdida en el siguiente paso de optimización.
+- **KL:** divergencia de Kullback-Leibler. En CompressARC aproxima el coste de
+  codificar cuánto se desvía un latente aprendido del ruido normal de referencia.
+- **Latente $z$:** código numérico generado a partir de señal aprendida y ruido.
+  Es el estado inicial que el decodificador transforma en predicciones.
+- **Logit:** puntuación continua previa a una probabilidad o elección discreta.
+  Un logit mayor para un color lo hace más probable respecto a los demás.
+- **Máscara:** señal que marca qué filas y columnas pertenecen a una cuadrícula
+  válida. También permite inferir un recorte cuando el tamaño de salida es
+  incierto.
+- **MDL:** *Minimum Description Length* o longitud mínima de descripción. Es
+  el criterio que favorece explicar los datos con una regla compacta en lugar de
+  memorizar cada salida por separado.
+- **Multitensor:** conjunto de tensores que representan diferentes subconjuntos
+  de ejes de la tarea, por ejemplo color, posición o dirección. La
+  implementación conserva 27 vistas válidas.
+- **Padding:** celdas de relleno añadidas para que cuadrículas de distintos
+  tamaños puedan almacenarse en una tabla rectangular común. Las máscaras
+  impiden que se interpreten como parte de la tarea.
+- **Parámetro:** valor numérico ajustable, como un peso de una proyección lineal
+  o la media de un posterior latente. Se reinicializa al comenzar otra tarea.
+- **`pass@2`:** criterio de ARC que acepta dos respuestas por entrada de test;
+  la tarea se considera resuelta si alguna coincide exactamente con la solución.
+- **Posterior y prior:** el prior es la distribución de referencia, aquí ruido
+  normal estándar. El posterior es la distribución ajustable que genera el
+  latente de una tarea concreta.
+- **Residual:** representación que atraviesa los bloques. Cada operación añade
+  una propuesta de cambio al estado anterior en vez de reemplazarlo por completo.
+- **Softmax:** transformación que convierte varias puntuaciones en pesos
+  positivos relativos que suman uno a lo largo de un eje elegido.
+- **Tensor:** tabla de números con uno o más ejes. Una cuadrícula es un tensor
+  de dos ejes; una pila de cuadrículas añade un eje de ejemplos.
+- **VAE:** *variational autoencoder*. En este contexto es un decodificador que
+  genera cuadrículas desde un latente y aporta un término KL para medir el coste
+  de información de ese latente.
 
 ## 10. Referencias
 
