@@ -1,0 +1,177 @@
+{
+  "label": "d_baseline",
+  "timestamp": "2026-07-20 06:01:13",
+  "command": [
+    "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python",
+    "-u",
+    "parallel_train.py",
+    "--split",
+    "training",
+    "--demo",
+    "10",
+    "--mixed-precision",
+    "off",
+    "--compile-forward",
+    "off",
+    "--float32-matmul-precision",
+    "highest"
+  ],
+  "return_code": 0,
+  "wall_time_s": 5911.8,
+  "n_cores": 24,
+  "sample_interval_s": 1.0,
+  "n_samples": 5911,
+  "cpu": {
+    "mean_pct": 73.7,
+    "median_pct": 81.4,
+    "p95_pct": 82.6,
+    "max_pct": 86.0,
+    "saturation_threshold_pct": 90.0,
+    "saturation_fraction": 0.0
+  },
+  "concurrency": {
+    "mean_workers": 11.04,
+    "max_workers": 12,
+    "workers_completed": 11
+  },
+  "throughput": {
+    "workers_completed": 11,
+    "wall_time_s": 5911.8,
+    "workers_per_hour": 6.7,
+    "mean_worker_lifetime_s": 5398.0
+  },
+  "memory": {
+    "tree_rss_max_mb": 19776.2,
+    "host_mem_used_max_pct": 20.6
+  },
+  "gpu": {
+    "vendor": "sysfs(amdgpu)",
+    "util_mean_pct": 99.5,
+    "util_max_pct": 100.0,
+    "mem_max_mb": 9019.7
+  },
+  "eje_d": {
+    "config": {
+      "mixed_precision": "off",
+      "compile_forward": "off",
+      "compile_phase1": false,
+      "float32_matmul_precision": "highest"
+    },
+    "tree_cpu_mean_pct": 1761.6,
+    "tree_cpu_per_worker_pct": 159.5,
+    "gpu_util_per_worker_pct": 9.0,
+    "gpu_cpu_balance": 1.35,
+    "vram_per_max_worker_mb": 751.6
+  },
+  "workers": [
+    {
+      "pid": 16394,
+      "name": "python",
+      "lifetime_s": 5909.8,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 12.8
+    },
+    {
+      "pid": 16395,
+      "name": "python",
+      "lifetime_s": 5908.8,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 13.9,
+      "peak_rss_mb": 938.4
+    },
+    {
+      "pid": 16449,
+      "name": "python",
+      "lifetime_s": 5906.8,
+      "mean_cpu_pct": 195.0,
+      "peak_cpu_pct": 201.6,
+      "peak_rss_mb": 1805.4
+    },
+    {
+      "pid": 16450,
+      "name": "python",
+      "lifetime_s": 5775.7,
+      "mean_cpu_pct": 195.3,
+      "peak_cpu_pct": 201.7,
+      "peak_rss_mb": 1807.5
+    },
+    {
+      "pid": 16451,
+      "name": "python",
+      "lifetime_s": 5723.7,
+      "mean_cpu_pct": 194.9,
+      "peak_cpu_pct": 201.3,
+      "peak_rss_mb": 1801.5
+    },
+    {
+      "pid": 16452,
+      "name": "python",
+      "lifetime_s": 5626.7,
+      "mean_cpu_pct": 195.4,
+      "peak_cpu_pct": 201.5,
+      "peak_rss_mb": 1789.9
+    },
+    {
+      "pid": 16453,
+      "name": "python",
+      "lifetime_s": 5313.7,
+      "mean_cpu_pct": 194.5,
+      "peak_cpu_pct": 201.7,
+      "peak_rss_mb": 1790.5
+    },
+    {
+      "pid": 16454,
+      "name": "python",
+      "lifetime_s": 5319.7,
+      "mean_cpu_pct": 194.5,
+      "peak_cpu_pct": 202.0,
+      "peak_rss_mb": 1790.6
+    },
+    {
+      "pid": 16455,
+      "name": "python",
+      "lifetime_s": 5150.7,
+      "mean_cpu_pct": 194.3,
+      "peak_cpu_pct": 201.3,
+      "peak_rss_mb": 1789.4
+    },
+    {
+      "pid": 16456,
+      "name": "python",
+      "lifetime_s": 5338.7,
+      "mean_cpu_pct": 194.9,
+      "peak_cpu_pct": 201.4,
+      "peak_rss_mb": 1787.1
+    },
+    {
+      "pid": 16457,
+      "name": "python",
+      "lifetime_s": 4587.6,
+      "mean_cpu_pct": 194.1,
+      "peak_cpu_pct": 201.3,
+      "peak_rss_mb": 1787.7
+    },
+    {
+      "pid": 16458,
+      "name": "python",
+      "lifetime_s": 4725.6,
+      "mean_cpu_pct": 194.2,
+      "peak_cpu_pct": 201.7,
+      "peak_rss_mb": 1786.5
+    }
+  ],
+  "phases": {
+    "log_files": [
+      ".log/arc_training_training_20260720_042242.log"
+    ],
+    "phase1_time_s": 0.0,
+    "phase2_time_s": 5909.5,
+    "phase1_workers_completed": 0,
+    "phase2_workers_completed": 10,
+    "phase1_workers_per_hour": null,
+    "phase2_workers_per_hour": 6.09,
+    "phase1_mean_task_lifetime_s": null,
+    "phase2_mean_task_lifetime_s": 5347.2
+  }
+}

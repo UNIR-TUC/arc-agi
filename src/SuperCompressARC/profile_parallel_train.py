@@ -73,6 +73,7 @@ import csv
 import glob
 import json
 import os
+import re
 import shutil
 import statistics
 import subprocess
@@ -99,6 +100,100 @@ def _extract_eje_d_config(passthrough):
         'compile_phase1': '--compile-phase1' in passthrough,
         'float32_matmul_precision': _passthrough_value(
             passthrough, '--float32-matmul-precision', 'high'
+        ),
+    }
+
+
+_PHASE_COMPLETE_RE = re.compile(r'Phase ([12]) complete in ([0-9.]+)s')
+_DONE_RE = re.compile(r'DONE\s+\[\s*\d+/\d+\]\s+\S+\s+([0-9.]+)s')
+
+
+def _arc_log_paths():
+    return set(glob.glob('.log/arc_training_*.log'))
+
+
+def _new_arc_logs(before_paths):
+    return sorted(_arc_log_paths() - before_paths)
+
+
+def _parse_arc_log_phases(path):
+    """Extract Phase 1/2 timing and task lifetimes from one ArcLogger file.
+
+    This keeps the profiler out of the training hot loop: ArcLogger already
+    records phase boundaries and per-task DONE lines, so we parse them after the
+    run instead of adding IPC or worker instrumentation.
+    """
+    current_phase = None
+    out = {
+        'path': path,
+        'phase1_time_s': None,
+        'phase2_time_s': None,
+        'phase1_workers_completed': 0,
+        'phase2_workers_completed': 0,
+        '_phase1_lifetimes': [],
+        '_phase2_lifetimes': [],
+    }
+
+    try:
+        with open(path) as f:
+            for line in f:
+                if 'PHASE: Phase 1' in line:
+                    current_phase = 'phase1'
+                    if 'SKIPPED' in line:
+                        out['phase1_time_s'] = 0.0
+                    continue
+                if 'PHASE: Phase 2' in line:
+                    current_phase = 'phase2'
+                    continue
+
+                match = _PHASE_COMPLETE_RE.search(line)
+                if match:
+                    phase = f'phase{match.group(1)}_time_s'
+                    out[phase] = float(match.group(2))
+                    continue
+
+                match = _DONE_RE.search(line)
+                if match and current_phase in ('phase1', 'phase2'):
+                    lifetime = float(match.group(1))
+                    out[f'{current_phase}_workers_completed'] += 1
+                    out[f'_{current_phase}_lifetimes'].append(lifetime)
+    except OSError:
+        pass
+
+    return out
+
+
+def _aggregate_phase_metrics(log_paths):
+    logs = [_parse_arc_log_phases(path) for path in log_paths]
+    phase1_lifetimes = [v for log in logs for v in log['_phase1_lifetimes']]
+    phase2_lifetimes = [v for log in logs for v in log['_phase2_lifetimes']]
+
+    phase1_times = [log['phase1_time_s'] for log in logs if log['phase1_time_s'] is not None]
+    phase2_times = [log['phase2_time_s'] for log in logs if log['phase2_time_s'] is not None]
+    phase1_time = sum(phase1_times) if phase1_times else None
+    phase2_time = sum(phase2_times) if phase2_times else None
+    phase1_workers = sum(log['phase1_workers_completed'] for log in logs)
+    phase2_workers = sum(log['phase2_workers_completed'] for log in logs)
+
+    return {
+        'log_files': log_paths,
+        'phase1_time_s': round(phase1_time, 1) if phase1_time is not None else None,
+        'phase2_time_s': round(phase2_time, 1) if phase2_time is not None else None,
+        'phase1_workers_completed': phase1_workers,
+        'phase2_workers_completed': phase2_workers,
+        'phase1_workers_per_hour': (
+            round(phase1_workers / phase1_time * 3600, 2)
+            if phase1_time and phase1_time > 0 else None
+        ),
+        'phase2_workers_per_hour': (
+            round(phase2_workers / phase2_time * 3600, 2)
+            if phase2_time and phase2_time > 0 else None
+        ),
+        'phase1_mean_task_lifetime_s': (
+            round(statistics.mean(phase1_lifetimes), 1) if phase1_lifetimes else None
+        ),
+        'phase2_mean_task_lifetime_s': (
+            round(statistics.mean(phase2_lifetimes), 1) if phase2_lifetimes else None
         ),
     }
 
@@ -341,6 +436,8 @@ def run_and_profile(args, passthrough):
     # Prime system-wide cpu_percent (first call returns 0.0 / meaningless).
     psutil.cpu_percent(percpu=True)
 
+    arc_logs_before = _arc_log_paths()
+
     child = subprocess.Popen(cmd)
     root = psutil.Process(child.pid)
     tracker = TreeTracker(root)
@@ -411,6 +508,7 @@ def run_and_profile(args, passthrough):
 
     wall = time.time() - t0
     return_code = child.poll()
+    phase_metrics = _aggregate_phase_metrics(_new_arc_logs(arc_logs_before))
 
     # ── Write raw time series ────────────────────────────────────────────────
     if rows:
@@ -502,6 +600,7 @@ def run_and_profile(args, passthrough):
             'workers_per_hour': round(len(completed) / wall * 3600, 2) if wall > 0 else None,
             'mean_worker_lifetime_s': round(statistics.mean(worker_lifetimes), 1) if worker_lifetimes else None,
         },
+        'phases': phase_metrics,
         'memory': {
             'tree_rss_max_mb': round(max((r['tree_rss_mb'] for r in rows), default=0.0), 1),
             'host_mem_used_max_pct': max((r['host_mem_used_pct'] for r in rows), default=0.0),
@@ -525,6 +624,7 @@ def run_and_profile(args, passthrough):
 
 def _print_summary(s, csv_path, json_path):
     c, cc, tp, g, d = s['cpu'], s['concurrency'], s['throughput'], s['gpu'], s['eje_d']
+    ph = s.get('phases', {})
     print('\n' + '=' * 66)
     print(f'  PROFILE SUMMARY — {s["label"]}   (return code {s["return_code"]})')
     print('=' * 66)
@@ -538,6 +638,14 @@ def _print_summary(s, csv_path, json_path):
     print(f'  Throughput           : {tp["workers_per_hour"]} workers/h'
           + (f'   (mean lifetime {tp["mean_worker_lifetime_s"]} s)'
              if tp["mean_worker_lifetime_s"] else ''))
+    print(f'  Phase 1              : {ph.get("phase1_time_s")} s  '
+          f'{ph.get("phase1_workers_completed")} workers'
+          + (f'  {ph.get("phase1_workers_per_hour")} workers/h'
+             if ph.get("phase1_workers_per_hour") is not None else ''))
+    print(f'  Phase 2              : {ph.get("phase2_time_s")} s  '
+          f'{ph.get("phase2_workers_completed")} workers'
+          + (f'  {ph.get("phase2_workers_per_hour")} workers/h'
+             if ph.get("phase2_workers_per_hour") is not None else ''))
     print(f'  Tree RSS max         : {s["memory"]["tree_rss_max_mb"]:.0f} MB')
     if g['vendor']:
         print(f'  GPU util mean / max  : {g["util_mean_pct"]} / {g["util_max_pct"]} %'
@@ -587,6 +695,19 @@ def compare(before_path, after_path):
          a['throughput']['workers_per_hour'], 'higher')
     line('mean_worker_lifetime_s', b['throughput']['mean_worker_lifetime_s'],
          a['throughput']['mean_worker_lifetime_s'], 'lower', ' s')
+
+    print('\n  Phase-level throughput (higher is better, Phase 2 is decisive):')
+    bp, ap = b.get('phases', {}), a.get('phases', {})
+    line('phase1_time_s', bp.get('phase1_time_s'), ap.get('phase1_time_s'), 'lower', ' s')
+    line('phase2_time_s', bp.get('phase2_time_s'), ap.get('phase2_time_s'), 'lower', ' s')
+    line('phase1_workers_completed', bp.get('phase1_workers_completed'),
+         ap.get('phase1_workers_completed'), 'higher')
+    line('phase2_workers_completed', bp.get('phase2_workers_completed'),
+         ap.get('phase2_workers_completed'), 'higher')
+    line('phase2_workers_per_hour', bp.get('phase2_workers_per_hour'),
+         ap.get('phase2_workers_per_hour'), 'higher')
+    line('phase2_mean_task_lifetime_s', bp.get('phase2_mean_task_lifetime_s'),
+         ap.get('phase2_mean_task_lifetime_s'), 'lower', ' s')
 
     print('\n  CPU pressure (must NOT get worse):')
     cpu_ok = []
