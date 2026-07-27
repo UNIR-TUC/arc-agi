@@ -19,13 +19,14 @@ import multitensor_systems
 import layers
 import solution_selection
 import visualization
+import accel
 
 """
 A script that solves one puzzle, to be imported and used with parallel_train.py and multiprocessing.
 """
 
 def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_dict, solutions_dict, error_queue,
-               loggers_dict=None, progress_dict=None, postprocess_stride=1):
+               loggers_dict=None, progress_dict=None, postprocess_stride=1, accel_config=None):
     """
     Solves a puzzle.
     Args:
@@ -46,9 +47,16 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
             training steps so the parent process can log percentage progress.
         postprocess_stride (int): Run full pass@2 candidate postprocessing every N
             training steps instead of every step (Eje H, H3). Default 1 (no change).
+        accel_config (dict, optional): Serialized accel.AccelConfig (Eje D, §9.6):
+            BF16 autocast, torch.compile and host/silicon tuning. None or an
+            all-defaults config reproduces the untouched baseline.
     """
 
     try:  # Error catching block that puts errors on the error_queue
+
+        # Eje D: must run before any GPU tensor exists, so allocator/Inductor
+        # environment variables and the matmul precision policy take effect.
+        accel_cfg = accel.configure_process(accel_config)
 
         torch.set_default_device('cuda')
         torch.cuda.set_device(gpu_id)
@@ -62,6 +70,9 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
 
         # Set up the training
         model = arc_compressor.ARCCompressor(task)
+        # Eje D: rebinds model.forward with BF16 autocast / torch.compile.
+        # No-op when accel is disabled; never changes the model's parameters.
+        accel.apply(model, accel_cfg)
         optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
         train_history_logger = solution_selection.Logger(task, postprocess_stride=postprocess_stride)
         train_history_logger.solution_most_frequent = tuple(((0, 0), (0, 0)) for example_num in range(task.n_test))

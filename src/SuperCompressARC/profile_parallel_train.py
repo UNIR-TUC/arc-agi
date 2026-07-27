@@ -39,7 +39,10 @@ What it measures
       - aggregate CPU% and RSS of the tree,
       - per-worker lifetime, mean CPU%, peak RSS  -> "resources per parallel task".
   * Worker completions over time  -> task throughput proxy.
-  * GPU utilization and VRAM (best effort, if rocm-smi/nvidia-smi is available).
+  * GPU utilization, memory-controller busy %, VRAM and board power (best effort).
+  * From `run_metadata_{split}.json` written by parallel_train.py: planned training
+    steps, pass@2 solved count and the exact Eje D acceleration configuration ->
+    training throughput (steps/s), energy per 1k steps, and accuracy.
 
 Outputs
 -------
@@ -57,13 +60,26 @@ Run again after applying an optimization:
 
     python profile_parallel_train.py --label optimized -- --split training --demo 20
 
+Eje D (§9.6) before/after workflow — `--accel-preset` forwards the matching flag
+to parallel_train.py and labels the summary, so the two runs differ only in the
+acceleration configuration:
+
+    python profile_parallel_train.py --label d_baseline --accel-preset baseline \
+        -- --split training --demo 20 --iterations 300
+    python profile_parallel_train.py --label d_full --accel-preset full \
+        -- --split training --demo 20 --iterations 300
+    python profile_parallel_train.py --compare .profile/d_baseline_summary.json \
+                                                .profile/d_full_summary.json
+
 Compare two summaries (no training is launched):
 
     python profile_parallel_train.py --compare .profile/baseline_summary.json \
                                                 .profile/optimized_summary.json
 
 The comparison prints deltas and FAILS LOUDLY if the CPU bottleneck got worse
-(so an "optimization" that actually increases CPU pressure is caught).
+(exit code 2, so an "optimization" that actually increases CPU pressure is
+caught) or if pass@2 accuracy dropped (exit code 3, so a speedup bought with
+broken numerics is caught too).
 """
 
 import argparse
@@ -92,26 +108,33 @@ def _detect_gpu_tool():
 
 
 def _sample_gpu(vendor, path):
-    """Return (util_percent, mem_used_mb) aggregated over GPUs, or (None, None).
+    """Return (util_pct, mem_used_mb, mem_busy_pct, power_w) or Nones.
 
     Kept deliberately short-lived and wrapped in try/except: a flaky SMI call
-    must never crash the harness nor block sampling for long.
+    must never crash the harness nor block sampling for long. The SMI path does
+    not report mem_busy/power here — those come from sysfs only.
     """
     try:
         if vendor == 'nvidia':
             out = subprocess.run(
-                [path, '--query-gpu=utilization.gpu,memory.used',
+                [path, '--query-gpu=utilization.gpu,memory.used,power.draw',
                  '--format=csv,noheader,nounits'],
                 capture_output=True, text=True, timeout=4,
             ).stdout.strip()
-            utils, mems = [], []
+            utils, mems, powers = [], [], []
             for line in out.splitlines():
-                u, m = line.split(',')
-                utils.append(float(u))
-                mems.append(float(m))
+                parts = line.split(',')
+                utils.append(float(parts[0]))
+                mems.append(float(parts[1]))
+                if len(parts) > 2:
+                    try:
+                        powers.append(float(parts[2]))
+                    except ValueError:
+                        pass
             if not utils:
-                return None, None
-            return max(utils), sum(mems)
+                return None, None, None, None
+            return (max(utils), sum(mems), None,
+                    sum(powers) if powers else None)
         if vendor == 'rocm':
             out = subprocess.run(
                 [path, '--showuse', '--showmeminfo', 'vram', '--json'],
@@ -133,10 +156,11 @@ def _sample_gpu(vendor, path):
                         except ValueError:
                             pass
             return (max(utils) if utils else None,
-                    sum(mems) if mems else None)
+                    sum(mems) if mems else None,
+                    None, None)
     except Exception:
-        return None, None
-    return None, None
+        return None, None, None, None
+    return None, None, None, None
 
 
 # ── GPU sampling via sysfs (preferred: no subprocess, no SMI ioctl surface) ──
@@ -166,12 +190,16 @@ def _detect_gpu_sysfs():
 
 
 def _sample_gpu_sysfs(device_dirs):
-    """Return (util_percent, mem_used_mb) aggregated over GPUs via sysfs, or (None, None).
+    """Return (util_pct, mem_used_mb, mem_busy_pct, power_w) via sysfs, or Nones.
 
     Pure file reads, wrapped defensively: a missing/unreadable attribute on one GPU must
     never crash the harness nor block sampling.
+
+    `mem_busy_percent` (memory-controller occupancy) and board power complement
+    `gpu_busy_percent` as silicon-utilisation signals for Eje D: BF16 and kernel
+    fusion should raise compute occupancy and lower energy per solved task.
     """
-    utils, mems = [], []
+    utils, mems, mem_busy, powers = [], [], [], []
     for device_dir in device_dirs:
         try:
             with open(os.path.join(device_dir, 'mem_info_vram_used')) as f:
@@ -183,7 +211,24 @@ def _sample_gpu_sysfs(device_dirs):
                 utils.append(float(f.read().strip()))
         except Exception:
             pass
-    return (max(utils) if utils else None, sum(mems) if mems else None)
+        try:
+            with open(os.path.join(device_dir, 'mem_busy_percent')) as f:
+                mem_busy.append(float(f.read().strip()))
+        except Exception:
+            pass
+        # Board power lives under device/hwmon/hwmon*/power1_average (microwatts).
+        try:
+            for power_path in glob.glob(
+                    os.path.join(device_dir, 'hwmon', 'hwmon*', 'power1_average')):
+                with open(power_path) as f:
+                    powers.append(int(f.read().strip()) / 1e6)
+                break
+        except Exception:
+            pass
+    return (max(utils) if utils else None,
+            sum(mems) if mems else None,
+            max(mem_busy) if mem_busy else None,
+            sum(powers) if powers else None)
 
 
 def _detect_gpu_source(mode):
@@ -213,7 +258,55 @@ def _sample_gpu_unified(source_type, payload):
     if source_type == 'smi':
         vendor, path = payload
         return _sample_gpu(vendor, path)
-    return None, None
+    return None, None, None, None
+
+
+# ── Run metadata ingestion (written by parallel_train.py) ─────────────────
+
+def _collect_run_metadata(t0):
+    """Read every run_metadata_{split}.json written by this run.
+
+    parallel_train.py writes one file per split at the end of run_split(),
+    describing what was actually executed (steps, tasks, solved count, exact
+    acceleration config). Files older than the profiled run are ignored so a
+    stale file from a previous experiment cannot pollute the summary.
+
+    Returns:
+        (list[dict], dict): per-split metadata, and derived aggregates
+            (planned steps, solved counts, accel config).
+    """
+    metadata = []
+    for path in sorted(glob.glob('run_metadata_*.json')):
+        try:
+            if os.path.getmtime(path) < t0 - 1:
+                continue
+            with open(path) as f:
+                metadata.append(json.load(f))
+        except Exception:
+            continue
+
+    total_steps = 0
+    n_tasks = 0
+    n_solved = 0
+    have_solutions = False
+    accel_cfg = None
+    for m in metadata:
+        steps = m.get('n_steps') or 0
+        tasks = m.get('n_tasks') or 0
+        total_steps += steps * tasks
+        n_tasks += tasks
+        if m.get('n_solved') is not None:
+            have_solutions = True
+            n_solved += m['n_solved']
+        accel_cfg = m.get('accel', accel_cfg)
+
+    derived = {
+        'planned_train_steps': total_steps,
+        'n_tasks': n_tasks,
+        'n_solved': n_solved if have_solutions else None,
+        'accel': accel_cfg,
+    }
+    return metadata, derived
 
 
 # ── Low-priority self so measuring does not steal CPU from workers ────────────
@@ -311,7 +404,8 @@ def run_and_profile(args, passthrough):
     cmd = [sys.executable, '-u', 'parallel_train.py'] + passthrough
     print(f'[profiler] launching: {" ".join(cmd)}')
     print(f'[profiler] cores={n_cores}  gpu={gpu_label}  '
-          f'interval={args.interval}s  gpu_interval={args.gpu_interval}s')
+          f'interval={args.interval}s  gpu_interval={args.gpu_interval}s  '
+          f'accel={args.accel_preset}')
 
     _lower_own_priority()
 
@@ -329,6 +423,9 @@ def run_and_profile(args, passthrough):
     workers_series = []
     gpu_util_series = []
     gpu_mem_series = []
+    gpu_mem_busy_series = []
+    gpu_power_series = []
+    gpu_energy_wh = 0.0
     last_gpu_sample_t = -float('inf')
 
     try:
@@ -346,10 +443,16 @@ def run_and_profile(args, passthrough):
             # the 1s CPU/process loop, to avoid contending with the GPU driver.
             if (gpu_source_type is not None
                     and (t_rel - last_gpu_sample_t) >= args.gpu_interval):
+                dt = (t_rel - last_gpu_sample_t) if last_gpu_sample_t > -1e9 else 0.0
                 last_gpu_sample_t = t_rel
-                gpu_util, gpu_mem = _sample_gpu_unified(gpu_source_type, gpu_payload)
+                gpu_util, gpu_mem, gpu_mem_busy, gpu_power = _sample_gpu_unified(
+                    gpu_source_type, gpu_payload)
+                # Rectangular integration of board power over the sampling
+                # interval -> energy, the basis of the energy-per-task metric.
+                if gpu_power is not None and dt > 0:
+                    gpu_energy_wh += gpu_power * dt / 3600.0
             else:
-                gpu_util, gpu_mem = None, None
+                gpu_util = gpu_mem = gpu_mem_busy = gpu_power = None
 
             rows.append({
                 't_rel': round(t_rel, 2),
@@ -362,6 +465,8 @@ def run_and_profile(args, passthrough):
                 'host_mem_used_pct': vmem.percent,
                 'gpu_util_pct': gpu_util,
                 'gpu_mem_mb': round(gpu_mem, 1) if gpu_mem is not None else None,
+                'gpu_mem_busy_pct': gpu_mem_busy,
+                'gpu_power_w': round(gpu_power, 1) if gpu_power is not None else None,
             })
             sys_cpu_series.append(sys_cpu)
             percore_series.append(percore)
@@ -370,6 +475,10 @@ def run_and_profile(args, passthrough):
                 gpu_util_series.append(gpu_util)
             if gpu_mem is not None:
                 gpu_mem_series.append(gpu_mem)
+            if gpu_mem_busy is not None:
+                gpu_mem_busy_series.append(gpu_mem_busy)
+            if gpu_power is not None:
+                gpu_power_series.append(gpu_power)
 
             # Sleep the remainder of the interval (keep sampling cost off the host).
             elapsed = time.time() - loop_start
@@ -421,6 +530,13 @@ def run_and_profile(args, passthrough):
     completed = [r for r in worker_records if tracker.workers[r['pid']]['end'] is not None]
     worker_lifetimes = [r['lifetime_s'] for r in completed if r['lifetime_s'] > 0]
 
+    # Metadata written by parallel_train.py: lets us report *training* throughput
+    # (steps/s) and pass@2 accuracy, not just process counts.
+    run_metadata, run_derived = _collect_run_metadata(t0)
+    planned_steps = run_derived['planned_train_steps']
+    n_solved = run_derived['n_solved']
+    n_meta_tasks = run_derived['n_tasks']
+
     summary = {
         'label': args.label,
         'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -458,7 +574,31 @@ def run_and_profile(args, passthrough):
             'util_mean_pct': round(statistics.mean(gpu_util_series), 1) if gpu_util_series else None,
             'util_max_pct': round(max(gpu_util_series), 1) if gpu_util_series else None,
             'mem_max_mb': round(max(gpu_mem_series), 1) if gpu_mem_series else None,
+            'mem_busy_mean_pct': round(statistics.mean(gpu_mem_busy_series), 1) if gpu_mem_busy_series else None,
+            'power_mean_w': round(statistics.mean(gpu_power_series), 1) if gpu_power_series else None,
+            'power_max_w': round(max(gpu_power_series), 1) if gpu_power_series else None,
+            'energy_wh': round(gpu_energy_wh, 3) if gpu_power_series else None,
         },
+        'efficiency': {
+            # Training throughput: planned Phase-2 steps over total wall time.
+            # Comparable across A/B runs as long as both use the same split,
+            # --demo, --iterations and Phase-1 cache state.
+            'planned_train_steps': planned_steps or None,
+            'steps_per_s_aggregate': (round(planned_steps / wall, 1)
+                                      if planned_steps and wall > 0 else None),
+            'energy_wh_per_worker': (round(gpu_energy_wh / len(completed), 4)
+                                     if gpu_power_series and completed else None),
+            'energy_wh_per_1k_steps': (round(gpu_energy_wh / (planned_steps / 1000.0), 4)
+                                       if gpu_power_series and planned_steps else None),
+        },
+        'accuracy': {
+            'n_solved': n_solved,
+            'n_tasks': n_meta_tasks or None,
+            'solved_fraction': (round(n_solved / n_meta_tasks, 4)
+                                if n_solved is not None and n_meta_tasks else None),
+        },
+        'accel_preset': args.accel_preset,
+        'run_metadata': run_metadata,
         'workers': worker_records,
     }
 
@@ -471,9 +611,11 @@ def run_and_profile(args, passthrough):
 
 def _print_summary(s, csv_path, json_path):
     c, cc, tp, g = s['cpu'], s['concurrency'], s['throughput'], s['gpu']
+    eff, acc = s['efficiency'], s['accuracy']
     print('\n' + '=' * 66)
     print(f'  PROFILE SUMMARY — {s["label"]}   (return code {s["return_code"]})')
     print('=' * 66)
+    print(f'  Acceleration         : {s["accel_preset"]}')
     print(f'  Wall time            : {s["wall_time_s"]:.1f} s   ({s["wall_time_s"]/3600:.2f} h)')
     print(f'  Host cores           : {s["n_cores"]}')
     print(f'  CPU mean / p95 / max : {c["mean_pct"]} / {c["p95_pct"]} / {c["max_pct"]} %')
@@ -484,10 +626,21 @@ def _print_summary(s, csv_path, json_path):
     print(f'  Throughput           : {tp["workers_per_hour"]} workers/h'
           + (f'   (mean lifetime {tp["mean_worker_lifetime_s"]} s)'
              if tp["mean_worker_lifetime_s"] else ''))
+    if eff['steps_per_s_aggregate'] is not None:
+        print(f'  Train throughput     : {eff["steps_per_s_aggregate"]} steps/s'
+              f'   ({eff["planned_train_steps"]} planned steps)')
     print(f'  Tree RSS max         : {s["memory"]["tree_rss_max_mb"]:.0f} MB')
     if g['vendor']:
         print(f'  GPU util mean / max  : {g["util_mean_pct"]} / {g["util_max_pct"]} %'
               f'   VRAM max {g["mem_max_mb"]} MB')
+        if g['mem_busy_mean_pct'] is not None:
+            print(f'  GPU mem busy mean    : {g["mem_busy_mean_pct"]} %')
+        if g['power_mean_w'] is not None:
+            print(f'  GPU power mean / max : {g["power_mean_w"]} / {g["power_max_w"]} W'
+                  f'   energy {g["energy_wh"]} Wh')
+    if acc['solved_fraction'] is not None:
+        print(f'  Solved (pass@2)      : {acc["n_solved"]}/{acc["n_tasks"]}'
+              f'   ({acc["solved_fraction"]*100:.1f} %)')
     print('-' * 66)
     print(f'  time series : {csv_path}')
     print(f'  summary     : {json_path}')
@@ -496,11 +649,20 @@ def _print_summary(s, csv_path, json_path):
 
 # ── Before/after comparison ──────────────────────────────────────────────────
 
-def compare(before_path, after_path):
+def compare(before_path, after_path, accuracy_tolerance=0.0):
     with open(before_path) as f:
         b = json.load(f)
     with open(after_path) as f:
         a = json.load(f)
+
+    def get(d, *path, default=None):
+        """Tolerant nested lookup: summaries written by older versions of this
+        script simply report the metric as missing instead of crashing."""
+        for key in path:
+            if not isinstance(d, dict) or key not in d:
+                return default
+            d = d[key]
+        return d
 
     def line(name, bv, av, better='lower', unit='', pct=False):
         if bv is None or av is None:
@@ -508,9 +670,18 @@ def compare(before_path, after_path):
             return None
         delta = av - bv
         rel = (delta / bv * 100) if bv else float('inf')
-        arrow = '↓' if delta < 0 else ('↑' if delta > 0 else '=')
-        good = (delta <= 0) if better == 'lower' else (delta >= 0)
-        tag = 'OK ' if good else 'REGRESSION'
+        if delta < 0:
+            arrow = '↓'
+        elif delta > 0:
+            arrow = '↑'
+        else:
+            arrow = '='
+        if better is None:
+            # Informational only: the metric has no intrinsic "good" direction.
+            good, tag = None, 'info'
+        else:
+            good = (delta <= 0) if better == 'lower' else (delta >= 0)
+            tag = 'OK ' if good else 'REGRESSION'
         d = f'{delta:+.1f}{unit}'
         r = f' ({rel:+.1f}%)' if not pct else ''
         print(f'  {name:<26}: {bv}{unit} -> {av}{unit}  {arrow} {d}{r}   [{tag}]')
@@ -518,10 +689,15 @@ def compare(before_path, after_path):
 
     print('\n' + '=' * 66)
     print(f'  COMPARISON   {b["label"]}  ->  {a["label"]}')
+    print(f'  accel preset {get(b, "accel_preset", default="?")}'
+          f'  ->  {get(a, "accel_preset", default="?")}')
     print('=' * 66)
 
     print('\n  Throughput / speed (higher is better):')
     line('wall_time_s', b['wall_time_s'], a['wall_time_s'], 'lower', ' s')
+    line('steps_per_s_aggregate',
+         get(b, 'efficiency', 'steps_per_s_aggregate'),
+         get(a, 'efficiency', 'steps_per_s_aggregate'), 'higher')
     line('workers_per_hour', b['throughput']['workers_per_hour'],
          a['throughput']['workers_per_hour'], 'higher')
     line('mean_worker_lifetime_s', b['throughput']['mean_worker_lifetime_s'],
@@ -534,20 +710,53 @@ def compare(before_path, after_path):
                        b['cpu']['saturation_fraction'], a['cpu']['saturation_fraction'],
                        'lower', '', pct=True))
 
-    print('\n  Concurrency / GPU:')
+    print('\n  Silicon utilisation (higher is better):')
     line('mean_workers', b['concurrency']['mean_workers'],
          a['concurrency']['mean_workers'], 'higher')
     line('gpu_util_mean_pct', b['gpu']['util_mean_pct'],
          a['gpu']['util_mean_pct'], 'higher', ' %')
+    line('gpu_mem_busy_mean_pct', get(b, 'gpu', 'mem_busy_mean_pct'),
+         get(a, 'gpu', 'mem_busy_mean_pct'), 'higher', ' %')
+
+    print('\n  Energy efficiency (lower is better; mean power is informational —\n'
+          '  drawing more watts is fine if the work per watt-hour improves):')
+    line('gpu_power_mean_w', get(b, 'gpu', 'power_mean_w'),
+         get(a, 'gpu', 'power_mean_w'), None, ' W')
+    line('energy_wh_per_1k_steps', get(b, 'efficiency', 'energy_wh_per_1k_steps'),
+         get(a, 'efficiency', 'energy_wh_per_1k_steps'), 'lower', ' Wh')
+    line('energy_wh_per_worker', get(b, 'efficiency', 'energy_wh_per_worker'),
+         get(a, 'efficiency', 'energy_wh_per_worker'), 'lower', ' Wh')
+
+    print('\n  Accuracy (must NOT get worse):')
+    b_solved = get(b, 'accuracy', 'solved_fraction')
+    a_solved = get(a, 'accuracy', 'solved_fraction')
+    line('solved_fraction', b_solved, a_solved, 'higher', '', pct=True)
+    accuracy_regressed = (
+        b_solved is not None and a_solved is not None
+        and (b_solved - a_solved) > accuracy_tolerance
+    )
+    if b_solved is None or a_solved is None:
+        print('  (no ground-truth solutions in these runs — accuracy not checked)')
+    elif get(a, 'accuracy', 'n_tasks') and get(a, 'accuracy', 'n_tasks') < 50:
+        print(f'  NOTE: only {get(a, "accuracy", "n_tasks")} tasks — pass@2 is noisy '
+              f'at this sample size; confirm on a larger split before concluding.')
 
     print('=' * 66)
-    # Guardrail: the optimization must not increase CPU pressure (Eje H §9.11.3).
+    # Guardrail 1: the optimization must not increase CPU pressure (Eje H §9.11.3).
     regressed = [ok for ok in cpu_ok if ok is False]
     if regressed:
         print('  ⚠  CPU pressure INCREASED — this change worsens the bottleneck.')
         print('=' * 66 + '\n')
         return 2
-    print('  ✓  CPU pressure did not get worse.')
+    # Guardrail 2: Eje D is semantics-preserving by design; a drop in pass@2
+    # means the acceleration changed the numerics in a harmful way (e.g. BF16
+    # truncating gradients of near-collapsed KL tensors, §9.6.1).
+    if accuracy_regressed:
+        print(f'  ⚠  pass@2 DROPPED by {(b_solved - a_solved)*100:.1f} points '
+              f'(tolerance {accuracy_tolerance*100:.1f}) — the speedup is not free.')
+        print('=' * 66 + '\n')
+        return 3
+    print('  ✓  CPU pressure did not get worse and pass@2 held up.')
     print('=' * 66 + '\n')
     return 0
 
@@ -576,6 +785,18 @@ def main():
                              'subprocess, safest); "smi" spawns rocm-smi/nvidia-smi; "auto" '
                              'prefers sysfs and falls back to smi; "off" disables GPU sampling '
                              'entirely. Default: auto')
+    parser.add_argument('--accel-preset',
+                        choices=['baseline', 'bf16', 'compile', 'full'], default=None,
+                        help='Eje D (§9.6) acceleration preset. Appends '
+                             '"--accel-preset X" to the parallel_train.py command line and '
+                             'records it in the summary, so before/after runs are labelled '
+                             'consistently. Use "baseline" for the reference run and '
+                             '"bf16"/"compile"/"full" for the accelerated ones. Individual '
+                             'flags can still be passed through after `--`.')
+    parser.add_argument('--accuracy-tolerance', type=float, default=0.0,
+                        help='In --compare mode, how much pass@2 solved_fraction may drop '
+                             'before the comparison is flagged as a regression (exit code 3). '
+                             'Default: 0.0 (strict).')
     parser.add_argument('--compare', nargs=2, metavar=('BEFORE.json', 'AFTER.json'),
                         help='Compare two summary JSONs instead of running a new profile.')
     parser.add_argument('passthrough', nargs=argparse.REMAINDER,
@@ -583,12 +804,22 @@ def main():
     args = parser.parse_args()
 
     if args.compare:
-        sys.exit(compare(args.compare[0], args.compare[1]))
+        sys.exit(compare(args.compare[0], args.compare[1], args.accuracy_tolerance))
 
     # Strip a leading '--' separator from REMAINDER if present.
     passthrough = args.passthrough
     if passthrough and passthrough[0] == '--':
         passthrough = passthrough[1:]
+
+    # --accel-preset is a convenience wrapper over the parallel_train.py flag; an
+    # explicit --accel-preset in the passthrough always wins.
+    if args.accel_preset and '--accel-preset' not in passthrough:
+        passthrough = passthrough + ['--accel-preset', args.accel_preset]
+    elif args.accel_preset is None:
+        idx = passthrough.index('--accel-preset') if '--accel-preset' in passthrough else None
+        args.accel_preset = (passthrough[idx + 1]
+                             if idx is not None and idx + 1 < len(passthrough)
+                             else 'unspecified')
 
     if args.interval < 0.5:
         print('[profiler] WARNING: interval < 0.5s adds measurable overhead; '

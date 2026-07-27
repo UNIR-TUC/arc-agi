@@ -44,13 +44,18 @@ import solution_selection
 import visualization
 import solve_task
 import arc_logging
+import accel
 
 # ── Global PyTorch settings (must run at import time for the main process) ──
 multiprocessing.set_start_method('spawn', force=True)
 torch.set_default_dtype(torch.float32)
 torch.set_default_device('cuda')
 torch.backends.cudnn.benchmark = True
-torch.backends.cuda.matmul.allow_tf32 = True
+# NOTE (Eje D, §9.2): `torch.backends.cuda.matmul.allow_tf32` used to be set here.
+# It is a **no-op on ROCm/RDNA4** (no TF32 hardware). The portable equivalent is
+# `torch.set_float32_matmul_precision(...)`, which accel.configure_process()
+# applies per worker process according to --matmul-precision (default 'highest',
+# i.e. exactly the previous FP32 behaviour).
 
 
 # ── Live terminal progress line ──────────────────────────────────────────────
@@ -95,6 +100,7 @@ def parallelize_runs(
     quiet=False,
     verbose=False,
     postprocess_stride=1,
+    accel_config=None,
 ):
     """
     Spawn worker processes to solve ARC-AGI tasks, greedily filling GPU memory.
@@ -118,6 +124,8 @@ def parallelize_runs(
         verbose (bool)               : print raw status to stdout.
         postprocess_stride (int)     : run full pass@2 postprocessing every N steps
             (Eje H, H3) instead of every step. Forwarded to solve_task.solve_task.
+        accel_config (dict|None)     : serialized accel.AccelConfig (Eje D, §9.6)
+            forwarded to every worker. None => untouched baseline.
 
     Returns:
         memory_dict    (dict[str, int])  : peak VRAM per task (bytes).
@@ -229,6 +237,7 @@ def parallelize_runs(
                             task_names[i], split, 1e20, n_iterations,
                             gpu_id, memory_dict, solutions_dict, error_queue,
                             _loggers_dict, _progress_dict, postprocess_stride,
+                            accel_config,
                         )
                         p = multiprocessing.Process(
                             target=solve_task.solve_task, args=worker_args
@@ -277,7 +286,10 @@ def _cache_path(split):
     return f'memory_cache_{split}.json'
 
 
-def _gpu_fingerprint(n_gpus):
+def _gpu_fingerprint(n_gpus, accel_config=None):
+    """Identity of the measurement environment. Includes the accel config because
+    BF16 autocast and torch.compile change each task's VRAM footprint (Eje D),
+    so a baseline measurement must not be reused for an accelerated run."""
     return {
         'n_gpus':            n_gpus,
         'gpu_names':         [torch.cuda.get_device_name(i) for i in range(n_gpus)],
@@ -286,10 +298,11 @@ def _gpu_fingerprint(n_gpus):
             for i in range(n_gpus)
         ],
         'torch_version':     torch.__version__,
+        'accel':             accel.AccelConfig.from_dict(accel_config).to_dict(),
     }
 
 
-def load_memory_cache(split, n_gpus, required_task_names):
+def load_memory_cache(split, n_gpus, required_task_names, accel_config=None):
     """Return {task_name: mem_bytes} from disk if the cache matches the
     current GPU fingerprint and covers every required task, else None."""
     path = _cache_path(split)
@@ -298,7 +311,7 @@ def load_memory_cache(split, n_gpus, required_task_names):
     try:
         with open(path, 'r') as f:
             cache = json.load(f)
-        if cache.get('fingerprint') != _gpu_fingerprint(n_gpus):
+        if cache.get('fingerprint') != _gpu_fingerprint(n_gpus, accel_config):
             return None
         measurements = cache.get('measurements', {})
         if not all(name in measurements for name in required_task_names):
@@ -308,10 +321,10 @@ def load_memory_cache(split, n_gpus, required_task_names):
         return None
 
 
-def save_memory_cache(split, n_gpus, memory_dict):
+def save_memory_cache(split, n_gpus, memory_dict, accel_config=None):
     path = _cache_path(split)
     cache = {
-        'fingerprint':  _gpu_fingerprint(n_gpus),
+        'fingerprint':  _gpu_fingerprint(n_gpus, accel_config),
         'created_at':   time.strftime('%Y-%m-%d %H:%M:%S'),
         'measurements': {k: int(v) for k, v in memory_dict.items()},
     }
@@ -322,7 +335,7 @@ def save_memory_cache(split, n_gpus, memory_dict):
 # ── Per-split runner ─────────────────────────────────────────────────────────
 
 def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
-              postprocess_stride=4):
+              postprocess_stride=4, accel_cfg=None, n_steps=1500):
     """
     Execute the full two-phase pipeline for one split and save all outputs.
 
@@ -332,6 +345,9 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             N steps instead of every step (Eje H, H3). Default 4. Phase 1's 2-step
             memory measurement always uses the Logger default (1) since it's too
             short to matter.
+        accel_cfg (accel.AccelConfig|None): Eje D acceleration settings, applied in
+            every worker process. None => untouched baseline.
+        n_steps (int): Phase 2 training iterations per task.
 
     Returns:
         n_solved (int)         : tasks solved (always 0 for 'test').
@@ -340,6 +356,8 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         predictions_file (str) : path to the saved .npz file.
     """
     split_start = time.time()
+    accel_cfg = accel.AccelConfig.from_dict(accel_cfg)
+    accel_config = accel_cfg.to_dict()
 
     # ── Load challenge names in original JSON order ──────────────────
     with open(f'dataset/arc-agi_{split}_challenges.json', 'r') as f:
@@ -358,12 +376,15 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     n_tasks = len(original_task_names)
 
     arc_logger.log_run_start(n_tasks, n_gpus)
+    arc_logger.info(f'Acceleration (Eje D): {accel_cfg.summary()}')
 
     # ── Phase 1: measure VRAM footprint (2 iterations per task), or load
     #    from a cached measurement keyed to the current GPU fingerprint ──
     gpu_memory_quotas = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
 
-    cached_memory_dict = load_memory_cache(split, n_gpus, original_task_names)
+    cached_memory_dict = load_memory_cache(
+        split, n_gpus, original_task_names, accel_config
+    )
     if cached_memory_dict is not None:
         arc_logger.log_phase(
             f'Phase 1 — SKIPPED — loaded {len(cached_memory_dict)} task '
@@ -391,9 +412,10 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             n_original_tasks=n_tasks,
             quiet=True,       # phase-1 task events → DEBUG only (not cluttering console)
             verbose=True,
+            accel_config=accel_config,
         )
         arc_logger.info(f'Phase 1 complete in {t_p1:.1f}s')
-        save_memory_cache(split, n_gpus, memory_dict)
+        save_memory_cache(split, n_gpus, memory_dict, accel_config)
         arc_logger.info(f'Saved Phase 1 measurements to {_cache_path(split)}')
 
     # Sort tasks by decreasing VRAM so the greedy scheduler fills GPUs tightly
@@ -404,9 +426,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     # Map task_name → original JSON index (used in log messages)
     task_original_idx = {name: idx for idx, name in enumerate(original_task_names)}
 
-    # ── Phase 2: full 2000-step training ─────────────────────────────
-    # n_steps = 2000
-    n_steps = 1500
+    # ── Phase 2: full training (n_steps comes from --iterations) ────────
 
     # Phase 1 measurements now capture `total_vram - free_now` (solve_task.py),
     # which already includes the per-process HIP/CUDA context (~470 MB each).
@@ -440,6 +460,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         quiet=False,
         verbose=True,
         postprocess_stride=postprocess_stride,
+        accel_config=accel_config,
     )
     arc_logger.info(f'Phase 2 complete in {t_p2:.1f}s')
 
@@ -484,6 +505,27 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     elapsed = time.time() - split_start
     arc_logger.log_run_summary(n_solved, n_tasks, elapsed, predictions_file)
     arc_logger.finalize_results(n_solved, n_tasks, elapsed)
+
+    # ── Save run_metadata_{split}.json ────────────────────────────────
+    # Machine-readable description of *what* was run, consumed by
+    # profile_parallel_train.py to report throughput-per-step, accuracy and the
+    # exact acceleration configuration of each A/B run (Eje D).
+    metadata_file = f'run_metadata_{split}.json'
+    with open(metadata_file, 'w') as f:
+        json.dump({
+            'split':              split,
+            'timestamp':          time.strftime('%Y-%m-%d %H:%M:%S'),
+            'n_tasks':            n_tasks,
+            'n_steps':            n_steps,
+            'n_solved':           n_solved if solutions_json is not None else None,
+            'elapsed_s':          round(elapsed, 1),
+            'n_gpus':             n_gpus,
+            'max_workers':        n_cpus,
+            'postprocess_stride': postprocess_stride,
+            'accel':              accel_cfg.describe(),
+            'backend':            accel.backend_info(),
+        }, f, indent=2)
+    arc_logger.info(f'Saved {metadata_file}')
 
     return n_solved, n_tasks, elapsed, predictions_file
 
@@ -567,7 +609,117 @@ if __name__ == '__main__':
             'Python-side recoloring overhead. Default: 4.'
         ),
     )
+    parser.add_argument(
+        '--iterations',
+        type=int,
+        default=1500,
+        metavar='N',
+        help=(
+            'Phase 2 training steps per task. Lower values make before/after A/B '
+            'profiling runs cheap. Default: 1500.'
+        ),
+    )
+
+    # ── Eje D — computational efficiency / silicon utilisation (§9.6) ──────
+    accel_group = parser.add_argument_group(
+        'Eje D — acceleration (all OFF by default: baseline behaviour)'
+    )
+    accel_group.add_argument(
+        '--accel-preset',
+        choices=sorted(accel.PRESETS),
+        default='baseline',
+        help=(
+            'Bundle of acceleration settings. "baseline" = untouched. "bf16" = '
+            'BF16 autocast + high matmul precision + 1 thread/worker. "compile" '
+            '= torch.compile (Inductor->Triton-ROCm). "full" = both plus '
+            'expandable_segments allocator. Individual flags below override it.'
+        ),
+    )
+    accel_group.add_argument(
+        '--amp',
+        choices=accel.AMP_CHOICES,
+        default=None,
+        help=(
+            'Mixed precision for the forward pass (§9.6.1). BF16 routes matmuls '
+            'to the RDNA4 Matrix cores while the KL and the residual stream stay '
+            'in FP32. fp16 is NOT recommended: no loss scaling is implemented.'
+        ),
+    )
+    accel_group.add_argument(
+        '--compile',
+        dest='compile_mode',
+        choices=accel.COMPILE_CHOICES,
+        default=None,
+        help=(
+            'torch.compile mode for model.forward (§9.6.2). Uses dynamic=False '
+            'because each worker solves a single task with static shapes. '
+            '"reduce-overhead" enables HIP graphs — more VRAM per worker.'
+        ),
+    )
+    accel_group.add_argument(
+        '--matmul-precision',
+        choices=accel.MATMUL_PRECISION_CHOICES,
+        default=None,
+        help=(
+            'torch.set_float32_matmul_precision value, the ROCm-correct '
+            'replacement for the no-op allow_tf32 (§9.2). Default: highest.'
+        ),
+    )
+    accel_group.add_argument(
+        '--threads-per-worker',
+        type=int,
+        default=None,
+        metavar='N',
+        help=(
+            'torch.set_num_threads per worker process (0 = leave untouched). '
+            'With many concurrent workers the default intra-op pools '
+            'oversubscribe the host CPU; 1 is usually best.'
+        ),
+    )
+    accel_group.add_argument(
+        '--alloc-conf',
+        type=str,
+        default=None,
+        metavar='CONF',
+        help=(
+            'PYTORCH_HIP_ALLOC_CONF / PYTORCH_CUDA_ALLOC_CONF value, e.g. '
+            '"expandable_segments:True" to cut allocator fragmentation and fit '
+            'more concurrent tasks in VRAM (§9.6.3).'
+        ),
+    )
+    accel_group.add_argument(
+        '--inductor-cache-dir',
+        type=str,
+        default=None,
+        metavar='DIR',
+        help='Persistent TorchInductor cache directory, reused across runs.',
+    )
+    accel_group.add_argument(
+        '--compile-threads',
+        type=int,
+        default=None,
+        metavar='N',
+        help=(
+            'TORCHINDUCTOR_COMPILE_THREADS per worker. Default 1, so N '
+            'concurrent workers do not each spawn a parallel Triton compile '
+            'pool and re-saturate the CPU.'
+        ),
+    )
     args = parser.parse_args()
+
+    accel_cfg = accel.config_from_preset(
+        args.accel_preset,
+        amp=args.amp,
+        compile_mode=args.compile_mode,
+        matmul_precision=args.matmul_precision,
+        threads_per_worker=args.threads_per_worker,
+        alloc_conf=args.alloc_conf,
+        inductor_cache_dir=args.inductor_cache_dir,
+        compile_threads=args.compile_threads,
+    )
+    # Export the tuned environment before any worker is spawned, so children
+    # inherit it (the allocator reads it at first allocation).
+    accel.configure_parent(accel_cfg)
 
     splits_to_run = (
         ['training', 'evaluation', 'test'] if args.split == 'all'
@@ -585,7 +737,8 @@ if __name__ == '__main__':
     arc_logging.init_results_file(results_file)
 
     print(f'\nStarting ARC-AGI parallel training — splits: {splits_to_run}')
-    print(f'GPUs: {n_gpus}   CPU cores: {n_cpus}\n')
+    print(f'GPUs: {n_gpus}   CPU cores: {n_cpus}')
+    print(f'Acceleration: {accel_cfg.summary()}\n')
 
     total_solved = 0
     total_tasks  = 0
@@ -608,6 +761,8 @@ if __name__ == '__main__':
             split, n_gpus, n_cpus, arc_logger, solutions_json,
             demo_n=args.demo,
             postprocess_stride=args.postprocess_stride,
+            accel_cfg=accel_cfg,
+            n_steps=args.iterations,
         )
         total_solved += n_solved
         total_tasks  += n_tasks
