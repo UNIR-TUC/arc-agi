@@ -335,7 +335,8 @@ def save_memory_cache(split, n_gpus, memory_dict, accel_config=None):
 # ── Per-split runner ─────────────────────────────────────────────────────────
 
 def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
-              postprocess_stride=4, accel_cfg=None, n_steps=1500):
+              postprocess_stride=4, accel_cfg=None, n_steps=1500,
+              compile_memory_factor=4.5):
     """
     Execute the full two-phase pipeline for one split and save all outputs.
 
@@ -348,6 +349,8 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         accel_cfg (accel.AccelConfig|None): Eje D acceleration settings, applied in
             every worker process. None => untouched baseline.
         n_steps (int): Phase 2 training iterations per task.
+        compile_memory_factor (float): multiplier applied to the (eager) Phase-1
+            measurements when Phase 2 runs compiled. See below.
 
     Returns:
         n_solved (int)         : tasks solved (always 0 for 'test').
@@ -358,6 +361,11 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     split_start = time.time()
     accel_cfg = accel.AccelConfig.from_dict(accel_cfg)
     accel_config = accel_cfg.to_dict()
+    # Phase 1 never compiles (Eje D): compiling to run 2 iterations cost ~1200 s
+    # per task and was 92 % of a profiling run's wall time.
+    measure_cfg = accel.for_measurement(accel_cfg)
+    measure_config = measure_cfg.to_dict()
+    compiled_phase2 = accel_cfg.compile_mode != 'off'
 
     # ── Load challenge names in original JSON order ──────────────────
     with open(f'dataset/arc-agi_{split}_challenges.json', 'r') as f:
@@ -383,9 +391,10 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     gpu_memory_quotas = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
 
     cached_memory_dict = load_memory_cache(
-        split, n_gpus, original_task_names, accel_config
+        split, n_gpus, original_task_names, measure_config
     )
     if cached_memory_dict is not None:
+        t_p1 = 0.0
         arc_logger.log_phase(
             f'Phase 1 — SKIPPED — loaded {len(cached_memory_dict)} task '
             f'measurements from {_cache_path(split)}'
@@ -412,11 +421,24 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             n_original_tasks=n_tasks,
             quiet=True,       # phase-1 task events → DEBUG only (not cluttering console)
             verbose=True,
-            accel_config=accel_config,
+            accel_config=measure_config,
         )
         arc_logger.info(f'Phase 1 complete in {t_p1:.1f}s')
-        save_memory_cache(split, n_gpus, memory_dict, accel_config)
+        save_memory_cache(split, n_gpus, memory_dict, measure_config)
         arc_logger.info(f'Saved Phase 1 measurements to {_cache_path(split)}')
+
+    # Phase 1 measured the *eager* footprint, but Phase 2 will run compiled, and
+    # compilation was measured to raise per-task VRAM ~4.3x (0.91 GB -> 3.87 GB
+    # on 10 training tasks). Without this correction the greedy scheduler would
+    # pack ~10 compiled tasks into 14.9 GB and run out of memory.
+    if compiled_phase2 and abs((compile_memory_factor or 1.0) - 1.0) > 1e-9:
+        memory_dict = {name: int(mem * compile_memory_factor)
+                       for name, mem in memory_dict.items()}
+        arc_logger.info(
+            f'Compiled Phase 2: scaled eager Phase-1 measurements by '
+            f'{compile_memory_factor}x  (mean '
+            f'{sum(memory_dict.values()) / max(len(memory_dict), 1) / 1024**2:.0f} MB/task)'
+        )
 
     # Sort tasks by decreasing VRAM so the greedy scheduler fills GPUs tightly
     sorted_tasks      = sorted(memory_dict.items(), key=lambda x: x[1], reverse=True)
@@ -522,7 +544,13 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             'n_gpus':             n_gpus,
             'max_workers':        n_cpus,
             'postprocess_stride': postprocess_stride,
+            # Phase split matters: aggregate wall-clock metrics are meaningless
+            # when Phase 1 dominates (a compiled Phase 1 once took 92 % of a run).
+            'phase1_s':           round(t_p1, 1),
+            'phase2_s':           round(t_p2, 1),
+            'compile_memory_factor': (compile_memory_factor if compiled_phase2 else None),
             'accel':              accel_cfg.describe(),
+            'accel_measurement':  measure_cfg.describe(),
             'backend':            accel.backend_info(),
         }, f, indent=2)
     arc_logger.info(f'Saved {metadata_file}')
@@ -629,10 +657,12 @@ if __name__ == '__main__':
         choices=sorted(accel.PRESETS),
         default='baseline',
         help=(
-            'Bundle of acceleration settings. "baseline" = untouched. "bf16" = '
-            'BF16 autocast + high matmul precision + 1 thread/worker. "compile" '
-            '= torch.compile (Inductor->Triton-ROCm). "full" = both plus '
-            'expandable_segments allocator. Individual flags below override it.'
+            'Bundle of acceleration settings. "baseline" = untouched. "compile" '
+            '= torch.compile (Inductor->Triton-ROCm) + host tuning. "full" = '
+            'compile plus the expandable_segments allocator. "bf16" = BF16 '
+            'autocast, kept for experiments only: it measured 2.7 %% SLOWER '
+            'because this workload is launch-bound, not FLOP-bound. Individual '
+            'flags below override the preset.'
         ),
     )
     accel_group.add_argument(
@@ -700,9 +730,37 @@ if __name__ == '__main__':
         default=None,
         metavar='N',
         help=(
-            'TORCHINDUCTOR_COMPILE_THREADS per worker. Default 1, so N '
-            'concurrent workers do not each spawn a parallel Triton compile '
-            'pool and re-saturate the CPU.'
+            'TORCHINDUCTOR_COMPILE_THREADS per worker. Phase 1 no longer '
+            'compiles, so Phase 2 can afford a small pool; single-threaded '
+            'Inductor was measured at ~1200 s per task.'
+        ),
+    )
+    accel_group.add_argument(
+        '--memory-planning',
+        dest='memory_planning',
+        action='store_true',
+        default=None,
+        help=(
+            'Enable torch._inductor.config.memory_planning (buffer reuse across '
+            'the fused graph). Compilation was measured to raise per-task VRAM '
+            'from ~0.9 GB to ~3.9 GB, capping concurrency at 3 tasks instead of 10.'
+        ),
+    )
+    accel_group.add_argument(
+        '--no-memory-planning',
+        dest='memory_planning',
+        action='store_false',
+        help='Disable Inductor memory planning (overrides the preset).',
+    )
+    accel_group.add_argument(
+        '--compile-memory-factor',
+        type=float,
+        default=4.5,
+        metavar='F',
+        help=(
+            'Multiplier applied to the eager Phase-1 VRAM measurements when '
+            'Phase 2 runs compiled. Measured ratio on RX 9070 XT: 4.3x '
+            '(0.91 GB eager -> 3.87 GB compiled per task). Use 1.0 to disable.'
         ),
     )
     args = parser.parse_args()
@@ -716,6 +774,7 @@ if __name__ == '__main__':
         alloc_conf=args.alloc_conf,
         inductor_cache_dir=args.inductor_cache_dir,
         compile_threads=args.compile_threads,
+        memory_planning=args.memory_planning,
     )
     # Export the tuned environment before any worker is spawned, so children
     # inherit it (the allocator reads it at first allocation).
@@ -764,6 +823,7 @@ if __name__ == '__main__':
             postprocess_stride=args.postprocess_stride,
             accel_cfg=accel_cfg,
             n_steps=args.iterations,
+            compile_memory_factor=args.compile_memory_factor,
         )
         total_solved += n_solved
         total_tasks  += n_tasks

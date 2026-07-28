@@ -288,6 +288,9 @@ def _collect_run_metadata(t0):
     total_steps = 0
     n_tasks = 0
     n_solved = 0
+    phase1_s = 0.0
+    phase2_s = 0.0
+    min_steps = None
     have_solutions = False
     accel_cfg = None
     for m in metadata:
@@ -295,6 +298,10 @@ def _collect_run_metadata(t0):
         tasks = m.get('n_tasks') or 0
         total_steps += steps * tasks
         n_tasks += tasks
+        if steps:
+            min_steps = steps if min_steps is None else min(min_steps, steps)
+        phase1_s += m.get('phase1_s') or 0.0
+        phase2_s += m.get('phase2_s') or 0.0
         if m.get('n_solved') is not None:
             have_solutions = True
             n_solved += m['n_solved']
@@ -304,6 +311,9 @@ def _collect_run_metadata(t0):
         'planned_train_steps': total_steps,
         'n_tasks': n_tasks,
         'n_solved': n_solved if have_solutions else None,
+        'min_n_steps': min_steps,
+        'phase1_s': round(phase1_s, 1) if phase1_s else None,
+        'phase2_s': round(phase2_s, 1) if phase2_s else None,
         'accel': accel_cfg,
     }
     return metadata, derived
@@ -536,6 +546,7 @@ def run_and_profile(args, passthrough):
     planned_steps = run_derived['planned_train_steps']
     n_solved = run_derived['n_solved']
     n_meta_tasks = run_derived['n_tasks']
+    phase2_s = run_derived['phase2_s']
 
     summary = {
         'label': args.label,
@@ -586,6 +597,14 @@ def run_and_profile(args, passthrough):
             'planned_train_steps': planned_steps or None,
             'steps_per_s_aggregate': (round(planned_steps / wall, 1)
                                       if planned_steps and wall > 0 else None),
+            # Phase-2-only throughput: the metric that actually reflects training
+            # speed. The aggregate one is dominated by Phase 1 whenever the
+            # measurement phase is expensive, which is exactly when a comparison
+            # matters most.
+            'phase1_s': run_derived['phase1_s'],
+            'phase2_s': phase2_s,
+            'steps_per_s_phase2': (round(planned_steps / phase2_s, 2)
+                                   if planned_steps and phase2_s else None),
             'energy_wh_per_worker': (round(gpu_energy_wh / len(completed), 4)
                                      if gpu_power_series and completed else None),
             'energy_wh_per_1k_steps': (round(gpu_energy_wh / (planned_steps / 1000.0), 4)
@@ -594,6 +613,7 @@ def run_and_profile(args, passthrough):
         'accuracy': {
             'n_solved': n_solved,
             'n_tasks': n_meta_tasks or None,
+            'min_n_steps': run_derived['min_n_steps'],
             'solved_fraction': (round(n_solved / n_meta_tasks, 4)
                                 if n_solved is not None and n_meta_tasks else None),
         },
@@ -629,6 +649,9 @@ def _print_summary(s, csv_path, json_path):
     if eff['steps_per_s_aggregate'] is not None:
         print(f'  Train throughput     : {eff["steps_per_s_aggregate"]} steps/s'
               f'   ({eff["planned_train_steps"]} planned steps)')
+    if eff.get('steps_per_s_phase2') is not None:
+        print(f'  Phase 2 throughput   : {eff["steps_per_s_phase2"]} steps/s'
+              f'   (phase1 {eff["phase1_s"]} s / phase2 {eff["phase2_s"]} s)')
     print(f'  Tree RSS max         : {s["memory"]["tree_rss_max_mb"]:.0f} MB')
     if g['vendor']:
         print(f'  GPU util mean / max  : {g["util_mean_pct"]} / {g["util_max_pct"]} %'
@@ -695,6 +718,13 @@ def compare(before_path, after_path, accuracy_tolerance=0.0):
 
     print('\n  Throughput / speed (higher is better):')
     line('wall_time_s', b['wall_time_s'], a['wall_time_s'], 'lower', ' s')
+    # Phase-2 throughput first: it isolates training speed from the Phase-1
+    # measurement, which can dominate the wall clock and invert the verdict.
+    line('steps_per_s_phase2',
+         get(b, 'efficiency', 'steps_per_s_phase2'),
+         get(a, 'efficiency', 'steps_per_s_phase2'), 'higher')
+    line('phase1_s', get(b, 'efficiency', 'phase1_s'),
+         get(a, 'efficiency', 'phase1_s'), 'lower', ' s')
     line('steps_per_s_aggregate',
          get(b, 'efficiency', 'steps_per_s_aggregate'),
          get(a, 'efficiency', 'steps_per_s_aggregate'), 'higher')
@@ -737,9 +767,16 @@ def compare(before_path, after_path, accuracy_tolerance=0.0):
     )
     if b_solved is None or a_solved is None:
         print('  (no ground-truth solutions in these runs — accuracy not checked)')
-    elif get(a, 'accuracy', 'n_tasks') and get(a, 'accuracy', 'n_tasks') < 50:
-        print(f'  NOTE: only {get(a, "accuracy", "n_tasks")} tasks — pass@2 is noisy '
-              f'at this sample size; confirm on a larger split before concluding.')
+    else:
+        n_after = get(a, 'accuracy', 'n_tasks')
+        min_steps = get(a, 'accuracy', 'min_n_steps')
+        if n_after and n_after < 50:
+            print(f'  NOTE: only {n_after} tasks — pass@2 is noisy '
+                  f'at this sample size; confirm on a larger split before concluding.')
+        if min_steps and min_steps < 1000:
+            print(f'  NOTE: only {min_steps} iterations/task — the reference setup uses '
+                  f'1500-2000. Almost nothing is solved this early, so this run '
+                  f'cannot support an accuracy claim either way.')
 
     print('=' * 66)
     # Guardrail 1: the optimization must not increase CPU pressure (Eje H §9.11.3).

@@ -90,6 +90,12 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         # (Eje H, H2) instead of one sync per training step.
         train_history_logger.materialize_curves()
 
+        # Eje D: where did torch.compile spend its time? Compilation dominates
+        # this workload, so the breakdown drives which mitigation to pursue.
+        report = accel.compile_report(accel_cfg)
+        if report:
+            print(f'[accel][{task_name}] compile times: {report}', flush=True)
+
         # Get the solution
         example_list = []
         for example_num in range(task.n_test):

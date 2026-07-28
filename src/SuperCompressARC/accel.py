@@ -84,9 +84,13 @@ class AccelConfig:
             PYTORCH_CUDA_ALLOC_CONF, e.g. 'expandable_segments:True'.
         inductor_cache_dir (str|None): persistent TorchInductor cache directory,
             so repeated runs reuse compiled kernels.
-        compile_threads (int): TORCHINDUCTOR_COMPILE_THREADS per worker. Kept at
-            1 by default so N concurrent workers do not each spawn a parallel
-            Triton compile pool and re-saturate the CPU (Eje H).
+        compile_threads (int): TORCHINDUCTOR_COMPILE_THREADS per worker. Phase 1
+            no longer compiles (see `for_measurement`), so Phase 2 can afford a
+            small pool; a single-threaded Inductor took ~20 min per task.
+        memory_planning (bool): enable `torch._inductor.config.memory_planning`,
+            which reuses buffers across the fused graph. Measured: compilation
+            raised VRAM from ~0.9 GB to ~3.9 GB per task, which cut scheduler
+            concurrency from 10 to 3 and ate most of the speedup.
     """
 
     amp: str = 'off'
@@ -96,6 +100,7 @@ class AccelConfig:
     alloc_conf: Optional[str] = None
     inductor_cache_dir: Optional[str] = None
     compile_threads: int = 1
+    memory_planning: bool = False
 
     # ── Introspection ───────────────────────────────────────────────────
     def is_enabled(self):
@@ -136,6 +141,14 @@ class AccelConfig:
 
 
 # Convenience presets so A/B runs are labelled consistently.
+#
+# NOTE (measured 2026-07-28, 10 training tasks x 300 iterations on RX 9070 XT):
+# BF16 autocast is *not* part of `full` any more. Paired per-task timings showed it
+# **+2.7 % slower** (8 of 10 tasks worse) with identical VRAM. The workload is
+# launch-bound, not FLOP-bound (GPU busy 97 % but mem_busy 3 % and 94 W of 304 W
+# TDP), so speeding up arithmetic buys nothing while autocast *adds* one cast
+# kernel per `layers.affine` call. `torch.compile`, which reduces the *number* of
+# launches, gave 13-26x per iteration in steady state instead.
 PRESETS = {
     'baseline': {},
     'bf16': {
@@ -148,14 +161,17 @@ PRESETS = {
         'matmul_precision': 'high',
         'threads_per_worker': 1,
         'inductor_cache_dir': '.inductor_cache',
+        'compile_threads': 4,
+        'memory_planning': True,
     },
     'full': {
-        'amp': 'bf16',
         'compile_mode': 'default',
         'matmul_precision': 'high',
         'threads_per_worker': 1,
         'alloc_conf': 'expandable_segments:True',
         'inductor_cache_dir': '.inductor_cache',
+        'compile_threads': 4,
+        'memory_planning': True,
     },
 }
 
@@ -172,6 +188,31 @@ def config_from_preset(name, **overrides):
     values = dict(PRESETS[name])
     values.update({k: v for k, v in overrides.items() if v is not None})
     return AccelConfig.from_dict(values)
+
+
+def for_measurement(cfg):
+    """Return the config to use for the Phase-1 VRAM measurement run.
+
+    Identical to `cfg` except that **compilation is always disabled**.
+
+    Rationale (measured): Phase 1 runs 2 iterations per task, one task at a time.
+    Compiling for that cost ~1200 s of single-threaded Inductor work per task and
+    accounted for **92 % of the total wall time** of a 10-task profiling run
+    (11 871 s of 12 921 s). Autocast is kept, since it costs nothing to enable
+    and does participate in the memory footprint.
+
+    The compiled footprint is recovered afterwards by scaling the measurements
+    (see `--compile-memory-factor` in parallel_train.py): eager measured
+    ~0.91 GB/task while the compiled run really used ~3.76 GB/task, so the
+    measurement must be scaled or Phase 2 would over-subscribe VRAM.
+
+    Side benefit: the Phase-1 cache becomes shareable between an eager run and a
+    compiled run of the same split, removing a fixed cost from every A/B.
+    """
+    cfg = AccelConfig.from_dict(cfg)
+    if cfg.compile_mode == 'off':
+        return cfg
+    return AccelConfig.from_dict({**cfg.to_dict(), 'compile_mode': 'off'})
 
 
 # ── Environment / process configuration ──────────────────────────────────────
@@ -228,6 +269,16 @@ def configure_process(cfg):
         except Exception as exc:  # pragma: no cover
             warnings.warn(f'[accel] set_num_threads failed: {exc}')
 
+    if cfg.memory_planning and cfg.compile_mode != 'off':
+        # Buffer reuse across the fused graph. Compilation was measured to raise
+        # per-task VRAM from ~0.9 GB to ~3.9 GB, which is what capped scheduler
+        # concurrency at 3 tasks instead of 10.
+        try:
+            import torch._inductor.config as inductor_config
+            inductor_config.memory_planning = True
+        except Exception as exc:  # pragma: no cover - depends on torch build
+            warnings.warn(f'[accel] inductor memory_planning unavailable: {exc}')
+
     return cfg
 
 
@@ -252,6 +303,25 @@ def backend_info():
     except Exception:  # pragma: no cover
         info['gpu_names'] = []
     return info
+
+
+def compile_report(cfg):
+    """Return a one-line breakdown of where torch.compile spent its time, or None.
+
+    Compilation dominates the cost of this workload (~1200 s per task cold,
+    ~250 s warm), so knowing whether it goes into Dynamo tracing (the unrolled
+    Python loops of `direction_share`: 64 `affine` calls x 4 layers x ~8
+    directional tensors) or into the Inductor scheduler decides which mitigation
+    is worth pursuing. Never raises.
+    """
+    cfg = AccelConfig.from_dict(cfg)
+    if cfg.compile_mode == 'off':
+        return None
+    try:
+        from torch._dynamo.utils import compile_times
+        return compile_times(repr='str', aggregate=True)
+    except Exception:
+        return None
 
 
 # ── Forward-pass wrapping (the only contact point with the model) ────────────
