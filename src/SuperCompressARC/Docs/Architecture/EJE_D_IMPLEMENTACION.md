@@ -33,12 +33,12 @@
 El Eje D no cambia la matemática del modelo: cambia **cómo se ejecuta**. La implementación
 añade una **capa de aceleración opt-in y externa al modelo** compuesta por:
 
-| Sub-eje | Mecanismo | Dónde vive |
-|---------|-----------|------------|
-| §9.6.1 Mixed precision | `torch.autocast('cuda', bfloat16)` alrededor de `model.forward` | `accel.apply()` |
-| §9.6.2 Fusión de kernels | `torch.compile(..., dynamic=False)` sobre `model.forward` | `accel.apply()` |
-| §9.6.3 Silicio / host | Política de precisión de matmul, hilos por worker, allocator, caché Inductor | `accel.configure_process()` |
-| §9.2 ROCm | Sustitución del `allow_tf32` no-op por `set_float32_matmul_precision` | `accel.configure_process()` |
+| Sub-eje                    | Mecanismo                                                                       | Dónde vive                   |
+| -------------------------- | ------------------------------------------------------------------------------- | ----------------------------- |
+| §9.6.1 Mixed precision    | `torch.autocast('cuda', bfloat16)` alrededor de `model.forward`             | `accel.apply()`             |
+| §9.6.2 Fusión de kernels | `torch.compile(..., dynamic=False)` sobre `model.forward`                   | `accel.apply()`             |
+| §9.6.3 Silicio / host     | Política de precisión de matmul, hilos por worker, allocator, caché Inductor | `accel.configure_process()` |
+| §9.2 ROCm                 | Sustitución del`allow_tf32` no-op por `set_float32_matmul_precision`       | `accel.configure_process()` |
 
 **Todo está desactivado por defecto.** Una `AccelConfig()` sin argumentos reproduce
 exactamente el comportamiento anterior (`is_enabled()` devuelve `False` y
@@ -52,15 +52,15 @@ el código original y no una variante.
 El requisito explícito era **no modificar el núcleo del modelo**. La implementación lo
 cumple de forma verificable: los siguientes archivos **no tienen ni una línea modificada**.
 
-| Archivo | Contenido | Estado |
-|---------|-----------|--------|
-| [arc_compressor.py](../../arc_compressor.py) | Arquitectura y forward pass | Sin cambios |
-| [layers.py](../../layers.py) | Todas las capas (`decode_latents`, `share_up/down`, `softmax`, `cummax`, `shift`, `direction_share`, `nonlinear`, `normalize`) | Sin cambios |
-| [multitensor_systems.py](../../multitensor_systems.py) | `MultiTensor`, `@multify` | Sin cambios |
-| [initializers.py](../../initializers.py) | Inicialización y equivarianzas | Sin cambios |
-| [train.py](../../train.py) | `take_step`, pérdida MDL | Sin cambios |
-| [solution_selection.py](../../solution_selection.py) | `Logger`, selección pass@2 | Sin cambios |
-| [preprocessing.py](../../preprocessing.py) | `Task` | Sin cambios |
+| Archivo                                               | Contenido                                                                                                                                      | Estado      |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| [arc_compressor.py](../../arc_compressor.py)           | Arquitectura y forward pass                                                                                                                    | Sin cambios |
+| [layers.py](../../layers.py)                           | Todas las capas (`decode_latents`, `share_up/down`, `softmax`, `cummax`, `shift`, `direction_share`, `nonlinear`, `normalize`) | Sin cambios |
+| [multitensor_systems.py](../../multitensor_systems.py) | `MultiTensor`, `@multify`                                                                                                                  | Sin cambios |
+| [initializers.py](../../initializers.py)               | Inicialización y equivarianzas                                                                                                                | Sin cambios |
+| [train.py](../../train.py)                             | `take_step`, pérdida MDL                                                                                                                    | Sin cambios |
+| [solution_selection.py](../../solution_selection.py)   | `Logger`, selección pass@2                                                                                                                  | Sin cambios |
+| [preprocessing.py](../../preprocessing.py)             | `Task`                                                                                                                                       | Sin cambios |
 
 ### 2.1 El truco que lo hace posible
 
@@ -95,12 +95,12 @@ flowchart LR
 
 ## 3. Mapa de cambios
 
-| Archivo | Tipo | Alcance del cambio |
-|---------|------|--------------------|
-| [accel.py](../../accel.py) | **Nuevo** | Toda la lógica del Eje D: config, presets, configuración de proceso, envoltura del forward |
-| [solve_task.py](../../solve_task.py) | Modificado | 1 parámetro nuevo (`accel_config`) + 2 llamadas |
-| [parallel_train.py](../../parallel_train.py) | Modificado | Flags CLI, propagación a workers, fingerprint de caché, metadatos de ejecución |
-| [profile_parallel_train.py](../../profile_parallel_train.py) | Modificado | Métricas de silicio/energía/exactitud, preset, guardarraíles nuevos |
+| Archivo                                                     | Tipo            | Alcance del cambio                                                                           |
+| ----------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------- |
+| [accel.py](../../accel.py)                                   | **Nuevo** | Toda la lógica del Eje D: config, presets, configuración de proceso, envoltura del forward |
+| [solve_task.py](../../solve_task.py)                         | Modificado      | 1 parámetro nuevo (`accel_config`) + 2 llamadas                                           |
+| [parallel_train.py](../../parallel_train.py)                 | Modificado      | Flags CLI, propagación a workers, fingerprint de caché, metadatos de ejecución            |
+| [profile_parallel_train.py](../../profile_parallel_train.py) | Modificado      | Métricas de silicio/energía/exactitud, preset, guardarraíles nuevos                       |
 
 Ningún cambio altera el algoritmo, la pérdida, el número de iteraciones ni la selección
 pass@2.
@@ -113,15 +113,15 @@ pass@2.
 
 Dataclass serializable (debe cruzar la frontera de `multiprocessing.spawn` como `dict`).
 
-| Campo | Tipo | Default | Significado |
-|-------|------|---------|-------------|
-| `amp` | `str` | `'off'` | `off` \| `bf16` \| `fp16`. Precisión mixta del forward (§9.6.1) |
-| `compile_mode` | `str` | `'off'` | `off` \| `default` \| `reduce-overhead` \| `max-autotune` (§9.6.2) |
-| `matmul_precision` | `str` | `'highest'` | Argumento de `torch.set_float32_matmul_precision` (§9.2) |
-| `threads_per_worker` | `int` | `0` | `torch.set_num_threads` por worker; `0` = no tocar |
-| `alloc_conf` | `str\|None` | `None` | `PYTORCH_HIP_ALLOC_CONF` / `PYTORCH_CUDA_ALLOC_CONF` |
-| `inductor_cache_dir` | `str\|None` | `None` | `TORCHINDUCTOR_CACHE_DIR` persistente |
-| `compile_threads` | `int` | `1` | `TORCHINDUCTOR_COMPILE_THREADS` por worker |
+| Campo                  | Tipo         | Default       | Significado                                                                 |
+| ---------------------- | ------------ | ------------- | --------------------------------------------------------------------------- |
+| `amp`                | `str`      | `'off'`     | `off` \| `bf16` \| `fp16`. Precisión mixta del forward (§9.6.1)     |
+| `compile_mode`       | `str`      | `'off'`     | `off` \| `default` \| `reduce-overhead` \| `max-autotune` (§9.6.2) |
+| `matmul_precision`   | `str`      | `'highest'` | Argumento de`torch.set_float32_matmul_precision` (§9.2)                  |
+| `threads_per_worker` | `int`      | `0`         | `torch.set_num_threads` por worker; `0` = no tocar                      |
+| `alloc_conf`         | `str\|None` | `None`      | `PYTORCH_HIP_ALLOC_CONF` / `PYTORCH_CUDA_ALLOC_CONF`                    |
+| `inductor_cache_dir` | `str\|None` | `None`      | `TORCHINDUCTOR_CACHE_DIR` persistente                                     |
+| `compile_threads`    | `int`      | `1`         | `TORCHINDUCTOR_COMPILE_THREADS` por worker                                |
 
 Métodos relevantes:
 
@@ -137,12 +137,12 @@ Métodos relevantes:
 Para que las comparativas A/B estén etiquetadas de forma consistente y no dependan de que
 el operador recuerde ocho flags:
 
-| Preset | `amp` | `compile_mode` | `matmul_precision` | `threads_per_worker` | `alloc_conf` | `inductor_cache_dir` |
-|--------|-------|----------------|--------------------|----------------------|--------------|----------------------|
-| `baseline` | off | off | highest | 0 | — | — |
-| `bf16` | bf16 | off | high | 1 | — | — |
-| `compile` | off | default | high | 1 | — | `.inductor_cache` |
-| `full` | bf16 | default | high | 1 | `expandable_segments:True` | `.inductor_cache` |
+| Preset       | `amp` | `compile_mode` | `matmul_precision` | `threads_per_worker` | `alloc_conf`               | `inductor_cache_dir` |
+| ------------ | ------- | ---------------- | -------------------- | ---------------------- | ---------------------------- | ---------------------- |
+| `baseline` | off     | off              | highest              | 0                      | —                           | —                     |
+| `bf16`     | bf16    | off              | high                 | 1                      | —                           | —                     |
+| `compile`  | off     | default          | high                 | 1                      | —                           | `.inductor_cache`    |
+| `full`     | bf16    | default          | high                 | 1                      | `expandable_segments:True` | `.inductor_cache`    |
 
 `config_from_preset(name, **overrides)` aplica el preset y luego los overrides **cuyo valor
 no es `None`**, de modo que la CLI puede pasar todos los flags incondicionalmente.
@@ -244,11 +244,11 @@ elemental. Por tanto, bajo autocast **permanece íntegramente en FP32**, sin nec
 
 El mismo patrón aparece en:
 
-| Ubicación | Expresión | Resultado |
-|-----------|-----------|-----------|
-| `add_residual` | `x + z` | FP32 |
-| `direction_share` | `x_list[d1] + c * affine(z_list[d2], ...)` | FP32 |
-| Cabeza de colores | `affine(x[...]) + 100 * head_weights[1]` | FP32 |
+| Ubicación          | Expresión                                   | Resultado |
+| ------------------- | -------------------------------------------- | --------- |
+| `add_residual`    | `x + z`                                    | FP32      |
+| `direction_share` | `x_list[d1] + c * affine(z_list[d2], ...)` | FP32      |
+| Cabeza de colores   | `affine(x[...]) + 100 * head_weights[1]`   | FP32      |
 
 **Consecuencia**: sólo los *intermedios* son BF16; el estado que se propaga entre capas es
 FP32. Esto acota el riesgo señalado en §9.6.1 para `normalize`, cuya media y varianza
@@ -297,12 +297,12 @@ paralelo de compilación de Triton y vuelvan a saturar la CPU — la patología 
 
 ## 7. Adaptaciones específicas de ROCm/RDNA4 (§9.2)
 
-| Antes | Problema en ROCm | Ahora |
-|-------|------------------|-------|
-| `torch.backends.cuda.matmul.allow_tf32 = True` en el import global de `parallel_train.py` | **No-op**: RDNA4 no tiene TF32; AMD ejecuta los matmul FP32 a precisión completa | Eliminado; sustituido por `torch.set_float32_matmul_precision(cfg.matmul_precision)` por worker, con default `highest` (comportamiento idéntico al anterior) |
-| `torch.backends.cudnn.benchmark = True` | Funcional (alias de MIOpen) | Se mantiene sin cambios |
-| — | Allocator con fragmentación bajo muchos procesos | `--alloc-conf expandable_segments:True` (opt-in) |
-| — | Sobresuscripción de hilos intra-op con 13+ workers | `--threads-per-worker 1` |
+| Antes                                                                                         | Problema en ROCm                                                                        | Ahora                                                                                                                                                            |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `torch.backends.cuda.matmul.allow_tf32 = True` en el import global de `parallel_train.py` | **No-op**: RDNA4 no tiene TF32; AMD ejecuta los matmul FP32 a precisión completa | Eliminado; sustituido por`torch.set_float32_matmul_precision(cfg.matmul_precision)` por worker, con default `highest` (comportamiento idéntico al anterior) |
+| `torch.backends.cudnn.benchmark = True`                                                     | Funcional (alias de MIOpen)                                                             | Se mantiene sin cambios                                                                                                                                          |
+| —                                                                                            | Allocator con fragmentación bajo muchos procesos                                       | `--alloc-conf expandable_segments:True` (opt-in)                                                                                                               |
+| —                                                                                            | Sobresuscripción de hilos intra-op con 13+ workers                                     | `--threads-per-worker 1`                                                                                                                                       |
 
 Notas de portabilidad:
 
@@ -337,11 +337,11 @@ def solve_task(..., postprocess_stride=1, accel_config=None):
 
 El orden importa y es deliberado:
 
-| Paso | Debe ir antes de… | Motivo |
-|------|-------------------|--------|
-| `configure_process` | primera reserva de VRAM | el allocator lee su config en la primera reserva |
-| `set_device(gpu_id)` | `apply` | `apply` consulta capacidades del dispositivo (BF16) |
-| `apply` | primer `take_step` | reasigna `model.forward` |
+| Paso                   | Debe ir antes de…      | Motivo                                                |
+| ---------------------- | ----------------------- | ----------------------------------------------------- |
+| `configure_process`  | primera reserva de VRAM | el allocator lee su config en la primera reserva      |
+| `set_device(gpu_id)` | `apply`               | `apply` consulta capacidades del dispositivo (BF16) |
+| `apply`              | primer`take_step`     | reasigna`model.forward`                             |
 
 El bucle de entrenamiento, la medición de VRAM y el volcado de soluciones **no cambian**.
 
@@ -353,22 +353,22 @@ El bucle de entrenamiento, la medición de VRAM y el volcado de soluciones **no 
 
 Grupo *"Eje D — acceleration (all OFF by default: baseline behaviour)"*:
 
-| Flag | Default | Descripción |
-|------|---------|-------------|
-| `--accel-preset {baseline,bf16,compile,full}` | `baseline` | Bundle de ajustes; los flags individuales lo sobrescriben |
-| `--amp {off,bf16,fp16}` | del preset | Precisión mixta del forward |
-| `--compile {off,default,reduce-overhead,max-autotune}` | del preset | Modo de `torch.compile` |
-| `--matmul-precision {highest,high,medium}` | del preset | Sustituto ROCm de `allow_tf32` |
-| `--threads-per-worker N` | del preset | `torch.set_num_threads` por worker |
-| `--alloc-conf CONF` | del preset | Config del allocator HIP/CUDA |
-| `--inductor-cache-dir DIR` | del preset | Caché persistente de TorchInductor |
-| `--compile-threads N` | `1` | `TORCHINDUCTOR_COMPILE_THREADS` por worker |
+| Flag                                                     | Default      | Descripción                                              |
+| -------------------------------------------------------- | ------------ | --------------------------------------------------------- |
+| `--accel-preset {baseline,bf16,compile,full}`          | `baseline` | Bundle de ajustes; los flags individuales lo sobrescriben |
+| `--amp {off,bf16,fp16}`                                | del preset   | Precisión mixta del forward                              |
+| `--compile {off,default,reduce-overhead,max-autotune}` | del preset   | Modo de`torch.compile`                                  |
+| `--matmul-precision {highest,high,medium}`             | del preset   | Sustituto ROCm de`allow_tf32`                           |
+| `--threads-per-worker N`                               | del preset   | `torch.set_num_threads` por worker                      |
+| `--alloc-conf CONF`                                    | del preset   | Config del allocator HIP/CUDA                             |
+| `--inductor-cache-dir DIR`                             | del preset   | Caché persistente de TorchInductor                       |
+| `--compile-threads N`                                  | `1`        | `TORCHINDUCTOR_COMPILE_THREADS` por worker              |
 
 Flag auxiliar, fuera de §9.6 pero necesario para abaratar los A/B:
 
-| Flag | Default | Descripción |
-|------|---------|-------------|
-| `--iterations N` | `1500` | Pasos de la Fase 2 por tarea. Antes estaba **hardcodeado** dentro de `run_split` |
+| Flag               | Default  | Descripción                                                                            |
+| ------------------ | -------- | --------------------------------------------------------------------------------------- |
+| `--iterations N` | `1500` | Pasos de la Fase 2 por tarea. Antes estaba**hardcodeado** dentro de `run_split` |
 
 ### 9.2 Propagación a los workers
 
@@ -438,10 +438,10 @@ los números no es una mejora.
 `_sample_gpu_sysfs` pasa de devolver `(util, vram)` a `(util, vram, mem_busy, power)`,
 leyendo dos atributos adicionales del mismo `device_dir`:
 
-| Métrica | Fuente sysfs | Significado |
-|---------|--------------|-------------|
-| `mem_busy_pct` | `device/mem_busy_percent` | Ocupación del controlador de memoria |
-| `power_w` | `device/hwmon/hwmon*/power1_average` (µW) | Potencia de placa |
+| Métrica         | Fuente sysfs                                 | Significado                           |
+| ---------------- | -------------------------------------------- | ------------------------------------- |
+| `mem_busy_pct` | `device/mem_busy_percent`                  | Ocupación del controlador de memoria |
+| `power_w`      | `device/hwmon/hwmon*/power1_average` (µW) | Potencia de placa                     |
 
 Se mantiene el diseño original de seguridad: lecturas de fichero puras, envueltas en
 `try/except`, en la **cadencia lenta** de `--gpu-interval` (20 s por defecto), nunca por
@@ -452,15 +452,15 @@ La energía se integra rectangularmente: `energy_wh += power_w * Δt / 3600`.
 
 ### 10.2 Métricas nuevas en el resumen
 
-| Bloque | Campo | Cálculo |
-|--------|-------|---------|
-| `gpu` | `mem_busy_mean_pct`, `power_mean_w`, `power_max_w`, `energy_wh` | De las series muestreadas |
-| `efficiency` | `planned_train_steps` | `Σ (n_steps × n_tasks)` de los metadatos |
-| `efficiency` | `steps_per_s_aggregate` | `planned_train_steps / wall_time` |
-| `efficiency` | `energy_wh_per_1k_steps` | `energy_wh / (planned_steps/1000)` |
-| `efficiency` | `energy_wh_per_worker` | `energy_wh / workers_completed` |
-| `accuracy` | `n_solved`, `n_tasks`, `solved_fraction` | De los metadatos |
-| — | `accel_preset`, `run_metadata` | Etiquetado y trazabilidad |
+| Bloque         | Campo                                                                   | Cálculo                                     |
+| -------------- | ----------------------------------------------------------------------- | -------------------------------------------- |
+| `gpu`        | `mem_busy_mean_pct`, `power_mean_w`, `power_max_w`, `energy_wh` | De las series muestreadas                    |
+| `efficiency` | `planned_train_steps`                                                 | `Σ (n_steps × n_tasks)` de los metadatos |
+| `efficiency` | `steps_per_s_aggregate`                                               | `planned_train_steps / wall_time`          |
+| `efficiency` | `energy_wh_per_1k_steps`                                              | `energy_wh / (planned_steps/1000)`         |
+| `efficiency` | `energy_wh_per_worker`                                                | `energy_wh / workers_completed`            |
+| `accuracy`   | `n_solved`, `n_tasks`, `solved_fraction`                          | De los metadatos                             |
+| —             | `accel_preset`, `run_metadata`                                      | Etiquetado y trazabilidad                    |
 
 `_collect_run_metadata(t0)` lee los `run_metadata_*.json` del directorio de trabajo e
 **ignora los que tengan `mtime` anterior al inicio de la ejecución**, de modo que un
@@ -476,11 +476,11 @@ fichero obsoleto de un experimento previo no contamine el resumen.
 
 `compare()` mantiene el guardarraíl de CPU del Eje H y **añade uno de exactitud**:
 
-| Código | Condición |
-|--------|-----------|
-| `0` | Todo correcto |
-| `2` | **Regresión de CPU**: subió `cpu_mean_pct` o `cpu_saturation_fraction` |
-| `3` | **Regresión de exactitud**: `solved_fraction` cayó más de `--accuracy-tolerance` |
+| Código | Condición                                                                                    |
+| ------- | --------------------------------------------------------------------------------------------- |
+| `0`   | Todo correcto                                                                                 |
+| `2`   | **Regresión de CPU**: subió `cpu_mean_pct` o `cpu_saturation_fraction`            |
+| `3`   | **Regresión de exactitud**: `solved_fraction` cayó más de `--accuracy-tolerance` |
 
 Justificación del código 3: el Eje D es **semánticamente neutro por diseño**. Si pass@2
 baja, la aceleración ha cambiado los números de forma dañina —típicamente BF16 truncando
@@ -501,10 +501,10 @@ Detalles de presentación:
 
 ### 10.4 Flags nuevos del profiler
 
-| Flag | Descripción |
-|------|-------------|
-| `--accel-preset {baseline,bf16,compile,full}` | Añade `--accel-preset X` al passthrough hacia `parallel_train.py` **y** lo registra en el resumen, evitando A/B mal etiquetados. Un `--accel-preset` explícito tras `--` tiene prioridad |
-| `--accuracy-tolerance F` | Caída tolerada de `solved_fraction` antes de marcar regresión. Default `0.0` (estricto) |
+| Flag                                            | Descripción                                                                                                                                                                                            |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--accel-preset {baseline,bf16,compile,full}` | Añade`--accel-preset X` al passthrough hacia `parallel_train.py` **y** lo registra en el resumen, evitando A/B mal etiquetados. Un `--accel-preset` explícito tras `--` tiene prioridad |
+| `--accuracy-tolerance F`                      | Caída tolerada de`solved_fraction` antes de marcar regresión. Default `0.0` (estricto)                                                                                                            |
 
 ---
 
@@ -559,14 +559,14 @@ python profile_parallel_train.py --compare .profile/d_baseline_summary.json \
 
 Criterios de aceptación:
 
-| Métrica | Criterio |
-|---------|----------|
-| `steps_per_s_aggregate` | ↑ ≥ 1,5× |
-| `gpu_util_mean_pct` | ↑ |
-| `energy_wh_per_1k_steps` | ↓ |
-| `cpu_saturation_fraction` | no ↑ |
-| `solved_fraction` | no ↓ |
-| Código de salida | `0` |
+| Métrica                    | Criterio    |
+| --------------------------- | ----------- |
+| `steps_per_s_aggregate`   | ↑ ≥ 1,5× |
+| `gpu_util_mean_pct`       | ↑          |
+| `energy_wh_per_1k_steps`  | ↓          |
+| `cpu_saturation_fraction` | no ↑       |
+| `solved_fraction`         | no ↓       |
+| Código de salida           | `0`       |
 
 ### 11.5 Barrido de concurrencia
 
@@ -580,14 +580,14 @@ intuición.
 
 ### 12.1 Riesgos conocidos
 
-| Riesgo | Mitigación implementada | Mitigación pendiente |
-|--------|-------------------------|----------------------|
-| BF16 agrava el *posterior collapse* (§8.2.4, §9.6.1) | Guardarraíl de exactitud (exit 3); KL siempre en FP32 | *Free-bits* del Eje B §9.4.1 |
-| Coste de compilación no amortizado en runs cortos | `inductor_cache_dir` persistente; `--iterations` para dimensionar el A/B | — |
-| N workers compilando a la vez saturan la CPU | `compile_threads=1` por defecto | Escalonar el arranque de workers |
-| `reduce-overhead` (HIP graphs) infla VRAM con muchos procesos | No está en ningún preset; opt-in explícito y documentado | — |
-| Caché de Fase 1 obsoleta tras cambiar de preset | La config accel forma parte del fingerprint | — |
-| Fallo de compilación mata una tarea | `_EagerFallback` revierte a eager | — |
+| Riesgo                                                          | Mitigación implementada                                                     | Mitigación pendiente            |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------- |
+| BF16 agrava el*posterior collapse* (§8.2.4, §9.6.1)         | Guardarraíl de exactitud (exit 3); KL siempre en FP32                       | *Free-bits* del Eje B §9.4.1  |
+| Coste de compilación no amortizado en runs cortos              | `inductor_cache_dir` persistente; `--iterations` para dimensionar el A/B | —                               |
+| N workers compilando a la vez saturan la CPU                    | `compile_threads=1` por defecto                                            | Escalonar el arranque de workers |
+| `reduce-overhead` (HIP graphs) infla VRAM con muchos procesos | No está en ningún preset; opt-in explícito y documentado                  | —                               |
+| Caché de Fase 1 obsoleta tras cambiar de preset                | La config accel forma parte del fingerprint                                  | —                               |
+| Fallo de compilación mata una tarea                            | `_EagerFallback` revierte a eager                                          | —                               |
 
 ### 12.2 Fuera de alcance (deliberadamente)
 
@@ -612,16 +612,16 @@ con la misma semilla, y lo que se compara es el pass@2 agregado sobre el split.
 
 ## 13. Trazabilidad con el documento de arquitectura
 
-| Sección de [COMPRESS_ARCHITECTURE_30_06.md](COMPRESS_ARCHITECTURE_30_06.md) | Estado | Dónde |
-|-----------------------------------------------------------------------------|--------|-------|
-| §9.6.1 Mixed precision BF16 | **Implementado** | `accel.apply` / `_autocast_wrap` |
-| §9.6.2 `torch.compile` + Triton-ROCm | **Implementado** (sin kernels a mano) | `accel.apply` |
-| §9.6.3 punto 1 — concurrencia | Ya existía (`--max-workers`); ahora **medible** | `parallel_train.py`, profiler |
-| §9.6.3 puntos 2–4 | No implementado | Fuera de alcance (§12.2) |
-| §9.2 sustitución de `allow_tf32` | **Implementado** | `accel.configure_process` |
-| §9.2 acumulación de KL en FP32 | **Garantizado por construcción** | Análisis §5.1 |
-| §9.11.3 paso 6 (`torch.compile`, único paso pendiente del Eje H) | **Implementado** vía Eje D | `accel.apply` |
-| §9.11.4 contrato de instrumentación | **Ampliado** con silicio, energía y exactitud | `profile_parallel_train.py` |
+| Sección de[COMPRESS_ARCHITECTURE_30_06.md](COMPRESS_ARCHITECTURE_30_06.md) | Estado                                                   | Dónde                               |
+| -------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------ |
+| §9.6.1 Mixed precision BF16                                               | **Implementado**                                   | `accel.apply` / `_autocast_wrap` |
+| §9.6.2`torch.compile` + Triton-ROCm                                     | **Implementado** (sin kernels a mano)              | `accel.apply`                      |
+| §9.6.3 punto 1 — concurrencia                                            | Ya existía (`--max-workers`); ahora **medible** | `parallel_train.py`, profiler      |
+| §9.6.3 puntos 2–4                                                        | No implementado                                          | Fuera de alcance (§12.2)            |
+| §9.2 sustitución de`allow_tf32`                                        | **Implementado**                                   | `accel.configure_process`          |
+| §9.2 acumulación de KL en FP32                                           | **Garantizado por construcción**                  | Análisis §5.1                      |
+| §9.11.3 paso 6 (`torch.compile`, único paso pendiente del Eje H)       | **Implementado** vía Eje D                        | `accel.apply`                      |
+| §9.11.4 contrato de instrumentación                                      | **Ampliado** con silicio, energía y exactitud     | `profile_parallel_train.py`        |
 
 **Impacto MDL**: cero. Este eje no añade ni un bit a θ, no modifica KL(z) ni el error de
 reconstrucción. Cambia únicamente **cómo** se calculan valores cuyo resultado es el mismo.

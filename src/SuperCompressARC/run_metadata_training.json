@@ -1,0 +1,30 @@
+{
+  "split": "training",
+  "timestamp": "2026-07-28 06:51:18",
+  "n_tasks": 10,
+  "n_steps": 300,
+  "n_solved": 0,
+  "elapsed_s": 12920.7,
+  "n_gpus": 1,
+  "max_workers": 24,
+  "postprocess_stride": 4,
+  "accel": {
+    "amp": "bf16",
+    "compile_mode": "default",
+    "matmul_precision": "high",
+    "threads_per_worker": 1,
+    "alloc_conf": "expandable_segments:True",
+    "inductor_cache_dir": ".inductor_cache",
+    "compile_threads": 1,
+    "enabled": true
+  },
+  "backend": {
+    "torch_version": "2.14.0.dev20260712+rocm7.2",
+    "hip_version": "7.2.53211",
+    "cuda_version": null,
+    "is_rocm": true,
+    "gpu_names": [
+      "AMD Radeon RX 9070 XT"
+    ]
+  }
+}

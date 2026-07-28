@@ -211,3 +211,4 @@ __marimo__/
 **arcagi/
 **.vscode/
 **results/
+**.inductor_cache
