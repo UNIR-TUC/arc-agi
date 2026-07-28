@@ -731,7 +731,8 @@ if __name__ == '__main__':
     n_gpus = torch.cuda.device_count()
 
     # Initialise the shared results file once for the whole run
-    current_date_time = time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime())
+    # Use a Windows-safe timestamp for filenames (':' is invalid on NTFS paths).
+    current_date_time = time.strftime('%Y-%m-%d_%H-%M-%S', time.localtime())
     print(f'ARC-AGI parallel training started at {current_date_time}')
     results_file = f'results_{current_date_time}.txt'
     arc_logging.init_results_file(results_file)
