@@ -9,27 +9,27 @@
     ],
     "torch_version": "2.14.0.dev20260712+rocm7.2",
     "accel": {
-      "amp": "bf16",
+      "amp": "off",
       "compile_mode": "off",
-      "matmul_precision": "high",
-      "threads_per_worker": 1,
+      "matmul_precision": "highest",
+      "threads_per_worker": 0,
       "alloc_conf": null,
       "inductor_cache_dir": null,
       "compile_threads": 1,
       "memory_planning": false
     }
   },
-  "created_at": "2026-07-29 01:28:45",
+  "created_at": "2026-07-30 23:13:14",
   "measurements": {
-    "007bbfb7": 882900992,
-    "00d62c1b": 1092616192,
-    "017c7c7b": 765460480,
-    "025d127b": 864026624,
-    "045e512c": 1436549120,
-    "0520fde7": 765460480,
-    "05269061": 803209216,
-    "05f2a901": 845152256,
-    "06df4c85": 1656750080,
-    "08ed6ac7": 836763648
+    "007bbfb7": 830472192,
+    "00d62c1b": 1077936128,
+    "017c7c7b": 664797184,
+    "025d127b": 784334848,
+    "045e512c": 1522532352,
+    "0520fde7": 666894336,
+    "05269061": 717225984,
+    "05f2a901": 759169024,
+    "06df4c85": 1809842176,
+    "08ed6ac7": 750780416
   }
 }
