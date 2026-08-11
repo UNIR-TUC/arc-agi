@@ -4,17 +4,17 @@
 >
 > Este documento explica **por qué** el modelo está diseñado como está, **qué** hace cada componente, **cómo** fluye el sistema de principio a fin y **cuánto cómputo** consume (TFLOPS pico y VRAM pico).
 >
-> Todas las afirmaciones técnicas remiten a líneas concretas del código del repo: archivos como [arc_compressor.py](arc_compressor.py), [layers.py](layers.py), [multitensor_systems.py](multitensor_systems.py), etc.
+> Todas las afirmaciones técnicas remiten a líneas concretas del código del repo: archivos como [arc_compressor.py](../../arc_compressor.py), [layers.py](../../layers.py), [multitensor_systems.py](../../multitensor_systems.py), etc.
 
 ---
 
 ## TL;DR
 
-**CompressARC** es un decodificador **VAE** de **~76 000 parámetros** que se entrena **una vez por tarea** (sin pretraining, sin búsqueda externa) durante **2000 iteraciones** (~20 min en una NVIDIA RTX 4070) y resuelve el **20 %** del conjunto de evaluación y el **34,75 %** del conjunto de entrenamiento de **ARC-AGI-1** con métrica **pass@2**.
+**CompressARC** es un decodificador **VAE-like** que se entrena **una vez por tarea** (sin pretraining, sin búsqueda externa) durante **2000 iteraciones** (~20 min en una NVIDIA RTX 4070) y resuelve el **20 %** del conjunto de evaluación y el **34,75 %** del conjunto de entrenamiento de **ARC-AGI-1** con métrica **pass@2**. El paper reporta **~76 000 parámetros** bajo su convención de contabilidad; en la implementación actual, el tamaño de `weights_list` depende de la tarea porque incluye posteriores y capacidades *task-specific*.
 
 La idea central es **inteligencia = compresión** (principio MDL, *Minimum Description Length*): el modelo más corto que reconstruye los ejemplos de entrenamiento de una tarea es también el que mejor generaliza al ejemplo de test. CompressARC materializa esta idea con:
 
-- Un **multitensor de 5 dimensiones** (`examples, colors, directions, x, y`) que separa explícitamente los tipos de información que aparecen en ARC.
+- Un **multitensor de 5 dimensiones** (`examples, colors, directions, x, y`) que separa explícitamente los tipos de información que aparecen en ARC y conserva **18 combinaciones válidas** de esas dimensiones.
 - **Equivarianzas estructurales** *hardcoded* (a permutación de colores, a las 8 direcciones del grupo diédrico D₄ y al intercambio x↔y) que reducen la longitud de descripción.
 - Un **decodificador VAE** cuya divergencia $\text{KL}$ mide directamente los *bits* del código latente.
 - Un loop de capas: `share_up → softmax → cummax → shift → direction_share → nonlinear → share_down → normalize` ×4.
@@ -38,7 +38,7 @@ La idea central es **inteligencia = compresión** (principio MDL, *Minimum Descr
     - [3.1 ¿Por qué un modelo pequeño (~76 K parámetros)?](#31-por-qué-un-modelo-pequeño-76-k-parámetros)
     - [3.2 ¿Por qué un VAE y no un Transformer?](#32-por-qué-un-vae-y-no-un-transformer)
     - [3.3 ¿Por qué un multitensor en lugar de un solo tensor?](#33-por-qué-un-multitensor-en-lugar-de-un-solo-tensor)
-    - [3.4 ¿Por qué 27 tensores y no 32?](#34-por-qué-27-tensores-y-no-32)
+    - [3.4 ¿Por qué 18 tensores y no 32?](#34-por-qué-18-tensores-y-no-32)
     - [3.5 ¿Por qué 8 direcciones?](#35-por-qué-8-direcciones)
     - [3.6 ¿Por qué scans direccionales (`cummax`, `shift`) y comunicación entre direcciones (`direction_share`)?](#36-por-qué-scans-direccionales-cummax-shift-y-comunicación-entre-direcciones-direction_share)
     - [3.7 ¿Por qué `symmetrize_xy` y `symmetrize_direction_sharing`?](#37-por-qué-symmetrize_xy-y-symmetrize_direction_sharing)
@@ -51,7 +51,7 @@ La idea central es **inteligencia = compresión** (principio MDL, *Minimum Descr
       - [4.1.1 Cómo leer una representación multitensor](#411-cómo-leer-una-representación-multitensor)
     - [4.2 Equivarianzas explícitas](#42-equivarianzas-explícitas)
       - [4.2.1 Qué significa que una regla sea equivariante](#421-qué-significa-que-una-regla-sea-equivariante)
-    - [4.3 Capa de decodificación (VAE)](#43-capa-de-decodificación-vae)
+    - [4.3 Capa de decodificación (VAE-like)](#43-capa-de-decodificación-vae-like)
       - [4.3.1 Del ruido al estado inicial de la red](#431-del-ruido-al-estado-inicial-de-la-red)
     - [4.4 Capas centrales — orden y propósito](#44-capas-centrales--orden-y-propósito)
       - [4.4.1 Una actualización residual, paso a paso](#441-una-actualización-residual-paso-a-paso)
@@ -94,7 +94,7 @@ La idea central es **inteligencia = compresión** (principio MDL, *Minimum Descr
     - [8.4 Limitaciones del flujo de entrenamiento por inferencia](#84-limitaciones-del-flujo-de-entrenamiento-por-inferencia)
       - [8.4.1 Número de iteraciones fijo (2000) e hiperparámetros estáticos](#841-número-de-iteraciones-fijo-2000-e-hiperparámetros-estáticos)
       - [8.4.2 Selección pass@2 con constantes mágicas](#842-selección-pass2-con-constantes-mágicas)
-      - [8.4.3 Ausencia total de curriculum](#843-ausencia-total-de-curriculum)
+      - [8.4.3 Curriculum limitado al tamaño de grid](#843-curriculum-limitado-al-tamaño-de-grid)
       - [8.4.4 Coste computacional: 20 min/puzzle a 0,04 % del pico GPU](#844-coste-computacional-20-minpuzzle-a-004--del-pico-gpu)
     - [8.5 Marco de Chollet: ¿por qué el techo está en ~20 %?](#85-marco-de-chollet-por-qué-el-techo-está-en-20-)
     - [8.6 Síntesis: vías de mejora ordenadas por impacto esperado](#86-síntesis-vías-de-mejora-ordenadas-por-impacto-esperado)
@@ -163,9 +163,11 @@ En CompressARC esto se materializa con un **decodificador VAE**:
 - La **cross-entropy** sobre los píxeles reconstruidos mide los bits necesarios para corregir errores de reconstrucción.
 - Se minimiza:
 
-$$\mathcal{L} = \underbrace{D_{\text{KL}}\big(\mathcal{N}(\mu,\Sigma) \,\|\, \mathcal{N}(0,I)\big)}_{\text{coste del código}} \;+\; 10 \cdot \underbrace{H(\text{logits}, \text{píxeles})}_{\text{coste de los errores}}$$
+$$
+\mathcal{L} = \underbrace{D_{\text{KL}}\big(\mathcal{N}(\mu,\Sigma) \,\|\, \mathcal{N}(0,I)\big)}_{\text{coste del código}} \;+\; 10 \cdot \underbrace{H(\text{logits}, \text{píxeles})}_{\text{coste de los errores}}
+$$
 
-El factor 10 es un balanceo empírico (ver [train.py:120](train.py)). Minimizar esta cantidad equivale a buscar **la descripción más corta posible** de los ejemplos.
+El factor 10 es un balanceo empírico (ver [train.py:120](../../train.py#L120)). Minimizar esta cantidad equivale a buscar **la descripción más corta posible** de los ejemplos.
 
 Generalización al test: como la cuadrícula de test se procesa por las mismas capas con los mismos pesos aprendidos durante el entrenamiento, la regla descubierta se aplica automáticamente.
 
@@ -363,24 +365,82 @@ Esta es la sección **central** del documento. Cada decisión arquitectónica re
 
 ### 3.1 ¿Por qué un modelo pequeño (~76 K parámetros)?
 
-En MDL, **la longitud de descripción incluye el modelo**. Un modelo grande necesitaría que sus propios pesos fueran transmitidos como parte del código, inflando $\mathcal{L}$. Como CompressARC se entrena desde cero por tarea, el tamaño del modelo está acotado por: cuánto puedes "permitirte gastar" en pesos antes de que la regla a transmitir se vuelva más cara que enumerar píxeles. El número 76 K es el resultado empírico de ese equilibrio. Compárese con GPT-2 small (124 M) o con un transformer ARC-específico (>1 M): CompressARC es **1000–10000× más pequeño**.
+En MDL, **la longitud de descripción incluye el modelo**. Un modelo grande
+necesitaría que sus propios pesos fueran transmitidos como parte del código,
+inflando $\mathcal{L}$. El código hace explícitas las dimensiones pequeñas en
+[`ARCCompressor`](../../arc_compressor.py#L14-L32):
+
+```python
+# arc_compressor.py — ARCCompressor
+n_layers = 4
+share_up_dim = 16
+share_down_dim = 8
+decoding_dim = 4
+softmax_dim = 2
+cummax_dim = 4
+shift_dim = 4
+nonlinear_dim = 16
+
+def channel_dim_fn(self, dims):
+  return 16 if dims[2] == 0 else 8
+```
+
+Estas constantes limitan la anchura de cada operación y hacen que el modelo
+sea pequeño, pero no determinan por sí solas un número universal de
+parámetros. `ARCCompressor.__init__()` crea pesos para cada tarea y añade a
+`weights_list` tanto las capas compartidas como los posteriores task-specific.
+Por eso la cifra de ~76 K del paper debe leerse como una convención de
+contabilidad para una configuración concreta, no como una propiedad invariable
+de cualquier instancia del código. La comprobación correcta es contar
+`sum(weight.numel() for weight in model.weights_list)` sobre una tarea real.
 
 ### 3.2 ¿Por qué un VAE y no un Transformer?
 
-Un Transformer normal **no mide bits directamente**: su loss (cross-entropy) sólo mide error de reconstrucción. Para implementar MDL hace falta un mecanismo explícito que mida **la longitud del código latente**. El VAE lo da gratis: la divergencia $\text{KL}$ es exactamente esa medida. Por eso CompressARC es un decodificador VAE, no un Transformer.
+Un Transformer normal **no mide bits directamente**: su loss
+(cross-entropy) solo mide error de reconstrucción. CompressARC necesita además
+un coste para la información específica de la tarea. La implementación no
+usa una clase `torch.nn.Module` VAE estándar; implementa un decodificador
+*VAE-like* basado en un canal AWGN parametrizado. `channel_layer()` muestrea
+$z$ y devuelve simultáneamente la KL que se suma a la pérdida. La etiqueta VAE
+describe esta función de código, no una API concreta de PyTorch.
 
 ### 3.3 ¿Por qué un multitensor en lugar de un solo tensor?
 
-Las tareas ARC mezclan información de naturalezas **muy distintas**: hay un eje de ejemplos (2-7 entradas/salidas), un eje de colores (hasta 10 categorías sin orden semántico), un eje de direcciones (relacionado con simetrías espaciales) y dos ejes espaciales (x e y). Tratar todo en un único tensor obligaría a la red a **redescubrir** que estos ejes son cualitativamente distintos. En cambio, un multitensor mantiene **27 tensores distintos**, uno por cada subconjunto de dimensiones, y permite que cada uno se procese localmente y se comunique con los demás de forma controlada (ver [§4.1](#41-el-multitensor--estructura-de-datos-central)).
+Las tareas ARC mezclan información de naturalezas **muy distintas**: hay un eje de ejemplos (2-7 entradas/salidas), un eje de colores (hasta 10 categorías sin orden semántico), un eje de direcciones (relacionado con simetrías espaciales) y dos ejes espaciales (x e y). Tratar todo en un único tensor obligaría a la red a **redescubrir** que estos ejes son cualitativamente distintos. En cambio, un multitensor mantiene **18 tensores distintos**, uno por cada combinación que `dims_valid()` acepta, y permite que cada uno se procese localmente y se comunique con los demás de forma controlada (ver [§4.1](#41-el-multitensor--estructura-de-datos-central)).
+Las tareas ARC mezclan información de naturalezas **muy distintas**: hay un
+eje de ejemplos, un eje de colores, un eje de direcciones y dos ejes
+espaciales (`x`, `y`). Tratar todo en un único tensor obligaría a la red a
+**redescubrir** que estos ejes son cualitativamente distintos. En cambio, el
+multitensor mantiene **18 tensores distintos**, uno por cada combinación que
+`dims_valid()` acepta, y permite que cada uno se procese localmente y se
+comunique con los demás de forma controlada (ver [§4.1](#41-el-multitensor--estructura-de-datos-central)).
 
-### 3.4 ¿Por qué 27 tensores y no 32?
+### 3.4 ¿Por qué 18 tensores y no 32?
 
-Las 5 dimensiones binarias dan $2^5 = 32$ combinaciones, pero hay dos reglas de validez en [multitensor_systems.py:35-50](multitensor_systems.py):
+Las 5 dimensiones binarias dan $2^5 = 32$ combinaciones, pero el código conserva solo las que pasan dos reglas en [`MultiTensorSystem.dims_valid()`](../../multitensor_systems.py#L34-L51):
 
 1. **Si x o y están activos, examples también debe estarlo.** Razón: un píxel sólo tiene sentido como parte de un ejemplo concreto; no hay un "píxel global".
 2. **Al menos uno de [color, direction, x, y] debe estar activo.** Un tensor que sólo tuviera `examples` sería un escalar por ejemplo: no aporta información estructural.
 
-Esto descarta 5 combinaciones (la combinación nula `[0,0,0,0,0]` más cuatro que violan la regla 1: `[0,0,0,1,0], [0,0,0,0,1], [0,0,0,1,1]` y la equivalente con examples=1 que falla otras reglas), dejando **27 tensores válidos**.
+El recuento exacto es **18**, no 27. Cuando `examples=0`, `x` e `y` deben ser cero y quedan las tres combinaciones no vacías de `colors` y `directions`: `[0,1,0,0,0]`, `[0,0,1,0,0]` y `[0,1,1,0,0]`. Cuando `examples=1`, cualquier combinación de los otros cuatro flags es posible salvo la combinación completamente vacía, por lo que quedan $2^4-1=15$. En total: $3+15=18$.
+
+```python
+# multitensor_systems.py — MultiTensorSystem.dims_valid
+def dims_valid(self, dims):
+  if (dims[3] or dims[4]) and not dims[0]:
+    return False
+  if sum(dims[1:]) == 0:
+    return False
+  return True
+```
+
+La función no crea tensores todavía: solo decide qué hojas puede recorrer
+`MultiTensorSystem.__iter__()`. La separación entre validación y construcción
+es importante porque las mismas combinaciones controlan tanto la asignación de
+pesos como la ejecución de las capas. Por ejemplo, `[0,1,0,0,0]` representa
+información por color sin ligar a un ejemplo concreto, mientras que
+`[0,0,0,1,0]` se rechaza porque una fila sin eje `examples` no tiene una
+referencia semántica dentro de la tarea.
 
 ### 3.5 ¿Por qué 8 direcciones?
 
@@ -390,38 +450,133 @@ Las 8 direcciones (N, NE, E, SE, S, SO, O, NO) cubren el **grupo diédrico D₄*
 
 Muchísimas reglas en ARC son **propagaciones espaciales**: rellenar regiones desde un borde, extender líneas hasta colisionar con un obstáculo, copiar un patrón a lo largo de un eje. Estas operaciones son naturalmente **escaneadas** a lo largo de una dirección.
 
-- `cummax` ([layers.py:436-460](layers.py)) implementa scans asociativos de máximo en las 4 direcciones cardinales y, para las diagonales, un scan recursivo en $\log(\min(x,y))$ pasos (idea de *blelloch scan*).
-- `shift` ([layers.py:475-490](layers.py)) hace desplazamientos por un píxel en las 8 direcciones.
-- `direction_share` ([layers.py:493-540](layers.py)) comunica información entre direcciones con coeficientes angulares fijos: $[1, 0.2, 0.4, 0.2, 1, 0.2, 0.4, 0.2]$, indexados por $(d_2 - d_1) \bmod 8$. Direcciones opuestas (offset 4) tienen coeficiente 1; ortogonales (offset 2, 6) tienen 0.4; vecinas (offset 1, 3, 5, 7) tienen 0.2. Esto es una **distancia angular suave** que refleja la geometría del grupo D₄.
+- `cummax` ([layers.py:436-460](../../layers.py#L436-L460)) implementa scans asociativos de máximo en las 4 direcciones cardinales y, para las diagonales, un scan recursivo en $\log(\min(x,y))$ pasos (idea de *blelloch scan*).
+- `shift` ([layers.py:475-490](../../layers.py#L475-L490)) hace desplazamientos por un píxel en las 8 direcciones.
+- `direction_share` ([layers.py:493-540](../../layers.py#L493-L540)) comunica información entre direcciones con coeficientes angulares fijos: $[1, 0.2, 0.4, 0.2, 1, 0.2, 0.4, 0.2]$, indexados por $(d_2 - d_1) \bmod 8$. Direcciones opuestas (offset 4) tienen coeficiente 1; ortogonales (offset 2, 6) tienen 0.4; vecinas (offset 1, 3, 5, 7) tienen 0.2. Esto es una **distancia angular suave** que refleja la geometría del grupo D₄.
 
 ### 3.7 ¿Por qué `symmetrize_xy` y `symmetrize_direction_sharing`?
 
-Las tareas ARC son **invariantes** a la elección arbitraria del nombre "x" vs "y" (rotar 90° no cambia la regla) y a las reflexiones/rotaciones. Forzar esta invarianza en los pesos del modelo (en lugar de esperar que la red la aprenda) **reduce la longitud de descripción**: hay menos parámetros independientes que transmitir.
+Las tareas ARC son **equivariantes** a muchas transformaciones espaciales: si
+se intercambian los ejes, la salida debe intercambiarlos de forma coherente.
+Forzar parte de esta relación en los pesos (en lugar de esperar que la red la
+aprenda) **reduce la longitud de descripción**. El código aplica las copias
+durante la inicialización, antes de que el optimizador reciba `weights_list`.
 
-- `symmetrize_xy` ([initializers.py:100-104](initializers.py)) iguala los pesos del tensor `dims=[..,1,0]` y `dims=[..,0,1]` (intercambia las posiciones de x e y en cada `dims`).
-- `symmetrize_direction_sharing` ([initializers.py:106-146](initializers.py)) restringe las 64 matrices del `direction_share` por capa al subespacio invariante bajo D₄ (rotaciones y reflejos del cuadrado).
-- La cabeza de colores se simetriza también: `head_weights[0] = stack([w, w], dim=-1)` ([initializers.py:84-88](initializers.py)) hace que las dos salidas (input y output) compartan los pesos.
+- `symmetrize_xy()` ([initializers.py](../../initializers.py#L122-L126)) iguala
+  el peso de una vista con `x` y la vista homóloga con `y`:
+
+```python
+# initializers.py — Initializer.symmetrize_xy
+for dims in self.multitensor_system:
+    if dims[3] == 0 and dims[4] == 1:
+        multiweights[dims] = multiweights[dims[:3] + [1, 0]]
+```
+
+- `symmetrize_direction_sharing()` ([initializers.py](../../initializers.py#L128-L169))
+  recorre cada par de direcciones, transforma sus índices al representante
+  equivalente y copia el mapa lineal representativo:
+
+```python
+# initializers.py — parte final de Initializer.symmetrize_direction_sharing
+multiweights[dims][dir1][dir2] = multiweights[from_dims][from_dir1][from_dir2]
+```
+
+- La cabeza mantiene el mismo mapa de entrada para sus dos canales (`input` y
+  `output`):
+
+```python
+# initializers.py — Initializer.initialize_head
+head_weights[0].requires_grad = False
+head_weights[0] = torch.stack([head_weights[0][..., 0]] * 2, dim=-1)
+head_weights[0].requires_grad = True
+```
+
+Estas operaciones comparten parámetros en puntos concretos. No demuestran que
+todo el `forward()` sea perfectamente equivariante: el propio constructor
+advierte que simetrizar todas las operaciones es difícil, y el tratamiento de
+colores anónimos proviene de cómo se usan los ejes, no de una permutación
+explícita de etiquetas.
 
 ### 3.8 ¿Por qué el coeficiente 10 entre KL y reconstrucción?
 
-Es un balanceo empírico (`loss = total_KL + 10 * reconstruction_error`, [train.py:120](train.py)). Sin este peso, el modelo *colapsa el posterior* (todo $\mu \to 0$) y deja de reconstruir. Con el peso 10, la reconstrucción tiene suficiente prioridad pero la compresión sigue presente. El valor 10 ha sido elegido por ensayo y error, no es un hiperparámetro especialmente sensible.
+Es un balanceo empírico. `take_step()` suma todos los mapas KL devueltos por
+`decode_latents()` y combina esa suma con el coste de reconstrucción:
+
+```python
+# train.py — train.take_step
+total_KL = 0
+for KL_amount in KL_amounts:
+  total_KL = total_KL + torch.sum(KL_amount)
+
+loss = total_KL + 10*reconstruction_error
+loss.backward()
+```
+
+El código verifica directamente el efecto de cada tensor latente mediante
+`KL_amounts`; el `10` solo escala el término de reconstrucción. El archivo no
+contiene una derivación que haga ese valor necesario ni un barrido de
+ablación, por lo que la explicación “empírica” es una caracterización del
+hiperparámetro, no una prueba teórica de optimalidad.
 
 ### 3.9 ¿Por qué Adam con `lr=0.01` y `betas=(0.5, 0.9)`?
 
 - **`lr=0.01`**: alta, pero el entrenamiento es muy corto (2000 iteraciones) y empieza desde Xavier random, así que conviene un paso grande.
 - **`β₁=0.5`** (en lugar del clásico 0.9): da menos peso al historial reciente y reacciona más rápido al gradiente actual. Como cada tarea es un dataset distinto y muy pequeño, el gradiente cambia mucho en los primeros pasos; un β₁ bajo lo absorbe mejor.
 - **`β₂=0.9`** (en lugar del clásico 0.999): mismo razonamiento, el estimador de varianza se adapta más rápido.
+  La configuración real aparece al crear cada modelo:
 
-Ver [train.py:135](train.py) y [solve_task.py:55](solve_task.py).
+```python
+# train.py / solve_task.py
+optimizer = torch.optim.Adam(
+  model.weights_list,
+  lr=0.01,
+  betas=(0.5, 0.9),
+)
+```
+
+`lr=0.01`, `β₁=0.5` y `β₂=0.9` son hechos verificables del programa. La
+interpretación de que un historial corto reacciona mejor a gradientes de una
+tarea pequeña es una justificación plausible, pero no está codificada como
+una regla adaptativa ni respaldada aquí por una ablación.
+
+Ver [train.py:135](../../train.py#L135) y [solve_task.py:55](../../solve_task.py#L55).
 
 ### 3.10 ¿Por qué dos predicciones (pass@2) y por qué una de ellas es EMA?
 
-La métrica oficial de ARC-AGI permite **dos intentos** por test. CompressARC los usa así (ver [solution_selection.py:54-90](solution_selection.py)):
+La métrica oficial de ARC-AGI permite **dos intentos** por test. `Logger`
+mantiene una muestra actual y una media exponencial de los logits y máscaras
+del test ([solution_selection.py](../../solution_selection.py#L72-L118)):
 
-- **Candidato 1**: la **muestra actual** del VAE en la iteración $t$. Captura la mejor estimación instantánea pero es ruidosa (el VAE muestrea).
-- **Candidato 2**: una **media exponencial** (EMA, decay=0.97) de los logits a lo largo del entrenamiento. Suaviza el ruido y suele converger a la moda del posterior.
+```python
+# solution_selection.py — Logger._track_solution
+self.ema_logits = self.ema_decay * self.ema_logits + (1 - self.ema_decay) * self.current_logits
+self.ema_x_mask = self.ema_decay * self.ema_x_mask + (1 - self.ema_decay) * self.current_x_mask
+self.ema_y_mask = self.ema_decay * self.ema_y_mask + (1 - self.ema_decay) * self.current_y_mask
+```
 
-Estas dos perspectivas suelen ser **complementarias**: cuando la red se aproxima a la solución pero aún oscila, la EMA captura el "centro" de las oscilaciones; cuando la red ya ha encontrado una respuesta determinista, la muestra y la EMA convergen al mismo punto. Las dos predicciones finales (`solution_most_frequent` y `solution_second_most_frequent`) se eligen agregando con `logaddexp` los scores de todas las iteraciones.
+Después, ambos candidatos se postprocesan y su evidencia se acumula por hash:
+
+```python
+score = -10*uncertainty
+if train_step < 150:
+  score = score - 10
+if logits is self.ema_logits:
+  score = score - 4
+self.solution_hashes_count[hashed_solution] = float(np.logaddexp(
+  self.solution_hashes_count.get(hashed_solution, -np.inf), score
+))
+```
+
+El primer candidato es la **muestra actual**, ruidosa por el `torch.randn()` del
+decodificador; el segundo es la **EMA** (`ema_decay = 0.97`). Las dos
+predicciones finales son las soluciones distintas con mayor evidencia
+acumulada, no necesariamente los resultados de la última iteración. En el
+runner secuencial el `Logger` usa `postprocess_stride=1`; el runner paralelo
+usa por defecto `postprocess_stride=4`, aunque siempre procesa el paso cero.
+
+Estas dos perspectivas pueden ser complementarias: cuando la red oscila, la EMA
+suaviza el estado; cuando converge, ambas pueden coincidir y el acumulador
+conserva la siguiente solución distinta con mejor score.
 
 ---
 
@@ -451,14 +606,32 @@ flowchart LR
   J --> E
 ```
 
-| Parte | Estructura real | Responsabilidad sencilla |
-| --- | --- | --- |
-| Preparación | `preprocessing.Task` | Leer la tarea, uniformar tamaños y ocultar las salidas de test. |
-| Representación | `MultiTensorSystem` | Mantener vistas de la tarea con distintos ejes relevantes. |
-| Generación | `layers.decode_latents` | Convertir ruido y parámetros ajustables en un estado inicial. |
-| Razonamiento geométrico | `ARCCompressor.forward` | Intercambiar y transformar información durante cuatro bloques. |
-| Predicción | `head_weights`, `mask_weights` | Puntuar colores y decidir qué zona de la cuadrícula es válida. |
-| Aprendizaje y elección | `train.take_step`, `Logger` | Actualizar parámetros y seleccionar dos soluciones robustas. |
+| Parte                    | Estructura real                    | Responsabilidad sencilla                                          |
+| ------------------------ | ---------------------------------- | ----------------------------------------------------------------- |
+| Preparación             | `preprocessing.Task`             | Leer la tarea, uniformar tamaños y ocultar las salidas de test.  |
+| Representación          | `MultiTensorSystem`              | Mantener vistas de la tarea con distintos ejes relevantes.        |
+| Generación              | `layers.decode_latents`          | Convertir ruido y parámetros ajustables en un estado inicial.    |
+| Razonamiento geométrico | `ARCCompressor.forward`          | Intercambiar y transformar información durante cuatro bloques.   |
+| Predicción              | `head_weights`, `mask_weights` | Puntuar colores y decidir qué zona de la cuadrícula es válida. |
+| Aprendizaje y elección  | `train.take_step`, `Logger`    | Actualizar parámetros y seleccionar dos soluciones robustas.     |
+
+La frontera de ejecución está en cuatro llamadas principales:
+
+```python
+# arc_compressor.py / train.py / solution_selection.py
+x, KL_amounts, KL_names = layers.decode_latents(
+  self.target_capacities, self.decode_weights, self.multiposteriors
+)
+logits, x_mask, y_mask, KL_amounts, KL_names = model.forward()
+loss = total_KL + 10*reconstruction_error
+train_history_logger.log(train_step, logits, x_mask, y_mask, ...)
+```
+
+`Task` prepara los datos y las vistas; `decode_latents` genera el estado
+residual; `forward()` aplica las capas y las cabezas; `take_step()` construye
+la función objetivo y actualiza todos los tensores de `model.weights_list`.
+El `Logger` recibe salidas separadas de la pérdida: registra candidatos, pero
+no participa en el gradiente.
 
 Un detalle importante: el ciclo `J → E` no reutiliza el modelo de otra tarea.
 Solo representa las 2 000 actualizaciones que refinan el mismo modelo mientras
@@ -466,19 +639,39 @@ resuelve una tarea concreta.
 
 ### 4.1 El multitensor — estructura de datos central
 
-El `MultiTensorSystem` ([multitensor_systems.py:11-93](multitensor_systems.py)) define **5 dimensiones binarias** y mantiene un tensor independiente por cada combinación válida.
+El `MultiTensorSystem` ([multitensor_systems.py](../../multitensor_systems.py#L9-L108)) define **5 dimensiones binarias** y mantiene un tensor independiente por cada una de las **18 combinaciones válidas**.
 
-> **Nota sobre la documentación del paper**: el Apéndice C del paper Liao & Gu describe el multitensor con **4 dimensiones** (`examples, colors, x, y`) y **16 tensores** ($2^4$) como simplificación expositiva. La **implementación real** ([multitensor_systems.py:9](multitensor_systems.py), `NUM_DIMENSIONS = 5`) añade la dimensión `directions` → **5 dimensiones y 27 tensores válidos**. Este documento describe siempre el código real.
+> **Nota sobre la documentación del paper**: el Apéndice C del paper Liao & Gu describe el multitensor con **4 dimensiones** (`examples, colors, x, y`) y **16 tensores** ($2^4$) como simplificación expositiva. La **implementación real** ([multitensor_systems.py](../../multitensor_systems.py#L9-L10), `NUM_DIMENSIONS = 5`) añade la dimensión `directions`; sus dos reglas de validez reducen las 32 hojas posibles a **18**. Este documento describe siempre el código real.
 
-| Índice | Dimensión | Longitud típica | Significado |
-|--------|-----------|-----------------|-------------|
-| 0 | examples | 2–7 (`n_examples`) | Pares (input, output) de la tarea |
-| 1 | colors | 1–10 (`n_colors`) | Colores presentes en la tarea (sin orden semántico) |
-| 2 | directions | **8** (fijo) | N, NE, E, SE, S, SO, O, NO |
-| 3 | x | ≤ 30 (`n_x`) | Altura del grid |
-| 4 | y | ≤ 30 (`n_y`) | Anchura del grid |
+```python
+# multitensor_systems.py — MultiTensorSystem
+NUM_DIMENSIONS = 5
+self.dim_lengths = [
+  self.n_examples, self.n_colors,
+  self.n_directions, self.n_x, self.n_y,
+]
 
-A esto se añade implícitamente un **canal** (última dimensión) cuya anchura la define `channel_dim_fn` en [arc_compressor.py:30-31](arc_compressor.py):
+def __iter__(self):
+  for dims in self._generate_dims_combinations():
+    if self.dims_valid(dims):
+      yield dims
+```
+
+`dims` no contiene los tamaños de los ejes; es una máscara binaria que indica
+qué ejes están presentes. Los tamaños concretos viven en `dim_lengths` y
+`shape(dims, extra_dim)`. Esta distinción permite que `[0,1,0,0,0]` y
+`[1,1,0,1,1]` compartan las mismas reglas de capas aunque sus formas sean
+completamente distintas.
+
+| Índice | Dimensión | Longitud típica      | Significado                                          |
+| ------- | ---------- | --------------------- | ---------------------------------------------------- |
+| 0       | examples   | 2–7 (`n_examples`) | Pares (input, output) de la tarea                    |
+| 1       | colors     | 1–10 (`n_colors`)  | Colores presentes en la tarea (sin orden semántico) |
+| 2       | directions | **8** (fijo)    | N, NE, E, SE, S, SO, O, NO                           |
+| 3       | x          | ≤ 30 (`n_x`)       | Altura del grid                                      |
+| 4       | y          | ≤ 30 (`n_y`)       | Anchura del grid                                     |
+
+A esto se añade implícitamente un **canal** (última dimensión) cuya anchura la define `channel_dim_fn` en [arc_compressor.py:30-31](../../arc_compressor.py#L30-L31):
 
 ```text
 channel_dim = 8  si dims[2] == 1  (tensor con dirección)
@@ -487,19 +680,19 @@ channel_dim = 16 si dims[2] == 0  (tensor sin dirección)
 
 Razón: los tensores con dirección ya tienen un factor 8× más de información por la propia dimensión `direction`, así que se compensa con menos canales.
 
-**Reglas de validez** ([multitensor_systems.py:35-50](multitensor_systems.py)):
+**Reglas de validez** ([`MultiTensorSystem.dims_valid()`](../../multitensor_systems.py#L34-L51)):
 
 1. Si `dims[3] == 1` o `dims[4] == 1`, entonces `dims[0] == 1` (un píxel pertenece a un ejemplo).
 2. `sum(dims[1:]) > 0` (al menos una dimensión informativa además de examples).
 
-Esto da **27 tensores válidos** de los 32 posibles. El siguiente diagrama clasifica un subconjunto representativo:
+Esto da **18 tensores válidos** de los 32 posibles. El siguiente diagrama clasifica un subconjunto representativo; todos los nodos mostrados pasan `dims_valid()`:
 
 ```mermaid
 graph TD
-    subgraph "Multitensor (27 tensores válidos)"
-        T1["[1,0,0,0,0]<br/>per-example scalar"]
-        T2["[0,1,0,0,0]<br/>per-color scalar"]
-        T3["[0,0,1,0,0]<br/>per-direction"]
+  subgraph "Multitensor (18 tensores válidos)"
+    T1["[0,1,0,0,0]<br/>per-color scalar"]
+    T2["[0,0,1,0,0]<br/>per-direction"]
+    T3["[0,1,1,0,0]<br/>color × direction"]
         T4["[1,1,0,0,0]<br/>example × color"]
         T5["[1,0,1,0,0]<br/>example × direction"]
         T6["[1,1,0,1,1]<br/>example × color × x × y<br/>(las cuadrículas)"]
@@ -513,7 +706,22 @@ graph TD
     T5 --> T7
 ```
 
-**El decorador `@multify`** ([multitensor_systems.py](multitensor_systems.py)) toma una función `f(dims, x, ...)` que opera sobre un tensor individual y la promueve a una función que opera sobre **todo el multitensor**, aplicándola a cada uno de los 27 tensores válidos con el `dims` correspondiente. Esto permite que el código de las capas sea genérico.
+**El decorador `@multify`** ([multitensor_systems.py](../../multitensor_systems.py#L151-L212)) toma una función `f(dims, x, ...)` que opera sobre un tensor individual y la promueve a una función que opera sobre **todo el multitensor**, aplicándola a cada una de las 18 hojas válidas con el `dims` correspondiente:
+
+```python
+# multitensor_systems.py — núcleo de multify.wrapper
+for dims in multitensor_system:
+  new_args = [arg[dims] if isinstance(arg, MultiTensor) else arg
+        for arg in args]
+  output = fn(dims, *new_args, **kwargs)
+  result_data[dims] = output
+```
+
+La función decorada conserva los argumentos que no son `MultiTensor` y extrae
+la hoja correspondiente de cada argumento multitensor. Después vuelve a
+envolver los resultados en un `MultiTensor`. Así, `layers.affine`, `normalize`
+y las operaciones direccionales se escriben una vez, pero se ejecutan con una
+forma y un conjunto de pesos específico para cada máscara `dims`.
 
 #### 4.1.1 Cómo leer una representación multitensor
 
@@ -554,7 +762,7 @@ Y una regla como "la fila central es especial" puede vivir en otro:
 El multitensor guarda simultáneamente estas vistas y otras compatibles. Las
 operaciones `share_up` y `share_down` permiten que un hallazgo pequeño, por
 ejemplo una relación entre colores, se comunique con una vista grande que sí
-incluye posiciones. No son 27 copias independientes de la cuadrícula: son 27
+incluye posiciones. No son 18 copias independientes de la cuadrícula: son 18
 niveles de detalle para expresar regularidades con el menor espacio posible.
 
 Las dos reglas de validez del código se entienden con ejemplos:
@@ -571,17 +779,17 @@ Las dos reglas de validez del código se entienden con ejemplos:
 El Apéndice C del paper usa una explicación simplificada de cuatro ejes y 16
 tensores. La implementación de este repositorio es la fuente de verdad para
 el comportamiento real: añade `directions`, usa cinco ejes binarios y conserva
-las 27 combinaciones que pasan `MultiTensorSystem.dims_valid()`.
+las 18 combinaciones que pasan `MultiTensorSystem.dims_valid()`.
 
 ### 4.2 Equivarianzas explícitas
 
-CompressARC implementa **tres equivarianzas estructurales** mediante *weight tying* en la inicialización (ver [initializers.py:100-146](initializers.py)).
+CompressARC implementa **tres equivarianzas estructurales** mediante *weight tying* en la inicialización (ver [initializers.py](../../initializers.py#L122-L169)).
 
-| Grupo de simetría | Mecanismo | Dónde se aplica |
-|-------------------|-----------|-----------------|
-| **Intercambio x ↔ y** | `symmetrize_xy` copia el peso de `dims=[…,1,0]` en `dims=[…,0,1]` y al revés | A todas las pilas de pesos (`share_up`, `share_down`, `softmax`, `cummax`, `shift`, `nonlinear`) en cada capa |
-| **Grupo diédrico D₄ (8 direcciones)** | `symmetrize_direction_sharing` restringe las 64 matrices del `direction_share` al subespacio invariante bajo rotaciones de 90° y reflejos | A `direction_share_weights` en cada capa |
-| **Permutación de colores** | La dimensión `colors` se trata como **anónima**: ningún peso depende del índice de color (la cabeza emite logits por color, pero el orden interno es irrelevante) | A toda la red (estructural, no por weight tying) |
+| Grupo de simetría                            | Mecanismo                                                                                                                                                                    | Dónde se aplica                                                                                                          |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Intercambio x ↔ y**                  | `symmetrize_xy` copia el peso de `dims=[…,1,0]` en `dims=[…,0,1]` y al revés                                                                                        | A todas las pilas de pesos (`share_up`, `share_down`, `softmax`, `cummax`, `shift`, `nonlinear`) en cada capa |
+| **Grupo diédrico D₄ (8 direcciones)** | `symmetrize_direction_sharing` restringe las 64 matrices del `direction_share` al subespacio invariante bajo rotaciones de 90° y reflejos                               | A`direction_share_weights` en cada capa                                                                                 |
+| **Permutación de colores**             | La dimensión`colors` se trata como **anónima**: ningún peso depende del índice de color (la cabeza emite logits por color, pero el orden interno es irrelevante) | A toda la red (estructural, no por weight tying)                                                                          |
 
 Estas tres equivarianzas reducen drásticamente la longitud de descripción del modelo y, por tanto, su KL efectiva.
 
@@ -623,35 +831,62 @@ las operaciones es difícil. Por tanto, esta arquitectura induce equivarianza
 en componentes importantes, pero no debe interpretarse como una demostración
 de equivarianza perfecta de punta a punta para toda transformación imaginable.
 
-### 4.3 Capa de decodificación (VAE)
+### 4.3 Capa de decodificación (VAE-like)
 
-El primer paso del forward pass es **decodificar el latente $z$** desde un posterior aprendido. Esto se hace en `decode_latents` ([layers.py:125-156](layers.py)), que delega en `channel_layer` ([layers.py:58-123](layers.py)) por cada tensor del multitensor.
+El primer paso del `forward()` es **decodificar el latente $z$** desde un
+posterior aprendido. Esto se hace en `decode_latents`
+([layers.py](../../layers.py#L126-L162)), que delega en `channel_layer`
+([layers.py](../../layers.py#L58-L123)) por cada una de las 18 hojas del
+multitensor.
 
-**Para cada uno de los 27 tensores válidos:**
+```python
+# layers.py — channel_layer
+mean, local_capacity_adjustment = posterior
+dimensionality = 1
+for axis_length in mean.shape:
+  dimensionality *= axis_length
 
-1. Se aprende un `mean` (media del posterior, shape = shape del tensor + canal `decoding_dim=4`) y un `local_capacity_adjustment` (varianza local, misma shape). Iniciados a 0.01·randn y 0 respectivamente.
-2. Se aprende también un escalar `target_capacity` (capacidad global del tensor, reparametrizado: el valor real es $e^{10 \cdot \text{target\_capacity}} \cdot 10000 + 0.5$).
-3. Se modela el canal como **AWGN** (Additive White Gaussian Noise) con capacidad ajustable. Las fórmulas clave:
+target_capacity = 10*target_capacity
+desired_global_capacity = torch.exp(target_capacity)*init_capacity + min_capacity
+output_scaling = 1-torch.exp(-desired_global_capacity / dimensionality * 2)
 
-$$\text{output\_scaling} = 1 - e^{-2 \cdot C_{\text{global}} / D}$$
-$$\sigma_{\text{noise}} = e^{-C_{\text{local}} / D}, \qquad \sigma_{\text{signal}}^2 = 1 - \sigma_{\text{noise}}^2$$
+noise_std = torch.exp(-desired_local_capacity / dimensionality)
+signal_var = 1-noise_std**2
+z = signal_std*normalized_mean + noise_std*torch.randn(normalized_mean.shape)
+z = output_scaling*z
+KL = 0.5*(noise_var + signal_var*normalized_mean**2 - 1) + desired_local_capacity/dimensionality
+```
 
-donde $D$ es la dimensionalidad del tensor.
+La implementación inicializa un `mean` por hoja con `decoding_dim=4`, un
+`local_capacity_adjustment` de la misma forma y un escalar `target_capacity`.
+`desired_local_capacity` se obtiene al centrar el ajuste local alrededor de la
+capacidad global y aplicar la exponencial. El `mean` se normaliza por todos sus
+ejes salvo el canal, se mezcla con ruido normal y se proyecta mediante una
+`affine` de 4 a 8 o 16 canales:
 
-4. Se muestrea $z = \sigma_{\text{signal}} \cdot \hat{\mu} + \sigma_{\text{noise}} \cdot \epsilon$ con $\epsilon \sim \mathcal{N}(0, I)$ y $\hat{\mu}$ es `mean` normalizado.
-5. Se calcula la KL explícitamente (no se usa la fórmula de capacidad AWGN, porque la señal transmitida es $\hat{\mu}$ y no tendría la varianza correcta para esa fórmula):
+```python
+# layers.py — decode_latents
+@multitensor_systems.multify
+def decode_latents_(dims, target_capacity, decode_weight, posterior):
+  z, KL = channel_layer(target_capacity, posterior)
+  x = affine(z, decode_weight, use_bias=True)
+  KL_amounts.append(KL)
+  KL_names.append(str(dims))
+  return x
+```
 
-$$\text{KL} = \tfrac{1}{2}(\sigma_{\text{noise}}^2 + \sigma_{\text{signal}}^2 \cdot \hat{\mu}^2 - 1) + \tfrac{C_{\text{local}}}{D}$$
-
-6. Una capa `affine` proyecta $z$ del espacio latente (`decoding_dim=4`) al espacio del residual stream (`channel_dim_fn(dims)`).
-
-**¿Por qué este esquema?** Porque permite que **cada tensor del multitensor decida cuánta información transmitir** (cuánta KL gastar), y dentro de cada tensor, **cada elemento decida si es "señal" o "ruido"** (mediante `local_capacity_adjustment`). El optimizador asignará automáticamente más capacidad a los tensores y elementos que ayuden a reducir la reconstrucción y dejará en ruido los irrelevantes. **Esta es la verdadera "compresión" del modelo.**
+La KL se devuelve por hoja y se agrega en `train.take_step()`. El esquema
+permite que cada vista gaste una cantidad distinta de KL y que cada elemento
+ajuste su capacidad local; no implica que una hoja irrelevante tenga KL
+exactamente cero ni que el optimizador encuentre siempre una asignación ideal.
+El comentario del código también advierte que el reescalado de `z` filtra una
+pequeña cantidad de información no contabilizada por la KL.
 
 #### 4.3.1 Del ruido al estado inicial de la red
 
 La palabra "decodificar" puede sugerir que existe un texto oculto que se
 traduce, pero aquí significa otra cosa: convertir un código numérico aleatorio
-en los primeros valores con los que trabajará la red. Para cada una de las 27
+en los primeros valores con los que trabajará la red. Para cada una de las 18
 vistas del multitensor, `decode_latents()` hace el siguiente recorrido:
 
 ```mermaid
@@ -687,7 +922,22 @@ las cuadrículas visibles y proponer las ocultas.
 
 ### 4.4 Capas centrales — orden y propósito
 
-Tras la decodificación, el residual stream pasa por **`n_layers = 4`** bloques idénticos. Cada bloque ejecuta esta secuencia exacta ([arc_compressor.py:113-130](arc_compressor.py)):
+Tras la decodificación, el residual stream pasa por **`n_layers = 4`** bloques idénticos. Cada bloque ejecuta esta secuencia exacta ([arc_compressor.py](../../arc_compressor.py#L112-L145)):
+
+```python
+# arc_compressor.py — ARCCompressor.forward
+for layer_num in range(self.n_layers):
+  x = layers.share_up(x, self.share_up_weights[layer_num])
+  x = layers.softmax(x, self.softmax_weights[layer_num], pre_norm=True)
+  x = layers.cummax(x, self.cummax_weights[layer_num], self.multitensor_system.task.masks,
+             post_norm=True)
+  x = layers.shift(x, self.shift_weights[layer_num], self.multitensor_system.task.masks,
+           post_norm=True)
+  x = layers.direction_share(x, self.direction_share_weights[layer_num], pre_norm=True)
+  x = layers.nonlinear(x, self.nonlinear_weights[layer_num], pre_norm=True)
+  x = layers.share_down(x, self.share_down_weights[layer_num])
+  x = layers.normalize(x)
+```
 
 ```mermaid
 flowchart LR
@@ -702,22 +952,31 @@ flowchart LR
     I --> A
 ```
 
-Cada operación está envuelta por **`add_residual`** ([layers.py:38-56](layers.py)), un decorador que añade proyecciones de bajada (residual → espacio interno) y subida (espacio interno → residual) más una conexión residual al estilo ResNet (He et al. 2015).
+Las capas `softmax`, `cummax`, `shift` y `nonlinear` están envueltas por
+**`add_residual`** ([layers.py](../../layers.py#L38-L56)), que añade
+proyecciones al espacio interno y una conexión residual. `share_up` y
+`share_down` son capas de comunicación multitensor, mientras que
+`direction_share` tiene su propia suma entre direcciones y no pasa por
+`add_residual`.
 
 **Detalle de cada capa:**
 
-| Capa | Función | Propósito |
-|------|---------|-----------|
-| `share_up` ([layers.py:256-265](layers.py)) | Para cada tensor de `dims` "alto" suma todos los tensores con `dims` "menor o igual" (con broadcast) | Propaga información agregada hacia tensores más específicos |
-| `softmax` ([layers.py:298-321](layers.py)) | Por cada subconjunto no vacío de ejes ∈ {color, dir, x, y}, aplica softmax y concatena. Salida tiene $2^k - 1$ canales donde $k$ = nº dims activos | Selección suave de qué eje "atender", al estilo *gating* |
-| `cummax` ([layers.py:436-460](layers.py)) | Scan máximo en cada una de las 8 direcciones. Diagonales con scan asociativo recursivo en $\log(\min(x,y))$ pasos | Propagación direccional tipo "extender hasta colisionar" |
-| `shift` ([layers.py:475-490](layers.py)) | Desplazamiento por 1 píxel en cada dirección | Comparación entre celdas vecinas |
-| `direction_share` ([layers.py:493-540](layers.py)) | 64 matrices lineales acopladas con coeficientes angulares $[1, 0.2, 0.4, 0.2, 1, 0.2, 0.4, 0.2]$ | Comunicación entre direcciones respetando D₄ |
-| `nonlinear` ([layers.py:542-555](layers.py)) | SiLU (Swish): $x \cdot \sigma(x)$ | No-linealidad estándar |
-| `share_down` ([layers.py:267-281](layers.py)) | Inverso de `share_up`: cada tensor "bajo" recibe el promedio (o suma con máscara cuando in/out tienen la misma forma) de los tensores "más altos" | Agrega información hacia tensores resumen |
-| `normalize` ([layers.py:14-25](layers.py)) | Normaliza a varianza 1 por canal | Estabilidad numérica entre capas |
+| Capa                                                                | Función                                                                                                                                                 | Propósito                                                     |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `share_up` ([layers.py:256-265](../../layers.py#L256-L265))        | Para cada tensor de`dims` "alto" suma todos los tensores con `dims` "menor o igual" (con broadcast)                                                  | Propaga información agregada hacia tensores más específicos |
+| `softmax` ([layers.py:298-321](../../layers.py#L298-L321))         | Por cada subconjunto no vacío de ejes ∈ {color, dir, x, y}, aplica softmax y concatena. Salida tiene$2^k - 1$ canales donde $k$ = nº dims activos | Selección suave de qué eje "atender", al estilo*gating*    |
+| `cummax` ([layers.py:436-460](../../layers.py#L436-L460))          | Scan máximo en cada una de las 8 direcciones. Diagonales con scan asociativo recursivo en$\log(\min(x,y))$ pasos                                      | Propagación direccional tipo "extender hasta colisionar"      |
+| `shift` ([layers.py:475-490](../../layers.py#L475-L490))           | Desplazamiento por 1 píxel en cada dirección                                                                                                           | Comparación entre celdas vecinas                              |
+| `direction_share` ([layers.py:493-540](../../layers.py#L493-L540)) | 64 matrices lineales acopladas con coeficientes angulares$[1, 0.2, 0.4, 0.2, 1, 0.2, 0.4, 0.2]$                                                        | Comunicación entre direcciones respetando D₄                 |
+| `nonlinear` ([layers.py:542-555](../../layers.py#L542-L555))       | SiLU (Swish):$x \cdot \sigma(x)$                                                                                                                       | No-linealidad estándar                                        |
+| `share_down` ([layers.py:267-281](../../layers.py#L267-L281))      | Inverso de`share_up`: cada tensor "bajo" recibe el promedio (o suma con máscara cuando in/out tienen la misma forma) de los tensores "más altos"     | Agrega información hacia tensores resumen                     |
+| `normalize` ([layers.py:14-25](../../layers.py#L14-L25))           | Normaliza a varianza 1 por canal                                                                                                                         | Estabilidad numérica entre capas                              |
 
-Las capas direccionales (`cummax`, `shift`) sólo se aplican a tensores que contienen `direction + x + y` (con o sin `color`), gracias al decorador `only_do_for_certain_shapes((1,1,1,1,1), (1,0,1,1,1))`. Para el resto, son la identidad.
+Las capas direccionales (`cummax`, `shift`) sólo se aplican a las dos formas
+`(1,1,1,1,1)` y `(1,0,1,1,1)`, gracias al decorador
+`only_do_for_certain_shapes(...)`. Para el resto de las 18 hojas son la
+identidad. `direction_share`, en cambio, se aplica a todas las formas válidas
+que contienen `directions`, incluidas vistas sin `x` o `y`.
 
 #### 4.4.1 Una actualización residual, paso a paso
 
@@ -733,11 +992,28 @@ estado_nuevo = estado_anterior
                    proyectar_entrada(estado_anterior)))
 ```
 
-El código de `layers.add_residual` implementa exactamente esa suma final
-`return x + z`. Las proyecciones `affine` cambian solo el eje de canales; no
-mezclan arbitrariamente filas, columnas o ejemplos. La operación especializada
-es la que aporta una capacidad concreta, como desplazar información o calcular
-máximos acumulados.
+El código de `layers.add_residual` termina con `return x + z`. Sin embargo,
+hay una discrepancia concreta entre la intención y la ejecución cuando se
+pasa `pre_norm=True`:
+
+```python
+# layers.py — add_residual
+if pre_norm:
+  z = normalize(x)
+z = affine(x, residual_weights[0], use_bias=use_bias)
+z = layer(dims, z, *args, **kwargs)
+if post_norm:
+  z = normalize(z)
+z = affine(z, residual_weights[1], use_bias=use_bias)
+return x + z
+```
+
+La asignación de `z = normalize(x)` queda sobrescrita por la siguiente línea;
+la proyección usa `x` sin normalizar. Por eso `pre_norm=True` no produce en la
+práctica una pre-normalización en esta versión. Las proyecciones `affine`
+cambian solo el eje de canales; no mezclan arbitrariamente filas, columnas o
+ejemplos. La operación especializada es la que aporta la capacidad concreta,
+como desplazar información o calcular máximos acumulados.
 
 ```mermaid
 flowchart LR
@@ -781,15 +1057,25 @@ identidad, tal como impone `only_do_for_certain_shapes`.
 
 ### 4.5 Cabezas lineales y postprocesamiento de máscaras
 
-Tras los 4 bloques, el residual stream produce tres salidas ([arc_compressor.py:131-142](arc_compressor.py)):
+Tras los 4 bloques, el residual stream produce tres salidas
+([arc_compressor.py](../../arc_compressor.py#L135-L145)):
 
-1. **Cabeza de colores** (`head_weights`, simetrizada): toma el tensor `dims=[1,1,0,1,1]` (`example × color × x × y`) y lo proyecta a 2 logits por píxel (canal 0 = input, canal 1 = output). Salida shape: `[n_examples, n_colors, n_x, n_y, 2]`. Se le añade `100 * head_weights[1]` como bias fuerte: una manera de "centrar" la predicción de la entrada cerca de la entrada observada.
-
+1. **Cabeza de colores** (`head_weights`, simetrizada): toma el tensor `dims=[1,1,0,1,1]` (`example × color × x × y`) y lo proyecta a 2 logits por píxel (canal 0 = input, canal 1 = output). Salida shape: `[n_examples, n_colors, n_x, n_y, 2]`. Se le añade `100 * head_weights[1]`, un sesgo aprendido que comparte la forma espacial del mapa de logits.
 2. **Máscara x** (`mask_weights`): toma el tensor `dims=[1,0,0,1,0]` (`example × x`) y emite 2 logits por índice (input/output). Indica qué filas pertenecen al output.
-
 3. **Máscara y** (análoga, dimensión y).
 
-**`postprocess_mask`** ([layers.py:557-583](layers.py)) añade un sumando de $-1000$ a los índices más allá del máximo observado en `task.shapes`, garantizando que el modelo no prediga grids más grandes de lo permitido por la tarea.
+**`postprocess_mask`** ([layers.py](../../layers.py#L557-L583)) añade un
+sumando de $-1000$ a los índices más allá del máximo observado en
+`task.shapes`, garantizando que el modelo no prediga grids más grandes de lo
+permitido por la tarea.
+
+```python
+# arc_compressor.py — final de ARCCompressor.forward
+output = layers.affine(x[[1, 1, 0, 1, 1]], self.head_weights, use_bias=False)
+x_mask = layers.affine(x[[1, 0, 0, 1, 0]], self.mask_weights, use_bias=True)
+y_mask = layers.affine(x[[1, 0, 0, 0, 1]], self.mask_weights, use_bias=True)
+x_mask, y_mask = layers.postprocess_mask(self.multitensor_system.task, x_mask, y_mask)
+```
 
 #### 4.5.1 De puntuaciones continuas a una cuadrícula discreta
 
@@ -798,14 +1084,14 @@ estado residual contiene números continuos. Las tres cabezas convierten esos
 números en decisiones de salida:
 
 1. La **cabeza de color** entrega una puntuación por color, por píxel y por
-  modo (`input` u `output`). `train.take_step()` añade después una columna de
-  logits cero para el negro, que se trata como color de fondo de referencia.
+   modo (`input` u `output`). `train.take_step()` añade después una columna de
+   logits cero para el negro, que se trata como color de fondo de referencia.
 2. Las **máscaras `x` e `y`** entregan una puntuación por fila y columna. Sirven
-  para recortar el área que el sistema considera perteneciente a la cuadrícula
-  de salida si su tamaño no se conoce de antemano.
+   para recortar el área que el sistema considera perteneciente a la cuadrícula
+   de salida si su tamaño no se conoce de antemano.
 3. `postprocess_mask()` descarta de forma determinista índices imposibles. Una
-  puntuación muy negativa, como `-1000`, hace que elegir esos índices sea
-  prácticamente imposible.
+   puntuación muy negativa, como `-1000`, hace que elegir esos índices sea
+   prácticamente imposible.
 
 Para un solo píxel, supongamos que la cabeza produce estos logits después de
 añadir el negro:
@@ -857,7 +1143,7 @@ El camino de esta tarea por el sistema es el siguiente:
 flowchart TD
   A[Dos demostraciones y una entrada de test] --> B[Task lee formas y colores]
   B --> C[Padding y máscaras para el tamaño máximo]
-  C --> D[Latentes de 27 vistas multitensor]
+  C --> D[Latentes de 18 vistas multitensor]
   D --> E[Forward: cuatro bloques]
   E --> F[Logits de color y máscaras de salida]
   F --> G[Comparar solo las dos demostraciones conocidas]
@@ -875,11 +1161,13 @@ predicción producida para el test por los mismos pesos y latentes.
 
 ### 5.1 Preprocesamiento
 
-Implementado en [preprocessing.py](preprocessing.py). La clase `Task` ([preprocessing.py:9-148](preprocessing.py)) absorbe el JSON crudo de ARC-AGI y produce:
+Implementado en [preprocessing.py](../../preprocessing.py). La clase `Task`
+([preprocessing.py](../../preprocessing.py#L8-L141)) absorbe el JSON crudo de
+ARC-AGI y produce:
 
 - `n_train`, `n_test`, `n_examples` (sumando train+test).
 - `shapes`: lista de `[in_shape, out_shape]` por ejemplo.
-- **Predicción del tamaño de salida** ([preprocessing.py:44-67](preprocessing.py)), por cascada de heurísticas:
+- **Predicción del tamaño de salida** ([preprocessing.py](../../preprocessing.py#L38-L60)), por cascada de heurísticas:
   1. Si `in_out_same_size` (todos los pares de entrenamiento tienen input.shape == output.shape) → out_shape = in_shape.
   2. Si no, pero `all_out_same_size` (todos los outputs de entrenamiento tienen igual shape) → usar esa shape.
   3. En último caso, asumir output = `[max_x, max_y]` global y dejar que la red **prediga** las máscaras x, y (esto activa la ruta `grid_size_uncertain` en el loss).
@@ -890,6 +1178,61 @@ Implementado en [preprocessing.py](preprocessing.py). La clase `Task` ([preproce
 - `masks`: tensor `[n_examples, n_x, n_y, 2]` con 1 dentro del grid y 0 fuera.
 - `solution_hash`: hash de la tupla del output ground-truth, usado para comprobar correctitud sin exponer la solución al modelo.
 
+Las tres operaciones que fijan este contrato son:
+
+```python
+# preprocessing.py — Task._predict_solution_shapes
+self.in_out_same_size = all(
+  tuple(inp) == tuple(out) for inp, out in self.shapes[:self.n_train]
+)
+self.all_out_same_size = len({tuple(shape[1]) for shape in self.shapes
+                if shape[1]}) == 1
+if self.in_out_same_size:
+  for shape in self.shapes[self.n_train:]:
+    shape[1] = shape[0]
+elif self.all_out_same_size:
+  default_shape = self.shapes[0][1]
+  for shape in self.shapes[self.n_train:]:
+    shape[1] = default_shape
+else:
+  max_x, max_y = self._get_max_dimensions()
+  for shape in self.shapes[self.n_train:]:
+    shape[1] = [max_x, max_y]
+```
+
+```python
+# preprocessing.py — Task._create_problem_tensor
+self.problem = np.zeros(
+  (self.n_examples, self.n_colors + 1, self.n_x, self.n_y, 2)
+)
+for subsplit, n_examples in [('train', self.n_train), ('test', self.n_test)]:
+  for example_num, example in enumerate(problem[subsplit]):
+    for mode in ('input', 'output'):
+      if subsplit == 'test' and mode == 'output':
+        continue
+      # escribir el grid en la región válida y dejar padding a cero
+self.problem = torch.from_numpy(np.argmax(self.problem, axis=1))
+```
+
+El tensor temporal conserva una dimensión one-hot de colores; después de
+`argmax(axis=1)` queda como `problem[example, x, y, mode]`, con el índice de
+color en cada celda. La rama `continue` es la barrera que impide convertir una
+salida de test ausente en un objetivo de entrenamiento.
+
+```python
+# preprocessing.py — Task._compute_mask
+for example_num, (in_shape, out_shape) in enumerate(self.shapes):
+  for mode_num, shape in enumerate([in_shape, out_shape]):
+    if shape:
+      x_mask = np.arange(self.n_x) < shape[0]
+      y_mask = np.arange(self.n_y) < shape[1]
+      self.masks[example_num, :, :, mode_num] = np.outer(x_mask, y_mask)
+```
+
+La máscara usa el tamaño real de cada input/output y no el tamaño máximo
+común. Por eso puede alimentar tanto las operaciones espaciales como la
+selección probabilística del recorte.
+
 #### 5.1.1 Del JSON a los tensores y las máscaras
 
 El archivo original de ARC es JSON y contiene listas anidadas de números. Una
@@ -897,14 +1240,14 @@ lista puede tener un tamaño distinto de otra, pero una GPU necesita normalmente
 tablas rectangulares. `Task` resuelve esta diferencia creando una cuadrícula de
 tamaño máximo y usando **padding** y **máscaras** para señalar qué zona es real.
 
-| Dato del JSON | Atributo de `Task` | Para qué se usa |
-| --- | --- | --- |
-| `train` y `test` | `n_train`, `n_test`, `n_examples` | Separar demostraciones completas de entradas con salida oculta. |
-| Tamaño de cada entrada/salida | `shapes` | Inferir o limitar el tamaño de la salida. |
-| Colores presentes | `colors`, `n_colors` | Convertir etiquetas ARC en índices internos; se incluye siempre `0` como negro. |
-| Cuadrículas conocidas | `problem` | Calcular la reconstrucción de entradas y salidas de demostración. |
-| Zona válida de cada grid | `masks` | Ignorar padding y restringir operaciones espaciales. |
-| Solución de evaluación, cuando existe | `solution`, `solution_hash` | Medir resultados fuera de la pérdida del modelo. |
+| Dato del JSON                           | Atributo de`Task`                     | Para qué se usa                                                                  |
+| --------------------------------------- | --------------------------------------- | --------------------------------------------------------------------------------- |
+| `train` y `test`                    | `n_train`, `n_test`, `n_examples` | Separar demostraciones completas de entradas con salida oculta.                   |
+| Tamaño de cada entrada/salida          | `shapes`                              | Inferir o limitar el tamaño de la salida.                                        |
+| Colores presentes                       | `colors`, `n_colors`                | Convertir etiquetas ARC en índices internos; se incluye siempre`0` como negro. |
+| Cuadrículas conocidas                  | `problem`                             | Calcular la reconstrucción de entradas y salidas de demostración.               |
+| Zona válida de cada grid               | `masks`                               | Ignorar padding y restringir operaciones espaciales.                              |
+| Solución de evaluación, cuando existe | `solution`, `solution_hash`         | Medir resultados fuera de la pérdida del modelo.                                 |
 
 Para la tarea sintética anterior, el formato conceptual sería:
 
@@ -929,74 +1272,123 @@ de `train.take_step()` evita que esa región contribuya a la pérdida.
 La forma de la salida se determina antes de entrenar con una cascada sencilla:
 
 1. Si todas las demostraciones conservan tamaño, la salida de test conserva el
-  tamaño de su input.
+   tamaño de su input.
 2. Si todas las salidas de demostración tienen el mismo tamaño, se adopta ese
-  tamaño para el test.
+   tamaño para el test.
 3. Si ninguna regla anterior aplica, se reserva el tamaño máximo observado y
-  las máscaras `x` e `y` deben localizar el rectángulo de salida.
+   las máscaras `x` e `y` deben localizar el rectángulo de salida.
 
 Esto no equivale a conocer la solución: solo evita pedir al modelo una forma
 imposible o desperdiciar capacidad fuera de los límites observados.
 
 ### 5.2 Entrenamiento por inferencia
 
-El loop está en `train.take_step` ([train.py:24-122](train.py)). Cada iteración:
+El loop está en `train.take_step`
+([train.py](../../train.py#L24-L138)). Cada iteración:
 
 1. `optimizer.zero_grad()`.
 2. `model.forward()` produce `logits`, `x_mask`, `y_mask`, `KL_amounts`, `KL_names`.
-3. Se añade una columna de ceros al canal de colores ([train.py:51](train.py)) para representar el color "negro" como logit 0 fijo.
-4. **KL total**: suma de los 27 vectores de KL retornados por `decode_latents`.
+3. Se añade una columna de ceros al canal de colores ([train.py:51](../../train.py#L51)) para representar el color "negro" como logit 0 fijo.
+4. **KL total**: suma de los 18 vectores de KL retornados por `decode_latents`.
 5. **Reconstrucción**: para cada ejemplo y cada modo (input/output del par):
    - Si el grid size es incierto, aplica un coeficiente `0.01^max(0, 1-step/100)` al peso de la máscara durante los primeros 100 pasos (curriculum: que la red se enfoque en colores antes de pelearse con el tamaño).
-   - **`mask_select_logprobs`** ([train.py:13-21](train.py)) trata el offset de la máscara como variable latente: para cada offset posible, calcula un log-probability proporcional al saldo de la máscara dentro/fuera. Luego `logsumexp` agrega.
-   - Para cada par `(x_offset, y_offset)` válido, recorta el output del modelo a la subgrid, calcula `cross_entropy` contra el ground-truth y combina con los logprobs de máscaras.
-   - `torch.logsumexp` agrega sobre todos los offsets → log-probabilidad marginal del output observado.
+
+- **`mask_select_logprobs`** ([train.py](../../train.py#L13-L22)) trata el offset de la máscara como variable latente: calcula todos los offsets con una suma prefija y después `logsumexp` agrega.
+- Para todos los pares `(x_offset, y_offset)` válidos, `unfold` crea los recortes del output en un batch; `cross_entropy` compara ese batch con el mismo crop de ground-truth y combina con los logprobs de máscaras.
+- `torch.logsumexp` agrega sobre todos los offsets → log-probabilidad marginal del output observado.
+
 6. **Loss**:
 
-$$\mathcal{L} = \text{total\_KL} + 10 \cdot \text{reconstruction\_error}$$
+$$
+\mathcal{L} = \text{total\_KL} + 10 \cdot \text{reconstruction\_error}
+$$
 
 7. `loss.backward()`, `optimizer.step()`, `optimizer.zero_grad()`.
 8. El `Logger` registra todas las métricas y postprocesa la solución (ver [§5.3](#53-postprocesamiento-y-selección-pass2)).
 
+El cálculo vectorizado del log-probability de los offsets es:
+
+```python
+# train.py — mask_select_logprobs
+def mask_select_logprobs(mask, length):
+  n_offsets = mask.shape[0] - length + 1
+  prefix = torch.cat([torch.zeros_like(mask[:1]), torch.cumsum(mask, dim=0)])
+  total = prefix[-1]
+  logprobs = 2*prefix[length:length+n_offsets] - 2*prefix[:n_offsets] - total
+  log_partition = torch.logsumexp(logprobs, dim=0)
+  return log_partition, logprobs
+```
+
+La identidad de la suma prefija evita recorrer cada offset desde Python. Para
+la reconstrucción de colores, el código aplica la misma idea a todos los
+recortes espaciales:
+
+```python
+# train.py — batch de crops en take_step
+logits_crops = logits_slice.unfold(1, output_shape[0], 1).unfold(2, output_shape[1], 1)
+logits_crops = logits_crops.permute(1, 2, 0, 3, 4).reshape(
+  n_x_offsets*n_y_offsets, logits_slice.shape[0], output_shape[0], output_shape[1]
+)
+target_batch = target_crop.unsqueeze(0).expand(n_x_offsets*n_y_offsets, -1, -1)
+ce = torch.nn.functional.cross_entropy(logits_crops, target_batch, reduction='none')
+ce_sum = ce.sum(dim=(1, 2)).reshape(n_x_offsets, n_y_offsets)
+```
+
+El `0` negro se añade antes de este cálculo como una columna de logits fija:
+
+```python
+logits = torch.cat([torch.zeros_like(logits[:, :1, :, :]), logits], dim=1)
+```
+
 **Configuración:**
 
-| Hiperparámetro | Valor | Archivo |
-|----------------|-------|---------|
-| Optimizador | Adam | [train.py:135](train.py), [solve_task.py:55](solve_task.py) |
-| Learning rate | 0.01 | idem |
-| `betas` | (0.5, 0.9) | idem |
-| Iteraciones | 2000 | [train.py:140](train.py), [parallel_train.py:147](parallel_train.py) |
-| Precisión | FP32 + TF32 matmul | [arc_compressor.py:10](arc_compressor.py), [parallel_train.py:39](parallel_train.py) |
-| cuDNN benchmark | True | [parallel_train.py:38](parallel_train.py) |
+| Hiperparámetro | Valor                                           | Archivo                                                                        |
+| --------------- | ----------------------------------------------- | ------------------------------------------------------------------------------ |
+| Optimizador     | Adam                                            | [train.py:135](../../train.py#L135), [solve_task.py:55](../../solve_task.py#L55) |
+| Learning rate   | 0.01                                            | idem                                                                           |
+| `betas`       | (0.5, 0.9)                                      | idem                                                                           |
+| Iteraciones     | 2000                                            | [train.py](../../train.py), [parallel_train.py](../../parallel_train.py)         |
+| Precisión      | FP32; el runner paralelo permite TF32 en matmul | [parallel_train.py](../../parallel_train.py)                                    |
+| cuDNN benchmark | True en el runner paralelo                      | [parallel_train.py](../../parallel_train.py)                                    |
 
 #### 5.2.1 Una iteración de optimización, sin saltos
 
 Una **iteración** es una oportunidad de corregir ligeramente los parámetros.
 No es una demostración nueva ni una respuesta final. El bucle de
-`train.take_step()` se puede leer así; el pseudocódigo conserva el orden del
-archivo, aunque omite detalles de offsets y tensores para centrarse en el flujo.
+`train.take_step()` conserva este orden; el fragmento omite solo el cuerpo
+repetitivo de la reconstrucción para centrarse en sus barreras y coeficientes.
 
 ```python
-# Pseudocódigo didáctico de train.take_step(...)
-optimizer.zero_grad()                     # olvida gradientes del paso anterior
+# train.py — train.take_step (control de una iteración)
+optimizer.zero_grad()
 logits, x_mask, y_mask, kls, names = model.forward()
-logits = add_fixed_black_logit(logits)    # el negro tiene logit de referencia 0
+logits = torch.cat([torch.zeros_like(logits[:, :1, :, :]), logits], dim=1)
 
-total_kl = sum(each_kl.sum() for each_kl in kls)
-reconstruction = 0
+total_KL = 0
+for KL_amount in kls:
+  total_KL = total_KL + torch.sum(KL_amount)
+reconstruction_error = 0
 
-for example in all_examples:
-    for mode in (input, output):
-        if example_is_test and mode_is_output:
-            continue                      # nunca mira la salida de test
-        reconstruction += negative_log_probability_of_known_grid(
-            logits, x_mask, y_mask, task.problem, task.shapes
-        )
+for example_num in range(task.n_examples):
+  for in_out_mode in range(2):
+    if example_num >= task.n_train and in_out_mode == 1:
+      continue
+    grid_size_uncertain = not (
+      task.in_out_same_size
+      or task.all_out_same_size and in_out_mode == 1
+      or task.all_in_same_size and in_out_mode == 0
+    )
+    if grid_size_uncertain:
+      coefficient = 0.01**max(0, 1-train_step/100)
+    # mask_select_logprobs + batched cross_entropy are applied here
+    if grid_size_uncertain:
+      coefficient = 0.1**max(0, 1-train_step/100)
+    reconstruction_error = reconstruction_error - logprob
 
-loss = total_kl + 10 * reconstruction
-loss.backward()                           # calcula cómo cambiar cada parámetro
-optimizer.step()                          # Adam aplica el cambio
-logger.log(...)                           # registra candidatos, no gradientes
+loss = total_KL + 10*reconstruction_error
+loss.backward()
+optimizer.step()
+optimizer.zero_grad()
 ```
 
 La pérdida une dos preguntas complementarias:
@@ -1013,19 +1405,44 @@ asigna una puntuación a cada candidato: favorece índices dentro de la máscara
 penaliza los que quedan fuera. `torch.logsumexp` agrega las posibilidades sin
 elegir de forma brusca una sola al inicio del entrenamiento.
 
-Durante los primeros 100 pasos, los términos de máscara reciben un coeficiente
-menor si la forma es incierta. Esta pequeña secuencia de aprendizaje evita que
-el modelo tenga que resolver color y tamaño con la misma intensidad desde el
-primer gradiente. Después de `loss.backward()`, PyTorch calcula derivadas; Adam
-usa esas derivadas y su historial para actualizar tanto los pesos de las capas
-como los parámetros de los posteriores latentes.
+Durante los primeros 100 pasos, el código usa dos coeficientes distintos cuando
+la forma es incierta: `0.01**max(0, 1-train_step/100)` para los log-probabilities
+de máscara y `0.1**max(0, 1-train_step/100)` para agregar los log-probabilities
+de los recortes. Ambos llegan a 1 en el paso 100. Esta es una forma limitada
+de curriculum sobre el tamaño, no un curriculum sobre el orden de los pares de
+demostración. Después de `loss.backward()`, PyTorch calcula derivadas; Adam usa
+esas derivadas y su historial para actualizar tanto los pesos de las capas como
+los parámetros de los posteriores latentes.
 
 ### 5.3 Postprocesamiento y selección pass@2
 
-Cada llamada a `Logger.log` ([solution_selection.py:40-91](solution_selection.py)) registra **dos candidatos**:
+Cada llamada a `Logger.log`
+([solution_selection.py](../../solution_selection.py#L40-L118)) actualiza
+siempre la **muestra actual** y la **EMA**, pero el postprocesamiento completo
+de candidatos puede quedar espaciado por `postprocess_stride`:
 
 1. La predicción de la **muestra actual** (logits, máscaras tal cual salen del forward pass).
 2. La predicción de la **EMA** de logits y máscaras (con `ema_decay = 0.97`).
+
+```python
+# solution_selection.py — Logger._track_solution
+self.current_logits = logits[self.task.n_train:, :, :, :, 1]
+self.ema_logits = self.ema_decay * self.ema_logits + (1 - self.ema_decay) * self.current_logits
+
+if self.postprocess_stride <= 1 or train_step % self.postprocess_stride == 0:
+  for logits, x_mask_set, y_mask_set in [
+    (self.current_logits, self.current_x_mask, self.current_y_mask),
+    (self.ema_logits, self.ema_x_mask, self.ema_y_mask),
+  ]:
+    solution, uncertainty = self._postprocess_solution(
+      logits, x_mask_set, y_mask_set
+    )
+    # hash, score y np.logaddexp acumulan la evidencia
+```
+
+En los pasos que no cumplen el stride se registran contribuciones neutras
+`(0, -inf)`, sin volver a ejecutar `argmax`, recortes, transferencia a CPU ni
+los bucles de recoloración.
 
 Para cada candidato:
 
@@ -1087,11 +1504,11 @@ la métrica oficial `pass@2`.
 
 ### 5.4 Entrenamiento paralelo a escala
 
-[parallel_train.py](parallel_train.py) ejecuta CompressARC sobre las 400 tareas de un split saturando una o varias GPUs. Estrategia:
+[parallel_train.py](../../parallel_train.py) ejecuta CompressARC sobre las tareas de un split saturando una o varias GPUs. Estrategia:
 
-1. **Fase de medición** ([parallel_train.py:144-146](parallel_train.py)): ejecuta 2 iteraciones de cada tarea midiendo `torch.cuda.max_memory_allocated()` para conocer el footprint real de cada puzzle (varía con `n_x · n_y · n_examples`).
-2. **Fase de saturación** ([parallel_train.py:148-152](parallel_train.py)): un scheduler greedy ordena las tareas por memoria decreciente y va lanzándolas en las GPUs disponibles, manteniendo el total por GPU por debajo de `gpu_memory_total - 4 GB` (reserva para el sistema).
-3. Cada tarea corre en un **proceso separado** (`multiprocessing.spawn`) ejecutando `solve_task.solve_task` ([solve_task.py:28-86](solve_task.py)), que es esencialmente el mismo loop de entrenamiento pero con captura de soluciones y de VRAM en un `Manager.dict()` compartido.
+1. **Fase de medición** ([parallel_train.py](../../parallel_train.py)): ejecuta 2 iteraciones de cada tarea y el worker registra el uso real con `torch.cuda.mem_get_info()` después de sincronizar, incluyendo contexto y allocator (varía con `n_x · n_y · n_examples`).
+2. **Fase de saturación** ([parallel_train.py](../../parallel_train.py)): un scheduler greedy ordena las tareas por memoria decreciente y va lanzándolas en las GPUs disponibles, usando cuotas de memoria libre por GPU.
+3. Cada tarea corre en un **proceso separado** (`multiprocessing.spawn`) ejecutando `solve_task.solve_task` ([solve_task.py](../../solve_task.py)), que es esencialmente el mismo loop de entrenamiento pero con captura de soluciones y de VRAM en un `Manager.dict()` compartido.
 4. Al final, las soluciones se escriben en `submission.json` para evaluación.
 
 Optimizaciones globales habilitadas en `parallel_train.py`:
@@ -1105,44 +1522,57 @@ Optimizaciones globales habilitadas en `parallel_train.py`:
 
 > **Advertencia metodológica.** Los números de esta sección son **estimaciones de orden de magnitud** derivadas de las dimensiones declaradas en el código y de los benchmarks oficiales del paper. Para medidas exactas en tu hardware, ejecuta:
 >
-> - `torch.cuda.max_memory_allocated()` (ya está integrado en [solve_task.py:51,75](solve_task.py)) para VRAM real.
+> - `torch.cuda.mem_get_info()` (integrado en [solve_task.py](../../solve_task.py#L96-L102)) para medir la memoria ocupada por el proceso, incluido el contexto y el allocator.
 > - `torch.profiler` o `torch.utils.flop_counter.FlopCounterMode` para FLOPS reales por forward pass.
 
 ### 6.1 Hardware de referencia (RTX 4070)
 
-El paper y el [README.md](README.md) mencionan **NVIDIA GeForce RTX 4070** como GPU de referencia. Especificaciones:
+El paper y el [README.md](../../README.md) mencionan **NVIDIA GeForce RTX 4070** como GPU de referencia. Especificaciones:
 
-| Métrica | Valor |
-|---------|-------|
-| Arquitectura | Ada Lovelace (AD104) |
-| CUDA cores | 5 888 |
-| Tensor Cores (4ª gen) | 184 |
-| **FP32 pico (sin Tensor Cores)** | **~29 TFLOPS** |
-| **TF32 pico (con Tensor Cores)** | **~58 TFLOPS** |
-| FP16 / BF16 pico | ~117 TFLOPS |
-| INT8 pico | ~234 TOPS |
-| **VRAM** | **12 GB GDDR6X** |
-| Memory bandwidth | 504 GB/s |
-| TDP | 200 W |
+| Métrica                               | Valor                  |
+| -------------------------------------- | ---------------------- |
+| Arquitectura                           | Ada Lovelace (AD104)   |
+| CUDA cores                             | 5 888                  |
+| Tensor Cores (4ª gen)                 | 184                    |
+| **FP32 pico (sin Tensor Cores)** | **~29 TFLOPS**   |
+| **TF32 pico (con Tensor Cores)** | **~58 TFLOPS**   |
+| FP16 / BF16 pico                       | ~117 TFLOPS            |
+| INT8 pico                              | ~234 TOPS              |
+| **VRAM**                         | **12 GB GDDR6X** |
+| Memory bandwidth                       | 504 GB/s               |
+| TDP                                    | 200 W                  |
 
-Como CompressARC habilita explícitamente `torch.backends.cuda.matmul.allow_tf32 = True`, **el pico relevante es ~58 TFLOPS en TF32** para los matmul y ~29 TFLOPS en FP32 para el resto.
+El runner paralelo habilita explícitamente `torch.backends.cuda.matmul.allow_tf32 = True`, por lo que **su pico teórico relevante sería ~58 TFLOPS en TF32** para los matmul y ~29 TFLOPS en FP32 para el resto en una RTX 4070. El runner secuencial no configura ese flag.
 
 ### 6.2 Recuento de parámetros
 
-El paper Liao & Gu (2025) reporta **~76 000 parámetros entrenables**. El desglose aproximado, derivado de [arc_compressor.py](arc_compressor.py) e [initializers.py](initializers.py):
+El paper Liao & Gu (2025) reporta **~76 000 parámetros** para su convención de
+contabilidad. La instancia actual del código cuenta de otra manera: todos los
+objetos trainable de `weights_list` incluyen capas compartidas, posteriores
+task-specific, ajustes de capacidad y `target_capacities`. El desglose real se
+deriva de [arc_compressor.py](../../arc_compressor.py) e
+[initializers.py](../../initializers.py):
 
-| Componente | Cantidad | Notas |
-|------------|----------|-------|
-| `multiposteriors` (mean + capacity por tensor) | dominante en bytes pero **no** en parámetros entrenables porque cada `mean` es de tamaño task-dependiente | crece con `n_examples · n_colors · n_x · n_y` |
-| `target_capacities` | 27 escalares | uno por tensor |
-| `decode_weights` (lineal 4 → channel) | ~27 × ~60 = 1 600 | |
-| Por cada una de las 4 capas: `share_up`, `share_down`, `softmax`, `cummax`, `shift`, `nonlinear` (multiresidual, 27 tensores cada uno) | ~5 000–7 000 por capa | dependiendo de `channel_dim_fn` |
-| Por cada capa: `direction_share` (64 matrices `channel × channel` × tensores con dirección) | ~10 000 por capa | la pieza más pesada por capa |
-| `head_weights` + `mask_weights` | ~200 | |
+| Componente                                                                                                                                     | Cantidad                                                      | Notas                                             |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------- |
+| `multiposteriors` (`mean` + `local_capacity_adjustment` por tensor)                                                                      | **sí son trainable** y dominan cuando crecen las grids | crece con`n_examples · n_colors · n_x · n_y` |
+| `target_capacities`                                                                                                                          | **18 escalares**                                        | uno por hoja válida                              |
+| `decode_weights` (lineal 4 → channel)                                                                                                       | depende de las 18 formas                                      | `channel_dim_fn` da 8 o 16 canales              |
+| Por cada una de las 4 capas:`share_up`, `share_down`, `softmax`, `cummax`, `shift`, `nonlinear` (multiresidual, 18 hojas cada uno) | depende de las formas                                         | pesos compartidos por operación y hoja           |
+| Por cada capa:`direction_share` (64 matrices `channel × channel` × tensores con dirección)                                              | ~10 000 por capa                                              | la pieza más pesada por capa                     |
+| `head_weights` + `mask_weights`                                                                                                            | ~200                                                          |                                                   |
 
-La cifra "76 K parámetros" del paper se refiere a los **pesos del modelo per se** (excluyendo los `mean` y `local_capacity_adjustment` del posterior, que son specific a cada tarea y considerados "datos" más que "modelo"). Esto es coherente con la filosofía MDL: lo que se transmite como modelo son los pesos compartidos; el latente $z$ es el "código" de la tarea.
+La cifra "76 K parámetros" del paper no debe reutilizarse como el recuento de
+`ARCCompressor.weights_list` actual: aquí los `mean`,
+`local_capacity_adjustment` y `target_capacities` son `requires_grad=True` y
+forman parte de la optimización por tarea. En una comprobación real sobre la
+tarea `007bbfb7`, `weights_list` contiene 11.038 objetos y 1.054.748 escalares;
+el número cambia con las formas y colores de la tarea. La distinción entre
+pesos compartidos y código task-specific puede ser útil para un análisis MDL,
+pero no autoriza a llamar “no entrenables” a los posteriores.
 
-> Para un recuento exacto, abre una sesión Python y ejecuta:
+> Para un recuento exacto de una tarea, ejecuta:
+>
 > ```python
 > import preprocessing, arc_compressor
 > task = preprocessing.preprocess_tasks('training', [0])[0]
@@ -1155,13 +1585,13 @@ La cifra "76 K parámetros" del paper se refiere a los **pesos del modelo per se
 
 Para una tarea **típica** con `n_examples = 4`, `n_colors = 10`, `n_x = n_y = 30`, los tensores más grandes del multitensor (los que contienen `x` e `y`) tienen forma del orden de $4 \cdot 10 \cdot 30 \cdot 30 = 36\,000$ elementos por canal (y hasta 8× más para los que añaden `direction`). Las operaciones dominantes en FLOPS son:
 
-| Operación | FLOPS aprox. por capa | Comentario |
-|-----------|----------------------|------------|
-| `affine` de las proyecciones down/up de cada `add_residual` | ~$10^8$ | matmul sobre tensor más grande |
-| `direction_share`: 64 matrices `8×8` aplicadas a cada tensor con dirección | ~$5 \cdot 10^8$ | dominante |
-| `softmax` (genera $2^k - 1$ canales) | ~$10^8$ | |
-| `cummax` direccional (8 direcciones + scan log diagonal) | ~$10^8$ | |
-| `shift`, `nonlinear`, `normalize` | ~$10^7$ cada una | |
+| Operación                                                                       | FLOPS aprox. por capa | Comentario                      |
+| -------------------------------------------------------------------------------- | --------------------- | ------------------------------- |
+| `affine` de las proyecciones down/up de cada `add_residual`                  | ~$10^8$             | matmul sobre tensor más grande |
+| `direction_share`: 64 matrices `8×8` aplicadas a cada tensor con dirección | ~$5 \cdot 10^8$     | dominante                       |
+| `softmax` (genera $2^k - 1$ canales)                                         | ~$10^8$             |                                 |
+| `cummax` direccional (8 direcciones + scan log diagonal)                       | ~$10^8$             |                                 |
+| `shift`, `nonlinear`, `normalize`                                          | ~$10^7$ cada una    |                                 |
 
 **Estimación por capa**: ~$10^9$ FLOPS.
 **Por forward pass (4 capas + decode + heads)**: ~$5 \cdot 10^9$ FLOPS ≈ **5 GFLOPS**.
@@ -1169,6 +1599,7 @@ Para una tarea **típica** con `n_examples = 4`, `n_colors = 10`, `n_x = n_y = 3
 **Por puzzle (2000 iteraciones)**: ~$3 \cdot 10^{13}$ FLOPS ≈ **30 TFLOPs totales por puzzle**.
 
 **Contraste con el pico de hardware:**
+
 - 20 min × 60 s × 58 TFLOPS pico = ~70 000 TFLOPs disponibles por GPU en 20 min.
 - 30 TFLOPs usados ≈ **0,04 %** del pico teórico.
 
@@ -1176,32 +1607,35 @@ La utilización efectiva es bajísima — algo **completamente esperado** en mod
 
 ### 6.4 VRAM pico
 
-CompressARC mide su pico real en cada puzzle con `torch.cuda.max_memory_allocated()` ([solve_task.py:50, 80](solve_task.py)). Componentes principales:
+CompressARC mide su uso de memoria por puzzle con `torch.cuda.mem_get_info()`
+después de sincronizar el worker ([solve_task.py](../../solve_task.py#L96-L102)).
+Componentes principales:
 
-| Componente | VRAM aprox. (tarea típica) | Notas |
-|------------|----------------------------|-------|
-| Pesos del modelo (76 K params × 4 bytes FP32) | ~0,3 MB | despreciable |
-| Estados del optimizador Adam (2× pesos) | ~0,6 MB | despreciable |
-| **Activaciones del forward pass** (multitensor, 27 tensores × 4 capas) | **~200–500 MB** | dominante; crece con `n_x · n_y · n_examples` |
-| **Gradientes** (~igual que activaciones) | **~200–500 MB** | dominante |
-| Buffer de muestras y EMA (`Logger`) | ~10 MB | |
-| Overhead PyTorch/CUDA | ~200 MB | |
+| Componente                                                                        | VRAM aprox. (tarea típica) | Notas                                            |
+| --------------------------------------------------------------------------------- | --------------------------- | ------------------------------------------------ |
+| Pesos de una instancia task-specific (p. ej. 1.054.748 escalares × 4 bytes FP32) | ~4,2 MB en esa tarea        | crece con las formas                             |
+| Estados del optimizador Adam (2× pesos)                                          | ~8,4 MB en esa tarea        | además del contexto del device                  |
+| **Activaciones del forward pass** (multitensor, 18 hojas × 4 capas)        | **~200–500 MB**      | dominante; crece con`n_x · n_y · n_examples` |
+| **Gradientes** (~igual que activaciones)                                    | **~200–500 MB**      | dominante                                        |
+| Buffer de muestras y EMA (`Logger`)                                             | ~10 MB                      |                                                  |
+| Overhead PyTorch/CUDA                                                             | ~200 MB                     |                                                  |
 
-**Estimación de pico VRAM por tarea**: **~500 MB – 1 GB** (típica), con picos de **hasta 2 GB** para tareas con grids de 30×30 y `n_examples = 7`.
+**Estimación de pico VRAM por tarea**: **~500 MB – 1 GB** (típica), con picos de **hasta 2 GB** para tareas con grids de 30×30 y `n_examples = 7`; el valor operativo se obtiene con `mem_get_info()` en el worker.
 
 **En una RTX 4070 (12 GB) con `parallel_train.py`:**
+
 - Margen reservado al sistema: 4 GB.
 - VRAM aprovechable: 8 GB.
 - Tareas concurrentes: típicamente **4–10**.
 
 ### 6.5 Tiempo total y eficiencia observada
 
-| Métrica | Valor reportado | Fuente |
-|---------|-----------------|--------|
-| Tiempo por puzzle (secuencial, RTX 4070) | ~20 min (2000 iteraciones) | [README.md:27](README.md) |
-| Tiempo total para el split de entrenamiento (400 puzzles) | ~130 h | paper y `results_for_the_blog_post/timing_result_training.txt` |
-| Tiempo total para el split de evaluación (400 puzzles) | ~138 h | idem |
-| Tiempo de pared con `parallel_train.py` (saturando 1 RTX 4070) | ~15–30 h | depende del solapamiento alcanzado |
+| Métrica                                                        | Valor reportado            | Fuente                                                          |
+| --------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- |
+| Tiempo por puzzle (secuencial, RTX 4070)                        | ~20 min (2000 iteraciones) | [README.md:27](../../README.md#L27)                              |
+| Tiempo total para el split de entrenamiento (400 puzzles)       | ~130 h                     | paper y`results_for_the_blog_post/timing_result_training.txt` |
+| Tiempo total para el split de evaluación (400 puzzles)         | ~138 h                     | idem                                                            |
+| Tiempo de pared con`parallel_train.py` (saturando 1 RTX 4070) | ~15–30 h                  | depende del solapamiento alcanzado                              |
 
 **Throughput observado:** ~2 it/s por puzzle, ~1,7 it/s combinando varios puzzles en paralelo. La ganancia de la paralelización no es lineal porque las GPUs pequeñas como la 4070 saturan PCIe y memory bandwidth antes que cómputo.
 
@@ -1246,7 +1680,7 @@ CompressARC reemplaza la búsqueda combinatoria sobre programas (intratable, ver
 
 #### 8.1.1 Subespacio de programas restringido por la arquitectura
 
-El "lenguaje de programas" sobre el que se busca el más corto **no es Turing-completo**: es exactamente el conjunto de programas que la red de [arc_compressor.py](arc_compressor.py) puede expresar al variar sus pesos y su `z` latente. Cualquier solución que requiera primitivas no representables por las capas existentes (`share_up/down`, `softmax`, `cummax`, `shift`, `direction_share`, `nonlinear`) cae **fuera del rango de búsqueda**, por mucho que se baje la pérdida.
+El "lenguaje de programas" sobre el que se busca el más corto **no es Turing-completo**: es exactamente el conjunto de programas que la red de [arc_compressor.py](../../arc_compressor.py) puede expresar al variar sus pesos y su `z` latente. Cualquier solución que requiera primitivas no representables por las capas existentes (`share_up/down`, `softmax`, `cummax`, `shift`, `direction_share`, `nonlinear`) cae **fuera del rango de búsqueda**, por mucho que se baje la pérdida.
 
 - Ejemplo: contar el número de objetos de un color requiere un bucle no-equivariante; no existe en el set de capas (paper, Apéndice H: *Counting/numbers* listado como disability).
 - Ejemplo: simular un agente que se mueve por una cuadrícula con reglas (puzzle 2dd70a9a) requiere recurrencia en el tiempo, ausente en el grafo de cómputo estático.
@@ -1267,11 +1701,11 @@ En la plantilla del Algoritmo 1 del paper, los pesos θ del modelo se hardcodean
 
 > *"It is somewhat reckless for us to neglect compressing θ in our work due to the sheer number of bits θ contributes."*
 
-Con 76 K parámetros en FP32, θ aporta ~300 KB de "longitud de programa" no contabilizada. Si se comprimiera (vía una KL adicional o L2 sobre θ derivado del MDL), el modelo sería forzado a usar pesos efectivos más pequeños, lo que podría mejorar la generalización por regularización implícita. **Sin esta compresión, el balance de la pérdida está sesgado**: penaliza KL en `z` (~10²–10³ nats por puzzle según Figura 6a del paper) pero ignora KL en θ.
+Con los ~76 K parámetros de la convención del paper en FP32, θ aporta ~300 KB de "longitud de programa" no contabilizada. Si se comprimiera (vía una KL adicional o L2 sobre θ derivado del MDL), el modelo sería forzado a usar pesos efectivos más pequeños, lo que podría mejorar la generalización por regularización implícita. **Sin esta compresión, el balance de la pérdida está sesgado**: penaliza KL en `z` (~10²–10³ nats por puzzle según Figura 6a del paper) pero ignora KL en θ.
 
 #### 8.1.4 El coeficiente β = 10 es puramente empírico
 
-En [train.py:106](train.py) la pérdida es `loss = total_KL + 10 * reconstruction_error`. El factor 10 no tiene justificación teórica: viene del régimen del β-VAE (Higgins et al. 2017), elegido porque sin él el posterior colapsa. Pero:
+En [train.py:106](../../train.py#L106) la pérdida es `loss = total_KL + 10 * reconstruction_error`. El factor 10 no tiene justificación teórica: viene del régimen del β-VAE (Higgins et al. 2017), elegido porque sin él el posterior colapsa. Pero:
 
 - Con β fijo, el balance KL ↔ reconstrucción es uniforme para todos los puzzles, cuando algunos puzzles necesitan más capacidad latente (mucha KL) y otros pueden expresarse con menos.
 - Un β-scheduling adaptativo (estilo NVAE, ver Apéndice A.3 del paper) por puzzle o por iteración podría reducir la varianza entre runs.
@@ -1280,13 +1714,13 @@ En [train.py:106](train.py) la pérdida es `loss = total_KL + 10 * reconstructio
 
 #### 8.2.1 Profundidad fija de 4 capas — contraste con ResNet
 
-`n_layers = 4` está hardcodeado en [arc_compressor.py:19](arc_compressor.py). El paper original ResNet (He et al. 2015, Tabla 3 / Tabla 6) demuestra que **incrementar la profundidad reduce error de manera monótona** hasta cientos de capas, gracias precisamente al diseño residual que CompressARC también usa (vía `add_residual` en [layers.py:38-56](layers.py)). Concretamente:
+`n_layers = 4` está hardcodeado en [arc_compressor.py:19](../../arc_compressor.py#L19). El paper original ResNet (He et al. 2015, Tabla 3 / Tabla 6) demuestra que **incrementar la profundidad reduce error de manera monótona** hasta cientos de capas, gracias precisamente al diseño residual que CompressARC también usa (vía `add_residual` en [layers.py:38-56](../../layers.py#L38-L56)). Concretamente:
 
 | Modelo (ImageNet) | Capas | top-5 err. |
-|-------------------|-------|------------|
-| ResNet-34 | 34 | 7.4 % |
-| ResNet-50 | 50 | 6.7 % |
-| ResNet-152 | 152 | 5.7 % |
+| ----------------- | ----- | ---------- |
+| ResNet-34         | 34    | 7.4 %      |
+| ResNet-50         | 50    | 6.7 %      |
+| ResNet-152        | 152   | 5.7 %      |
 
 La elección de 4 capas no es por falta de capacidad técnica (el residual lo permite); es para **mantener la longitud de descripción del modelo baja** (cada capa añade pesos a θ). Pero como θ no se comprime (§8.1.3), esta restricción **no está justificada por el propio principio MDL** del trabajo.
 
@@ -1294,7 +1728,7 @@ Consecuencia práctica: ningún razonamiento que requiera más de ~4 pasos de c�
 
 #### 8.2.2 Ausencia de recurrencia y profundidad adaptativa
 
-El forward pass de [arc_compressor.py:111-135](arc_compressor.py) ejecuta exactamente 4 bloques en cualquier puzzle, sin condición de parada ni iteración. No hay nada análogo a:
+El forward pass de [arc_compressor.py:111-135](../../arc_compressor.py#L111-L135) ejecuta exactamente 4 bloques en cualquier puzzle, sin condición de parada ni iteración. No hay nada análogo a:
 
 - *Adaptive Computation Time* (Graves 2016)
 - *Universal Transformer* / *Hierarchical Reasoning Model* (HRM)
@@ -1320,26 +1754,26 @@ Implicación: el **20 % pass@2 reportado no es estable**. Una run alternativa co
 
 #### 8.2.5 Tamaño del modelo limitado por la propia premisa MDL
 
-Los 76 K parámetros son una elección de equilibrio (sección 3.1 de este documento): más parámetros aumentarían la longitud del programa transmitido y violarían la filosofía MDL. Pero **es un equilibrio circular**: como θ no se comprime (§8.1.3), añadir más parámetros no penalizaría más la pérdida actual. Si los autores comprimieran θ correctamente, podrían escalar el modelo de manera principista.
+La configuración de ~76 K parámetros reportada por el paper es una elección de equilibrio (sección 3.1 de este documento): más parámetros aumentarían la longitud del programa transmitido y violarían la filosofía MDL. Pero **es un equilibrio circular**: como θ no se comprime (§8.1.3), añadir más parámetros no penalizaría más la pérdida actual. Si los autores comprimieran θ correctamente, podrían escalar el modelo de manera principista.
 
 ### 8.3 Limitaciones de representación e inductive biases
 
 #### 8.3.1 El multitensor tiene exactamente 5 dimensiones — y sólo 5
 
-[multitensor_systems.py](multitensor_systems.py) define las dimensiones `examples, colors, directions, x, y`. Esta elección refleja un subconjunto de los **Core Knowledge priors** de Chollet (2019, §III.1.2), que enumera 4 sistemas innatos:
+[multitensor_systems.py](../../multitensor_systems.py) define las dimensiones `examples, colors, directions, x, y`. Esta elección refleja un subconjunto de los **Core Knowledge priors** de Chollet (2019, §III.1.2), que enumera 4 sistemas innatos:
 
-| Core Knowledge (Chollet 2019) | Materializado en CompressARC |
-|-------------------------------|------------------------------|
+| Core Knowledge (Chollet 2019)                  | Materializado en CompressARC                                                                |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | Objectness (cohesión, persistencia, contacto) | **Implícitamente** vía pixels + simetrías; no hay primitiva explícita de "objeto" |
-| Agentness / goal-directedness | **Ausente**: no hay representación de agentes ni de objetivos |
-| Numbers & counting | **Ausente**: las comparaciones son cualitativas, no aritméticas; no hay 1, 2, 3... |
-| Elementary geometry & topology | **Parcial**: D₄ + 2D Euclídeo, pero no topología (connectedness, holes) |
+| Agentness / goal-directedness                  | **Ausente**: no hay representación de agentes ni de objetivos                        |
+| Numbers & counting                             | **Ausente**: las comparaciones son cualitativas, no aritméticas; no hay 1, 2, 3...   |
+| Elementary geometry & topology                 | **Parcial**: D₄ + 2D Euclídeo, pero no topología (connectedness, holes)            |
 
 Toda categoría de puzzles que dependa de uno de los priors no materializados es **estructuralmente inaccesible**: el modelo no tiene cómo representar el concepto.
 
 #### 8.3.2 Equivarianza atada exactamente al grupo D₄
 
-Las 8 direcciones (sección 3.5 de este documento) corresponden al grupo diédrico de simetrías del cuadrado: 4 rotaciones + 4 reflexiones. La equivarianza se impone por *weight tying* en [initializers.py:106-146](initializers.py) (`symmetrize_direction_sharing`). Esto **excluye** :
+Las 8 direcciones (sección 3.5 de este documento) corresponden al grupo diédrico de simetrías del cuadrado: 4 rotaciones + 4 reflexiones. La equivarianza se impone por *weight tying* en [initializers.py:106-146](../../initializers.py#L106-L146) (`symmetrize_direction_sharing`). Esto **excluye** :
 
 - Ángulos arbitrarios (rotaciones de 30°, 60°, etc.).
 - Escalado / transformaciones afines (zoom in/out de un shape).
@@ -1379,7 +1813,7 @@ Sin compresión cross-puzzle, CompressARC no puede aprovechar patrones recurrent
 
 #### 8.4.1 Número de iteraciones fijo (2000) e hiperparámetros estáticos
 
-[train.py:140](train.py) y [parallel_train.py:147](parallel_train.py) fijan 2000 iteraciones. Las tablas 4 y 5 del paper muestran mejora monótona pero claramente asintótica. Algunos puzzles:
+[train.py:140](../../train.py#L140) y [parallel_train.py:147](../../parallel_train.py#L147) fijan 2000 iteraciones. Las tablas 4 y 5 del paper muestran mejora monótona pero claramente asintótica. Algunos puzzles:
 
 - Convergen a la respuesta correcta antes del paso 200 (ej. Bounding Box, paso 150 en este documento).
 - Requerirían claramente más de 2000 pasos para que un tensor crítico se "rescate" del colapso.
@@ -1388,7 +1822,7 @@ Un **criterio de parada adaptativo** (basado en estabilidad de la muestra EMA o 
 
 #### 8.4.2 Selección pass@2 con constantes mágicas
 
-[solution_selection.py:54-90](solution_selection.py) implementa el scoring de los dos candidatos con constantes hardcodeadas:
+[solution_selection.py:54-90](../../solution_selection.py#L54-L90) implementa el scoring de los dos candidatos con constantes hardcodeadas:
 
 ```
 score = -10 * uncertainty
@@ -1398,9 +1832,12 @@ if logits is self.ema_logits:  score -= 4
 
 Los valores −10, −10, −4 no tienen justificación teórica. Son hiperparámetros descubiertos empíricamente. Una mejora trivial: **aprender el peso EMA-vs-sample** o reemplazar el scoring por un clasificador entrenado sobre las soluciones generadas durante el training.
 
-#### 8.4.3 Ausencia total de curriculum
+#### 8.4.3 Curriculum limitado al tamaño de grid
 
-Chollet (2019, §II.2.3) enfatiza que **el curriculum forma parte de la inteligencia**: el orden en que se presenta la experiencia condiciona la skill final. CompressARC presenta los 2-7 demonstration pairs **simultáneamente y sin orden** en cada paso de optimización. Posibles mejoras:
+Chollet (2019, §II.2.3) enfatiza que **el curriculum forma parte de la inteligencia**: el orden en que se presenta la experiencia condiciona la skill final. CompressARC presenta los demonstration pairs simultáneamente y no los reordena por dificultad, pero **sí tiene un curriculum limitado para tamaños de grid inciertos** en `train.take_step()`: durante los primeros 100 pasos reduce primero el peso de la selección de máscara y después el de la agregación sobre tamaños/recortes.
+
+Lo que sigue ausente es un curriculum sobre el orden o la frecuencia de los
+pairs:
 
 - *Easy-first*: ordenar los pairs por complejidad estimada (área del grid, número de colores), permitir que el modelo aprenda la regla simple primero.
 - *Active learning*: muestrear los pairs con mayor pérdida más a menudo.
@@ -1416,17 +1853,19 @@ Como detalla la sección 6.3 de este documento, CompressARC consume sólo **~30 
 
 Chollet (2019, §II.2.1) define la inteligencia como:
 
-$$\mathcal{I}_{IS, scope} \propto \mathbb{E}\left[\frac{\text{skill} \cdot \text{generalization\_difficulty}}{\text{priors} + \text{experience}}\right]$$
+$$
+\mathcal{I}_{IS, scope} \propto \mathbb{E}\left[\frac{\text{skill} \cdot \text{generalization\_difficulty}}{\text{priors} + \text{experience}}\right]
+$$
 
 Aplicando este marco a CompressARC:
 
-| Componente | Valor para CompressARC | Análisis |
-|------------|-----------------------|----------|
-| **Priors** | Muy fuertes (D₄, multitensor, capas direccionales, equivarianzas hardcoded) | Reducen drásticamente la "experiencia" necesaria, pero **restringen el scope alcanzable** |
-| **Experience** | 2-7 demonstration pairs (muy bajo, alineado con Chollet) | Comparable a humanos |
-| **Skill achieved** | 20 % eval / 34,75 % train | Limitada por priors faltantes |
-| **Generalization difficulty** | Alta (puzzles novedosos, broad generalization) | El método sí se enfrenta a tareas con alto $GD$ |
-| **Scope** | Sólo puzzles cuya hidden rule es expresable con priors actuales | Estimable empíricamente en ~20-35 % de ARC-AGI-1 |
+| Componente                          | Valor para CompressARC                                                       | Análisis                                                                                       |
+| ----------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **Priors**                    | Muy fuertes (D₄, multitensor, capas direccionales, equivarianzas hardcoded) | Reducen drásticamente la "experiencia" necesaria, pero**restringen el scope alcanzable** |
+| **Experience**                | 2-7 demonstration pairs (muy bajo, alineado con Chollet)                     | Comparable a humanos                                                                            |
+| **Skill achieved**            | 20 % eval / 34,75 % train                                                    | Limitada por priors faltantes                                                                   |
+| **Generalization difficulty** | Alta (puzzles novedosos, broad generalization)                               | El método sí se enfrenta a tareas con alto$GD$                                              |
+| **Scope**                     | Sólo puzzles cuya hidden rule es expresable con priors actuales             | Estimable empíricamente en ~20-35 % de ARC-AGI-1                                               |
 
 **Conclusión del marco de Chollet**: CompressARC está cerca del techo de su **scope intrínseco** dado el set actual de priors. La ruta para subir del 20 % no es entrenar más o agrandar el modelo, sino **expandir el conjunto de priors** (más operaciones nativas: copia, conteo, recurrencia) o **permitir que los priors se aprendan** a partir de experiencia cross-puzzle (Apéndice K.1).
 
@@ -1436,20 +1875,20 @@ Esto sitúa a CompressARC en la categoría de Chollet de **"broad generalization
 
 La siguiente tabla cataloga las mejoras propuestas, su coste estimado de implementación, e impacto cualitativo esperado en pass@2. Las propuestas marcadas con (K.x) provienen del propio paper, Apéndices K.1–K.4.
 
-| # | Limitación principal | Vía de mejora | Coste impl. | Impacto esperado | Justificación |
-|---|---------------------|---------------|------------|------------------|---------------|
-| 1 | Sin copia/replicación de shapes (§8.2.3) | Capa de cross-attention sobre grids o tropical conv refinada (K.2) | Alto | **Alto** | Apéndice H del paper: la mayor categoría única de disabilities (rotaciones, reflexiones, escalado, duplicación) |
-| 2 | Sin compresión cross-puzzle (§8.3.5) | Hypernetwork / LORA compartida entre puzzles (K.1) | Alto | **Alto** | Aprovecha patrones recurrentes; mejora generalización por regularización implícita |
-| 3 | Posterior collapse (§8.2.4) | KL floor con scheduling decreciente (K.3) | Bajo | Medio | Mejora consistencia entre runs; subiría la varianza-baja del 18,5 % al ~22-25 % |
-| 4 | Profundidad fija (§8.2.1, §8.2.2) | Bloques residuales con depth adaptativa o ACT | Medio | Medio | HRM con iteración explícita alcanza 40,3 % vs 20 % de CompressARC |
-| 5 | Sin primitivas de conteo (§8.3.4) | Layer dedicada: sum-along-dim + softmax-over-counts | Medio | Medio | Resolvería puzzles tipo ce9e57f2; estimable en +3-5 puntos |
-| 6 | Sin representación de objetos (§8.3.3) | Slot attention sobre componentes conexas detectadas pre-red | Alto | **Alto** | Materializa el prior nº1 de Core Knowledge; abre toda la categoría "agrupar/seleccionar objetos" |
-| 7 | θ no regularizado (§8.1.3) | Término L2 derivado de la KL sobre θ (K.4) | Bajo | Bajo-Medio | Reduce overfitting; permite escalar modelo de manera principista |
-| 8 | Constantes mágicas en pass@2 (§8.4.2) | Clasificador entrenado para seleccionar candidatos | Bajo | Bajo | Mejora marginal, pero "fruta a baja altura" |
-| 9 | Iteraciones fijas (§8.4.1) | Criterio de parada adaptativo (estabilidad EMA) | Bajo | Bajo | Reasigna cómputo; mismo total compute → más puzzles resueltos |
-| 10 | 0,04 % de utilización GPU (§8.4.4) | Fusionar kernels con Triton / torch.compile | Medio | **Alto** indirecto | Desbloquea ×10–×100 más experimentos por unidad de tiempo |
-| 11 | θ no contabilizado / equilibrio circular (§8.1.3, §8.2.5) | Compresión explícita de θ: cuantización + entropy coding o prior gaussiano-como-KL (Eje G, §9.10) | Bajo-Medio | Medio (habilitador) | Cierra el bucle MDL; **precondición** para escalar ejes A/E sin violar MDL; responde a la evidencia de la ablación F.5 |
-| 12 | Colapso frágil e impredecible de tensores (§8.2.4) | Interpretabilidad activa: monitorización de KL por-tensor + PCA con intervención dirigida (Eje F, §9.9) | Bajo-Medio | Medio | Convierte el diagnóstico post-hoc del Apéndice I en control online; estabiliza y explica los fallos |
+| #  | Limitación principal                                        | Vía de mejora                                                                                             | Coste impl. | Impacto esperado         | Justificación                                                                                                                |
+| -- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ----------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| 1  | Sin copia/replicación de shapes (§8.2.3)                   | Capa de cross-attention sobre grids o tropical conv refinada (K.2)                                         | Alto        | **Alto**           | Apéndice H del paper: la mayor categoría única de disabilities (rotaciones, reflexiones, escalado, duplicación)           |
+| 2  | Sin compresión cross-puzzle (§8.3.5)                       | Hypernetwork / LORA compartida entre puzzles (K.1)                                                         | Alto        | **Alto**           | Aprovecha patrones recurrentes; mejora generalización por regularización implícita                                         |
+| 3  | Posterior collapse (§8.2.4)                                 | KL floor con scheduling decreciente (K.3)                                                                  | Bajo        | Medio                    | Mejora consistencia entre runs; subiría la varianza-baja del 18,5 % al ~22-25 %                                              |
+| 4  | Profundidad fija (§8.2.1, §8.2.2)                          | Bloques residuales con depth adaptativa o ACT                                                              | Medio       | Medio                    | HRM con iteración explícita alcanza 40,3 % vs 20 % de CompressARC                                                           |
+| 5  | Sin primitivas de conteo (§8.3.4)                           | Layer dedicada: sum-along-dim + softmax-over-counts                                                        | Medio       | Medio                    | Resolvería puzzles tipo ce9e57f2; estimable en +3-5 puntos                                                                   |
+| 6  | Sin representación de objetos (§8.3.3)                     | Slot attention sobre componentes conexas detectadas pre-red                                                | Alto        | **Alto**           | Materializa el prior nº1 de Core Knowledge; abre toda la categoría "agrupar/seleccionar objetos"                            |
+| 7  | θ no regularizado (§8.1.3)                                 | Término L2 derivado de la KL sobre θ (K.4)                                                               | Bajo        | Bajo-Medio               | Reduce overfitting; permite escalar modelo de manera principista                                                              |
+| 8  | Constantes mágicas en pass@2 (§8.4.2)                      | Clasificador entrenado para seleccionar candidatos                                                         | Bajo        | Bajo                     | Mejora marginal, pero "fruta a baja altura"                                                                                   |
+| 9  | Iteraciones fijas (§8.4.1)                                  | Criterio de parada adaptativo (estabilidad EMA)                                                            | Bajo        | Bajo                     | Reasigna cómputo; mismo total compute → más puzzles resueltos                                                              |
+| 10 | 0,04 % de utilización GPU (§8.4.4)                         | Fusionar kernels con Triton / torch.compile                                                                | Medio       | **Alto** indirecto | Desbloquea ×10–×100 más experimentos por unidad de tiempo                                                                 |
+| 11 | θ no contabilizado / equilibrio circular (§8.1.3, §8.2.5) | Compresión explícita de θ: cuantización + entropy coding o prior gaussiano-como-KL (Eje G, §9.10)     | Bajo-Medio  | Medio (habilitador)      | Cierra el bucle MDL;**precondición** para escalar ejes A/E sin violar MDL; responde a la evidencia de la ablación F.5 |
+| 12 | Colapso frágil e impredecible de tensores (§8.2.4)         | Interpretabilidad activa: monitorización de KL por-tensor + PCA con intervención dirigida (Eje F, §9.9) | Bajo-Medio  | Medio                    | Convierte el diagnóstico post-hoc del Apéndice I en control online; estabiliza y explica los fallos                         |
 
 **Recomendación de priorización**: las mejoras #1 (copia de formas), #2 (compresión cross-puzzle) y #6 (slot-based object representation) son las que más probablemente cierran el gap del 20 % a algo cercano al 40 % alcanzado por HRM. Las mejoras #3 y #10 deberían hacerse primero por su bajo coste-alta-rentabilidad: la primera estabiliza resultados, la segunda multiplica la velocidad de iteración para todo lo demás.
 
@@ -1469,23 +1908,23 @@ El objetivo no es prescribir código concreto (eso queda fuera del alcance de es
 
 El baseline del paper (Liao & Gu 2025) usó una NVIDIA RTX 4070 (12 GB, Ada Lovelace, ~58 TFLOPS TF32). El hardware disponible es una AMD Radeon RX 9070 XT (Navi 48, RDNA 4) con perfil sensiblemente superior:
 
-| Métrica relevante para CompressARC | RTX 4070 (baseline) | RX 9070 XT (objetivo) | Factor |
-|------------------------------------|---------------------|------------------------|--------|
-| VRAM | 12 GB GDDR6X | **16 GB GDDR6** | ×1,33 |
-| Memory bandwidth | 504 GB/s | **640 GB/s** | ×1,27 |
-| Cache on-die (L2 / Infinity Cache) | 36 MB L2 | **64 MB Infinity Cache** | ×1,78 |
-| Stream / CUDA processors | 5 888 | 4 096 | ×0,70 |
-| Compute Units / SM | 46 SM | 64 CU | ×1,39 |
-| AI/Matrix accelerators | 184 Tensor Cores (4ª gen) | **128 AI Accelerators (RDNA4 Matrix)** | — |
-| FP32 pico (sin matrix) | ~29 TFLOPS | **48,7 TFLOPS** | ×1,68 |
-| FP16/BF16 vector | ~58 TFLOPS | 48,7 TFLOPS | ×0,84 |
-| **FP16/BF16 matrix** | ~117 TFLOPS | **195 TFLOPS** | ×1,67 |
-| FP16 matrix con sparsity 2:4 | ~234 TFLOPS | **389 TFLOPS** | ×1,66 |
-| FP8 matrix | ~234 TFLOPS (Ada FP8) | **389 TFLOPS** | ×1,66 |
-| INT8 matrix | ~234 TOPS | **389 TOPS** | ×1,66 |
-| TDP | 200 W | 304 W | ×1,52 |
-| RAM sistema (no GPU) | no documentado | **94 GB DDR5** | n/a |
-| Núcleos CPU (i9-12900K) | n/a | **16 cores / 24 threads, 5,2 GHz** | n/a |
+| Métrica relevante para CompressARC | RTX 4070 (baseline)        | RX 9070 XT (objetivo)                        | Factor |
+| ----------------------------------- | -------------------------- | -------------------------------------------- | ------ |
+| VRAM                                | 12 GB GDDR6X               | **16 GB GDDR6**                        | ×1,33 |
+| Memory bandwidth                    | 504 GB/s                   | **640 GB/s**                           | ×1,27 |
+| Cache on-die (L2 / Infinity Cache)  | 36 MB L2                   | **64 MB Infinity Cache**               | ×1,78 |
+| Stream / CUDA processors            | 5 888                      | 4 096                                        | ×0,70 |
+| Compute Units / SM                  | 46 SM                      | 64 CU                                        | ×1,39 |
+| AI/Matrix accelerators              | 184 Tensor Cores (4ª gen) | **128 AI Accelerators (RDNA4 Matrix)** | —     |
+| FP32 pico (sin matrix)              | ~29 TFLOPS                 | **48,7 TFLOPS**                        | ×1,68 |
+| FP16/BF16 vector                    | ~58 TFLOPS                 | 48,7 TFLOPS                                  | ×0,84 |
+| **FP16/BF16 matrix**          | ~117 TFLOPS                | **195 TFLOPS**                         | ×1,67 |
+| FP16 matrix con sparsity 2:4        | ~234 TFLOPS                | **389 TFLOPS**                         | ×1,66 |
+| FP8 matrix                          | ~234 TFLOPS (Ada FP8)      | **389 TFLOPS**                         | ×1,66 |
+| INT8 matrix                         | ~234 TOPS                  | **389 TOPS**                           | ×1,66 |
+| TDP                                 | 200 W                      | 304 W                                        | ×1,52 |
+| RAM sistema (no GPU)                | no documentado             | **94 GB DDR5**                         | n/a    |
+| Núcleos CPU (i9-12900K)            | n/a                        | **16 cores / 24 threads, 5,2 GHz**     | n/a    |
 
 **Implicaciones cuantitativas para CompressARC:**
 
@@ -1502,27 +1941,27 @@ El baseline del paper (Liao & Gu 2025) usó una NVIDIA RTX 4070 (12 GB, Ada Love
 
 El repositorio actual está escrito asumiendo CUDA: `parallel_train.py:38-39` invoca `torch.backends.cuda.matmul.allow_tf32 = True` y `torch.backends.cudnn.benchmark = True`. Ninguno de los dos hace lo esperado en AMD/ROCm:
 
-| Llamada CUDA | Equivalente ROCm 7.2 | Comportamiento real en RX 9070 XT |
-|--------------|----------------------|----------------------------------|
-| `torch.backends.cuda.matmul.allow_tf32` | No existe (RDNA4 no tiene TF32) | **No-op**. AMD ejecuta matmul FP32 a precisión completa |
-| `torch.backends.cudnn.benchmark` | Mapeado a MIOpen | Funcional, pero MIOpen 3.x tiene menos kernels heurísticos que cuDNN |
-| `torch.compile(mode='reduce-overhead')` | Backend `inductor` con codegen Triton-ROCm | Funcional desde PyTorch 2.4 + ROCm 6.2; ROCm 7.2 mejora cobertura de kernels |
-| `torch.cuda.amp.autocast` | `torch.amp.autocast('cuda', dtype=bf16)` | **Funcional**; BF16 es la ruta recomendada en RDNA4 |
-| Triton kernels custom | Triton-AMD (HIP backend) | Operacional pero algunos patrones (`tl.atomic`, scans complejos) tienen worse codegen |
+| Llamada CUDA                              | Equivalente ROCm 7.2                        | Comportamiento real en RX 9070 XT                                                       |
+| ----------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `torch.backends.cuda.matmul.allow_tf32` | No existe (RDNA4 no tiene TF32)             | **No-op**. AMD ejecuta matmul FP32 a precisión completa                          |
+| `torch.backends.cudnn.benchmark`        | Mapeado a MIOpen                            | Funcional, pero MIOpen 3.x tiene menos kernels heurísticos que cuDNN                   |
+| `torch.compile(mode='reduce-overhead')` | Backend`inductor` con codegen Triton-ROCm | Funcional desde PyTorch 2.4 + ROCm 6.2; ROCm 7.2 mejora cobertura de kernels            |
+| `torch.cuda.amp.autocast`               | `torch.amp.autocast('cuda', dtype=bf16)`  | **Funcional**; BF16 es la ruta recomendada en RDNA4                               |
+| Triton kernels custom                     | Triton-AMD (HIP backend)                    | Operacional pero algunos patrones (`tl.atomic`, scans complejos) tienen worse codegen |
 
 **Recomendaciones que esto impone**:
 
 - Sustituir `allow_tf32 = True` por `torch.set_float32_matmul_precision('high')`, que en ROCm activa el path BF16-internal-accumulation cuando el operador lo soporta (PyTorch 2.5+).
 - Mantener `cudnn.benchmark = True` (alias a MIOpen.benchmark en ROCm); en CompressARC la mayoría de los kernels son ad-hoc (no convoluciones cuDNN), así que el impacto es marginal.
 - Cualquier rewrite con kernels custom (§9.6.2) debe escribirse en Triton (idioma común CUDA/ROCm) o en HIP directamente. **No** usar PTX-asm inline.
-- El subsistema `cummax` recursivo de [layers.py:436-460](layers.py) es un scan asociativo: en Triton-ROCm el patrón `tl.cumsum` / `tl.cummax` está disponible desde Triton 3.0; sustituir el bucle Python por un único kernel Triton es la mejora #10 de §8.6 ya factible.
+- El subsistema `cummax` recursivo de [layers.py:436-460](../../layers.py#L436-L460) es un scan asociativo: en Triton-ROCm el patrón `tl.cumsum` / `tl.cummax` está disponible desde Triton 3.0; sustituir el bucle Python por un único kernel Triton es la mejora #10 de §8.6 ya factible.
 - La fragilidad estocástica (§8.2.4) puede agravarse con BF16 si la KL acumula en BF16; **la acumulación de KL debe quedarse en FP32** (autocast con `cache_enabled=False` en esa región del grafo).
 
 ### 9.3 Eje A: expansión del scope del lenguaje de programas
 
 Este eje ataca la limitación fundamental (§8.1.1, §8.3): el espacio de programas representables por la arquitectura actual **no contiene** soluciones para grandes familias de puzzles ARC. Añadir primitivas amplía el scope (Chollet 2019 §I.3.2) y, si la primitiva está bien elegida, reduce la longitud de descripción de las tareas que la usan **más** de lo que aumenta θ → MDL-positivo.
 
-**Refuerzo desde la documentación del paper**: el Apéndice C describe el multitensor como "un tensor por cada subconjunto de dimensiones"; por eso **añadir una nueva dimensión** (p.ej. `slots`, §9.3.2) es una extensión *nativa* del formato, no un parche externo. Además, la ablación del **Apéndice F.4** (sustituir las operaciones especializadas por capas lineales genéricas degrada la precisión) confirma que las primitivas nuevas de este eje deben ser **estructurales** —con el sesgo inductivo geométrico o simbólico correcto— y no MLPs genéricos. Nótese que el paper simplifica la exposición a 4 dimensiones/16 tensores, mientras que la implementación real usa 5 dimensiones/27 tensores (ver [§4.1](#41-el-multitensor--estructura-de-datos-central)).
+**Refuerzo desde la documentación del paper**: el Apéndice C describe el multitensor como "un tensor por cada subconjunto de dimensiones"; por eso **añadir una nueva dimensión** (p.ej. `slots`, §9.3.2) es una extensión *nativa* del formato, no un parche externo. Además, la ablación del **Apéndice F.4** (sustituir las operaciones especializadas por capas lineales genéricas degrada la precisión) confirma que las primitivas nuevas de este eje deben ser **estructurales** —con el sesgo inductivo geométrico o simbólico correcto— y no MLPs genéricos. Nótese que el paper simplifica la exposición a 4 dimensiones/16 tensores, mientras que la implementación real usa 5 dimensiones y conserva 18 hojas válidas (ver [§4.1](#41-el-multitensor--estructura-de-datos-central)).
 
 #### 9.3.1 Operador de copia/replicación basado en cross-attention
 
@@ -1530,14 +1969,16 @@ Este eje ataca la limitación fundamental (§8.1.1, §8.3): el espacio de progra
 
 **Marco teórico**: cross-attention con queries indexadas por destino y keys/values indexados por fuente (Vaswani et al. 2017). Concretamente, para un grid de $H \times W$ píxeles:
 
-$$\text{Copy}(x)_{ij} = \sum_{(i',j')} \underbrace{\text{softmax}_{(i',j')}\!\big(Q_{ij} \cdot K_{i'j'}\big)}_{\text{mapa de copia}} \cdot V_{i'j'}$$
+$$
+\text{Copy}(x)_{ij} = \sum_{(i',j')} \underbrace{\text{softmax}_{(i',j')}\!\big(Q_{ij} \cdot K_{i'j'}\big)}_{\text{mapa de copia}} \cdot V_{i'j'}
+$$
 
 donde $Q$, $K$, $V$ son proyecciones lineales del tensor de píxeles `[examples, color, x, y, channel]`. El **mapa de copia** es exactamente la matriz que un programa de copy-paste necesitaría: una distribución sobre fuentes para cada destino.
 
 **MDL accounting**:
 
 - Cada cabeza de cross-attention añade ~$3 \cdot c_h^2 \approx 3 \cdot 64 = 192$ parámetros por capa (si $c_h = 8$).
-- Con 4 cabezas × 4 capas = 3 072 parámetros extra ⇒ θ pasa de 76 K → ~79 K (≈ +4 %).
+- Con 4 cabezas × 4 capas = 3 072 parámetros extra ⇒ θ pasa de ~76 K (convención del paper) → ~79 K (≈ +4 %).
 - A cambio, puzzles que antes necesitaban 200 nats de KL para codificar un mapa de traslación pueden codificarse con ~10–20 nats (la decisión "cuál parche copiar dónde" se vuelve barata).
 - **Saldo MDL**: positivo en el espacio agregado de puzzles si al menos ~20 puzzles del split aprovechan la primitiva.
 
@@ -1611,7 +2052,9 @@ Este eje no añade primitivas nuevas: explota mejor las existentes mediante mejo
 
 **Marco teórico**: el truco **free-bits** (Kingma et al. 2016 *Improving Variational Inference with Inverse Autoregressive Flow*, §5) modifica la pérdida así:
 
-$$\mathcal{L}_{\text{free-bits}} = \sum_i \max(\tau, \text{KL}_i) + 10 \cdot \text{reconstruction}$$
+$$
+\mathcal{L}_{\text{free-bits}} = \sum_i \max(\tau, \text{KL}_i) + 10 \cdot \text{reconstruction}
+$$
 
 Con umbral $\tau$. Mientras $\text{KL}_i < \tau$, su contribución es constante (gradiente nulo respecto a $\mu_i, \sigma_i$), lo que libera al modelo de la presión de comprimir ese tensor a 0. Una vez $\text{KL}_i > \tau$, vuelve a la pérdida estándar.
 
@@ -1619,7 +2062,7 @@ Apéndice K.3 del paper Liao & Gu sugiere exactamente esto, con la mejora de **s
 
 **MDL accounting**: $\tau$ es un hiperparámetro escalar; añade 4 bytes a θ ⇒ irrelevante. La pérdida final converge a la original, así que el techo MDL no se ve afectado, sólo la trayectoria de optimización.
 
-**Coste sobre RX 9070 XT**: cero adicional. Sólo cambia la lógica de [train.py:106](train.py) por un `max(τ_t, KL_i)` por tensor.
+**Coste sobre RX 9070 XT**: cero adicional. Sólo cambia la lógica de [train.py:106](../../train.py#L106) por un `max(τ_t, KL_i)` por tensor.
 
 **Impacto esperado**: el Apéndice K.3 del paper estima que rescatar 4–6 tensores más subiría el pass@2 promedio ~3–5 puntos. Combinado con multi-seed (§9.4.2), debería **eliminar la varianza** entre runs (actualmente alta — los autores reconocen "lucky runs").
 
@@ -1629,7 +2072,7 @@ Apéndice K.3 del paper Liao & Gu sugiere exactamente esto, con la mejora de **s
 
 **Problema atacado**: §8.1.2 (la trayectoria depende fuertemente de la semilla; runs distintas resuelven puzzles distintos).
 
-**Marco teórico**: si cada run resuelve correctamente con probabilidad $p$ un puzzle dado, y las semillas son aproximadamente independientes, $N$ runs en paralelo dan pass@$N$ con probabilidad $1 - (1-p)^N$. El logger de [solution_selection.py:40-91](solution_selection.py) ya acumula scores con `logaddexp` ⇒ basta concatenar los buffers de todas las semillas. La elección final pass@2 son las dos respuestas con mayor score agregado.
+**Marco teórico**: si cada run resuelve correctamente con probabilidad $p$ un puzzle dado, y las semillas son aproximadamente independientes, $N$ runs en paralelo dan pass@$N$ con probabilidad $1 - (1-p)^N$. El logger de [solution_selection.py:40-91](../../solution_selection.py#L40-L91) ya acumula scores con `logaddexp` ⇒ basta concatenar los buffers de todas las semillas. La elección final pass@2 son las dos respuestas con mayor score agregado.
 
 **Cálculo sobre RX 9070 XT**:
 
@@ -1643,11 +2086,13 @@ Apéndice K.3 del paper Liao & Gu sugiere exactamente esto, con la mejora de **s
 
 #### 9.4.3 Curriculum y active sampling sobre demonstration pairs
 
-**Problema atacado**: §8.4.3 (ausencia de curriculum, Chollet 2019 §II.2.3 lo identifica como componente de la inteligencia).
+**Problema atacado**: §8.4.3 (ausencia de curriculum sobre demonstration pairs; Chollet 2019 §II.2.3 lo identifica como componente de la inteligencia).
 
 **Marco teórico**: en cada paso de optimización, en lugar de sumar la pérdida sobre los 2–7 demonstration pairs con peso uniforme, ponderar con un esquema de **active sampling**:
 
-$$w_{i,t} = \frac{e^{\beta_t \cdot \ell_{i,t-1}}}{\sum_j e^{\beta_t \cdot \ell_{j,t-1}}}$$
+$$
+w_{i,t} = \frac{e^{\beta_t \cdot \ell_{i,t-1}}}{\sum_j e^{\beta_t \cdot \ell_{j,t-1}}}
+$$
 
 donde $\ell_{i,t-1}$ es la pérdida del par $i$ en la iteración anterior. Para $\beta_t = 0$ recuperamos el muestreo uniforme; para $\beta_t \to \infty$ sólo se entrena con el par más difícil. Schedule recomendado: $\beta_t = t / T$ — empezar uniforme, terminar enfocando en los pares no resueltos.
 
@@ -1661,7 +2106,7 @@ Variante easy-first: muestrear primero por área decreciente (los grids pequeño
 
 #### 9.4.4 Selección pass@2 aprendida en lugar de constantes mágicas
 
-**Problema atacado**: §8.4.2 (las constantes −10, −10, −4 en [solution_selection.py:54-90](solution_selection.py) no tienen justificación).
+**Problema atacado**: §8.4.2 (las constantes −10, −10, −4 en [solution_selection.py:54-90](../../solution_selection.py#L54-L90) no tienen justificación).
 
 **Marco teórico**: reemplazar el scoring heurístico por un clasificador binario entrenado sobre el split de training para predecir "esta solución es correcta". Features: `uncertainty`, `train_step`, `is_ema`, KL totales, magnitud de cada KL_i, varianza de los logits en las últimas K iteraciones, etc. Modelo: regresión logística o pequeño MLP (50 params).
 
@@ -1677,17 +2122,21 @@ Variante easy-first: muestrear primero por área decreciente (los grids pequeño
 
 **Marco teórico**: la longitud de descripción agregada de los 400 puzzles del split es:
 
-$$\sum_{p=1}^{400} \big[ |\theta_p| + \text{KL}(z_p) + R(z_p) \big]$$
+$$
+\sum_{p=1}^{400} \big[ |\theta_p| + \text{KL}(z_p) + R(z_p) \big]
+$$
 
 Si $\theta_p = \theta_{\text{shared}} + \Delta\theta_p$ con $\Delta\theta_p$ de bajo rango (LoRA, Hu et al. 2021), la suma se transforma en:
 
-$$|\theta_{\text{shared}}| + \sum_{p=1}^{400} \big[ |\Delta\theta_p| + \text{KL}(z_p) + R(z_p) \big]$$
+$$
+|\theta_{\text{shared}}| + \sum_{p=1}^{400} \big[ |\Delta\theta_p| + \text{KL}(z_p) + R(z_p) \big]
+$$
 
 Si $|\Delta\theta_p| \ll |\theta_p|$, la longitud agregada **baja drásticamente**. Esta es la compresión que justifica meta-aprendizaje desde la óptica MDL pura: **no es pretraining sobre datos externos** (eso violaría la regla de ARC), es **compresión conjunta** del corpus de tareas — completamente legítima por MDL.
 
 Dos arquitecturas candidatas:
 
-1. **LoRA por puzzle**: $\theta_p = \theta_{\text{shared}} + B_p A_p$ con $A_p \in \mathbb{R}^{r \times d}$, $B_p \in \mathbb{R}^{d \times r}$, $r \ll d$. Coste por puzzle: $2rd$ parámetros. Si $r = 4$, $d = 32$: 256 params por puzzle vs 76 K de θ completo ⇒ ratio 300×.
+1. **LoRA por puzzle**: $\theta_p = \theta_{\text{shared}} + B_p A_p$ con $A_p \in \mathbb{R}^{r \times d}$, $B_p \in \mathbb{R}^{d \times r}$, $r \ll d$. Coste por puzzle: $2rd$ parámetros. Si $r = 4$, $d = 32$: 256 params por puzzle vs ~76 K de θ completo según la convención del paper ⇒ ratio 300×.
 2. **Hypernetwork** (Ha et al. 2016): un meta-modelo $H_\phi(t_p) \to \theta_p$ que toma una representación $t_p$ de la tarea (extraída del multitensor de entrada). Compresión más fuerte pero más difícil de entrenar.
 
 **Protocolo de entrenamiento MDL-compatible**:
@@ -1721,7 +2170,7 @@ Este eje no cambia la matemática del modelo; cambia **cómo** se ejecuta. Es el
 Estrategia recomendada:
 
 - **BF16 autocast** sobre `share_up`, `share_down`, `direction_share`, `softmax` (la salida de softmax es naturalmente acotada).
-- **FP32** mantenido en: cómputo de KL ([layers.py:58-123](layers.py) en `channel_layer`), acumulador de pérdida, optimizador.
+- **FP32** mantenido en: cómputo de KL ([layers.py:58-123](../../layers.py#L58-L123) en `channel_layer`), acumulador de pérdida, optimizador.
 - BF16 sobre FP16 porque BF16 tiene el mismo rango que FP32 (8 bits de exponente) y CompressARC no está calibrado para clipping (un overflow FP16 en cualquier tensor del multitensor sería catastrófico para la KL).
 
 **Coste**: cero adicional sobre RX 9070 XT (BF16 nativo).
@@ -1738,8 +2187,8 @@ Estrategia recomendada:
 
 **Limitaciones a tener en cuenta**:
 
-- El multitensor tiene 27 tensores de **formas distintas** por puzzle: `dynamic=True` es obligatorio, pero genera más recompilations (~5–10 al inicio, luego cache hit).
-- `cummax` con scan recursivo logarítmico ([layers.py:436-460](layers.py)) probablemente no se fusiona automáticamente; **reescribirlo como un único kernel Triton** que haga el scan asociativo es la mejora más rentable individual.
+- El multitensor tiene 18 tensores de **formas distintas** por puzzle: `dynamic=True` sería necesario para compilar entre tareas, pero genera más recompilations (~5–10 al inicio, luego cache hit).
+- `cummax` con scan recursivo logarítmico ([layers.py:436-460](../../layers.py#L436-L460)) probablemente no se fusiona automáticamente; **reescribirlo como un único kernel Triton** que haga el scan asociativo es la mejora más rentable individual.
 - `direction_share` (64 matrices 8×8 acopladas) es una `bmm` con permutaciones: candidato ideal a fusionar manualmente.
 
 **Coste de implementación**: medio (1–2 semanas de un ingeniero familiarizado con Triton). El payoff es permanente: **toda futura mejora hereda el speedup**.
@@ -1748,12 +2197,12 @@ Estrategia recomendada:
 
 #### 9.6.3 Paralelización extendida con 16 GB VRAM y 94 GB RAM
 
-**Marco teórico**: el scheduler greedy de [parallel_train.py:148-152](parallel_train.py) ya satura una GPU con múltiples puzzles. Las mejoras posibles con el hardware actual:
+**Marco teórico**: el scheduler greedy de [parallel_train.py:148-152](../../parallel_train.py#L148-L152) ya satura una GPU con múltiples puzzles. Las mejoras posibles con el hardware actual:
 
 1. **Aumentar el número máximo de procesos concurrentes** de 8–10 a 16–22 (1,33× más VRAM, descontando reserva).
 2. **Pre-procesamiento CPU paralelo**: con 16 cores i9, ejecutar `preprocessing.Task(...)` para los siguientes N puzzles **mientras la GPU entrena** los actuales. Elimina latencia entre tareas en la cola.
 3. **Caché de modelos calientes en RAM** (94 GB): mantener los `weights_list` de los últimos puzzles resueltos para análisis posterior sin re-entrenar. Cabe trivialmente.
-4. **Mover el `Logger` de [solution_selection.py](solution_selection.py) a RAM compartida** entre procesos (con `multiprocessing.Manager`). Ya está; pero el overhead de IPC se puede reducir con shared-memory tensors (`torch.multiprocessing`).
+4. **Mover el `Logger` de [solution_selection.py](../../solution_selection.py) a RAM compartida** entre procesos (con `multiprocessing.Manager`). Ya está; pero el overhead de IPC se puede reducir con shared-memory tensors (`torch.multiprocessing`).
 
 **Coste de implementación**: bajo (cambios en `parallel_train.py` principalmente).
 
@@ -1765,11 +2214,11 @@ Estrategia recomendada:
 
 **Marco teórico**: tres opciones, ordenadas por incremento de capacidad:
 
-1. **Universal Transformer** (Dehghani et al. 2019): tied weights ⇒ los pesos de las 4 capas se reemplazan por **una única capa aplicada T veces**. θ baja de 76 K → ~19 K (mejora MDL pura), y T puede ser >> 4 sin coste en θ. Wall-clock por iter sube ×(T/4).
+1. **Universal Transformer** (Dehghani et al. 2019): tied weights ⇒ los pesos de las 4 capas se reemplazan por **una única capa aplicada T veces**. θ baja de ~76 K (convención del paper) → ~19 K (mejora MDL pura), y T puede ser >> 4 sin coste en θ. Wall-clock por iter sube ×(T/4).
 2. **Adaptive Computation Time** (Graves 2016): añadir un **halting head** por tensor del multitensor que produzca una probabilidad $h_t \in (0, 1)$ de detenerse en la iteración $t$. La predicción final es $\sum_t (\prod_{s<t}(1-h_s)) h_t \cdot \text{output}_t$. Permite que puzzles fáciles converjan en 2–3 iter y los difíciles tomen 20–30.
 3. **Hierarchical Reasoning Model** (HRM): dos niveles, un "planner" lento y un "executor" rápido. Más complejo de implementar, pero hay evidencia empírica directa de su eficacia en ARC.
 
-Propuesta recomendada: empezar por **Universal Transformer + ACT** (combinables). Reescribir el loop `for layer in n_layers` ([arc_compressor.py:111-135](arc_compressor.py)) como `while not halted` con $T_{max} = 16$ y halting per-tensor.
+Propuesta recomendada: empezar por **Universal Transformer + ACT** (combinables). Reescribir el loop `for layer in n_layers` ([arc_compressor.py:111-135](../../arc_compressor.py#L111-L135)) como `while not halted` con $T_{max} = 16$ y halting per-tensor.
 
 **MDL accounting**:
 
@@ -1786,34 +2235,34 @@ Propuesta recomendada: empezar por **Universal Transformer + ACT** (combinables)
 
 **Riesgo**: el entrenamiento de halting heads con straight-through es notoriamente inestable (literatura ACT). Mitigación: bucear en variantes recientes como **PonderNet** (Banino et al. 2021) que reformula ACT como problema variacional con KL — encaja perfectamente con la pérdida MDL de CompressARC.
 
-**Caveat MDL (Apéndice F.5)**: la ablación F.5 confirma que subir parámetros no rinde por sí solo; por eso la vía recomendada aquí es el **Universal Transformer con weight-tying**, que **reduce** θ (76 K → ~19 K) mientras aumenta la profundidad efectiva. Añadir profundidad con pesos independientes por capa sería anti-MDL salvo que θ se comprima explícitamente (ver [§9.10](#910-eje-g-compresión-explícita-de-θ-mdl-completo)).
+**Caveat MDL (Apéndice F.5)**: la ablación F.5 confirma que subir parámetros no rinde por sí solo; por eso la vía recomendada aquí es el **Universal Transformer con weight-tying**, que **reduce** θ (~76 K → ~19 K en la convención del paper) mientras aumenta la profundidad efectiva. Añadir profundidad con pesos independientes por capa sería anti-MDL salvo que θ se comprima explícitamente (ver [§9.10](#910-eje-g-compresión-explícita-de-θ-mdl-completo)).
 
 ### 9.8 Síntesis: presupuesto de cómputo, roadmap experimental y riesgos
 
 La siguiente tabla integra los cinco ejes con su coste de cómputo cuantificado sobre el hardware disponible y su dependencia con otros ejes. "Wall-clock por puzzle" asume que los ejes habilitadores (D) ya están activos; "VRAM extra por puzzle" se suma al baseline ~0,7 GB.
 
-| Eje | Propuesta | VRAM extra | Compute extra | θ extra | Wall-clock | Δ pass@2 esperado | Depende de |
-|-----|-----------|-----------|---------------|---------|------------|-------------------|-----------|
-| D | BF16 autocast | 0 | −60 % | 0 | ÷3 | ±0 (habilitador) | — |
-| D | torch.compile + Triton-ROCm | 0 | −50 % | 0 | ÷2,5 | ±0 (habilitador) | — |
-| D | Paralelización extendida | n/a | n/a | 0 | n/a | ±0 (habilitador) | BF16 + compile |
-| B | KL floor con scheduling | 0 | 0 | +1 | ±0 | +3–5 | — |
-| B | Multi-seed ensembling (×4) | +2 GB | +300 % | 0 (×4 instances) | ±0 paralelo | +10–15 | VRAM (D) |
-| B | Curriculum sobre demo pairs | 0 | 0 | 0 | ±0 | +1–2 | — |
-| B | Selección pass@2 aprendida | <1 MB | trivial | +50 | ±0 | +0,5–1 | — |
-| G | Compresión explícita de θ (§9.10) | 0 | +5 % | ~0 (regulariza θ) | ×1,02 | +1–3 (habilitador de A/E) | — |
-| F | Interpretabilidad activa: KL+PCA online (§9.9) | <5 MB | +2 % | +30 | ±0 | +2–4 | KL floor (B) |
-| A | Copia/replicación (cross-attn) | +5 MB | +5 % | +3 K | ×1,05 | +5–8 | BF16 (D) |
-| A | Slot attention (objetos) | +10 MB | +10 % | +4 K | ×1,1 | +8–12 | BF16 (D) |
-| A | Conteo + VQ | +1 MB | +2 % | +2 K | ×1,02 | +3–5 | — |
-| E | Universal Transformer + ACT | +5 MB | +×(T/4) | −57 K (¡menos!) | ×2,25 | +15–20 | BF16 + compile |
-| C | LoRA cross-puzzle | +50 MB shared | +100 % (train) | shared θ_base 76K + per-puzzle ~256 | ÷7 (eval) | +20–30 | training pipeline distinto |
+| Eje | Propuesta                                       | VRAM extra    | Compute extra  | θ extra                             | Wall-clock   | Δ pass@2 esperado         | Depende de                 |
+| --- | ----------------------------------------------- | ------------- | -------------- | ------------------------------------ | ------------ | -------------------------- | -------------------------- |
+| D   | BF16 autocast                                   | 0             | −60 %         | 0                                    | ÷3          | ±0 (habilitador)          | —                         |
+| D   | torch.compile + Triton-ROCm                     | 0             | −50 %         | 0                                    | ÷2,5        | ±0 (habilitador)          | —                         |
+| D   | Paralelización extendida                       | n/a           | n/a            | 0                                    | n/a          | ±0 (habilitador)          | BF16 + compile             |
+| B   | KL floor con scheduling                         | 0             | 0              | +1                                   | ±0          | +3–5                      | —                         |
+| B   | Multi-seed ensembling (×4)                     | +2 GB         | +300 %         | 0 (×4 instances)                    | ±0 paralelo | +10–15                    | VRAM (D)                   |
+| B   | Curriculum sobre demo pairs                     | 0             | 0              | 0                                    | ±0          | +1–2                      | —                         |
+| B   | Selección pass@2 aprendida                     | <1 MB         | trivial        | +50                                  | ±0          | +0,5–1                    | —                         |
+| G   | Compresión explícita de θ (§9.10)           | 0             | +5 %           | ~0 (regulariza θ)                   | ×1,02       | +1–3 (habilitador de A/E) | —                         |
+| F   | Interpretabilidad activa: KL+PCA online (§9.9) | <5 MB         | +2 %           | +30                                  | ±0          | +2–4                      | KL floor (B)               |
+| A   | Copia/replicación (cross-attn)                 | +5 MB         | +5 %           | +3 K                                 | ×1,05       | +5–8                      | BF16 (D)                   |
+| A   | Slot attention (objetos)                        | +10 MB        | +10 %          | +4 K                                 | ×1,1        | +8–12                     | BF16 (D)                   |
+| A   | Conteo + VQ                                     | +1 MB         | +2 %           | +2 K                                 | ×1,02       | +3–5                      | —                         |
+| E   | Universal Transformer + ACT                     | +5 MB         | +×(T/4)       | −57 K (¡menos!)                    | ×2,25       | +15–20                    | BF16 + compile             |
+| C   | LoRA cross-puzzle                               | +50 MB shared | +100 % (train) | shared θ_base 76K + per-puzzle ~256 | ÷7 (eval)   | +20–30                    | training pipeline distinto |
 
 Leyenda: ±0 = sin cambio relevante. Las cifras de Δ pass@2 son estimaciones con incertidumbre **alta**; el rango da la banda razonable derivada de la literatura citada en cada subsección.
 
 **Roadmap experimental recomendado (orden de ejecución):**
 
-0. **Fase −1 — desatascar la CPU (PRIORIDAD 0, Eje H §9.11)**: ajustar concurrencia, eliminar syncs GPU→CPU del hot path, vectorizar los bucles de offset y aplicar `torch.compile`. **Debe ir antes que nada**: la CPU satura al ~100 % en carga real (≈13 tareas) y todos los ejes siguientes heredan ese cuello de botella. Semánticamente neutro (no cambia arquitectura ni resultados). Validación con [profile_parallel_train.py](profile_parallel_train.py). Resultado: CPU no saturada, throughput agregado ×3–×10.
+0. **Fase −1 — desatascar la CPU (PRIORIDAD 0, Eje H §9.11)**: ajustar concurrencia, terminar la vectorización de longitudes y evaluar `torch.compile`. La eliminación de syncs por curva, el batching de crops y `postprocess_stride` ya están en el código actual; la CPU aún debe medirse en carga real (≈13 tareas) antes de afirmar un factor de speedup. Validación con [profile_parallel_train.py](../../profile_parallel_train.py). Resultado esperado: CPU no saturada, throughput agregado ×3–×10.
 1. **Fase 0 — habilitadores (1–2 semanas)**: activar BF16 (§9.6.1), `torch.compile` (§9.6.2), ampliar paralelización (§9.6.3). Resultado: wall-clock ÷ 5–10 sin cambiar el modelo. Validación: reproducir el 20 % baseline en ~20 h.
 2. **Fase 1 — robustez (1 semana)**: KL floor (§9.4.1), curriculum (§9.4.3), selección aprendida (§9.4.4) y **compresión de θ (Eje G, §9.10)** como cimiento MDL que habilita el escalado posterior de forma principista. Resultado: pass@2 estable ~22–24 % (varianza-baja).
 3. **Fase 2 — ensembling + diagnóstico (días)**: multi-seed × 4 (§9.4.2) e **interpretabilidad activa (Eje F, §9.9)** para selección de semilla y rescate dirigido de tensores críticos. Resultado: pass@2 ~30–35 % en eval. **Hito psicológico**: igualar o superar HRM sin tocar la arquitectura.
@@ -1841,7 +2290,7 @@ Los ejes A–E modifican la arquitectura o el flujo de optimización. Este eje F
 
 **Marco teórico**: el paper ya provee las dos herramientas de observación necesarias, sólo que las usa después de entrenar:
 
-- **KL por-tensor** ([layers.py:58-123](layers.py) devuelve `KL_amounts` / `KL_names`, agregados en [train.py](train.py)): la trayectoria temporal de la KL de cada uno de los 27 tensores indica cuánta información transporta cada uno y permite detectar colapsos inminentes (pendiente de KL fuertemente negativa hacia 0).
+- **KL por-tensor** ([layers.py](../../layers.py#L58-L162) devuelve `KL_amounts` / `KL_names`, agregados en [train.py](../../train.py)): la trayectoria temporal de la KL de cada una de las 18 hojas indica cuánta información transporta cada una y permite detectar colapsos inminentes (pendiente de KL fuertemente negativa hacia 0).
 - **PCA de la salida media de la capa de decodificación** por tensor (la técnica exacta usada en la §5.2.1): revela cuántos conceptos codifica cada tensor y cuáles son *estructuralmente* relevantes para la tarea concreta.
 
 La propuesta convierte estas observaciones en un **lazo de control** que, en tiempo de entrenamiento:
@@ -1852,7 +2301,7 @@ La propuesta convierte estas observaciones en un **lazo de control** que, en tie
 
 **MDL accounting**: la fase de *monitorización* no añade ni un bit a θ (sólo lee cantidades ya calculadas). Las *intervenciones* deben respetar la restricción transversal del §9: el free-bits selectivo converge al MDL igual que el global cuando $\tau_i \to 0$; la reasignación de capacidad es un reparto interno del mismo presupuesto de KL; y la selección de semilla es MDL-neutra a efectos de pass@2 (mismo argumento que §9.4.2).
 
-**Coste sobre RX 9070 XT**: la monitorización de 27 trayectorias escalares es despreciable. La PCA por tensor (matrices pequeñas, `decoding_dim=4` u 8/16 canales) se ejecuta cada K iteraciones en la CPU (i9-12900K) sin frenar la GPU. Coste efectivo ≈ 0.
+**Coste sobre RX 9070 XT**: la monitorización de 18 trayectorias escalares es despreciable. La PCA por tensor (matrices pequeñas, `decoding_dim=4` u 8/16 canales) se ejecuta cada K iteraciones en la CPU (i9-12900K) sin frenar la GPU. Coste efectivo ≈ 0.
 
 **Impacto esperado**: +2–4 puntos pass@2 por reducción de fallos por colapso y —tanto o más importante— un **diagnóstico explicable** de *por qué* falla un puzzle concreto, lo que acelera el diseño de los ejes A y E. Depende de tener el KL floor del §9.4.1 disponible como mecanismo de intervención.
 
@@ -1866,11 +2315,13 @@ Todos los ejes anteriores asumen —siguiendo al paper— que los pesos θ del m
 
 **Marco teórico**: añadir a la pérdida un término diferenciable que aproxime la **longitud de código de θ**, de forma análoga a como la KL aproxima la longitud del código de `z`:
 
-$$\mathcal{L} = \underbrace{\text{KL}(z)}_{\text{código de } z} + 10\cdot\text{reconstruction} + \lambda\cdot\underbrace{L(\theta)}_{\text{código de } \theta}$$
+$$
+\mathcal{L} = \underbrace{\text{KL}(z)}_{\text{código de } z} + 10\cdot\text{reconstruction} + \lambda\cdot\underbrace{L(\theta)}_{\text{código de } \theta}
+$$
 
 Dos materializaciones compatibles con MDL:
 
-1. **Prior gaussiano como KL sobre θ** (equivalente MDL de un L2): modelar cada peso como transmitido bajo un prior $\mathcal{N}(0,\sigma_\theta^2)$ con ruido de cuantización; el número de bits es entonces $\approx \tfrac{1}{2}\log(1+\theta^2/\sigma_{\text{ruido}}^2)$, exactamente la misma forma AWGN que ya usa `channel_layer` para `z` ([layers.py:58-123](layers.py)). Reutiliza la maquinaria existente.
+1. **Prior gaussiano como KL sobre θ** (equivalente MDL de un L2): modelar cada peso como transmitido bajo un prior $\mathcal{N}(0,\sigma_\theta^2)$ con ruido de cuantización; el número de bits es entonces $\approx \tfrac{1}{2}\log(1+\theta^2/\sigma_{\text{ruido}}^2)$, exactamente la misma forma AWGN que ya usa `channel_layer` para `z` ([layers.py:58-123](../../layers.py#L58-L123)). Reutiliza la maquinaria existente.
 2. **Cuantización + entropy coding** (K.4): discretizar θ a una rejilla y contabilizar su entropía; la pérdida penaliza distribuciones de pesos de alta entropía. Más fiel a "bits reales del programa" pero requiere straight-through.
 
 **Consecuencia clave — desbloquea el escalado principista**: una vez θ está en la balanza, el optimizador **decide por sí mismo** cuánta capacidad merece la pena. Esto responde directamente a la ablación del **Apéndice F.5** (subir parámetros no ayuda, a veces empeora): con θ contabilizado, añadir una primitiva del Eje A o profundidad del Eje E sólo baja la pérdida si su reducción en KL(z) + reconstrucción supera su coste $L(\theta)$. El equilibrio circular de §8.2.5 se rompe y "modelo pequeño" pasa de ser una elección manual a ser un **resultado emergente** de la optimización.
@@ -1891,7 +2342,7 @@ Dos materializaciones compatibles con MDL:
 
 > **Este eje tiene prioridad de implementación sobre todos los demás** (D, B, A, E, C, F, G) por una razón empírica y otra lógica:
 >
-> - **Empírica**: en las ejecuciones de carga alta con [parallel_train.py](parallel_train.py) (≈13 tareas concurrentes probadas), la **CPU del host se satura al ~100 % de forma constante** mientras la GPU queda infrautilizada (coherente con el 0,04 % de pico de cómputo medido en §6.3 y §8.4.4). El throughput agregado no está limitado por la GPU sino por la **capacidad del host de alimentarla**.
+> - **Empírica**: en las ejecuciones de carga alta con [parallel_train.py](../../parallel_train.py) (≈13 tareas concurrentes probadas), la **CPU del host se satura al ~100 % de forma constante** mientras la GPU queda infrautilizada (coherente con el 0,04 % de pico de cómputo medido en §6.3 y §8.4.4). El throughput agregado no está limitado por la GPU sino por la **capacidad del host de alimentarla**.
 > - **Lógica**: todos los ejes A–G (y las fases del roadmap §9.8) **heredan** el coste de este cuello de botella. Cada semilla extra (§9.4.2), cada primitiva nueva (Eje A) y cada iteración adicional (Eje E) añade más operaciones coordinadas por Python: si el host ya está saturado, esas mejoras rinden por debajo de su potencial o directamente no caben. Este eje es, por tanto, un **habilitador de orden 0**, incluso anterior a la Fase 0 (habilitadores de silicio del Eje D).
 
 **Restricción absoluta**: este eje **no cambia la arquitectura ni el flujo de cómputo** (§4, §5). No toca el multitensor, ni las 4 capas, ni la pérdida, ni la selección pass@2. Todas las transformaciones propuestas son **semánticamente neutras** (mismos números, distinta forma de calcularlos) o de **coordinación de procesos** (cuántas tareas concurrentes). El núcleo permanece intacto.
@@ -1900,18 +2351,18 @@ Dos materializaciones compatibles con MDL:
 
 El cuello de botella **no es la matemática pesada** (esa ya corre en PyTorch/ROCm y es diminuta). Es la **sobrecarga de Python orquestando miles de operaciones tensoriales minúsculas por iteración**, multiplicada por ~13 procesos concurrentes, más **sincronizaciones GPU→CPU** que serializan el pipeline. Se identifican cuatro focos concretos, todos en el camino caliente que corre 2000 veces × 13 tareas:
 
-| # | Foco (archivo:símbolo) | Patrón que delata el problema | Coste por iteración |
-|---|------------------------|-------------------------------|---------------------|
-| H1 | [train.py](train.py) `take_step` — bucle de reconstrucción | **Bucles Python anidados alrededor de ops tensoriales**: `for example_num` × `for in_out_mode` × `for x_offset` × `for y_offset` (hasta 30×30 = **900 iteraciones**), cada una con *slicing* + `cross_entropy` (un kernel diminuto). En modo `grid_size_uncertain`, `mask_select_logprobs` se re-invoca en dos bucles `for length in range(1, n+1)` (≈30+30), cada uno con su propio bucle de offsets → **O(n²) lanzamientos** por ejemplo | cientos–miles de kernels |
-| H2 | [solution_selection.py](solution_selection.py) `Logger.log` | **Sincronizaciones GPU→CPU en el hot path**: `float(KL_amount.detach().sum().cpu().numpy())` se ejecuta para los **27 tensores** de KL cada iteración, más `total_KL`, `reconstruction_error`, `loss` → ≥30 `.cpu()` que **fuerzan `cudaSynchronize` y matan el solapamiento asíncrono** | ≥30 syncs |
-| H3 | [solution_selection.py](solution_selection.py) `_postprocess_solution`/`best_crop` | Corre **dos veces por iteración** (muestra + EMA); `_best_slice_point` tiene un **bucle Python de offsets** que construye listas de ops diminutas; luego `.cpu().numpy().tolist()` + **triple bucle Python anidado** para recolorear píxeles | 2× por iter |
-| H4 | [layers.py](layers.py) `@multify` / `direction_share` | **Muchísimas llamadas pequeñas a PyTorch**: el decorador `@multify` ([multitensor_systems.py](multitensor_systems.py)) reconstruye en Python la lista de argumentos e itera sobre **27 tensores por cada llamada de capa**; `direction_share` hace `for d1 in range(8): for d2 in range(8)` = **64 `affine` (matmuls 8×8)** por tensor direccional por capa. 4 capas amplifican todo ×4 | miles de dispatch |
+| #  | Foco (archivo:símbolo)                                                                     | Patrón que delata el problema                                                                                                                                                                                                                                                                                                                                                | Coste por iteración         |
+| -- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| H1 | [train.py](../../train.py) `take_step` — bucle de reconstrucción                         | **Bucles Python externos alrededor de ops tensoriales**: `for example_num` × `for in_out_mode`; los offsets `x_offset × y_offset` ya se forman en batch con `unfold` y una sola `cross_entropy` por par ejemplo/modo. En modo `grid_size_uncertain`, todavía hay bucles Python sobre longitudes posibles que vuelven a llamar a `mask_select_logprobs` | dispatch residual; no 900 CE |
+| H2 | [solution_selection.py](../../solution_selection.py) `Logger.log`                          | **Resuelto en la implementación actual**: KL, pérdida y curvas se acumulan como tensores detachados en el device; `materialize_curves()` hace el `stack().cpu()` al final. Sigue habiendo sincronización cuando `_postprocess_solution` materializa candidatos, según `postprocess_stride`                                                                  | diferido al final/stride     |
+| H3 | [solution_selection.py](../../solution_selection.py) `_postprocess_solution`/`best_crop` | Se ejecuta para muestra + EMA solo cuando el stride lo permite (1 en secuencial, 4 por defecto en paralelo);`_best_slice_point` aún tiene un **bucle Python de offsets** y luego `.cpu().numpy().tolist()` + recoloración Python                                                                                                                                  | 2× por postproceso          |
+| H4 | [layers.py](../../layers.py) `@multify` / `direction_share`                              | **Muchas llamadas pequeñas a PyTorch**: `@multify` ([multitensor_systems.py](../../multitensor_systems.py)) recorre **18 hojas por cada llamada de capa**; `direction_share` hace `for d1 in range(8): for d2 in range(8)` = **64 `affine` (matmuls 8×8)** por hoja direccional por capa. 4 capas amplifican todo ×4                              | miles de dispatch            |
 
 **Veredicto sobre la naturaleza del problema** (respuesta directa a las preguntas del análisis): es una **mezcla dominada por dos factores**:
 
 1. **Sobrecarga de Python coordinando demasiadas operaciones pequeñas** (H1, H4) → *demasiados kernel launches pequeños hacia GPU*. Es el factor primario.
 2. **Exceso de procesos concurrentes** (13) compitiendo por los núcleos del host mientras cada uno está *CPU-bound* haciendo dispatch → satura la CPU y **agrava** el factor 1.
-3. Contribuyen en segundo orden las **sincronizaciones GPU→CPU** (H2, H3) y la lógica de scheduling/progreso/IPC de [parallel_train.py](parallel_train.py) (marginal: el tick de 1 s y el `Manager.dict` son baratos comparados con el hot loop).
+3. Contribuyen en segundo orden las **sincronizaciones GPU→CPU** (principalmente H3, porque H2 se difiere al final) y la lógica de scheduling/progreso/IPC de [parallel_train.py](../../parallel_train.py) (marginal: el tick de 1 s y el `Manager.dict` son baratos comparados con el hot loop).
 
 #### 9.11.2 Estrategia: optimizar el dispatch actual **antes** que reescribir a kernels nativos
 
@@ -1924,11 +2375,11 @@ Hay dos estrategias posibles y su relación coste/beneficio es asimétrica:
 
 #### 9.11.3 Plan de acción ordenado por coste/beneficio (todo semánticamente neutro)
 
-1. **Ajustar la concurrencia a la capacidad real del host** *(coste trivial, efecto inmediato)*. Añadir a [parallel_train.py](parallel_train.py) un tope configurable de procesos concurrentes (`--max-workers`, hoy limitado sólo por `n_cpus` y memoria) y barrer 4→8→13 midiendo throughput agregado con el script de §9.11.4. Si la CPU satura, **menos tareas concurrentes pueden dar más throughput total** (menos contención de dispatch). No cambia el resultado de ninguna tarea, sólo cuántas corren a la vez.
+1. **Ajustar la concurrencia a la capacidad real del host** *(coste trivial, efecto a medir)*. Añadir a [parallel_train.py](../../parallel_train.py) un tope configurable de procesos concurrentes (`--max-workers`, hoy limitado sólo por `n_cpus` y memoria) y barrer 4→8→13 midiendo throughput agregado con el script de §9.11.4. Si la CPU satura, **menos tareas concurrentes pueden dar más throughput total** (menos contención de dispatch). No cambia el resultado de ninguna tarea, sólo cuántas corren a la vez.
 2. **Perfilar para localizar los hot loops reales** *(coste bajo)*: usar el script de la sección 9.11.4 (métricas de sistema/proceso, no intrusivo) y un perfilado puntual de una sola tarea (`cProfile`/`torch.profiler`) para confirmar H1–H4 con números antes de tocar código.
-3. **Eliminar las sincronizaciones GPU→CPU del hot path (H2)** *(bajo coste, alto beneficio)*: acumular los escalares de KL/pérdida en **tensores en GPU** y volcarlos a CPU **una sola vez al final** (o cada N pasos), en lugar de ≥30 `.cpu()` por iteración. Mismo valor logueado, sin `cudaSynchronize` por iteración.
-4. **Vectorizar los bucles de offset (H1)** *(coste medio, alto beneficio)*: reemplazar los bucles Python `x_offset × y_offset` y `mask_select_logprobs` por operaciones tensoriales batcheadas (p. ej. `unfold`/`as_strided` para generar todos los crops a la vez y un único `cross_entropy` con reducción por offset). Resultado numéricamente idéntico al `logsumexp` actual, con **un** kernel en vez de cientos.
-5. **Aligerar el postprocesado del logger (H3)** *(coste medio)*: correr `_postprocess_solution` con menos frecuencia (no es necesario en cada uno de los 2000 pasos para la selección pass@2 —basta cada K— o diferir el recoloreo Python) y vectorizar `_best_slice_point`. Mantiene la lógica de scoring.
+3. **Sincronizaciones GPU→CPU del hot path (H2)** *(ya aplicado en parte)*: `Logger.log` acumula los escalares de KL/pérdida como tensores detachados y `materialize_curves()` los vuelca en un `stack().cpu()` final. El trabajo pendiente es medir si el postprocesado de candidatos, que sí materializa datos según el stride, sigue dominando.
+4. **Vectorizar los bucles de offset (H1)** *(ya aplicado en parte)*: `mask_select_logprobs` usa suma prefija y `unfold` genera todos los crops para un único `cross_entropy` batched. Quedan los bucles Python sobre longitudes cuando `grid_size_uncertain` es verdadero.
+5. **Aligerar el postprocesado del logger (H3)** *(ya aplicado en parte)*: `postprocess_stride` evita ejecutar `_postprocess_solution` en cada paso del runner paralelo (por defecto, cada 4); queda vectorizar `_best_slice_point` y recolorear sin bucles Python si el perfilado lo justifica. Mantiene la lógica de scoring.
 6. **`torch.compile` sobre el `forward` y `take_step` (H4)** *(coste medio)*: `torch.compile(mode='reduce-overhead', dynamic=True)` con backend Inductor→Triton-ROCm (ver §9.6.2 y restricciones ROCm de §9.2) fusiona secuencias y **reduce drásticamente el número de kernel launches** que Python debe coordinar, atacando H4 sin reescribir a mano. Requiere `dynamic=True` por las formas variables del multitensor.
 7. **Sólo entonces**, valorar **kernels personalizados** (Triton/C++/CUDA) para el punto más caliente que quede tras 1–6, típicamente el scan diagonal de `cummax` (§9.6.2). Focalizado, no global.
 
@@ -1940,7 +2391,7 @@ Hay dos estrategias posibles y su relación coste/beneficio es asimétrica:
 
 #### 9.11.4 Instrumentación de medición (contrato con el script de perfilado)
 
-Para ejecutar los pasos 1–7 con evidencia y no "a ciegas", este eje se apoya en un script de perfilado **externo y de bajo overhead** ([profile_parallel_train.py](profile_parallel_train.py)) que envuelve a [parallel_train.py](parallel_train.py) y muestrea —sin instrumentar el hot loop— las métricas necesarias: velocidad de entrenamiento y recursos por tarea concurrente, carga/uso/comportamiento de CPU (global y por núcleo), concurrencia efectiva de workers a lo largo del tiempo, VRAM/GPU y una **comparativa antes/después**. Su diseño (muestreo ≥1 s, proceso único de baja prioridad, sin tocar el código de entrenamiento) garantiza que **medir no agrave el cuello de botella**. Ver detalle de uso en su docstring.
+Para ejecutar los pasos 1–7 con evidencia y no "a ciegas", este eje se apoya en un script de perfilado **externo y de bajo overhead** ([profile_parallel_train.py](../../profile_parallel_train.py)) que envuelve a [parallel_train.py](../../parallel_train.py) y muestrea —sin instrumentar el hot loop— las métricas necesarias: velocidad de entrenamiento y recursos por tarea concurrente, carga/uso/comportamiento de CPU (global y por núcleo), concurrencia efectiva de workers a lo largo del tiempo, VRAM/GPU y una **comparativa antes/después**. Su diseño (muestreo ≥1 s, proceso único de baja prioridad, sin tocar el código de entrenamiento) garantiza que **medir no agrave el cuello de botella**. Ver detalle de uso en su docstring.
 
 ---
 
@@ -1975,7 +2426,7 @@ Para ejecutar los pasos 1–7 con evidencia y no "a ciegas", este eje se apoya e
   memorizar cada salida por separado.
 - **Multitensor:** conjunto de tensores que representan diferentes subconjuntos
   de ejes de la tarea, por ejemplo color, posición o dirección. La
-  implementación conserva 27 vistas válidas.
+  implementación conserva 18 vistas válidas.
 - **Padding:** celdas de relleno añadidas para que cuadrículas de distintos
   tamaños puedan almacenarse en una tabla rectangular común. Las máscaras
   impiden que se interpreten como parte de la tarea.
@@ -2000,33 +2451,33 @@ Para ejecutar los pasos 1–7 con evidencia y no "a ciegas", este eje se apoya e
 
 ### Papers
 
-- **Liao, I.; Gu, A. (2025).** *ARC-AGI Without Pretraining.* [Blog post](https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html). PDF en el repo: [2512.06104v1_ARC_AGI_WITHOUT_PRETRAINING.pdf](2512.06104v1_ARC_AGI_WITHOUT_PRETRAINING.pdf).
-- **Chollet, F. (2019).** *On the Measure of Intelligence.* arXiv:1911.01547. PDF: [1911.01547v2_On_The_Measure_of_Intelligence.pdf](1911.01547v2_On_The_Measure_of_Intelligence.pdf).
-- **He, K.; Zhang, X.; Ren, S.; Sun, J. (2015).** *Deep Residual Learning for Image Recognition.* arXiv:1512.03385. PDF: [1512.03385v1_Deep_Residual_Learning_For_Image_Recognition.pdf](1512.03385v1_Deep_Residual_Learning_For_Image_Recognition.pdf). Referencia para las conexiones residuales usadas por `add_residual`.
+- **Liao, I.; Gu, A. (2025).** *ARC-AGI Without Pretraining.* [Blog post](https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html). PDF en el repo: [2512.06104v1_ARC_AGI_WITHOUT_PRETRAINING.pdf](../../Docs/2025/2512.06104v1_ARC_AGI_WITHOUT_PRETRAINING.pdf).
+- **Chollet, F. (2019).** *On the Measure of Intelligence.* arXiv:1911.01547. Texto local: [1911.01547v2_On_The_Measure_of_Intelligence.md](../../Docs/2019/1911.01547v2_On_The_Measure_of_Intelligence.md).
+- **He, K.; Zhang, X.; Ren, S.; Sun, J. (2015).** *Deep Residual Learning for Image Recognition.* arXiv:1512.03385. Texto local: [1512.03385v1_Deep_Residual_Learning_For_Image_Recognition.md](../../Docs/2015/1512.03385v1_Deep_Residual_Learning_For_Image_Recognition.md). Referencia para las conexiones residuales usadas por `add_residual`.
 
 ### Archivos del repositorio
 
-| Archivo | Contenido |
-|---------|-----------|
-| [arc_compressor.py](arc_compressor.py) | Clase `ARCCompressor`, hiperparámetros, forward pass |
-| [multitensor_systems.py](multitensor_systems.py) | `MultiTensorSystem`, `MultiTensor`, decorador `@multify` |
-| [layers.py](layers.py) | Implementación de todas las capas (`channel_layer`, `share_*`, `softmax`, `cummax`, `shift`, `direction_share`, `nonlinear`, `normalize`, `postprocess_mask`) |
-| [initializers.py](initializers.py) | Inicialización Xavier, `symmetrize_xy`, `symmetrize_direction_sharing`, `initialize_head` |
-| [preprocessing.py](preprocessing.py) | Clase `Task`, predicción de shapes, construcción del multitensor |
-| [train.py](train.py) | `take_step`, `mask_select_logprobs`, cómputo del loss, loop secuencial |
-| [solve_task.py](solve_task.py) | Entry point para una tarea individual, captura de VRAM pico |
-| [solution_selection.py](solution_selection.py) | Clase `Logger`, EMA, scoring, selección pass@2 |
-| [parallel_train.py](parallel_train.py) | Scheduler greedy multi-GPU, TF32, cudnn benchmark |
-| [analyze_example.py](analyze_example.py) | Script interactivo para analizar una tarea con visualizaciones |
-| [scoring.py](scoring.py) | Validación de submissions contra ground-truth |
-| [list_solved_puzzles.py](list_solved_puzzles.py) | Tabla de puzzles resueltos a partir de un `.npz` |
-| [plot_problems.py](plot_problems.py) / [plot_accuracy.py](plot_accuracy.py) / [visualization.py](visualization.py) | Utilidades de visualización |
-| [README.md](README.md) | Instrucciones de uso, tips de lectura |
-| [requirements.txt](requirements.txt) | Dependencias Python |
+| Archivo                                                                                                                           | Contenido                                                                                                                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [arc_compressor.py](../../arc_compressor.py)                                                                                       | Clase`ARCCompressor`, hiperparámetros, forward pass                                                                                                                           |
+| [multitensor_systems.py](../../multitensor_systems.py)                                                                             | `MultiTensorSystem`, `MultiTensor`, decorador `@multify`                                                                                                                   |
+| [layers.py](../../layers.py)                                                                                                       | Implementación de todas las capas (`channel_layer`, `share_*`, `softmax`, `cummax`, `shift`, `direction_share`, `nonlinear`, `normalize`, `postprocess_mask`) |
+| [initializers.py](../../initializers.py)                                                                                           | Inicialización Xavier,`symmetrize_xy`, `symmetrize_direction_sharing`, `initialize_head`                                                                                  |
+| [preprocessing.py](../../preprocessing.py)                                                                                         | Clase`Task`, predicción de shapes, construcción del multitensor                                                                                                              |
+| [train.py](../../train.py)                                                                                                         | `take_step`, `mask_select_logprobs`, cómputo del loss, loop secuencial                                                                                                      |
+| [solve_task.py](../../solve_task.py)                                                                                               | Entry point para una tarea individual, captura de VRAM pico                                                                                                                      |
+| [solution_selection.py](../../solution_selection.py)                                                                               | Clase`Logger`, EMA, scoring, selección pass@2                                                                                                                                 |
+| [parallel_train.py](../../parallel_train.py)                                                                                       | Scheduler greedy multi-GPU, TF32, cudnn benchmark                                                                                                                                |
+| [analyze_example.py](../../analyze_example.py)                                                                                     | Script interactivo para analizar una tarea con visualizaciones                                                                                                                   |
+| [scoring.py](../../scoring.py)                                                                                                     | Validación de submissions contra ground-truth                                                                                                                                   |
+| [list_solved_puzzles.py](../../list_solved_puzzles.py)                                                                             | Tabla de puzzles resueltos a partir de un`.npz`                                                                                                                                |
+| [plot_problems.py](../../plot_problems.py) / [plot_accuracy.py](../../plot_accuracy.py) / [visualization.py](../../visualization.py) | Utilidades de visualización                                                                                                                                                     |
+| [README.md](../../README.md)                                                                                                       | Instrucciones de uso, tips de lectura                                                                                                                                            |
+| [requirements.txt](../../requirements.txt)                                                                                         | Dependencias Python                                                                                                                                                              |
 
 ### Recursos externos
 
-- Repositorio en GitHub: <https://github.com/iliao2345/CompressARC>
-- Blog post original: <https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html>
-- Kaggle notebook: <https://www.kaggle.com/code/iliao2345/arc-agi-without-pretraining/notebook?scriptVersionId=232760209>
-- ARC-AGI benchmark: <https://arcprize.org/>
+- Repositorio en GitHub: [https://github.com/iliao2345/CompressARC](https://github.com/iliao2345/CompressARC)
+- Blog post original: [https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html](https://iliao2345.github.io/blog_posts/arc_agi_without_pretraining/arc_agi_without_pretraining.html)
+- Kaggle notebook: [https://www.kaggle.com/code/iliao2345/arc-agi-without-pretraining/notebook?scriptVersionId=232760209](https://www.kaggle.com/code/iliao2345/arc-agi-without-pretraining/notebook?scriptVersionId=232760209)
+- ARC-AGI benchmark: [https://arcprize.org/](https://arcprize.org/)
