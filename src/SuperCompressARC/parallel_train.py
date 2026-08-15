@@ -34,6 +34,11 @@ import multiprocessing
 import numpy as np
 import torch
 
+try:
+    import psutil
+except ImportError:  # the host-RAM guards degrade to no-ops
+    psutil = None
+
 import preprocessing
 import train
 import arc_compressor
@@ -80,6 +85,125 @@ def _print_progress_line(task_names, tasks_started, tasks_finished, progress_dic
     sys.stdout.flush()
 
 
+# ── Crash-resumable per-task results ─────────────────────────────────────────
+
+def _safe_task_name(task_name):
+    """Reject anything that is not a plain ARC task id before it reaches a path."""
+    if not task_name or not all(ch.isalnum() or ch in '-_' for ch in task_name):
+        raise ValueError(f'unsafe task name for a file path: {task_name!r}')
+    return task_name
+
+
+def _partial_dir(split):
+    return os.path.join('.partial', split)
+
+
+def save_task_partial(split, task_name, n_steps, solution, logger_data,
+                      arc_logger=None):
+    """Persist one finished task so an interrupted split can be resumed.
+
+    A 400-task split takes tens of hours and its results otherwise live only in
+    the Manager dict, so any failure loses the whole run.
+    """
+    if not solution:
+        return
+    try:
+        directory = _partial_dir(split)
+        os.makedirs(directory, exist_ok=True)
+        path = os.path.join(directory, f'{_safe_task_name(task_name)}.json')
+        tmp = path + '.tmp'
+        with open(tmp, 'w') as f:
+            json.dump({'n_steps': n_steps,
+                       'solution': solution,
+                       'logger': logger_data}, f)
+        os.replace(tmp, path)
+    except Exception as exc:
+        if arc_logger is not None:
+            arc_logger.warning(f'Could not save partial result for {task_name}: {exc}')
+
+
+def load_task_partials(split, task_names, n_steps):
+    """Return (solutions, loggers) for tasks already completed at this n_steps."""
+    solutions, loggers = {}, {}
+    directory = _partial_dir(split)
+    if not os.path.isdir(directory):
+        return solutions, loggers
+    for name in task_names:
+        try:
+            path = os.path.join(directory, f'{_safe_task_name(name)}.json')
+            if not os.path.exists(path):
+                continue
+            with open(path, 'r') as f:
+                payload = json.load(f)
+        except Exception:
+            continue
+        # A --demo 300-iteration partial must never satisfy a 1500-iteration run.
+        if payload.get('n_steps') != n_steps or not payload.get('solution'):
+            continue
+        solutions[name] = payload['solution']
+        if payload.get('logger'):
+            loggers[name] = payload['logger']
+    return solutions, loggers
+
+
+# A worker needs a couple of minutes of Inductor work to reach its peak RSS, so
+# recently launched ones are charged in full instead of trusting `available`.
+_HOST_MEM_RAMP_S = 120
+
+
+def _host_mem_available_gb():
+    """Free host RAM right now, or None if psutil is unavailable.
+
+    Deliberately `available` and not `total`: Ubuntu plus whatever else runs on
+    the box keeps several GB the workers will never get.
+    """
+    if psutil is None:
+        return None
+    try:
+        return psutil.virtual_memory().available / 1024**3
+    except Exception:
+        return None
+
+
+def _host_memory_cap(n_cpus, gb_per_worker, reserve_gb, arc_logger=None):
+    """Lower the concurrency cap so N workers fit in the free host RAM.
+
+    The scheduler packs on VRAM only, but compiled workers peak at 5-9 GB RSS
+    against 1.8 GB eager, so host RAM is what actually binds once the VRAM
+    over-estimate is removed.
+    """
+    if not gb_per_worker or gb_per_worker <= 0:
+        return n_cpus
+    available_gb = _host_mem_available_gb()
+    if available_gb is None:
+        return n_cpus
+    budget_gb = available_gb - max(reserve_gb, 0.0)
+    cap = max(1, int(budget_gb / gb_per_worker))
+    if arc_logger is not None:
+        arc_logger.info(
+            f'Host RAM: {available_gb:.0f} GB free − {reserve_gb:.0f} GB reserved '
+            f'= {budget_gb:.0f} GB for workers → cap {cap} '
+            f'(at {gb_per_worker} GB/worker)'
+        )
+    return min(n_cpus, cap)
+
+
+def _host_mem_admits(gb_per_worker, reserve_gb, n_unaccounted):
+    """True if launching one more worker still leaves `reserve_gb` free.
+
+    Runtime backstop for an unattended multi-day run: it catches a wrong
+    `--host-mem-per-worker-gb`, an unusually large task, or anything else the
+    operator starts on the box mid-run.
+    """
+    if reserve_gb <= 0:
+        return True
+    available_gb = _host_mem_available_gb()
+    if available_gb is None:
+        return True
+    pending_gb = n_unaccounted * max(gb_per_worker or 0.0, 0.0)
+    return available_gb - pending_gb >= reserve_gb
+
+
 # ── Core scheduler ───────────────────────────────────────────────────────────
 
 def parallelize_runs(
@@ -101,6 +225,10 @@ def parallelize_runs(
     verbose=False,
     postprocess_stride=1,
     accel_config=None,
+    partial_split=None,
+    partial_n_steps=None,
+    host_mem_per_worker_gb=0.0,
+    host_mem_reserve_gb=8.0,
 ):
     """
     Spawn worker processes to solve ARC-AGI tasks, greedily filling GPU memory.
@@ -126,6 +254,13 @@ def parallelize_runs(
             (Eje H, H3) instead of every step. Forwarded to solve_task.solve_task.
         accel_config (dict|None)     : serialized accel.AccelConfig (Eje D, §9.6)
             forwarded to every worker. None => untouched baseline.
+        partial_split (str|None)     : if set, write each finished task's result to
+            .partial/{split}/ so an interrupted run can be resumed.
+        partial_n_steps (int|None)   : iteration count stamped into those partials.
+        host_mem_per_worker_gb (float): expected peak RSS per worker; > 0 caps
+            concurrency so the workers fit in host RAM.
+        host_mem_reserve_gb (float): host RAM never handed to workers; no task is
+            launched if doing so would eat into it.
 
     Returns:
         memory_dict    (dict[str, int])  : peak VRAM per task (bytes).
@@ -135,6 +270,8 @@ def parallelize_runs(
     """
     t = time.time()
     gpu_quotas = gpu_quotas[:]
+    n_cpus = _host_memory_cap(n_cpus, host_mem_per_worker_gb,
+                              host_mem_reserve_gb, arc_logger)
     n_disp = n_original_tasks if n_original_tasks is not None else n_tasks
 
     tasks_started    = [False] * n_tasks
@@ -143,6 +280,8 @@ def parallelize_runs(
     process_gpu_ids  = [None]  * n_tasks
     task_start_times = [None]  * n_tasks
     task_last_pct    = {}   # task_name → last 10%-bucket logged
+    recent_launches  = []   # start times of workers still ramping up their RSS
+    mem_blocked      = False
 
     with multiprocessing.Manager() as manager:
 
@@ -177,6 +316,15 @@ def parallelize_runs(
                         solved_info = _check_solved(
                             task_names[i], solutions_json, solutions_dict
                         )
+
+                        if partial_split is not None:
+                            save_task_partial(
+                                partial_split, task_names[i], partial_n_steps,
+                                solutions_dict.get(task_names[i]),
+                                (_loggers_dict.get(task_names[i])
+                                 if _loggers_dict is not None else None),
+                                arc_logger,
+                            )
 
                         if arc_logger is not None:
                             arc_logger.log_task_finished(
@@ -218,6 +366,8 @@ def parallelize_runs(
                 )
 
             # ── Schedule new tasks ────────────────────────────────────
+            recent_launches = [ts for ts in recent_launches
+                               if time.time() - ts < _HOST_MEM_RAMP_S]
             for gpu_id in range(n_gpus):
                 for i in range(n_tasks):
                     if tasks_started[i]:
@@ -226,7 +376,22 @@ def parallelize_runs(
                     running = (sum(map(int, tasks_started))
                                - sum(map(int, tasks_finished)))
                     enough_cpus = running < n_cpus
-                    if enough_quota and enough_cpus:
+                    enough_host_mem = _host_mem_admits(
+                        host_mem_per_worker_gb, host_mem_reserve_gb,
+                        len(recent_launches) + 1,
+                    )
+                    if enough_quota and enough_cpus and not enough_host_mem:
+                        if not mem_blocked and arc_logger is not None:
+                            arc_logger.warning(
+                                f'Holding back new tasks: host RAM down to '
+                                f'{_host_mem_available_gb():.0f} GB free, '
+                                f'reserve is {host_mem_reserve_gb:.0f} GB'
+                            )
+                        mem_blocked = True
+                    if enough_quota and enough_cpus and enough_host_mem:
+                        if mem_blocked and arc_logger is not None:
+                            arc_logger.info('Host RAM recovered — scheduling resumed')
+                        mem_blocked = False
                         gpu_quotas[gpu_id] -= task_usages[i]
                         task_start_times[i] = time.time()
 
@@ -246,6 +411,7 @@ def parallelize_runs(
                         processes[i]       = p
                         tasks_started[i]   = True
                         process_gpu_ids[i] = gpu_id
+                        recent_launches.append(time.time())
 
                         if arc_logger is not None:
                             arc_logger.log_task_started(
@@ -336,7 +502,8 @@ def save_memory_cache(split, n_gpus, memory_dict, accel_config=None):
 
 def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
               postprocess_stride=4, accel_cfg=None, n_steps=1500,
-              compile_memory_factor=4.5):
+              compile_memory_factor=1.2, resume=False,
+              host_mem_per_worker_gb=0.0, host_mem_reserve_gb=8.0):
     """
     Execute the full two-phase pipeline for one split and save all outputs.
 
@@ -351,6 +518,12 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         n_steps (int): Phase 2 training iterations per task.
         compile_memory_factor (float): multiplier applied to the (eager) Phase-1
             measurements when Phase 2 runs compiled. See below.
+        resume (bool): reuse per-task results left in .partial/{split}/ by an
+            earlier interrupted run at the same n_steps.
+        host_mem_per_worker_gb (float): expected peak RSS per worker; > 0 caps
+            Phase-2 concurrency so the workers fit in host RAM.
+        host_mem_reserve_gb (float): host RAM left to the OS and everything else
+            running on the box; never handed to workers.
 
     Returns:
         n_solved (int)         : tasks solved (always 0 for 'test').
@@ -427,10 +600,12 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         save_memory_cache(split, n_gpus, memory_dict, measure_config)
         arc_logger.info(f'Saved Phase 1 measurements to {_cache_path(split)}')
 
-    # Phase 1 measured the *eager* footprint, but Phase 2 will run compiled, and
-    # compilation was measured to raise per-task VRAM ~4.3x (0.91 GB -> 3.87 GB
-    # on 10 training tasks). Without this correction the greedy scheduler would
-    # pack ~10 compiled tasks into 14.9 GB and run out of memory.
+    # Phase 1 measured the *eager* footprint. Compiled tasks were later measured
+    # to occupy essentially the same VRAM (~0.95 GB against ~0.89 GB eager: 3
+    # resident compiled tasks held 2.84-2.90 GB of whole-GPU memory), so this
+    # only carries a small safety margin. The old 4.5x default came from a
+    # *compiled* Phase 1 whose reading still included Inductor autotuning
+    # buffers, and it throttled Phase 2 to 3 concurrent tasks instead of 10.
     if compiled_phase2 and abs((compile_memory_factor or 1.0) - 1.0) > 1e-9:
         memory_dict = {name: int(mem * compile_memory_factor)
                        for name, mem in memory_dict.items()}
@@ -444,6 +619,22 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     sorted_tasks      = sorted(memory_dict.items(), key=lambda x: x[1], reverse=True)
     sorted_names      = [name for name, _ in sorted_tasks]
     sorted_mem_usages = [mem  for _, mem  in sorted_tasks]
+
+    # Skip tasks a previous interrupted run already finished at this n_steps.
+    resume_solutions, resume_loggers = (
+        load_task_partials(split, original_task_names, n_steps) if resume
+        else ({}, {})
+    )
+    if resume_solutions:
+        arc_logger.info(
+            f'Resume: {len(resume_solutions)}/{n_tasks} tasks already complete in '
+            f'{_partial_dir(split)} — Phase 2 will run the remaining '
+            f'{n_tasks - len(resume_solutions)}'
+        )
+        pending = [(name, mem) for name, mem in zip(sorted_names, sorted_mem_usages)
+                   if name not in resume_solutions]
+        sorted_names      = [name for name, _ in pending]
+        sorted_mem_usages = [mem  for _, mem  in pending]
 
     # Map task_name → original JSON index (used in log messages)
     task_original_idx = {name: idx for idx, name in enumerate(original_task_names)}
@@ -463,27 +654,36 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     )
 
     arc_logger.log_phase(
-        f'Phase 2 — Full training  ({n_steps} iterations × {n_tasks} tasks)'
+        f'Phase 2 — Full training  ({n_steps} iterations × {len(sorted_names)} tasks)'
     )
 
-    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
-        safe_gpu_memory_quotas,
-        sorted_mem_usages,
-        n_steps,
-        sorted_names,
-        split,
-        n_tasks, n_gpus, n_cpus,
-        collect_logger_data=True,
-        track_progress=True,
-        arc_logger=arc_logger,
-        solutions_json=solutions_json,
-        task_original_idx=task_original_idx,
-        n_original_tasks=n_tasks,
-        quiet=False,
-        verbose=True,
-        postprocess_stride=postprocess_stride,
-        accel_config=accel_config,
-    )
+    if sorted_names:
+        _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+            safe_gpu_memory_quotas,
+            sorted_mem_usages,
+            n_steps,
+            sorted_names,
+            split,
+            len(sorted_names), n_gpus, n_cpus,
+            collect_logger_data=True,
+            track_progress=True,
+            arc_logger=arc_logger,
+            solutions_json=solutions_json,
+            task_original_idx=task_original_idx,
+            n_original_tasks=n_tasks,
+            quiet=False,
+            verbose=True,
+            postprocess_stride=postprocess_stride,
+            accel_config=accel_config,
+            partial_split=split,
+            partial_n_steps=n_steps,
+            host_mem_per_worker_gb=host_mem_per_worker_gb,
+            host_mem_reserve_gb=host_mem_reserve_gb,
+        )
+    else:
+        solutions_dict, loggers_data, t_p2 = {}, {}, 0.0
+    solutions_dict = {**resume_solutions, **solutions_dict}
+    loggers_data   = {**resume_loggers,   **loggers_data}
     arc_logger.info(f'Phase 2 complete in {t_p2:.1f}s')
 
     # ── Save predictions_{split}.npz in original JSON task order ─────
@@ -548,6 +748,9 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             # when Phase 1 dominates (a compiled Phase 1 once took 92 % of a run).
             'phase1_s':           round(t_p1, 1),
             'phase2_s':           round(t_p2, 1),
+            'resumed_tasks':      len(resume_solutions),
+            'host_mem_per_worker_gb': host_mem_per_worker_gb or None,
+            'host_mem_reserve_gb': host_mem_reserve_gb,
             'compile_memory_factor': (compile_memory_factor if compiled_phase2 else None),
             'accel':              accel_cfg.describe(),
             'accel_measurement':  measure_cfg.describe(),
@@ -647,6 +850,41 @@ if __name__ == '__main__':
             'profiling runs cheap. Default: 1500.'
         ),
     )
+    parser.add_argument(
+        '--resume',
+        action='store_true',
+        help=(
+            'Reuse per-task results left in .partial/{split}/ by an earlier '
+            'interrupted run at the same --iterations. Results are always '
+            'written there; this flag only controls whether they are consumed. '
+            'Delete the directory to force a clean run.'
+        ),
+    )
+    parser.add_argument(
+        '--host-mem-per-worker-gb',
+        type=float,
+        default=0.0,
+        metavar='GB',
+        help=(
+            'Expected peak host RSS per worker; >0 caps Phase-2 concurrency so '
+            'the workers fit in the RAM that is actually free. The scheduler '
+            'otherwise packs on VRAM only, and compiled workers peak at 5-9 GB '
+            'RSS against 1.8 GB eager. Suggested: 6 with a warm Inductor cache, '
+            '9 with a cold one. Default: 0 (disabled).'
+        ),
+    )
+    parser.add_argument(
+        '--host-mem-reserve-gb',
+        type=float,
+        default=8.0,
+        metavar='GB',
+        help=(
+            'Host RAM never handed to workers, for the OS and anything else '
+            'running on the box. Budgets are computed from free memory minus '
+            'this, and no task starts if launching it would eat into it. '
+            'Default: 8.0. Use 0 to disable the guard entirely.'
+        ),
+    )
 
     # ── Eje D — computational efficiency / silicon utilisation (§9.6) ──────
     accel_group = parser.add_argument_group(
@@ -658,9 +896,11 @@ if __name__ == '__main__':
         default='baseline',
         help=(
             'Bundle of acceleration settings. "baseline" = untouched. "compile" '
-            '= torch.compile (Inductor->Triton-ROCm) + host tuning. "full" = '
-            'compile plus the expandable_segments allocator. "bf16" = BF16 '
-            'autocast, kept for experiments only: it measured 2.7 %% SLOWER '
+            '= torch.compile (Inductor->Triton-ROCm) + host tuning, the only '
+            'configuration measured to win at 1500 iterations (-51 %% wall, '
+            '+105 %% steps/s, pass@2 unharmed). "full" = compile plus the '
+            'expandable_segments allocator. "bf16" = BF16 autocast, kept for '
+            'experiments only: it measured 34 %% SLOWER at 1500 iterations '
             'because this workload is launch-bound, not FLOP-bound. Individual '
             'flags below override the preset.'
         ),
@@ -683,7 +923,9 @@ if __name__ == '__main__':
         help=(
             'torch.compile mode for model.forward (§9.6.2). Uses dynamic=False '
             'because each worker solves a single task with static shapes. '
-            '"reduce-overhead" enables HIP graphs — more VRAM per worker.'
+            '"reduce-overhead" enables HIP graphs: fastest measured mode, but '
+            'its outputs live in a replayed static pool — accel clones them, and '
+            'pass@2 must be re-verified before trusting it.'
         ),
     )
     accel_group.add_argument(
@@ -742,8 +984,9 @@ if __name__ == '__main__':
         default=None,
         help=(
             'Enable torch._inductor.config.memory_planning (buffer reuse across '
-            'the fused graph). Compilation was measured to raise per-task VRAM '
-            'from ~0.9 GB to ~3.9 GB, capping concurrency at 3 tasks instead of 10.'
+            'the fused graph). Measured to change neither speed nor VRAM on this '
+            'workload; toggling it also partitions the Inductor cache key, which '
+            'forces a full recompile.'
         ),
     )
     accel_group.add_argument(
@@ -755,12 +998,15 @@ if __name__ == '__main__':
     accel_group.add_argument(
         '--compile-memory-factor',
         type=float,
-        default=4.5,
+        default=1.2,
         metavar='F',
         help=(
             'Multiplier applied to the eager Phase-1 VRAM measurements when '
-            'Phase 2 runs compiled. Measured ratio on RX 9070 XT: 4.3x '
-            '(0.91 GB eager -> 3.87 GB compiled per task). Use 1.0 to disable.'
+            'Phase 2 runs compiled. Compiled and eager footprints were measured '
+            'to be within ~7 %% of each other (~0.95 vs ~0.89 GB/task), so this '
+            'is a safety margin, not a correction. Default: 1.2. The former 4.5 '
+            'default came from a compiled Phase 1 and throttled Phase 2 to 3 '
+            'concurrent tasks instead of 10.'
         ),
     )
     args = parser.parse_args()
@@ -824,6 +1070,9 @@ if __name__ == '__main__':
             accel_cfg=accel_cfg,
             n_steps=args.iterations,
             compile_memory_factor=args.compile_memory_factor,
+            resume=args.resume,
+            host_mem_per_worker_gb=args.host_mem_per_worker_gb,
+            host_mem_reserve_gb=args.host_mem_reserve_gb,
         )
         total_solved += n_solved
         total_tasks  += n_tasks

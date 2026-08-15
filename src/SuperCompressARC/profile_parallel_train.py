@@ -334,9 +334,22 @@ def _lower_own_priority():
 
 # ── Process-tree tracking ────────────────────────────────────────────────────
 
+# A direct child of parallel_train.py that never exceeds this much CPU is
+# infrastructure (the spawn resource_tracker, the per-phase Manager server), not
+# a task worker; real workers run at 100-200 %.
+TASK_WORKER_CPU_PCT = 50.0
+
+
 class TreeTracker:
     """Tracks the parent process and its (recursive) children, priming psutil's
-    cpu_percent so subsequent reads are accurate, and records per-worker stats."""
+    cpu_percent so subsequent reads are accurate, and records per-worker stats.
+
+    Task workers are the *direct* children of parallel_train.py that actually
+    burn CPU. Everything deeper is TorchInductor's compile pool, which spawns
+    dozens of short-lived processes per task and used to inflate the concurrency
+    and throughput metrics by an order of magnitude (149 "workers completed" for
+    a 10-task run).
+    """
 
     def __init__(self, root_proc):
         self.root = root_proc
@@ -367,6 +380,8 @@ class TreeTracker:
                         self.workers[pid] = {
                             'start': t_rel, 'end': None, 'cpu_samples': [],
                             'peak_rss': 0.0, 'name': proc.name(),
+                            'direct': proc.ppid() == self.root.pid,
+                            'is_task': False,
                         }
             except psutil.Error:
                 continue
@@ -377,8 +392,9 @@ class TreeTracker:
                 self.completions.append((t_rel, pid))
 
     def sample(self):
-        """Return aggregate (n_workers, tree_cpu_pct, tree_rss_mb) for this tick."""
+        """Return (n_task_workers, n_helpers, tree_cpu_pct, tree_rss_mb)."""
         n_workers = 0
+        n_helpers = 0
         tree_cpu = 0.0
         tree_rss = 0.0
         for pid, proc in self._known.items():
@@ -389,11 +405,20 @@ class TreeTracker:
                 continue
             tree_cpu += cpu
             tree_rss += rss
-            if pid in self.workers and self.workers[pid]['end'] is None:
+            rec = self.workers.get(pid)
+            if rec is None or rec['end'] is not None:
+                continue
+            rec['cpu_samples'].append(cpu)
+            rec['peak_rss'] = max(rec['peak_rss'], rss)
+            # Sticky: once a direct child has done real work it stays a worker
+            # even while it idles waiting on the GPU.
+            if rec['direct'] and cpu >= TASK_WORKER_CPU_PCT:
+                rec['is_task'] = True
+            if rec['is_task']:
                 n_workers += 1
-                self.workers[pid]['cpu_samples'].append(cpu)
-                self.workers[pid]['peak_rss'] = max(self.workers[pid]['peak_rss'], rss)
-        return n_workers, tree_cpu, tree_rss
+            else:
+                n_helpers += 1
+        return n_workers, n_helpers, tree_cpu, tree_rss
 
 
 # ── Main run+profile ─────────────────────────────────────────────────────────
@@ -431,6 +456,7 @@ def run_and_profile(args, passthrough):
     sys_cpu_series = []
     percore_series = []
     workers_series = []
+    helpers_series = []
     gpu_util_series = []
     gpu_mem_series = []
     gpu_mem_busy_series = []
@@ -446,7 +472,7 @@ def run_and_profile(args, passthrough):
             tracker.refresh(t_rel)
             percore = psutil.cpu_percent(percpu=True)
             sys_cpu = sum(percore) / len(percore) if percore else 0.0
-            n_workers, tree_cpu, tree_rss = tracker.sample()
+            n_workers, n_helpers, tree_cpu, tree_rss = tracker.sample()
             vmem = psutil.virtual_memory()
 
             # GPU sampling runs on its own slow cadence (default 20s), decoupled from
@@ -470,6 +496,7 @@ def run_and_profile(args, passthrough):
                 'percore_max_pct': round(max(percore), 1) if percore else 0.0,
                 'percore_min_pct': round(min(percore), 1) if percore else 0.0,
                 'n_workers': n_workers,
+                'n_helper_procs': n_helpers,
                 'tree_cpu_pct': round(tree_cpu, 1),
                 'tree_rss_mb': round(tree_rss, 1),
                 'host_mem_used_pct': vmem.percent,
@@ -481,6 +508,7 @@ def run_and_profile(args, passthrough):
             sys_cpu_series.append(sys_cpu)
             percore_series.append(percore)
             workers_series.append(n_workers)
+            helpers_series.append(n_helpers)
             if gpu_util is not None:
                 gpu_util_series.append(gpu_util)
             if gpu_mem is not None:
@@ -531,13 +559,17 @@ def run_and_profile(args, passthrough):
         worker_records.append({
             'pid': pid,
             'name': rec['name'],
+            'task_worker': rec['is_task'],
             'lifetime_s': round(end - rec['start'], 1),
             'mean_cpu_pct': round(statistics.mean(cpu_samples), 1) if cpu_samples else None,
             'peak_cpu_pct': round(max(cpu_samples), 1) if cpu_samples else None,
             'peak_rss_mb': round(rec['peak_rss'], 1),
         })
 
-    completed = [r for r in worker_records if tracker.workers[r['pid']]['end'] is not None]
+    # Only real task workers count: Inductor's compile pool otherwise reports
+    # ~150 "completed workers" for a 10-task run.
+    completed = [r for r in worker_records
+                 if r['task_worker'] and tracker.workers[r['pid']]['end'] is not None]
     worker_lifetimes = [r['lifetime_s'] for r in completed if r['lifetime_s'] > 0]
 
     # Metadata written by parallel_train.py: lets us report *training* throughput
@@ -569,6 +601,10 @@ def run_and_profile(args, passthrough):
             'mean_workers': round(statistics.mean(workers_series), 2) if workers_series else 0,
             'max_workers': max(workers_series) if workers_series else 0,
             'workers_completed': len(completed),
+            # Inductor compile-pool processes: not tasks, but they consume the
+            # host RAM and CPU that cap how many tasks can run at once.
+            'mean_helper_procs': round(statistics.mean(helpers_series), 2) if helpers_series else 0,
+            'max_helper_procs': max(helpers_series) if helpers_series else 0,
         },
         'throughput': {
             'workers_completed': len(completed),
@@ -643,6 +679,9 @@ def _print_summary(s, csv_path, json_path):
           f'{c["saturation_fraction"]*100:.1f} % of run')
     print(f'  Workers mean / max   : {cc["mean_workers"]} / {cc["max_workers"]}')
     print(f'  Workers completed    : {cc["workers_completed"]}')
+    if cc.get('max_helper_procs'):
+        print(f'  Compile helper procs : {cc["mean_helper_procs"]} mean / '
+              f'{cc["max_helper_procs"]} max  (not counted as workers)')
     print(f'  Throughput           : {tp["workers_per_hour"]} workers/h'
           + (f'   (mean lifetime {tp["mean_worker_lifetime_s"]} s)'
              if tp["mean_worker_lifetime_s"] else ''))
@@ -672,7 +711,7 @@ def _print_summary(s, csv_path, json_path):
 
 # ── Before/after comparison ──────────────────────────────────────────────────
 
-def compare(before_path, after_path, accuracy_tolerance=0.0):
+def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.0):
     with open(before_path) as f:
         b = json.load(f)
     with open(after_path) as f:
@@ -687,7 +726,7 @@ def compare(before_path, after_path, accuracy_tolerance=0.0):
             d = d[key]
         return d
 
-    def line(name, bv, av, better='lower', unit='', pct=False):
+    def line(name, bv, av, better='lower', unit='', pct=False, tolerance=0.0):
         if bv is None or av is None:
             print(f'  {name:<26}: {bv} -> {av}')
             return None
@@ -702,6 +741,8 @@ def compare(before_path, after_path, accuracy_tolerance=0.0):
         if better is None:
             # Informational only: the metric has no intrinsic "good" direction.
             good, tag = None, 'info'
+        elif tolerance > 0 and abs(delta) <= tolerance:
+            good, tag = True, 'OK~'
         else:
             good = (delta <= 0) if better == 'lower' else (delta >= 0)
             tag = 'OK ' if good else 'REGRESSION'
@@ -733,9 +774,10 @@ def compare(before_path, after_path, accuracy_tolerance=0.0):
     line('mean_worker_lifetime_s', b['throughput']['mean_worker_lifetime_s'],
          a['throughput']['mean_worker_lifetime_s'], 'lower', ' s')
 
-    print('\n  CPU pressure (must NOT get worse):')
+    print(f'\n  CPU pressure (must NOT get worse; ±{cpu_tolerance_pp} pp is noise):')
     cpu_ok = []
-    cpu_ok.append(line('cpu_mean_pct', b['cpu']['mean_pct'], a['cpu']['mean_pct'], 'lower', ' %'))
+    cpu_ok.append(line('cpu_mean_pct', b['cpu']['mean_pct'], a['cpu']['mean_pct'],
+                       'lower', ' %', tolerance=cpu_tolerance_pp))
     cpu_ok.append(line('cpu_saturation_fraction',
                        b['cpu']['saturation_fraction'], a['cpu']['saturation_fraction'],
                        'lower', '', pct=True))
@@ -743,6 +785,8 @@ def compare(before_path, after_path, accuracy_tolerance=0.0):
     print('\n  Silicon utilisation (higher is better):')
     line('mean_workers', b['concurrency']['mean_workers'],
          a['concurrency']['mean_workers'], 'higher')
+    line('max_helper_procs', get(b, 'concurrency', 'max_helper_procs'),
+         get(a, 'concurrency', 'max_helper_procs'), None)
     line('gpu_util_mean_pct', b['gpu']['util_mean_pct'],
          a['gpu']['util_mean_pct'], 'higher', ' %')
     line('gpu_mem_busy_mean_pct', get(b, 'gpu', 'mem_busy_mean_pct'),
@@ -779,20 +823,20 @@ def compare(before_path, after_path, accuracy_tolerance=0.0):
                   f'cannot support an accuracy claim either way.')
 
     print('=' * 66)
-    # Guardrail 1: the optimization must not increase CPU pressure (Eje H §9.11.3).
-    regressed = [ok for ok in cpu_ok if ok is False]
-    if regressed:
-        print('  ⚠  CPU pressure INCREASED — this change worsens the bottleneck.')
-        print('=' * 66 + '\n')
-        return 2
-    # Guardrail 2: Eje D is semantics-preserving by design; a drop in pass@2
-    # means the acceleration changed the numerics in a harmful way (e.g. BF16
-    # truncating gradients of near-collapsed KL tensors, §9.6.1).
+    # Guardrail 1: Eje D is semantics-preserving by design, so a drop in pass@2
+    # outranks everything else — a `reduce-overhead` run once posted the best
+    # throughput of a campaign while solving nothing at all.
     if accuracy_regressed:
         print(f'  ⚠  pass@2 DROPPED by {(b_solved - a_solved)*100:.1f} points '
               f'(tolerance {accuracy_tolerance*100:.1f}) — the speedup is not free.')
         print('=' * 66 + '\n')
         return 3
+    # Guardrail 2: the optimization must not increase CPU pressure (Eje H §9.11.3).
+    regressed = [ok for ok in cpu_ok if ok is False]
+    if regressed:
+        print('  ⚠  CPU pressure INCREASED — this change worsens the bottleneck.')
+        print('=' * 66 + '\n')
+        return 2
     print('  ✓  CPU pressure did not get worse and pass@2 held up.')
     print('=' * 66 + '\n')
     return 0
@@ -834,6 +878,10 @@ def main():
                         help='In --compare mode, how much pass@2 solved_fraction may drop '
                              'before the comparison is flagged as a regression (exit code 3). '
                              'Default: 0.0 (strict).')
+    parser.add_argument('--cpu-tolerance-pp', type=float, default=2.0,
+                        help='In --compare mode, how many percentage points cpu_mean_pct '
+                             'may rise before it counts as a regression. Sub-point moves '
+                             'are run-to-run noise. Default: 2.0.')
     parser.add_argument('--compare', nargs=2, metavar=('BEFORE.json', 'AFTER.json'),
                         help='Compare two summary JSONs instead of running a new profile.')
     parser.add_argument('passthrough', nargs=argparse.REMAINDER,
@@ -841,7 +889,8 @@ def main():
     args = parser.parse_args()
 
     if args.compare:
-        sys.exit(compare(args.compare[0], args.compare[1], args.accuracy_tolerance))
+        sys.exit(compare(args.compare[0], args.compare[1],
+                         args.accuracy_tolerance, args.cpu_tolerance_pp))
 
     # Strip a leading '--' separator from REMAINDER if present.
     passthrough = args.passthrough

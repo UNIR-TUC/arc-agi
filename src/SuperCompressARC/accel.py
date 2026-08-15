@@ -202,9 +202,11 @@ def for_measurement(cfg):
     and does participate in the memory footprint.
 
     The compiled footprint is recovered afterwards by scaling the measurements
-    (see `--compile-memory-factor` in parallel_train.py): eager measured
-    ~0.91 GB/task while the compiled run really used ~3.76 GB/task, so the
-    measurement must be scaled or Phase 2 would over-subscribe VRAM.
+    (see `--compile-memory-factor` in parallel_train.py). The night campaign of
+    2026-07-29 showed the scale factor is close to 1: whole-GPU VRAM with 3
+    compiled tasks resident was 2.84-2.90 GB, i.e. ~0.95 GB/task against
+    ~0.89 GB/task eager. The earlier 3.87 GB figure was an artefact of measuring
+    a *compiled* Phase 1, which still held Inductor's autotuning buffers.
 
     Side benefit: the Phase-1 cache becomes shareable between an eager run and a
     compiled run of the same split, removing a fixed cost from every A/B.
@@ -270,9 +272,9 @@ def configure_process(cfg):
             warnings.warn(f'[accel] set_num_threads failed: {exc}')
 
     if cfg.memory_planning and cfg.compile_mode != 'off':
-        # Buffer reuse across the fused graph. Compilation was measured to raise
-        # per-task VRAM from ~0.9 GB to ~3.9 GB, which is what capped scheduler
-        # concurrency at 3 tasks instead of 10.
+        # Buffer reuse across the fused graph. Measured to change neither speed
+        # nor VRAM here (2864 vs 2842 MB with it off), and it partitions the
+        # Inductor cache key, so toggling it forces a full recompile.
         try:
             import torch._inductor.config as inductor_config
             inductor_config.memory_planning = True
@@ -372,6 +374,31 @@ def _autocast_wrap(forward, dtype):
     return forward_with_autocast
 
 
+# Compile modes whose outputs live in a HIP/CUDA-graph static pool.
+_CUDAGRAPH_MODES = ('reduce-overhead', 'max-autotune')
+
+
+def _clone_wrap(forward):
+    """Copy the forward outputs out of the cudagraph static buffers.
+
+    Under `reduce-overhead` the returned tensors alias a pool that the next
+    replay overwrites, while `solution_selection.Logger` retains `logits`,
+    `x_mask` and `y_mask` for the whole run. Measured consequence: a
+    `reduce-overhead` campaign solved 0/10 tasks at 7.34 steps/s while the same
+    tasks compiled normally solved 5/10 (§15.9).
+    """
+    def forward_with_cloned_outputs():
+        logits, x_mask, y_mask, KL_amounts, KL_names = forward()
+        return (
+            logits.clone(),
+            x_mask.clone(),
+            y_mask.clone(),
+            [KL.clone() for KL in KL_amounts],
+            KL_names,
+        )
+    return forward_with_cloned_outputs
+
+
 def apply(model, cfg):
     """Rebind `model.forward` with the configured acceleration wrappers.
 
@@ -403,6 +430,8 @@ def apply(model, cfg):
         except Exception as exc:
             warnings.warn(f'[accel] torch.compile unavailable ({exc}); '
                           f'running eager.')
+        if cfg.compile_mode in _CUDAGRAPH_MODES:
+            forward = _clone_wrap(forward)
 
     dtype = _AMP_DTYPES.get(cfg.amp)
     if dtype is torch.bfloat16 and not _bf16_supported():
