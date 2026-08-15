@@ -75,8 +75,8 @@ Trains all 400 tasks **one at a time**. Safe and simple, but slow.
 
 ### Parallel — `parallel_train.py` (recommended)
 
-```
-> python parallel_train.py
+```bash
+python parallel_train.py
 ```
 
 Runs as many tasks simultaneously as your GPU VRAM allows, then refills slots as tasks finish. 4–10× faster than sequential.
@@ -87,6 +87,34 @@ Runs as many tasks simultaneously as your GPU VRAM allows, then refills slots as
 | GPU VRAM needed | up to full GPU memory (scheduler auto-limits)                                                                                                   |
 | Output          | `submission.json` (Kaggle-format)                                                                                                             |
 | How it works    | Phase 1: runs 2 iterations per task to measure VRAM footprint. Phase 2: greedy scheduler packs tasks onto the GPU under the safe memory budget. |
+
+#### Terminal monitor
+
+When standard output is an interactive UTF-8 terminal, `parallel_train.py`
+automatically displays a dense ANSI monitor inspired by `btop`. It includes
+global progress, active and completed tasks, task metadata, terminal progress
+bars, and observed iterations per second.
+
+The monitor uses the scheduler's existing one-second progress sample. It does
+not add worker polling, GPU queries, threads, subprocesses, or model changes.
+Output remains line-oriented when redirected, when `TERM=dumb` or `NO_COLOR`
+is set, or when the monitor is disabled explicitly:
+
+```bash
+python parallel_train.py --split training --no-tui
+```
+
+Task states are shown as colored terminal text:
+
+- `WAITING`: queued or initializing.
+- `SEARCHING`: measuring task memory in phase 1.
+- `SOLVING`: running training iterations.
+- `VERIFYING`: materializing and selecting the final prediction.
+- `SUCCESS`: a prediction matched known ground truth.
+- `FAILED`: neither attempt matched known ground truth.
+
+The `test` split has no ground truth, so completed tasks are not labeled as
+failures. The layout adapts to wide, medium, and small terminal dimensions.
 
 ### Changing the split
 

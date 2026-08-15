@@ -55,7 +55,7 @@ torch.backends.cuda.matmul.allow_tf32 = True
 
 # ── Live terminal progress line ──────────────────────────────────────────────
 
-def _print_progress_line(task_names, tasks_started, tasks_finished, progress_dict,
+def _print_progress_line(task_names, tasks_started, tasks_finished, progress,
                           n_iterations, n_tasks):
     """Overwrite a single terminal line with the %-progress of every task
     currently running in parallel. Piggybacks on the scheduler's existing
@@ -66,7 +66,7 @@ def _print_progress_line(task_names, tasks_started, tasks_finished, progress_dic
     parts = []
     for i in running:
         name = task_names[i]
-        step = int(progress_dict.get(name, 0))
+        step = int(progress.get(name, 0))
         pct  = 100.0 * step / max(n_iterations, 1)
         parts.append(f'{name}:{pct:3.0f}%')
     line = f'[{len(running)} running] ' + '  '.join(parts)
@@ -150,6 +150,8 @@ def parallelize_runs(
 
             # Check for errors propagated from workers
             if not error_queue.empty():
+                if arc_logger is not None:
+                    arc_logger.close_dashboard()
                 raise ValueError(error_queue.get())
 
             # ── Detect finished tasks ─────────────────────────────────
@@ -174,13 +176,16 @@ def parallelize_runs(
                             arc_logger.log_task_finished(
                                 task_names[i], orig_idx, n_disp,
                                 elapsed, peak_mb, solved_info, quiet=quiet,
+                                has_ground_truth=solutions_json is not None,
                             )
                             if solved_info is not None:
                                 arc_logger.write_solved_result(
                                     task_names[i], orig_idx, solved_info
                                 )
 
-                        if verbose:
+                        if verbose and not (
+                            arc_logger is not None and arc_logger.dashboard.enabled
+                        ):
                             status = f'[SOLVED @{solved_info}]' if solved_info else ''
                             print(task_names[i], 'finished on gpu',
                                   process_gpu_ids[i],
@@ -190,11 +195,15 @@ def parallelize_runs(
             # ── Report training progress for running tasks ────────────
             # File/debug log: throttled to once per 10% bucket per task
             # (cheap, useful for post-run analysis).
-            if _progress_dict is not None and arc_logger is not None:
+            progress_snapshot = {}
+            if _progress_dict is not None:
                 for i in range(n_tasks):
                     if tasks_started[i] and not tasks_finished[i]:
                         name   = task_names[i]
                         step   = int(_progress_dict.get(name, 0))
+                        progress_snapshot[name] = step
+                        if arc_logger is None:
+                            continue
                         bucket = int(step / max(n_iterations, 1) * 10) * 10
                         if bucket > task_last_pct.get(name, -1):
                             task_last_pct[name] = bucket
@@ -203,11 +212,14 @@ def parallelize_runs(
             # Terminal: a single overwriting status line with every running
             # task's live %, redrawn on the existing 1s tick below — no extra
             # polling, so no measurable performance impact.
-            if _progress_dict is not None and verbose:
-                _print_progress_line(
-                    task_names, tasks_started, tasks_finished,
-                    _progress_dict, n_iterations, n_tasks,
-                )
+            if _progress_dict is not None:
+                if arc_logger is not None and arc_logger.dashboard.enabled:
+                    arc_logger.render_progress(progress_snapshot, n_iterations)
+                elif verbose:
+                    _print_progress_line(
+                        task_names, tasks_started, tasks_finished,
+                        progress_snapshot, n_iterations, n_tasks,
+                    )
 
             # ── Schedule new tasks ────────────────────────────────────
             for gpu_id in range(n_gpus):
@@ -243,18 +255,23 @@ def parallelize_runs(
                                 task_names[i], orig_idx, n_disp, gpu_id,
                                 quiet=quiet,
                             )
-                        if verbose:
+                        if verbose and not (
+                            arc_logger is not None and arc_logger.dashboard.enabled
+                        ):
                             print(task_names[i], 'started on gpu', gpu_id,
                                   f'quota={gpu_quotas[gpu_id]:.0f}')
 
             time.sleep(1)
 
-        if _progress_dict is not None and verbose:
+        if (_progress_dict is not None and verbose
+            and not (arc_logger is not None and arc_logger.dashboard.enabled)):
             sys.stdout.write('\n')
             sys.stdout.flush()
 
         # Final error scan
         if not error_queue.empty():
+            if arc_logger is not None:
+                arc_logger.close_dashboard()
             raise ValueError(error_queue.get())
 
         # ── Collect results before Manager shuts down ─────────────────
@@ -567,6 +584,11 @@ if __name__ == '__main__':
             'Python-side recoloring overhead. Default: 4.'
         ),
     )
+    parser.add_argument(
+        '--no-tui',
+        action='store_true',
+        help='Disable the interactive ANSI dashboard and use line-oriented output.',
+    )
     args = parser.parse_args()
 
     splits_to_run = (
@@ -601,14 +623,19 @@ if __name__ == '__main__':
 
         # Per-split logger (.log directory, shared last_results.txt)
         arc_logger = arc_logging.ArcLogger(
-            split, log_dir='.', results_file=results_file
+            split, log_dir='.', results_file=results_file,
+            enable_tui=False if args.no_tui else None,
         )
 
-        n_solved, n_tasks, elapsed, pred_file = run_split(
-            split, n_gpus, n_cpus, arc_logger, solutions_json,
-            demo_n=args.demo,
-            postprocess_stride=args.postprocess_stride,
-        )
+        try:
+            n_solved, n_tasks, elapsed, pred_file = run_split(
+                split, n_gpus, n_cpus, arc_logger, solutions_json,
+                demo_n=args.demo,
+                postprocess_stride=args.postprocess_stride,
+            )
+        except BaseException:
+            arc_logger.close_dashboard()
+            raise
         total_solved += n_solved
         total_tasks  += n_tasks
 
