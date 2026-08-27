@@ -30,7 +30,7 @@ import json
 import shutil
 import argparse
 import multiprocessing
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Optional
 
 import numpy as np
@@ -68,20 +68,34 @@ torch.backends.cudnn.benchmark = True
 # ── Live terminal progress line ──────────────────────────────────────────────
 
 def _print_progress_line(task_names, tasks_started, tasks_finished, progress_dict,
-                          n_iterations, n_tasks):
+                          n_iterations, n_tasks, task_start_times=None):
     """Overwrite a single terminal line with the %-progress of every task
     currently running in parallel. Piggybacks on the scheduler's existing
-    1s poll tick, so it adds no extra polling or logging overhead."""
+    1s poll tick, so it adds no extra polling or logging overhead.
+
+    A task shows `init` until it reports its first step: without that, a run
+    wedged before training starts looks exactly like one that is merely slow.
+    """
     running = [i for i in range(n_tasks) if tasks_started[i] and not tasks_finished[i]]
     if not running:
         return
-    parts = []
+    now = time.time()
+    parts, rates, worst_remaining = [], [], 0
     for i in running:
         name = task_names[i]
-        step = int(progress_dict.get(name, 0))
-        pct  = 100.0 * step / max(n_iterations, 1)
-        parts.append(f'{name}:{pct:3.0f}%')
-    line = f'[{len(running)} running] ' + '  '.join(parts)
+        step = int(progress_dict.get(name, -1))
+        if step < 0:
+            parts.append(f'{name}:init')
+            continue
+        parts.append(f'{name}:{100.0 * step / max(n_iterations, 1):3.0f}%')
+        elapsed = now - task_start_times[i] if task_start_times else 0.0
+        if step > 0 and elapsed > 0:
+            rates.append(step / elapsed)
+            worst_remaining = max(worst_remaining, (n_iterations - step) / (step / elapsed))
+    head = f'{len(running)} running'
+    if rates:
+        head += f', {sum(rates):.1f} it/s, eta {worst_remaining / 60:.0f}m'
+    line = f'[{head}] ' + '  '.join(parts)
     width = shutil.get_terminal_size((120, 20)).columns
     sys.stdout.write('\r' + line[:width - 1].ljust(width - 1))
     sys.stdout.flush()
@@ -211,6 +225,16 @@ def _host_mem_admits(gb_per_worker, reserve_gb, n_unaccounted):
 # ── Core scheduler ───────────────────────────────────────────────────────────
 
 @dataclass(frozen=True)
+class ResourceLimits:
+    """Host and device limits that keep an unattended multi-day run alive."""
+
+    host_mem_per_worker_gb: float = 0.0
+    host_mem_reserve_gb: float = 8.0
+    vram_margin_frac: float = 0.0
+    stall_timeout_s: float = 1800.0
+
+
+@dataclass(frozen=True)
 class ParallelRunOptions:
     """Optional configuration for :func:`parallelize_runs`."""
 
@@ -228,6 +252,7 @@ class ParallelRunOptions:
     partial_n_steps: Optional[int] = None
     host_mem_per_worker_gb: float = 0.0
     host_mem_reserve_gb: float = 8.0
+    stall_timeout_s: float = 1800.0
 
 def parallelize_runs(
     gpu_quotas,
@@ -276,6 +301,7 @@ def parallelize_runs(
     partial_n_steps = options.partial_n_steps
     host_mem_per_worker_gb = options.host_mem_per_worker_gb
     host_mem_reserve_gb = options.host_mem_reserve_gb
+    stall_timeout_s = options.stall_timeout_s
 
     t = time.time()
     gpu_quotas = gpu_quotas[:]
@@ -289,6 +315,7 @@ def parallelize_runs(
     process_gpu_ids  = [None]  * n_tasks
     task_start_times = [None]  * n_tasks
     task_last_pct    = {}   # task_name → last 10%-bucket logged
+    task_last_step   = {}   # task_name → (step, when it last changed)
     recent_launches  = []   # start times of workers still ramping up their RSS
     mem_blocked      = False
 
@@ -371,25 +398,60 @@ def parallelize_runs(
             if _progress_dict is not None and verbose:
                 _print_progress_line(
                     task_names, tasks_started, tasks_finished,
-                    _progress_dict, n_iterations, n_tasks,
+                    _progress_dict, n_iterations, n_tasks, task_start_times,
                 )
 
+            # ── Stall watchdog ────────────────────────────────────────
+            # A wedged worker spins on the GPU forever and takes the whole
+            # campaign with it (j_base_50, 2026-08-27). Kill it and move on;
+            # with no partial written, --resume retries it next time.
+            if _progress_dict is not None and stall_timeout_s > 0:
+                now = time.time()
+                for i in range(n_tasks):
+                    if not tasks_started[i] or tasks_finished[i]:
+                        continue
+                    name = task_names[i]
+                    step = int(_progress_dict.get(name, -1))
+                    last = task_last_step.get(name)
+                    if last is None or step != last[0]:
+                        task_last_step[name] = (step, now)
+                        continue
+                    if now - last[1] <= stall_timeout_s:
+                        continue
+                    where = f'step {step}' if step >= 0 else 'before the training loop'
+                    if arc_logger is not None:
+                        arc_logger.warning(
+                            f'{name} stalled {where} for '
+                            f'{stall_timeout_s:.0f}s — terminating it'
+                        )
+                    processes[i].terminate()
+                    processes[i].join(timeout=30)
+                    if processes[i].is_alive():
+                        processes[i].kill()
+                    tasks_finished[i] = True
+                    gpu_quotas[process_gpu_ids[i]] += task_usages[i]
+
             # ── Schedule new tasks ────────────────────────────────────
+            # One launch per tick: ten workers racing into the HIP allocator in
+            # the same instant wedged the driver on a near-full card.
             recent_launches = [ts for ts in recent_launches
                                if time.time() - ts < _HOST_MEM_RAMP_S]
+            launched = False
             for gpu_id in range(n_gpus):
+                if launched:
+                    break
                 for i in range(n_tasks):
                     if tasks_started[i]:
                         continue
-                    enough_quota = gpu_quotas[gpu_id] >= task_usages[i]
                     running = (sum(map(int, tasks_started))
                                - sum(map(int, tasks_finished)))
-                    enough_cpus = running < n_cpus
-                    enough_host_mem = _host_mem_admits(
-                        host_mem_per_worker_gb, host_mem_reserve_gb,
-                        len(recent_launches) + 1,
-                    )
-                    if enough_quota and enough_cpus and not enough_host_mem:
+                    if running >= n_cpus:
+                        break
+                    if gpu_quotas[gpu_id] < task_usages[i]:
+                        continue
+                    if not _host_mem_admits(host_mem_per_worker_gb,
+                                            host_mem_reserve_gb,
+                                            len(recent_launches) + 1):
                         if not mem_blocked and arc_logger is not None:
                             arc_logger.warning(
                                 f'Holding back new tasks: host RAM down to '
@@ -397,39 +459,41 @@ def parallelize_runs(
                                 f'reserve is {host_mem_reserve_gb:.0f} GB'
                             )
                         mem_blocked = True
-                    if enough_quota and enough_cpus and enough_host_mem:
-                        if mem_blocked and arc_logger is not None:
-                            arc_logger.info('Host RAM recovered — scheduling resumed')
-                        mem_blocked = False
-                        gpu_quotas[gpu_id] -= task_usages[i]
-                        task_start_times[i] = time.time()
+                        break
+                    if mem_blocked and arc_logger is not None:
+                        arc_logger.info('Host RAM recovered — scheduling resumed')
+                    mem_blocked = False
+                    gpu_quotas[gpu_id] -= task_usages[i]
+                    task_start_times[i] = time.time()
 
-                        orig_idx = (task_original_idx.get(task_names[i], i)
-                                    if task_original_idx else i)
+                    orig_idx = (task_original_idx.get(task_names[i], i)
+                                if task_original_idx else i)
 
-                        worker_args = (
-                            task_names[i], split, 1e20, n_iterations,
-                            gpu_id, memory_dict, solutions_dict, error_queue,
-                            _loggers_dict, _progress_dict, postprocess_stride,
-                            accel_config,
+                    worker_args = (
+                        task_names[i], split, 1e20, n_iterations,
+                        gpu_id, memory_dict, solutions_dict, error_queue,
+                        _loggers_dict, _progress_dict, postprocess_stride,
+                        accel_config,
+                    )
+                    p = multiprocessing.Process(
+                        target=solve_task.solve_task, args=worker_args
+                    )
+                    p.start()
+                    processes[i]       = p
+                    tasks_started[i]   = True
+                    process_gpu_ids[i] = gpu_id
+                    recent_launches.append(time.time())
+                    launched = True
+
+                    if arc_logger is not None:
+                        arc_logger.log_task_started(
+                            task_names[i], orig_idx, n_disp, gpu_id,
+                            quiet=quiet,
                         )
-                        p = multiprocessing.Process(
-                            target=solve_task.solve_task, args=worker_args
-                        )
-                        p.start()
-                        processes[i]       = p
-                        tasks_started[i]   = True
-                        process_gpu_ids[i] = gpu_id
-                        recent_launches.append(time.time())
-
-                        if arc_logger is not None:
-                            arc_logger.log_task_started(
-                                task_names[i], orig_idx, n_disp, gpu_id,
-                                quiet=quiet,
-                            )
-                        if verbose:
-                            print(task_names[i], 'started on gpu', gpu_id,
-                                  f'quota={gpu_quotas[gpu_id]:.0f}')
+                    if verbose:
+                        print(task_names[i], 'started on gpu', gpu_id,
+                              f'quota={gpu_quotas[gpu_id]:.0f}')
+                    break
 
             time.sleep(1)
 
@@ -511,8 +575,7 @@ def save_memory_cache(split, n_gpus, memory_dict, accel_config=None):
 
 def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
               postprocess_stride=4, accel_cfg=None, n_steps=1500,
-              compile_memory_factor=1.2, resume=False,
-              host_mem_per_worker_gb=0.0, host_mem_reserve_gb=8.0):
+              compile_memory_factor=1.2, resume=False, limits=None):
     """
     Execute the full two-phase pipeline for one split and save all outputs.
 
@@ -529,10 +592,8 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             measurements when Phase 2 runs compiled. See below.
         resume (bool): reuse per-task results left in .partial/{split}/ by an
             earlier interrupted run at the same n_steps.
-        host_mem_per_worker_gb (float): expected peak RSS per worker; > 0 caps
-            Phase-2 concurrency so the workers fit in host RAM.
-        host_mem_reserve_gb (float): host RAM left to the OS and everything else
-            running on the box; never handed to workers.
+        limits (ResourceLimits|None): host-RAM caps, VRAM packing margin and the
+            stall watchdog timeout.
 
     Returns:
         n_solved (int)         : tasks solved (always 0 for 'test').
@@ -541,6 +602,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         predictions_file (str) : path to the saved .npz file.
     """
     split_start = time.time()
+    limits = limits or ResourceLimits()
     accel_cfg = accel.AccelConfig.from_dict(accel_cfg)
     accel_config = accel_cfg.to_dict()
     # Phase 1 never compiles (Eje D): compiling to run 2 iterations cost ~1200 s
@@ -652,16 +714,18 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
 
     # ── Phase 2: full training (n_steps comes from --iterations) ────────
 
-    # Phase 1 measurements now capture `total_vram - free_now` (solve_task.py),
-    # which already includes the per-process HIP/CUDA context (~470 MB each).
-    # The original 4 GB margin was compensating for that unmeasured overhead;
-    # 1 GB now suffices: system/display GPU use (~90 MB idle) + allocator
-    # fragmentation + measurement variance.
-    safe_gpu_memory_quotas = [q - 1 * 1024**3 for q in gpu_memory_quotas]
-    arc_logger.debug(
-        f'Phase 2 free VRAM: '
-        + ', '.join(f'GPU{i}={safe_gpu_memory_quotas[i]/1024**3:.2f} GB'
-                   for i in range(n_gpus))
+    # The flat 1 GiB floor is enough on the measured evidence: the same 10 tasks
+    # at 300 and at 1500 iterations peaked at 8890 and 9021 MB, so a 2-iteration
+    # Phase-1 reading under-reports the steady state by only ~1.5 %.
+    # --vram-margin-frac raises the margin proportionally if a bigger split
+    # turns out to need it.
+    safe_gpu_memory_quotas = [q - max(1 * 1024**3, int(q * limits.vram_margin_frac))
+                              for q in gpu_memory_quotas]
+    arc_logger.info(
+        'Phase 2 VRAM budget: '
+        + ', '.join(f'GPU{i}={safe_gpu_memory_quotas[i]/1024**3:.2f} GB '
+                    f'of {gpu_memory_quotas[i]/1024**3:.2f} GB free'
+                    for i in range(n_gpus))
     )
 
     arc_logger.log_phase(
@@ -689,8 +753,9 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
                 accel_config=accel_config,
                 partial_split=split,
                 partial_n_steps=n_steps,
-                host_mem_per_worker_gb=host_mem_per_worker_gb,
-                host_mem_reserve_gb=host_mem_reserve_gb,
+                host_mem_per_worker_gb=limits.host_mem_per_worker_gb,
+                host_mem_reserve_gb=limits.host_mem_reserve_gb,
+                stall_timeout_s=limits.stall_timeout_s,
             ),
         )
     else:
@@ -762,8 +827,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             'phase1_s':           round(t_p1, 1),
             'phase2_s':           round(t_p2, 1),
             'resumed_tasks':      len(resume_solutions),
-            'host_mem_per_worker_gb': host_mem_per_worker_gb or None,
-            'host_mem_reserve_gb': host_mem_reserve_gb,
+            'limits':             asdict(limits),
             'compile_memory_factor': (compile_memory_factor if compiled_phase2 else None),
             'accel':              accel_cfg.describe(),
             'accel_measurement':  measure_cfg.describe(),
@@ -896,6 +960,30 @@ if __name__ == '__main__':
             'running on the box. Budgets are computed from free memory minus '
             'this, and no task starts if launching it would eat into it. '
             'Default: 8.0. Use 0 to disable the guard entirely.'
+        ),
+    )
+    parser.add_argument(
+        '--vram-margin-frac',
+        type=float,
+        default=0.0,
+        metavar='F',
+        help=(
+            'Withhold this fraction of free VRAM from the Phase-2 packer, on top '
+            'of the 1 GiB floor. Default 0: the floor alone covers the ~1.5 %% by '
+            'which a 2-iteration Phase-1 reading under-reports a 1500-step run. '
+            'Raise it only if a full split shows VRAM pressure.'
+        ),
+    )
+    parser.add_argument(
+        '--task-stall-timeout',
+        type=float,
+        default=1800.0,
+        metavar='S',
+        help=(
+            'Terminate a worker that reports no progress for this many seconds. '
+            'Without it one wedged task hangs an 800-task campaign forever; the '
+            'task is simply retried on the next --resume. Default: 1800. '
+            'Use 0 to disable.'
         ),
     )
 
@@ -1039,6 +1127,13 @@ if __name__ == '__main__':
     # inherit it (the allocator reads it at first allocation).
     accel.configure_parent(accel_cfg)
 
+    limits = ResourceLimits(
+        host_mem_per_worker_gb=args.host_mem_per_worker_gb,
+        host_mem_reserve_gb=args.host_mem_reserve_gb,
+        vram_margin_frac=args.vram_margin_frac,
+        stall_timeout_s=args.task_stall_timeout,
+    )
+
     splits_to_run = (
         ['training', 'evaluation', 'test'] if args.split == 'all'
         else [args.split]
@@ -1084,8 +1179,7 @@ if __name__ == '__main__':
             n_steps=args.iterations,
             compile_memory_factor=args.compile_memory_factor,
             resume=args.resume,
-            host_mem_per_worker_gb=args.host_mem_per_worker_gb,
-            host_mem_reserve_gb=args.host_mem_reserve_gb,
+            limits=limits,
         )
         total_solved += n_solved
         total_tasks  += n_tasks

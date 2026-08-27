@@ -79,9 +79,13 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         train_history_logger.solution_second_most_frequent = tuple(((0, 0), (0, 0)) for example_num in range(task.n_test))
 
         # Training loop
+        if progress_dict is not None:
+            progress_dict[task_name] = 0   # reached the loop: no longer "init"
         for train_step in range(n_train_iterations):
             train.take_step(task, model, optimizer, train_step, train_history_logger)
-            if progress_dict is not None and train_step % 100 == 0:
+            # Every 10 steps, not 100: the parent's stall watchdog needs finer
+            # resolution than a slow task's 100-step interval.
+            if progress_dict is not None and train_step % 10 == 0:
                 progress_dict[task_name] = train_step
             if time.time() > time_limit:
                 break
