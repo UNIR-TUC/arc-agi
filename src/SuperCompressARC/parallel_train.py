@@ -30,6 +30,8 @@ import json
 import shutil
 import argparse
 import multiprocessing
+from dataclasses import dataclass
+from typing import Optional
 
 import numpy as np
 import torch
@@ -108,6 +110,7 @@ def save_task_partial(split, task_name, n_steps, solution, logger_data,
     if not solution:
         return
     try:
+        arc_logger.info(f'Saving partial result for {task_name}')
         directory = _partial_dir(split)
         os.makedirs(directory, exist_ok=True)
         path = os.path.join(directory, f'{_safe_task_name(task_name)}.json')
@@ -124,6 +127,7 @@ def save_task_partial(split, task_name, n_steps, solution, logger_data,
 
 def load_task_partials(split, task_names, n_steps):
     """Return (solutions, loggers) for tasks already completed at this n_steps."""
+    arc_logger.info(f'Loading partial results for split {split}')
     solutions, loggers = {}, {}
     directory = _partial_dir(split)
     if not os.path.isdir(directory):
@@ -206,6 +210,25 @@ def _host_mem_admits(gb_per_worker, reserve_gb, n_unaccounted):
 
 # ── Core scheduler ───────────────────────────────────────────────────────────
 
+@dataclass(frozen=True)
+class ParallelRunOptions:
+    """Optional configuration for :func:`parallelize_runs`."""
+
+    collect_logger_data: bool = False
+    track_progress: bool = False
+    arc_logger: object = None
+    solutions_json: Optional[dict] = None
+    task_original_idx: Optional[dict] = None
+    n_original_tasks: Optional[int] = None
+    quiet: bool = False
+    verbose: bool = False
+    postprocess_stride: int = 1
+    accel_config: Optional[dict] = None
+    partial_split: Optional[str] = None
+    partial_n_steps: Optional[int] = None
+    host_mem_per_worker_gb: float = 0.0
+    host_mem_reserve_gb: float = 8.0
+
 def parallelize_runs(
     gpu_quotas,
     task_usages,
@@ -215,20 +238,7 @@ def parallelize_runs(
     n_tasks,
     n_gpus,
     n_cpus,
-    collect_logger_data=False,
-    track_progress=False,
-    arc_logger=None,
-    solutions_json=None,
-    task_original_idx=None,
-    n_original_tasks=None,
-    quiet=False,
-    verbose=False,
-    postprocess_stride=1,
-    accel_config=None,
-    partial_split=None,
-    partial_n_steps=None,
-    host_mem_per_worker_gb=0.0,
-    host_mem_reserve_gb=8.0,
+    options=None,
 ):
     """
     Spawn worker processes to solve ARC-AGI tasks, greedily filling GPU memory.
@@ -242,25 +252,8 @@ def parallelize_runs(
         n_tasks (int)                : len(task_names).
         n_gpus (int)                 : number of CUDA devices.
         n_cpus (int)                 : CPU core count (caps concurrent processes).
-        collect_logger_data (bool)   : if True, store solution logs for predictions.npz.
-        track_progress (bool)        : if True, workers report step % to main process.
-        arc_logger (ArcLogger|None)  : logger; None silences per-task events.
-        solutions_json (dict|None)   : ground-truth solutions for solved-status check.
-        task_original_idx (dict|None): task_name → index in the original JSON order.
-        n_original_tasks (int|None)  : total tasks in original order (for display).
-        quiet (bool)                 : task-start/finish events go to DEBUG not INFO.
-        verbose (bool)               : print raw status to stdout.
-        postprocess_stride (int)     : run full pass@2 postprocessing every N steps
-            (Eje H, H3) instead of every step. Forwarded to solve_task.solve_task.
-        accel_config (dict|None)     : serialized accel.AccelConfig (Eje D, §9.6)
-            forwarded to every worker. None => untouched baseline.
-        partial_split (str|None)     : if set, write each finished task's result to
-            .partial/{split}/ so an interrupted run can be resumed.
-        partial_n_steps (int|None)   : iteration count stamped into those partials.
-        host_mem_per_worker_gb (float): expected peak RSS per worker; > 0 caps
-            concurrency so the workers fit in host RAM.
-        host_mem_reserve_gb (float): host RAM never handed to workers; no task is
-            launched if doing so would eat into it.
+        options (ParallelRunOptions|None): optional logging, progress, persistence,
+            acceleration, and host-memory settings.
 
     Returns:
         memory_dict    (dict[str, int])  : peak VRAM per task (bytes).
@@ -268,6 +261,22 @@ def parallelize_runs(
         loggers_data   (dict)            : logger data per task (empty if not collected).
         time_taken     (float)           : wall-clock seconds.
     """
+    options = options or ParallelRunOptions()
+    collect_logger_data = options.collect_logger_data
+    track_progress = options.track_progress
+    arc_logger = options.arc_logger
+    solutions_json = options.solutions_json
+    task_original_idx = options.task_original_idx
+    n_original_tasks = options.n_original_tasks
+    quiet = options.quiet
+    verbose = options.verbose
+    postprocess_stride = options.postprocess_stride
+    accel_config = options.accel_config
+    partial_split = options.partial_split
+    partial_n_steps = options.partial_n_steps
+    host_mem_per_worker_gb = options.host_mem_per_worker_gb
+    host_mem_reserve_gb = options.host_mem_reserve_gb
+
     t = time.time()
     gpu_quotas = gpu_quotas[:]
     n_cpus = _host_memory_cap(n_cpus, host_mem_per_worker_gb,
@@ -590,11 +599,13 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             original_task_names,
             split,
             n_tasks, n_gpus, n_cpus,
-            arc_logger=arc_logger,
-            n_original_tasks=n_tasks,
-            quiet=True,       # phase-1 task events → DEBUG only (not cluttering console)
-            verbose=True,
-            accel_config=measure_config,
+            ParallelRunOptions(
+                arc_logger=arc_logger,
+                n_original_tasks=n_tasks,
+                quiet=True,  # phase-1 task events → DEBUG only
+                verbose=True,
+                accel_config=measure_config,
+            ),
         )
         arc_logger.info(f'Phase 1 complete in {t_p1:.1f}s')
         save_memory_cache(split, n_gpus, memory_dict, measure_config)
@@ -665,20 +676,22 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             sorted_names,
             split,
             len(sorted_names), n_gpus, n_cpus,
-            collect_logger_data=True,
-            track_progress=True,
-            arc_logger=arc_logger,
-            solutions_json=solutions_json,
-            task_original_idx=task_original_idx,
-            n_original_tasks=n_tasks,
-            quiet=False,
-            verbose=True,
-            postprocess_stride=postprocess_stride,
-            accel_config=accel_config,
-            partial_split=split,
-            partial_n_steps=n_steps,
-            host_mem_per_worker_gb=host_mem_per_worker_gb,
-            host_mem_reserve_gb=host_mem_reserve_gb,
+            ParallelRunOptions(
+                collect_logger_data=True,
+                track_progress=True,
+                arc_logger=arc_logger,
+                solutions_json=solutions_json,
+                task_original_idx=task_original_idx,
+                n_original_tasks=n_tasks,
+                quiet=False,
+                verbose=True,
+                postprocess_stride=postprocess_stride,
+                accel_config=accel_config,
+                partial_split=split,
+                partial_n_steps=n_steps,
+                host_mem_per_worker_gb=host_mem_per_worker_gb,
+                host_mem_reserve_gb=host_mem_reserve_gb,
+            ),
         )
     else:
         solutions_dict, loggers_data, t_p2 = {}, {}, 0.0
