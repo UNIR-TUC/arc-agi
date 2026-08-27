@@ -1,0 +1,254 @@
+==================================================================
+  COMPARISON   g_comp_mw03  ->  g_comp_mw06
+  accel preset compile  ->  compile
+==================================================================
+
+  Throughput / speed (higher is better):
+  wall_time_s               : 4633.5 s -> 1996.2 s  ↓ -2637.3 s (-56.9%)   [OK ]
+  steps_per_s_phase2        : 3.27 -> 7.52  ↑ +4.2 (+130.0%)   [OK ]
+  phase1_s                  : 46.3 -> None
+  steps_per_s_aggregate     : 3.2 -> 7.5  ↑ +4.3 (+134.4%)   [OK ]
+  workers_per_hour          : 15.54 -> 18.03  ↑ +2.5 (+16.0%)   [OK ]
+  mean_worker_lifetime_s    : 630.8 s -> 969.4 s  ↑ +338.6 s (+53.7%)   [REGRESSION]
+
+  CPU pressure (must NOT get worse; ±2.0 pp is noise):
+  cpu_mean_pct              : 18.2 % -> 32.0 %  ↑ +13.8 % (+75.8%)   [REGRESSION]
+  cpu_saturation_fraction   : 0.0 -> 0.0  = +0.0   [OK ]
+
+  Silicon utilisation (higher is better):
+  mean_workers              : 2.72 -> 4.85  ↑ +2.1 (+78.3%)   [OK ]
+  max_helper_procs          : 18 -> 32  ↑ +14.0 (+77.8%)   [info]
+  gpu_util_mean_pct         : 91.1 % -> 98.7 %  ↑ +7.6 % (+8.3%)   [OK ]
+  gpu_mem_busy_mean_pct     : 2.2 % -> 2.1 %  ↓ -0.1 % (-4.5%)   [REGRESSION]
+
+  Energy efficiency (lower is better; mean power is informational —
+  drawing more watts is fine if the work per watt-hour improves):
+  gpu_power_mean_w          : 86.5 W -> 102.4 W  ↑ +15.9 W (+18.4%)   [info]
+  energy_wh_per_1k_steps    : 7.4309 Wh -> 3.7859 Wh  ↓ -3.6 Wh (-49.1%)   [OK ]
+  energy_wh_per_worker      : 5.5731 Wh -> 5.6789 Wh  ↑ +0.1 Wh (+1.9%)   [REGRESSION]
+
+  Accuracy (must NOT get worse):
+  solved_fraction           : 0.3 -> 0.3  = +0.0   [OK ]
+  NOTE: only 10 tasks — pass@2 is noisy at this sample size; confirm on a larger split before concluding.
+==================================================================
+  ⚠  CPU pressure INCREASED — this change worsens the bottleneck.
+==================================================================
+
+
+==================================================================
+  COMPARISON   g_comp_mw06  ->  g_comp_mw10
+  accel preset compile  ->  compile
+==================================================================
+
+  Throughput / speed (higher is better):
+  wall_time_s               : 1996.2 s -> 1923.2 s  ↓ -73.0 s (-3.7%)   [OK ]
+  steps_per_s_phase2        : 7.52 -> 7.81  ↑ +0.3 (+3.9%)   [OK ]
+  phase1_s                  : None -> None
+  steps_per_s_aggregate     : 7.5 -> 7.8  ↑ +0.3 (+4.0%)   [OK ]
+  workers_per_hour          : 18.03 -> 18.72  ↑ +0.7 (+3.8%)   [OK ]
+  mean_worker_lifetime_s    : 969.4 s -> 1492.9 s  ↑ +523.5 s (+54.0%)   [REGRESSION]
+
+  CPU pressure (must NOT get worse; ±2.0 pp is noise):
+  cpu_mean_pct              : 32.0 % -> 56.7 %  ↑ +24.7 % (+77.2%)   [REGRESSION]
+  cpu_saturation_fraction   : 0.0 -> 0.0  = +0.0   [OK ]
+
+  Silicon utilisation (higher is better):
+  mean_workers              : 4.85 -> 7.76  ↑ +2.9 (+60.0%)   [OK ]
+  max_helper_procs          : 32 -> 52  ↑ +20.0 (+62.5%)   [info]
+  gpu_util_mean_pct         : 98.7 % -> 98.0 %  ↓ -0.7 % (-0.7%)   [REGRESSION]
+  gpu_mem_busy_mean_pct     : 2.1 % -> 2.0 %  ↓ -0.1 % (-4.8%)   [REGRESSION]
+
+  Energy efficiency (lower is better; mean power is informational —
+  drawing more watts is fine if the work per watt-hour improves):
+  gpu_power_mean_w          : 102.4 W -> 102.7 W  ↑ +0.3 W (+0.3%)   [info]
+  energy_wh_per_1k_steps    : 3.7859 Wh -> 3.6856 Wh  ↓ -0.1 Wh (-2.6%)   [OK ]
+  energy_wh_per_worker      : 5.6789 Wh -> 5.5284 Wh  ↓ -0.2 Wh (-2.7%)   [OK ]
+
+  Accuracy (must NOT get worse):
+  solved_fraction           : 0.3 -> 0.3  = +0.0   [OK ]
+  NOTE: only 10 tasks — pass@2 is noisy at this sample size; confirm on a larger split before concluding.
+==================================================================
+  ⚠  CPU pressure INCREASED — this change worsens the bottleneck.
+==================================================================
+
+
+==================================================================
+  COMPARISON   g_comp_mw10  ->  g_comp_mw14
+  accel preset compile  ->  compile
+==================================================================
+
+  Throughput / speed (higher is better):
+  wall_time_s               : 1923.2 s -> 1842.2 s  ↓ -81.0 s (-4.2%)   [OK ]
+  steps_per_s_phase2        : 7.81 -> 8.15  ↑ +0.3 (+4.4%)   [OK ]
+  phase1_s                  : None -> None
+  steps_per_s_aggregate     : 7.8 -> 8.1  ↑ +0.3 (+3.8%)   [OK ]
+  workers_per_hour          : 18.72 -> 19.54  ↑ +0.8 (+4.4%)   [OK ]
+  mean_worker_lifetime_s    : 1492.9 s -> 1440.3 s  ↓ -52.6 s (-3.5%)   [OK ]
+
+  CPU pressure (must NOT get worse; ±2.0 pp is noise):
+  cpu_mean_pct              : 56.7 % -> 56.9 %  ↑ +0.2 % (+0.4%)   [OK~]
+  cpu_saturation_fraction   : 0.0 -> 0.0  = +0.0   [OK ]
+
+  Silicon utilisation (higher is better):
+  mean_workers              : 7.76 -> 7.81  ↑ +0.0 (+0.6%)   [OK ]
+  max_helper_procs          : 52 -> 52  = +0.0 (+0.0%)   [info]
+  gpu_util_mean_pct         : 98.0 % -> 97.7 %  ↓ -0.3 % (-0.3%)   [REGRESSION]
+  gpu_mem_busy_mean_pct     : 2.0 % -> 2.3 %  ↑ +0.3 % (+15.0%)   [OK ]
+
+  Energy efficiency (lower is better; mean power is informational —
+  drawing more watts is fine if the work per watt-hour improves):
+  gpu_power_mean_w          : 102.7 W -> 102.0 W  ↓ -0.7 W (-0.7%)   [info]
+  energy_wh_per_1k_steps    : 3.6856 Wh -> 3.5075 Wh  ↓ -0.2 Wh (-4.8%)   [OK ]
+  energy_wh_per_worker      : 5.5284 Wh -> 5.2612 Wh  ↓ -0.3 Wh (-4.8%)   [OK ]
+
+  Accuracy (must NOT get worse):
+  solved_fraction           : 0.3 -> 0.3  = +0.0   [OK ]
+  NOTE: only 10 tasks — pass@2 is noisy at this sample size; confirm on a larger split before concluding.
+==================================================================
+  ✓  CPU pressure did not get worse and pass@2 held up.
+==================================================================
+
+==================================================================
+  COMPARISON   g_comp_mw10  ->  h_graphs_clone
+  accel preset compile  ->  compile
+==================================================================
+
+  Throughput / speed (higher is better):
+  wall_time_s               : 1923.2 s -> 1018.2 s  ↓ -905.0 s (-47.1%)   [OK ]
+  steps_per_s_phase2        : 7.81 -> 14.76  ↑ +7.0 (+89.0%)   [OK ]
+  phase1_s                  : None -> None
+  steps_per_s_aggregate     : 7.8 -> 14.7  ↑ +6.9 (+88.5%)   [OK ]
+  workers_per_hour          : 18.72 -> 35.36  ↑ +16.6 (+88.9%)   [OK ]
+  mean_worker_lifetime_s    : 1492.9 s -> 921.2 s  ↓ -571.7 s (-38.3%)   [OK ]
+
+  CPU pressure (must NOT get worse; ±2.0 pp is noise):
+  cpu_mean_pct              : 56.7 % -> 61.9 %  ↑ +5.2 % (+9.2%)   [REGRESSION]
+  cpu_saturation_fraction   : 0.0 -> 0.126  ↑ +0.1   [REGRESSION]
+
+  Silicon utilisation (higher is better):
+  mean_workers              : 7.76 -> 9.04  ↑ +1.3 (+16.5%)   [OK ]
+  max_helper_procs          : 52 -> 52  = +0.0 (+0.0%)   [info]
+  gpu_util_mean_pct         : 98.0 % -> 98.1 %  ↑ +0.1 % (+0.1%)   [OK ]
+  gpu_mem_busy_mean_pct     : 2.0 % -> 1.7 %  ↓ -0.3 % (-15.0%)   [REGRESSION]
+
+  Energy efficiency (lower is better; mean power is informational —
+  drawing more watts is fine if the work per watt-hour improves):
+  gpu_power_mean_w          : 102.7 W -> 91.4 W  ↓ -11.3 W (-11.0%)   [info]
+  energy_wh_per_1k_steps    : 3.6856 Wh -> 1.7222 Wh  ↓ -2.0 Wh (-53.3%)   [OK ]
+  energy_wh_per_worker      : 5.5284 Wh -> 2.5834 Wh  ↓ -2.9 Wh (-53.3%)   [OK ]
+
+  Accuracy (must NOT get worse):
+  solved_fraction           : 0.3 -> 0.0  ↓ -0.3   [REGRESSION]
+  NOTE: only 10 tasks — pass@2 is noisy at this sample size; confirm on a larger split before concluding.
+==================================================================
+  ⚠  pass@2 DROPPED by 30.0 points (tolerance 0.0) — the speedup is not free.
+==================================================================
+
+==================================================================
+  COMPARISON   g_comp_mw10  ->  i_warm_2
+  accel preset compile  ->  compile
+==================================================================
+
+  Throughput / speed (higher is better):
+  wall_time_s               : 1923.2 s -> 1845.2 s  ↓ -78.0 s (-4.1%)   [OK ]
+  steps_per_s_phase2        : 7.81 -> 8.14  ↑ +0.3 (+4.2%)   [OK ]
+  phase1_s                  : None -> None
+  steps_per_s_aggregate     : 7.8 -> 8.1  ↑ +0.3 (+3.8%)   [OK ]
+  workers_per_hour          : 18.72 -> 19.51  ↑ +0.8 (+4.2%)   [OK ]
+  mean_worker_lifetime_s    : 1492.9 s -> 1427.9 s  ↓ -65.0 s (-4.4%)   [OK ]
+
+  CPU pressure (must NOT get worse; ±2.0 pp is noise):
+  cpu_mean_pct              : 56.7 % -> 56.2 %  ↓ -0.5 % (-0.9%)   [OK~]
+  cpu_saturation_fraction   : 0.0 -> 0.0  = +0.0   [OK ]
+
+  Silicon utilisation (higher is better):
+  mean_workers              : 7.76 -> 7.73  ↓ -0.0 (-0.4%)   [REGRESSION]
+  max_helper_procs          : 52 -> 52  = +0.0 (+0.0%)   [info]
+  gpu_util_mean_pct         : 98.0 % -> 97.7 %  ↓ -0.3 % (-0.3%)   [REGRESSION]
+  gpu_mem_busy_mean_pct     : 2.0 % -> 2.2 %  ↑ +0.2 % (+10.0%)   [OK ]
+
+  Energy efficiency (lower is better; mean power is informational —
+  drawing more watts is fine if the work per watt-hour improves):
+  gpu_power_mean_w          : 102.7 W -> 101.6 W  ↓ -1.1 W (-1.1%)   [info]
+  energy_wh_per_1k_steps    : 3.6856 Wh -> 3.4934 Wh  ↓ -0.2 Wh (-5.2%)   [OK ]
+  energy_wh_per_worker      : 5.5284 Wh -> 5.2402 Wh  ↓ -0.3 Wh (-5.2%)   [OK ]
+
+  Accuracy (must NOT get worse):
+  solved_fraction           : 0.3 -> 0.3  = +0.0   [OK ]
+  NOTE: only 10 tasks — pass@2 is noisy at this sample size; confirm on a larger split before concluding.
+==================================================================
+  ✓  CPU pressure did not get worse and pass@2 held up.
+==================================================================
+
+
+==================================================================
+  COMPARISON   i_warm_2  ->  i_warm_3
+  accel preset compile  ->  compile
+==================================================================
+
+  Throughput / speed (higher is better):
+  wall_time_s               : 1845.2 s -> 1756.2 s  ↓ -89.0 s (-4.8%)   [OK ]
+  steps_per_s_phase2        : 8.14 -> 8.55  ↑ +0.4 (+5.0%)   [OK ]
+  phase1_s                  : None -> None
+  steps_per_s_aggregate     : 8.1 -> 8.5  ↑ +0.4 (+4.9%)   [OK ]
+  workers_per_hour          : 19.51 -> 20.5  ↑ +1.0 (+5.1%)   [OK ]
+  mean_worker_lifetime_s    : 1427.9 s -> 1183.8 s  ↓ -244.1 s (-17.1%)   [OK ]
+
+  CPU pressure (must NOT get worse; ±2.0 pp is noise):
+  cpu_mean_pct              : 56.2 % -> 48.6 %  ↓ -7.6 % (-13.5%)   [OK ]
+  cpu_saturation_fraction   : 0.0 -> 0.0  = +0.0   [OK ]
+
+  Silicon utilisation (higher is better):
+  mean_workers              : 7.73 -> 6.74  ↓ -1.0 (-12.8%)   [REGRESSION]
+  max_helper_procs          : 52 -> 47  ↓ -5.0 (-9.6%)   [info]
+  gpu_util_mean_pct         : 97.7 % -> 98.7 %  ↑ +1.0 % (+1.0%)   [OK ]
+  gpu_mem_busy_mean_pct     : 2.2 % -> 2.1 %  ↓ -0.1 % (-4.5%)   [REGRESSION]
+
+  Energy efficiency (lower is better; mean power is informational —
+  drawing more watts is fine if the work per watt-hour improves):
+  gpu_power_mean_w          : 101.6 W -> 102.4 W  ↑ +0.8 W (+0.8%)   [info]
+  energy_wh_per_1k_steps    : 3.4934 Wh -> 3.3266 Wh  ↓ -0.2 Wh (-4.8%)   [OK ]
+  energy_wh_per_worker      : 5.2402 Wh -> 4.99 Wh  ↓ -0.3 Wh (-4.8%)   [OK ]
+
+  Accuracy (must NOT get worse):
+  solved_fraction           : 0.3 -> 0.3  = +0.0   [OK ]
+  NOTE: only 10 tasks — pass@2 is noisy at this sample size; confirm on a larger split before concluding.
+==================================================================
+  ✓  CPU pressure did not get worse and pass@2 held up.
+==================================================================
+
+==================================================================
+  COMPARISON   j_base_50  ->  j_comp_50
+  accel preset baseline  ->  compile
+==================================================================
+
+  Throughput / speed (higher is better):
+  wall_time_s               : 1412.3 s -> 13476.0 s  ↑ +12063.7 s (+854.2%)   [REGRESSION]
+  steps_per_s_phase2        : None -> 5.67
+  phase1_s                  : None -> 252.7
+  steps_per_s_aggregate     : None -> 5.6
+  workers_per_hour          : 127.45 -> 27.25  ↓ -100.2 (-78.6%)   [REGRESSION]
+  mean_worker_lifetime_s    : 4.6 s -> 1259.7 s  ↑ +1255.1 s (+27284.8%)   [REGRESSION]
+
+  CPU pressure (must NOT get worse; ±2.0 pp is noise):
+  cpu_mean_pct              : 32.4 % -> 61.2 %  ↑ +28.8 % (+88.9%)   [REGRESSION]
+  cpu_saturation_fraction   : 0.0 -> 0.032  ↑ +0.0   [REGRESSION]
+
+  Silicon utilisation (higher is better):
+  mean_workers              : 8.44 -> 9.53  ↑ +1.1 (+12.9%)   [OK ]
+  max_helper_procs          : 5 -> 39  ↑ +34.0 (+680.0%)   [info]
+  gpu_util_mean_pct         : 89.4 % -> 98.8 %  ↑ +9.4 % (+10.5%)   [OK ]
+  gpu_mem_busy_mean_pct     : 0.9 % -> 4.0 %  ↑ +3.1 % (+344.4%)   [OK ]
+
+  Energy efficiency (lower is better; mean power is informational —
+  drawing more watts is fine if the work per watt-hour improves):
+  gpu_power_mean_w          : 77.1 W -> 101.8 W  ↑ +24.7 W (+32.0%)   [info]
+  energy_wh_per_1k_steps    : None -> 5.076
+  energy_wh_per_worker      : 0.6068 Wh -> 3.7323 Wh  ↑ +3.1 Wh (+515.1%)   [REGRESSION]
+
+  Accuracy (must NOT get worse):
+  solved_fraction           : None -> 0.38
+  (no ground-truth solutions in these runs — accuracy not checked)
+==================================================================
+  ⚠  CPU pressure INCREASED — this change worsens the bottleneck.
+==================================================================
