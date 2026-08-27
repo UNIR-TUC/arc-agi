@@ -1,0 +1,47 @@
+2026-08-15 17:48:20 | WARNING  | DEMO MODE — running 10 of 400 tasks in the training split
+2026-08-15 17:48:20 | INFO     | ========================================================================
+2026-08-15 17:48:20 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-08-15 17:48:20 | INFO     |   Tasks       : 10
+2026-08-15 17:48:20 | INFO     |   GPUs        : 1
+2026-08-15 17:48:20 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/arc_training_training_20260815_174820.log
+2026-08-15 17:48:20 | INFO     |   Results file: results_2026-08-15_17:48:20.txt
+2026-08-15 17:48:20 | INFO     | ========================================================================
+2026-08-15 17:48:20 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:20 | INFO     | ------------------------------------------------------------------------
+2026-08-15 17:48:20 | INFO     | PHASE: Phase 1 — SKIPPED — loaded 10 task measurements from memory_cache_training.json
+2026-08-15 17:48:20 | INFO     | ------------------------------------------------------------------------
+2026-08-15 17:48:20 | INFO     | GPU fingerprint matches cached run. Delete memory_cache_training.json to force re-measurement.
+2026-08-15 17:48:20 | DEBUG    | Phase 2 free VRAM: GPU0=14.83 GB
+2026-08-15 17:48:20 | INFO     | ------------------------------------------------------------------------
+2026-08-15 17:48:20 | INFO     | PHASE: Phase 2 — Full training  (1500 iterations × 10 tasks)
+2026-08-15 17:48:20 | INFO     | ------------------------------------------------------------------------
+2026-08-15 17:48:22 | INFO     | START [  9/10] 06df4c85  →  GPU 0
+2026-08-15 17:48:22 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:22 | INFO     | START [  5/10] 045e512c  →  GPU 0
+2026-08-15 17:48:22 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:22 | INFO     | START [  2/10] 00d62c1b  →  GPU 0
+2026-08-15 17:48:22 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:22 | INFO     | START [  1/10] 007bbfb7  →  GPU 0
+2026-08-15 17:48:22 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:22 | INFO     | START [  4/10] 025d127b  →  GPU 0
+2026-08-15 17:48:22 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:22 | INFO     | START [  8/10] 05f2a901  →  GPU 0
+2026-08-15 17:48:22 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:22 | INFO     | START [ 10/10] 08ed6ac7  →  GPU 0
+2026-08-15 17:48:22 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:22 | INFO     | START [  7/10] 05269061  →  GPU 0
+2026-08-15 17:48:22 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:22 | INFO     | START [  6/10] 0520fde7  →  GPU 0
+2026-08-15 17:48:22 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:22 | INFO     | START [  3/10] 017c7c7b  →  GPU 0
+2026-08-15 17:48:22 | DEBUG    |   GPU 0 | Used: 0.09/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-08-15 17:48:23 | DEBUG    | PROG  06df4c85  step    0/1500  (  0.0%)
+2026-08-15 17:48:23 | DEBUG    | PROG  045e512c  step    0/1500  (  0.0%)
+2026-08-15 17:48:23 | DEBUG    | PROG  00d62c1b  step    0/1500  (  0.0%)
+2026-08-15 17:48:23 | DEBUG    | PROG  007bbfb7  step    0/1500  (  0.0%)
+2026-08-15 17:48:23 | DEBUG    | PROG  025d127b  step    0/1500  (  0.0%)
+2026-08-15 17:48:23 | DEBUG    | PROG  05f2a901  step    0/1500  (  0.0%)
+2026-08-15 17:48:23 | DEBUG    | PROG  08ed6ac7  step    0/1500  (  0.0%)
+2026-08-15 17:48:23 | DEBUG    | PROG  05269061  step    0/1500  (  0.0%)
+2026-08-15 17:48:23 | DEBUG    | PROG  0520fde7  step    0/1500  (  0.0%)
+2026-08-15 17:48:23 | DEBUG    | PROG  017c7c7b  step    0/1500  (  0.0%)
