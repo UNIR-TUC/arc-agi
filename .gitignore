@@ -214,3 +214,4 @@ __marimo__/
 **results/
 **.inductor_cache
 results_*.txt
+**.partial/

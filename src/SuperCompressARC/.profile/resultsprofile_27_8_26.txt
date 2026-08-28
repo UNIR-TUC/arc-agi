@@ -223,32 +223,31 @@
 ==================================================================
 
   Throughput / speed (higher is better):
-  wall_time_s               : 1412.3 s -> 13476.0 s  ↑ +12063.7 s (+854.2%)   [REGRESSION]
-  steps_per_s_phase2        : None -> 5.67
+  wall_time_s               : 40550.7 s -> 13476.0 s  ↓ -27074.7 s (-66.8%)   [OK ]
+  steps_per_s_phase2        : 1.85 -> 5.67  ↑ +3.8 (+206.5%)   [OK ]
   phase1_s                  : None -> 252.7
-  steps_per_s_aggregate     : None -> 5.6
-  workers_per_hour          : 127.45 -> 27.25  ↓ -100.2 (-78.6%)   [REGRESSION]
-  mean_worker_lifetime_s    : 4.6 s -> 1259.7 s  ↑ +1255.1 s (+27284.8%)   [REGRESSION]
+  steps_per_s_aggregate     : 1.8 -> 5.6  ↑ +3.8 (+211.1%)   [OK ]
+  workers_per_hour          : 4.44 -> 27.25  ↑ +22.8 (+513.7%)   [OK ]
+  mean_worker_lifetime_s    : 7869.1 s -> 1259.7 s  ↓ -6609.4 s (-84.0%)   [OK ]
 
   CPU pressure (must NOT get worse; ±2.0 pp is noise):
-  cpu_mean_pct              : 32.4 % -> 61.2 %  ↑ +28.8 % (+88.9%)   [REGRESSION]
+  cpu_mean_pct              : 79.4 % -> 61.2 %  ↓ -18.2 % (-22.9%)   [OK ]
   cpu_saturation_fraction   : 0.0 -> 0.032  ↑ +0.0   [REGRESSION]
 
   Silicon utilisation (higher is better):
-  mean_workers              : 8.44 -> 9.53  ↑ +1.1 (+12.9%)   [OK ]
-  max_helper_procs          : 5 -> 39  ↑ +34.0 (+680.0%)   [info]
-  gpu_util_mean_pct         : 89.4 % -> 98.8 %  ↑ +9.4 % (+10.5%)   [OK ]
-  gpu_mem_busy_mean_pct     : 0.9 % -> 4.0 %  ↑ +3.1 % (+344.4%)   [OK ]
+  mean_workers              : 9.7 -> 9.53  ↓ -0.2 (-1.8%)   [REGRESSION]
+  max_helper_procs          : 3 -> 39  ↑ +36.0 (+1200.0%)   [info]
+  gpu_util_mean_pct         : 99.9 % -> 98.8 %  ↓ -1.1 % (-1.1%)   [REGRESSION]
+  gpu_mem_busy_mean_pct     : 3.7 % -> 4.0 %  ↑ +0.3 % (+8.1%)   [OK ]
 
   Energy efficiency (lower is better; mean power is informational —
   drawing more watts is fine if the work per watt-hour improves):
-  gpu_power_mean_w          : 77.1 W -> 101.8 W  ↑ +24.7 W (+32.0%)   [info]
-  energy_wh_per_1k_steps    : None -> 5.076
-  energy_wh_per_worker      : 0.6068 Wh -> 3.7323 Wh  ↑ +3.1 Wh (+515.1%)   [REGRESSION]
+  gpu_power_mean_w          : 93.7 W -> 101.8 W  ↑ +8.1 W (+8.6%)   [info]
+  energy_wh_per_1k_steps    : 14.0813 Wh -> 5.076 Wh  ↓ -9.0 Wh (-64.0%)   [OK ]
+  energy_wh_per_worker      : 21.122 Wh -> 3.7323 Wh  ↓ -17.4 Wh (-82.3%)   [OK ]
 
   Accuracy (must NOT get worse):
-  solved_fraction           : None -> 0.38
-  (no ground-truth solutions in these runs — accuracy not checked)
+  solved_fraction           : 0.36 -> 0.38  ↑ +0.0   [OK ]
 ==================================================================
   ⚠  CPU pressure INCREASED — this change worsens the bottleneck.
 ==================================================================
