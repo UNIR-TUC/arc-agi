@@ -222,6 +222,13 @@ def _host_mem_admits(gb_per_worker, reserve_gb, n_unaccounted):
     return available_gb - pending_gb >= reserve_gb
 
 
+def _cache_free_gb(cache_dir):
+    """Return free space on the cache filesystem, or None when disabled."""
+    if not cache_dir:
+        return None
+    return shutil.disk_usage(cache_dir).free / 1024**3
+
+
 # ── Core scheduler ───────────────────────────────────────────────────────────
 
 @dataclass(frozen=True)
@@ -232,6 +239,7 @@ class ResourceLimits:
     host_mem_reserve_gb: float = 8.0
     vram_margin_frac: float = 0.0
     stall_timeout_s: float = 1800.0
+    cache_min_free_gb: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -253,6 +261,8 @@ class ParallelRunOptions:
     host_mem_per_worker_gb: float = 0.0
     host_mem_reserve_gb: float = 8.0
     stall_timeout_s: float = 1800.0
+    cache_dir: Optional[str] = None
+    cache_min_free_gb: float = 0.0
 
 def parallelize_runs(
     gpu_quotas,
@@ -302,6 +312,8 @@ def parallelize_runs(
     host_mem_per_worker_gb = options.host_mem_per_worker_gb
     host_mem_reserve_gb = options.host_mem_reserve_gb
     stall_timeout_s = options.stall_timeout_s
+    cache_dir = options.cache_dir
+    cache_min_free_gb = options.cache_min_free_gb
 
     t = time.time()
     gpu_quotas = gpu_quotas[:]
@@ -318,6 +330,7 @@ def parallelize_runs(
     task_last_step   = {}   # task_name → (step, when it last changed)
     recent_launches  = []   # start times of workers still ramping up their RSS
     mem_blocked      = False
+    cache_blocked    = False
 
     with multiprocessing.Manager() as manager:
 
@@ -436,6 +449,29 @@ def parallelize_runs(
             # the same instant wedged the driver on a near-full card.
             recent_launches = [ts for ts in recent_launches
                                if time.time() - ts < _HOST_MEM_RAMP_S]
+            cache_free_gb = _cache_free_gb(cache_dir)
+            if (cache_min_free_gb > 0 and cache_free_gb is not None
+                    and cache_free_gb < cache_min_free_gb):
+                if not cache_blocked and arc_logger is not None:
+                    arc_logger.warning(
+                        f'Holding back new tasks: Inductor cache filesystem has '
+                        f'{cache_free_gb:.1f} GB free, below the '
+                        f'{cache_min_free_gb:.1f} GB minimum'
+                    )
+                cache_blocked = True
+                running = (sum(map(int, tasks_started))
+                           - sum(map(int, tasks_finished)))
+                if running == 0:
+                    raise RuntimeError(
+                        f'Inductor cache filesystem below free-space minimum: '
+                        f'{cache_free_gb:.1f} GB free < '
+                        f'{cache_min_free_gb:.1f} GB required at {cache_dir}'
+                    )
+                time.sleep(1)
+                continue
+            if cache_blocked and arc_logger is not None:
+                arc_logger.info('Inductor cache space recovered — scheduling resumed')
+            cache_blocked = False
             launched = False
             for gpu_id in range(n_gpus):
                 if launched:
@@ -610,6 +646,25 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     measure_cfg = accel.for_measurement(accel_cfg)
     measure_config = measure_cfg.to_dict()
     compiled_phase2 = accel_cfg.compile_mode != 'off'
+    cache_dir = (
+        os.path.abspath(os.environ['TORCHINDUCTOR_CACHE_DIR'])
+        if compiled_phase2 and os.environ.get('TORCHINDUCTOR_CACHE_DIR')
+        else None
+    )
+    if cache_dir:
+        os.makedirs(cache_dir, exist_ok=True)
+        cache_free_gb = _cache_free_gb(cache_dir)
+        arc_logger.info(
+            f'Inductor cache: {cache_dir} ({cache_free_gb:.1f} GB free, '
+            f'minimum {limits.cache_min_free_gb:.1f} GB)'
+        )
+        if (limits.cache_min_free_gb > 0
+                and cache_free_gb < limits.cache_min_free_gb):
+            raise RuntimeError(
+                f'Inductor cache filesystem below free-space minimum: '
+                f'{cache_free_gb:.1f} GB free < '
+                f'{limits.cache_min_free_gb:.1f} GB required at {cache_dir}'
+            )
 
     # ── Load challenge names in original JSON order ──────────────────
     with open(f'dataset/arc-agi_{split}_challenges.json', 'r') as f:
@@ -756,6 +811,8 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
                 host_mem_per_worker_gb=limits.host_mem_per_worker_gb,
                 host_mem_reserve_gb=limits.host_mem_reserve_gb,
                 stall_timeout_s=limits.stall_timeout_s,
+                cache_dir=cache_dir,
+                cache_min_free_gb=limits.cache_min_free_gb,
             ),
         )
     else:
@@ -828,6 +885,12 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             'phase2_s':           round(t_p2, 1),
             'resumed_tasks':      len(resume_solutions),
             'limits':             asdict(limits),
+            'inductor_cache': {
+                'path': cache_dir,
+                'free_gb_at_end': (
+                    round(_cache_free_gb(cache_dir), 1) if cache_dir else None
+                ),
+            },
             'compile_memory_factor': (compile_memory_factor if compiled_phase2 else None),
             'accel':              accel_cfg.describe(),
             'accel_measurement':  measure_cfg.describe(),
@@ -986,6 +1049,18 @@ if __name__ == '__main__':
             'Use 0 to disable.'
         ),
     )
+    parser.add_argument(
+        '--cache-min-free-gb',
+        type=float,
+        default=0.0,
+        metavar='GB',
+        help=(
+            'Stop launching new Phase-2 tasks when the filesystem containing '
+            'the Inductor cache has less than this much free space. Running '
+            'tasks finish and persist before the run exits. Default: 0 '
+            '(disabled).'
+        ),
+    )
 
     # ── Eje D — computational efficiency / silicon utilisation (§9.6) ──────
     accel_group = parser.add_argument_group(
@@ -1132,6 +1207,7 @@ if __name__ == '__main__':
         host_mem_reserve_gb=args.host_mem_reserve_gb,
         vram_margin_frac=args.vram_margin_frac,
         stall_timeout_s=args.task_stall_timeout,
+        cache_min_free_gb=args.cache_min_free_gb,
     )
 
     splits_to_run = (

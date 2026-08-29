@@ -617,10 +617,14 @@ Un tercer punto, tras el bucle de entrenamiento, vuelca el diagnóstico de compi
 ```python
 report = accel.compile_report(accel_cfg)
 if report:
-    print(f'[accel][{task_name}] compile times: {report}', flush=True)
+  print(f'[accel][{task_name}] torch.compile report: {report}', flush=True)
 ```
 
-Sale por `stdout`, que el profiler ya captura, y es `None` cuando no hay compilación.
+Sale por `stdout`, que el profiler ya captura, e incluye contadores explícitos de las
+cachés `FXGraph` y `AOTAutograd` (`hits`, `misses`, `bypasses`, `guard_misses`) antes del
+desglose de tiempos. Es `None` cuando no hay compilación. `compile_inner` no significa
+«generación de kernels»: también incluye el tracing de Dynamo y el trabajo de AOTAutograd
+que no haya podido reutilizarse.
 
 El bucle de entrenamiento, la medición de VRAM y el volcado de soluciones **no cambian**.
 
@@ -1741,7 +1745,11 @@ MEM_RESERVE_GB=20 ./run_evaluation_full.sh  # si la máquina tiene más cosas ab
 ```
 
 Variables disponibles: `ITERATIONS`, `MAX_WORKERS`, `MEM_PER_WORKER_GB`,
-`MEM_RESERVE_GB`, `STALL_TIMEOUT_S`, `MAX_ATTEMPTS`.
+`MEM_RESERVE_GB`, `STALL_TIMEOUT_S`, `MAX_ATTEMPTS`, `CACHE_MOUNT`,
+`CACHE_EXPECTED_UUID`, `CACHE_EXPECTED_SERIAL`, `INDUCTOR_CACHE_DIR`, `CACHE_WARN_FREE_GB`,
+`CACHE_MIN_FREE_GB`, `CACHE_MIN_FREE_INODES`, `CACHE_PREFLIGHT_ONLY` y `PYTHON_BIN`.
+El runner usa por defecto `arcagi/bin/python`, por lo que no depende de que el entorno
+virtual se haya activado en la shell.
 
 ### 18.5 Qué vigilar en el log
 
@@ -1752,6 +1760,7 @@ Variables disponibles: `ITERATIONS`, `MAX_WORKERS`, `MEM_PER_WORKER_GB`,
 | `[6 running, X.X it/s, eta Nm]`                | Ritmo agregado y ETA. Sin `it/s` tras unos minutos, algo va mal    |
 | `<tarea>:init`                                 | El worker aún no ha entrado al bucle; normal durante ~1 min        |
 | `Holding back new tasks`                       | La reserva de RAM está frenando arranques (§16.5)                  |
+| `Inductor cache filesystem has ...`            | El disco de caché cruzó el mínimo; no arrancan tareas nuevas       |
 | `<tarea> stalled ... terminating it`           | Watchdog; la tarea se reintentará en la siguiente pasada           |
 
 Al terminar quedan `submission_{split}.json` y `predictions_{split}.npz`, y
@@ -1768,5 +1777,82 @@ completo es más variado. Merece la pena mirar el log a la primera hora:
 
 Es la única decisión de los scripts que descansa en una extrapolación y no en una medida
 directa.
+
+### 18.7 Caché Inductor en el NVMe dedicado
+
+La caché calentada alcanzó **76 710 181 114 bytes** y **1 962 120 ficheros** antes de la
+ronda completa. Para no consumir el SSD del sistema se copió, con verificación `rsync`
+por checksum sin diferencias, al Corsair MP600 PRO LPX cuyo UUID es
+`7171729e-8a92-40d6-a172-634a85f1ce7f`. El original se conserva temporalmente para
+rollback.
+
+El runner espera ese filesystem en `/mnt/supercompressarc-cache` y usa
+`/mnt/supercompressarc-cache/.inductor_cache`. El montaje persistente se configura una
+sola vez como administrador:
+
+```bash
+sudo mkdir -p /mnt/supercompressarc-cache
+echo 'UUID=7171729e-8a92-40d6-a172-634a85f1ce7f /mnt/supercompressarc-cache ext4 defaults,nosuid,nodev,noatime,nofail,x-systemd.device-timeout=10s 0 2' \
+  | sudo tee -a /etc/fstab
+sudo systemctl daemon-reload
+sudo mount /mnt/supercompressarc-cache
+```
+
+No se usa `noexec`: TorchInductor carga objetos compilados desde esa ruta. Antes de cada
+intento, `run_full_split.sh` comprueba el punto de montaje exacto, UUID, `ext4`, opciones,
+permisos, espacio e inodos. Esto evita que un montaje ausente convierta accidentalmente
+la ruta en una carpeta del filesystem raíz.
+
+El preflight puede ejecutarse sin iniciar PyTorch ni ningún worker:
+
+```bash
+CACHE_PREFLIGHT_ONLY=1 ./run_training_full.sh
+```
+
+Los defaults operativos son:
+
+| Guarda                         | Default       | Acción                                                        |
+| ------------------------------ | ------------- | ------------------------------------------------------------- |
+| Aviso de espacio               | 400 GB libres | Escribe un warning antes de arrancar                          |
+| Corte de espacio               | 250 GB libres | No inicia el intento                                          |
+| Corte dinámico en Fase 2       | 250 GB libres | Deja terminar workers activos, persiste parciales y sale      |
+| Reserva de inodos              | 1 000 000      | No inicia el intento                                          |
+
+`parallel_train.py` recibe la misma ruta mediante `--inductor-cache-dir` y
+`TORCHINDUCTOR_CACHE_DIR`, y guarda la ruta y el espacio final en
+`run_metadata_{split}.json`. Cambiar la ruta forma parte de la configuración usada por el
+fingerprint de Fase 1: la primera ejecución puede repetir esa medición, pero `--resume`
+conserva todas las tareas ya terminadas.
+
+No hay borrado automático ni *eviction* por hashes: los artefactos internos no tienen una
+dependencia suficientemente trazable para podarlos con seguridad durante una campaña. Si
+se alcanza el corte, se libera o archiva una caché completa obsoleta y se relanza el mismo
+script. Para rollback, se detiene la campaña y se relanza con `CACHE_MOUNT` e
+`INDUCTOR_CACHE_DIR` apuntando a la copia original; los parciales siguen siendo válidos.
+
+### 18.8 Validación del traslado (2026-08-29)
+
+La copia se verificó con `rsync -aicn --delete`: tras un smoke test compilado, origen y
+destino siguieron siendo idénticos salvo por el `mtime` del directorio `locks/`. La tarea
+`007bbfb7`, ya ejecutada previamente, produjo:
+
+| Métrica                                      | LPX externo |
+| -------------------------------------------- | ----------- |
+| `FXGraph cache`                              | 2 hits, 0 misses, 0 bypasses |
+| Ficheros nuevos o modificados en la caché    | 0           |
+| `compile_inner`                              | 222,9 s     |
+| `fx_codegen_and_compile`                     | 6,4 s       |
+| `PyCodeCache.load_by_key_path`               | 2,4 s       |
+| Fase 2 completa, una iteración               | 241,5 s     |
+
+Que `compile_inner` marque ~223 s **no significa que se recompilasen kernels**. La métrica
+engloba el tracing de Dynamo y AOTAutograd, que vuelven a recorrer el `forward` en cada
+proceso. La caché persistente actúa después: los dos grafos fueron hits y el backend cargó
+el código existente. Es el mismo suelo de ~240 s documentado en §17.10.
+
+Como prueba de almacenamiento independiente, recorrer los metadatos de los 1 962 120
+ficheros tardó 1,47 s en el SSD raíz y 1,43 s en el LPX. No se observa penalización por el
+traslado en este patrón; la compilación está dominada por CPU/tracing, no por ancho de banda
+del NVMe.
 
 

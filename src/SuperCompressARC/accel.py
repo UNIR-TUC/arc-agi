@@ -308,7 +308,7 @@ def backend_info():
 
 
 def compile_report(cfg):
-    """Return a one-line breakdown of where torch.compile spent its time, or None.
+    """Return torch.compile timings and persistent FX graph cache counters.
 
     Compilation dominates the cost of this workload (~1200 s per task cold,
     ~250 s warm), so knowing whether it goes into Dynamo tracing (the unrolled
@@ -320,8 +320,24 @@ def compile_report(cfg):
     if cfg.compile_mode == 'off':
         return None
     try:
-        from torch._dynamo.utils import compile_times
-        return compile_times(repr='str', aggregate=True)
+        from torch._dynamo.utils import compile_times, counters
+        inductor = counters.get('inductor', {})
+        aot_autograd = counters.get('aot_autograd', {})
+        fx_cache_summary = (
+            'FXGraph cache: '
+            f'hits={inductor.get("fxgraph_cache_hit", 0)} '
+            f'misses={inductor.get("fxgraph_cache_miss", 0)} '
+            f'bypasses={inductor.get("fxgraph_cache_bypass", 0)}'
+        )
+        aot_cache_summary = (
+            'AOTAutograd cache: '
+            f'hits={aot_autograd.get("autograd_cache_hit", 0)} '
+            f'misses={aot_autograd.get("autograd_cache_miss", 0)} '
+            f'bypasses={aot_autograd.get("autograd_cache_bypass", 0)} '
+            f'guard_misses={aot_autograd.get("autograd_cache_guard_miss", 0)}'
+        )
+        return (f'{fx_cache_summary}\n{aot_cache_summary}\n'
+                f'{compile_times(repr="str", aggregate=True)}')
     except Exception:
         return None
 

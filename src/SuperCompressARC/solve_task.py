@@ -98,7 +98,7 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         # this workload, so the breakdown drives which mitigation to pursue.
         report = accel.compile_report(accel_cfg)
         if report:
-            print(f'[accel][{task_name}] compile times: {report}', flush=True)
+            print(f'[accel][{task_name}] torch.compile report: {report}', flush=True)
 
         # Get the solution
         example_list = []
