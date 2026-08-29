@@ -983,11 +983,11 @@ if __name__ == '__main__':
     parser.add_argument(
         '--iterations',
         type=int,
-        default=1500,
+        default=2000,
         metavar='N',
         help=(
             'Phase 2 training steps per task. Lower values make before/after A/B '
-            'profiling runs cheap. Default: 1500.'
+            'profiling runs cheap. Default: 2000.'
         ),
     )
     parser.add_argument(

@@ -30,6 +30,7 @@
 - [16. Estrategia para la ejecución completa (400+400)](#16-estrategia-para-la-ejecución-completa-400400)
 - [17. Campaña de confirmación (2026-08-27): bloques G–J](#17-campaña-de-confirmación-2026-08-27-bloques-gj)
 - [18. Ejecución final: scripts de producción](#18-ejecución-final-scripts-de-producción)
+- [19. Ejemplo individual compilado (`analyze_example.py`)](#19-ejemplo-individual-compilado-analyze_examplepy)
 
 > **Aviso de vigencia.** Las secciones 3 a 14 se escribieron tras la primera
 > campaña. La batería nocturna de §15 refuta dos de sus conclusiones — la
@@ -72,12 +73,12 @@ equivocado que §15.3 desmonta.
 **Veredicto final** (§17), sobre 50 tareas —cinco veces la muestra anterior— y con
 todas las correcciones aplicadas:
 
-| | baseline | compile | Δ |
-| ------------------ | ---------------- | ------------------ | ------------- |
-| Wall, 50 tareas    | 40 551 s (11,3 h)| **13 476 s (3,7 h)** | **−66,8 %** |
-| `steps_per_s_phase2` | 1,85           | **5,67**           | **+207 %**    |
-| Wh por 1 000 pasos | 14,08            | **5,08**           | −64,0 %       |
-| pass@2             | 18/50 (36 %)     | **19/50 (38 %)**   | sin pérdida   |
+|                        | baseline          | compile                    | Δ                 |
+| ---------------------- | ----------------- | -------------------------- | ------------------ |
+| Wall, 50 tareas        | 40 551 s (11,3 h) | **13 476 s (3,7 h)** | **−66,8 %** |
+| `steps_per_s_phase2` | 1,85              | **5,67**             | **+207 %**   |
+| Wh por 1 000 pasos     | 14,08             | **5,08**             | −64,0 %           |
+| pass@2                 | 18/50 (36 %)      | **19/50 (38 %)**     | sin pérdida       |
 
 Tres veces más rápido, un tercio de la energía y la precisión intacta, sin haber
 tocado una línea del núcleo. Los dos scripts de producción están en §18.
@@ -136,15 +137,15 @@ Primera campaña A/B real. Entorno: RX 9070 XT (15,92 GB), ROCm 7.2.53211,
 `torch 2.14.0.dev20260712+rocm7.2`, i9-12900K (24 hilos), 10 tareas del split
 `training`, 300 iteraciones/tarea, sin límite efectivo de `--max-workers`.
 
-| Métrica                   | `baseline` | `bf16`     | `full` (bf16 + compile) |
-| ------------------------- | ---------- | ---------- | ----------------------- |
-| Fase 1 (medición de VRAM) | 46,3 s     | 52,3 s     | **11 871,5 s**          |
-| Fase 2 (entrenamiento)    | 1 453,5 s  | 1 456,6 s  | **1 049,2 s**           |
-| Wall total                | 1 499,8 s  | 1 508,9 s  | 12 920,7 s              |
-| **steps/s en Fase 2**     | **2,06**   | 2,06       | **2,86 (+38 %)**        |
-| Concurrencia en Fase 2    | 10         | 10         | 3–4                     |
-| VRAM por tarea            | 0,91 GB    | 0,93 GB    | **3,87 GB**             |
-| Tareas resueltas          | 1/10       | 0/10       | 0/10                    |
+| Métrica                    | `baseline`   | `bf16`  | `full` (bf16 + compile) |
+| --------------------------- | -------------- | --------- | ------------------------- |
+| Fase 1 (medición de VRAM)  | 46,3 s         | 52,3 s    | **11 871,5 s**      |
+| Fase 2 (entrenamiento)      | 1 453,5 s      | 1 456,6 s | **1 049,2 s**       |
+| Wall total                  | 1 499,8 s      | 1 508,9 s | 12 920,7 s                |
+| **steps/s en Fase 2** | **2,06** | 2,06      | **2,86 (+38 %)**    |
+| Concurrencia en Fase 2      | 10             | 10        | 3–4                      |
+| VRAM por tarea              | 0,91 GB        | 0,93 GB   | **3,87 GB**         |
+| Tareas resueltas            | 1/10           | 0/10      | 0/10                      |
 
 > La comparativa agregada del profiler daba `steps_per_s_aggregate −90 %` para `full`.
 > Era un artefacto: la métrica promediaba sobre una Fase 1 que ocupó el **92 % del wall**.
@@ -159,18 +160,18 @@ Primera campaña A/B real. Entorno: RX 9070 XT (15,92 GB), ROCm 7.2.53211,
 Comparación **pareada por tarea** de la duración en Fase 2 (mismo orden de arranque,
 misma concurrencia, mismos datos):
 
-| Tarea     | baseline  | bf16      | Δ          |
-| --------- | --------- | --------- | ---------- |
-| 017c7c7b  | 1 081,0 s | 1 214,1 s | +12,3 %    |
-| 08ed6ac7  | 1 324,1 s | 1 402,3 s | +5,9 %     |
-| 007bbfb7  | 1 336,1 s | 1 401,3 s | +4,9 %     |
-| 05f2a901  | 1 301,1 s | 1 361,2 s | +4,6 %     |
-| 0520fde7  | 1 209,1 s | 1 230,1 s | +1,7 %     |
-| 06df4c85  | 1 434,2 s | 1 454,3 s | +1,4 %     |
-| 00d62c1b  | 1 424,2 s | 1 439,3 s | +1,1 %     |
-| 025d127b  | 1 361,2 s | 1 367,2 s | +0,4 %     |
-| 045e512c  | 1 451,3 s | 1 425,3 s | −1,8 %     |
-| 05269061  | 1 338,1 s | 1 290,1 s | −3,6 %     |
+| Tarea           | baseline  | bf16      | Δ               |
+| --------------- | --------- | --------- | ---------------- |
+| 017c7c7b        | 1 081,0 s | 1 214,1 s | +12,3 %          |
+| 08ed6ac7        | 1 324,1 s | 1 402,3 s | +5,9 %           |
+| 007bbfb7        | 1 336,1 s | 1 401,3 s | +4,9 %           |
+| 05f2a901        | 1 301,1 s | 1 361,2 s | +4,6 %           |
+| 0520fde7        | 1 209,1 s | 1 230,1 s | +1,7 %           |
+| 06df4c85        | 1 434,2 s | 1 454,3 s | +1,4 %           |
+| 00d62c1b        | 1 424,2 s | 1 439,3 s | +1,1 %           |
+| 025d127b        | 1 361,2 s | 1 367,2 s | +0,4 %           |
+| 045e512c        | 1 451,3 s | 1 425,3 s | −1,8 %          |
+| 05269061        | 1 338,1 s | 1 290,1 s | −3,6 %          |
 | **Media** |           |           | **+2,7 %** |
 
 8 de 10 tareas empeoran. No es ruido, y la causa está en el código: la carga es
@@ -189,13 +190,13 @@ BF16.
 
 Los mensajes `PROG` cada 100 pasos permiten separar compilación de ejecución:
 
-| Tarea (`full`) | pasos 0→100 | 100→200  | 200→300 | it/s en régimen |
-| -------------- | ----------- | -------- | ------- | --------------- |
-| 08ed6ac7       | 265 s       | **20 s** | 20 s    | ~5,0            |
-| 025d127b       | 265 s       | **31 s** | 36 s    | ~3,0            |
-| 0520fde7       | 260 s       | **39 s** | 34 s    | ~2,7            |
-| 017c7c7b       | 248 s       | **39 s** | 42 s    | ~2,5            |
-| 05f2a901       | 263 s       | **40 s** | 49 s    | ~2,5            |
+| Tarea (`full`) | pasos 0→100 | 100→200       | 200→300 | it/s en régimen |
+| ---------------- | ------------ | -------------- | -------- | ---------------- |
+| 08ed6ac7         | 265 s        | **20 s** | 20 s     | ~5,0             |
+| 025d127b         | 265 s        | **31 s** | 36 s     | ~3,0             |
+| 0520fde7         | 260 s        | **39 s** | 34 s     | ~2,7             |
+| 017c7c7b         | 248 s        | **39 s** | 42 s     | ~2,5             |
+| 05f2a901         | 263 s        | **40 s** | 49 s     | ~2,5             |
 
 La misma tarea `025d127b` en `baseline` tarda **516 s** en sus primeros 100 pasos
 (0,19 it/s). El modelo compilado corre por tanto **entre 13× y 26× más rápido por
@@ -218,22 +219,24 @@ Un **≈5× de throughput real** que la comparativa agregada no dejaba ver.
    > retenía los buffers de autotuning de Inductor. En régimen permanente una tarea
    > compilada ocupa ~0,95 GB frente a ~0,89 GB eager. El factor 4,5 que salió de aquí
    > limitó la concurrencia a 3 durante toda la batería nocturna.
+   >
 3. **Amortización.** Con caché fría, compilar 10 tareas cuesta 11 871 s y ahorra 404 s por
    cada 300 iteraciones → punto de equilibrio en **~8 800 iteraciones/tarea**. A las
    1 500–2 000 reales, en frío **aún pierde**.
    > **⚠ Corregido en §15.7.** Con la Fase 1 ya eager y `compile_threads=4`, a 1500
    > iteraciones compilar gana con holgura: −50,7 % de wall medido directamente.
+   >
 
 ### 3.4 Cambios de diseño que se derivan
 
-| Hallazgo                                    | Cambio aplicado                                                        | Referencia   |
-| ------------------------------------------- | ---------------------------------------------------------------------- | ------------ |
-| Fase 1 compilando = 92 % del wall           | `accel.for_measurement()`: la Fase 1 **nunca** compila                 | §5.3, §10.3  |
-| Medición eager subestima ×4,3 el footprint  | `--compile-memory-factor` (default 4,5) escala la medición             | §10.3        |
-| VRAM compilada limita la concurrencia       | `memory_planning` (reuso de buffers de Inductor) activo en los presets | §5.1, §5.4   |
-| Inductor monohilo tarda ~20 min/tarea       | `compile_threads` 1 → 4; `accel.compile_report()` para diagnosticar    | §5.8, §9     |
-| BF16 es más lento                           | Retirado del preset `full`; queda como preset experimental             | §5.2, §6.4   |
-| Las métricas agregadas invierten veredictos | `steps_per_s_phase2` como métrica principal de `compare()`             | §11.2        |
+| Hallazgo                                     | Cambio aplicado                                                          | Referencia    |
+| -------------------------------------------- | ------------------------------------------------------------------------ | ------------- |
+| Fase 1 compilando = 92 % del wall            | `accel.for_measurement()`: la Fase 1 **nunca** compila           | §5.3, §10.3 |
+| Medición eager subestima ×4,3 el footprint | `--compile-memory-factor` (default 4,5) escala la medición            | §10.3        |
+| VRAM compilada limita la concurrencia        | `memory_planning` (reuso de buffers de Inductor) activo en los presets | §5.1, §5.4  |
+| Inductor monohilo tarda ~20 min/tarea        | `compile_threads` 1 → 4; `accel.compile_report()` para diagnosticar | §5.8, §9    |
+| BF16 es más lento                           | Retirado del preset`full`; queda como preset experimental              | §5.2, §6.4  |
+| Las métricas agregadas invierten veredictos | `steps_per_s_phase2` como métrica principal de `compare()`          | §11.2        |
 
 > Las filas 2 y 3 partían de una premisa falsa. El default del factor es hoy **1,2** y
 > `memory_planning` queda documentado como inocuo (§15.3, §15.6). Las filas 1, 4, 5 y 6
@@ -249,6 +252,7 @@ Un **≈5× de throughput real** que la comparativa agregada no dejaba ver.
 | [solve_task.py](../../solve_task.py)                         | Modificado      | 1 parámetro nuevo (`accel_config`) + 2 llamadas                                           |
 | [parallel_train.py](../../parallel_train.py)                 | Modificado      | Flags CLI, propagación a workers, fingerprint de caché, metadatos de ejecución            |
 | [profile_parallel_train.py](../../profile_parallel_train.py) | Modificado      | Métricas de silicio/energía/exactitud, preset, guardarraíles nuevos                       |
+| [analyze_example.py](../../analyze_example.py)               | Modificado      | Preset CLI y compilación del`forward` para una tarea individual (§19)                    |
 
 Ningún cambio altera el algoritmo, la pérdida, el número de iteraciones ni la selección
 pass@2.
@@ -261,15 +265,15 @@ pass@2.
 
 Dataclass serializable (debe cruzar la frontera de `multiprocessing.spawn` como `dict`).
 
-| Campo                  | Tipo         | Default       | Significado                                                                 |
-| ---------------------- | ------------ | ------------- | --------------------------------------------------------------------------- |
-| `amp`                | `str`      | `'off'`     | `off` \| `bf16` \| `fp16`. Precisión mixta del forward (§9.6.1)     |
-| `compile_mode`       | `str`      | `'off'`     | `off` \| `default` \| `reduce-overhead` \| `max-autotune` (§9.6.2) |
-| `matmul_precision`   | `str`      | `'highest'` | Argumento de`torch.set_float32_matmul_precision` (§9.2)                  |
-| `threads_per_worker` | `int`      | `0`         | `torch.set_num_threads` por worker; `0` = no tocar                      |
-| `alloc_conf`         | `str\|None` | `None`      | `PYTORCH_HIP_ALLOC_CONF` / `PYTORCH_CUDA_ALLOC_CONF`                    |
-| `inductor_cache_dir` | `str\|None` | `None`      | `TORCHINDUCTOR_CACHE_DIR` persistente                                     |
-| `compile_threads`    | `int`      | `1`         | `TORCHINDUCTOR_COMPILE_THREADS` por worker (4 en los presets de compilación) |
+| Campo                  | Tipo         | Default       | Significado                                                                        |
+| ---------------------- | ------------ | ------------- | ---------------------------------------------------------------------------------- |
+| `amp`                | `str`      | `'off'`     | `off` \| `bf16` \| `fp16`. Precisión mixta del forward (§9.6.1)            |
+| `compile_mode`       | `str`      | `'off'`     | `off` \| `default` \| `reduce-overhead` \| `max-autotune` (§9.6.2)        |
+| `matmul_precision`   | `str`      | `'highest'` | Argumento de`torch.set_float32_matmul_precision` (§9.2)                         |
+| `threads_per_worker` | `int`      | `0`         | `torch.set_num_threads` por worker; `0` = no tocar                             |
+| `alloc_conf`         | `str\|None` | `None`      | `PYTORCH_HIP_ALLOC_CONF` / `PYTORCH_CUDA_ALLOC_CONF`                           |
+| `inductor_cache_dir` | `str\|None` | `None`      | `TORCHINDUCTOR_CACHE_DIR` persistente                                            |
+| `compile_threads`    | `int`      | `1`         | `TORCHINDUCTOR_COMPILE_THREADS` por worker (4 en los presets de compilación)    |
 | `memory_planning`    | `bool`     | `False`     | `torch._inductor.config.memory_planning`: reuso de buffers en el grafo fusionado |
 
 > **⚠ `memory_planning` no hace nada aquí** (§15.6): ni velocidad ni VRAM cambian al
@@ -292,11 +296,11 @@ Para que las comparativas A/B estén etiquetadas de forma consistente y no depen
 el operador recuerde diez flags:
 
 | Preset       | `amp` | `compile_mode` | `matmul_precision` | `threads_per_worker` | `compile_threads` | `memory_planning` | `alloc_conf`               | `inductor_cache_dir` |
-| ------------ | ----- | -------------- | ------------------ | -------------------- | ----------------- | ----------------- | -------------------------- | -------------------- |
-| `baseline`   | off   | off            | highest            | 0                    | 1                 | —                | —                          | —                    |
-| `bf16`       | bf16  | off            | high               | 1                    | 1                 | —                | —                          | —                    |
-| `compile`    | off   | default        | high               | 1                    | 4                 | sí               | —                          | `.inductor_cache`    |
-| `full`       | off   | default        | high               | 1                    | 4                 | sí               | `expandable_segments:True` | `.inductor_cache`    |
+| ------------ | ------- | ---------------- | -------------------- | ---------------------- | ------------------- | ------------------- | ---------------------------- | ---------------------- |
+| `baseline` | off     | off              | highest              | 0                      | 1                   | —                  | —                           | —                     |
+| `bf16`     | bf16    | off              | high                 | 1                      | 1                   | —                  | —                           | —                     |
+| `compile`  | off     | default          | high                 | 1                      | 4                   | sí                 | —                           | `.inductor_cache`    |
+| `full`     | off     | default          | high                 | 1                      | 4                   | sí                 | `expandable_segments:True` | `.inductor_cache`    |
 
 > **`full` ya no lleva BF16.** En la versión inicial `full` era «bf16 + compile». La
 > medición pareada de §3.1 mostró que BF16 es un 2,7 % más lento con VRAM idéntica, así
@@ -517,12 +521,12 @@ el núcleo (ver §13).
 La compilación funciona (13–26× por iteración, §3.2) pero **no es gratis**. Los tres
 costes medidos y su mitigación:
 
-| Coste                          | Medido                                         | Mitigación aplicada                                                       |
-| ------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------- |
-| Tiempo de compilación, en frío | ~1 190 s/tarea, monohilo                       | `compile_threads` 1 → 4; `compile_report()` para localizar el gasto        |
-| Tiempo de compilación, caliente| ~250 s/tarea                                   | `inductor_cache_dir` persistente (`.inductor_cache`) en los presets       |
-| VRAM                           | 0,91 GB → 3,87 GB/tarea (×4,3)                 | `memory_planning`; `--compile-memory-factor` para que el scheduler no falle |
-| Compilar donde no toca         | Fase 1 = 92 % del wall                         | `accel.for_measurement()` (§5.3)                                          |
+| Coste                            | Medido                           | Mitigación aplicada                                                            |
+| -------------------------------- | -------------------------------- | ------------------------------------------------------------------------------- |
+| Tiempo de compilación, en frío | ~1 190 s/tarea, monohilo         | `compile_threads` 1 → 4; `compile_report()` para localizar el gasto        |
+| Tiempo de compilación, caliente | ~250 s/tarea                     | `inductor_cache_dir` persistente (`.inductor_cache`) en los presets         |
+| VRAM                             | 0,91 GB → 3,87 GB/tarea (×4,3) | `memory_planning`; `--compile-memory-factor` para que el scheduler no falle |
+| Compilar donde no toca           | Fase 1 = 92 % del wall           | `accel.for_measurement()` (§5.3)                                             |
 
 > **⚠ La fila de VRAM es falsa** (§15.3) y con ella su mitigación. La compilación no
 > infla la VRAM; lo que sí multiplica —×3 a ×5— es la **RAM de host** (§15.4). Con
@@ -544,12 +548,12 @@ equilibrio baja a ~1 500 y entra en zona rentable.
 Proyección para el split completo (400 tareas × 1 500 iteraciones), extrapolando los
 throughputs medidos:
 
-| Escenario                                        | Wall estimado |
-| ------------------------------------------------ | ------------- |
-| baseline actual (1,9 it/s agregados)             | ~88 h         |
-| compile, caché fría, antes de estas correcciones | ~54 h         |
-| compile + Fase 1 eager + `compile_threads=4`     | ~25 h         |
-| lo anterior + VRAM contenida y caché caliente    | **~8–16 h**   |
+| Escenario                                          | Wall estimado      |
+| -------------------------------------------------- | ------------------ |
+| baseline actual (1,9 it/s agregados)               | ~88 h              |
+| compile, caché fría, antes de estas correcciones | ~54 h              |
+| compile + Fase 1 eager +`compile_threads=4`      | ~25 h              |
+| lo anterior + VRAM contenida y caché caliente     | **~8–16 h** |
 
 Es el objetivo de §9.6.3 (15–30 h), alcanzado por una vía distinta a la que asumía el
 documento de arquitectura: no por precisión mixta, sino por reducción de lanzamientos.
@@ -636,17 +640,17 @@ El bucle de entrenamiento, la medición de VRAM y el volcado de soluciones **no 
 
 Grupo *"Eje D — acceleration (all OFF by default: baseline behaviour)"*:
 
-| Flag                                                     | Default      | Descripción                                              |
-| -------------------------------------------------------- | ------------ | --------------------------------------------------------- |
-| `--accel-preset {baseline,bf16,compile,full}`          | `baseline` | Bundle de ajustes; los flags individuales lo sobrescriben |
-| `--amp {off,bf16,fp16}`                                | del preset   | Precisión mixta del forward                              |
-| `--compile {off,default,reduce-overhead,max-autotune}` | del preset   | Modo de`torch.compile`                                  |
-| `--matmul-precision {highest,high,medium}`             | del preset   | Sustituto ROCm de`allow_tf32`                           |
-| `--threads-per-worker N`                               | del preset   | `torch.set_num_threads` por worker                      |
-| `--alloc-conf CONF`                                    | del preset   | Config del allocator HIP/CUDA                             |
-| `--inductor-cache-dir DIR`                             | del preset   | Caché persistente de TorchInductor                       |
-| `--compile-threads N`                                  | del preset   | `TORCHINDUCTOR_COMPILE_THREADS` por worker (4 al compilar) |
-| `--memory-planning` / `--no-memory-planning`           | del preset   | Reuso de buffers de Inductor; palanca principal contra la inflación de VRAM |
+| Flag                                                     | Default      | Descripción                                                                    |
+| -------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------- |
+| `--accel-preset {baseline,bf16,compile,full}`          | `baseline` | Bundle de ajustes; los flags individuales lo sobrescriben                       |
+| `--amp {off,bf16,fp16}`                                | del preset   | Precisión mixta del forward                                                    |
+| `--compile {off,default,reduce-overhead,max-autotune}` | del preset   | Modo de`torch.compile`                                                        |
+| `--matmul-precision {highest,high,medium}`             | del preset   | Sustituto ROCm de`allow_tf32`                                                 |
+| `--threads-per-worker N`                               | del preset   | `torch.set_num_threads` por worker                                            |
+| `--alloc-conf CONF`                                    | del preset   | Config del allocator HIP/CUDA                                                   |
+| `--inductor-cache-dir DIR`                             | del preset   | Caché persistente de TorchInductor                                             |
+| `--compile-threads N`                                  | del preset   | `TORCHINDUCTOR_COMPILE_THREADS` por worker (4 al compilar)                    |
+| `--memory-planning` / `--no-memory-planning`         | del preset   | Reuso de buffers de Inductor; palanca principal contra la inflación de VRAM    |
 | `--compile-memory-factor F`                            | `1,2`      | Escala las mediciones eager de Fase 1 cuando la Fase 2 compila (§10.3, §15.3) |
 
 Flag auxiliar, fuera de §9.6 pero necesario para abaratar los A/B:
@@ -788,7 +792,7 @@ La energía se integra rectangularmente: `energy_wh += power_w * Δt / 3600`.
 | `gpu`        | `mem_busy_mean_pct`, `power_mean_w`, `power_max_w`, `energy_wh` | De las series muestreadas                    |
 | `efficiency` | `planned_train_steps`                                                 | `Σ (n_steps × n_tasks)` de los metadatos |
 | `efficiency` | `phase1_s`, `phase2_s`                                              | De los metadatos                             |
-| `efficiency` | **`steps_per_s_phase2`**                                              | `planned_train_steps / phase2_s`           |
+| `efficiency` | **`steps_per_s_phase2`**                                        | `planned_train_steps / phase2_s`           |
 | `efficiency` | `steps_per_s_aggregate`                                               | `planned_train_steps / wall_time`          |
 | `efficiency` | `energy_wh_per_1k_steps`                                              | `energy_wh / (planned_steps/1000)`         |
 | `efficiency` | `energy_wh_per_worker`                                                | `energy_wh / workers_completed`            |
@@ -913,29 +917,29 @@ un estado frío (`memory_cache_training.json` y `.inductor_cache` purgados **una
 y a partir de ahí **no vuelve a purgar**: con la Fase 1 siempre eager, la misma medición es
 válida para los presets eager y compilado.
 
-| Bloque | Runs                             | Pregunta que responde                                              |
-| ------ | -------------------------------- | ------------------------------------------------------------------ |
-| A      | `e_base_mw4`, `e_base_mw10`      | ¿Cuánto del efecto era concurrencia y no compilación?              |
-| B      | `e_comp_cold`, `e_comp_warm`     | ¿Cuánto del coste de compilación recupera la caché persistente?    |
-| C      | `e_comp_noexp`, `e_comp_nomp`    | ¿Se puede bajar la VRAM compilada y recuperar concurrencia?         |
-| D      | `e_base_1500`, `e_comp_1500`     | **¿Compensa compilar a las iteraciones reales?**                    |
-| E      | `e_graphs`                       | ¿Los HIP graphs eliminan el resto del overhead de lanzamiento?      |
-| F      | `e_bf16_1500`                    | Control: confirmar que BF16 sigue sin aportar a escala real         |
+| Bloque | Runs                              | Pregunta que responde                                               |
+| ------ | --------------------------------- | ------------------------------------------------------------------- |
+| A      | `e_base_mw4`, `e_base_mw10`   | ¿Cuánto del efecto era concurrencia y no compilación?            |
+| B      | `e_comp_cold`, `e_comp_warm`  | ¿Cuánto del coste de compilación recupera la caché persistente? |
+| C      | `e_comp_noexp`, `e_comp_nomp` | ¿Se puede bajar la VRAM compilada y recuperar concurrencia?        |
+| D      | `e_base_1500`, `e_comp_1500`  | **¿Compensa compilar a las iteraciones reales?**             |
+| E      | `e_graphs`                      | ¿Los HIP graphs eliminan el resto del overhead de lanzamiento?     |
+| F      | `e_bf16_1500`                   | Control: confirmar que BF16 sigue sin aportar a escala real         |
 
 El bloque D es el decisivo: es el único que se ejecuta en el régimen de iteraciones donde
 la amortización de §7.3 predice que la compilación gana.
 
 Criterios de aceptación:
 
-| Métrica                    | Criterio                                    |
-| --------------------------- | ------------------------------------------- |
-| `steps_per_s_phase2`      | ↑ ≥ 1,5× (métrica principal)              |
-| `phase1_s`                | no ↑ respecto al baseline                   |
-| `gpu_util_mean_pct`       | ↑                                          |
-| `energy_wh_per_1k_steps`  | ↓                                          |
-| `cpu_saturation_fraction` | no ↑                                       |
-| `solved_fraction`         | no ↓ — **sólo evaluable con ≥1500 iter**   |
-| Código de salida           | `0`                                       |
+| Métrica                    | Criterio                                          |
+| --------------------------- | ------------------------------------------------- |
+| `steps_per_s_phase2`      | ↑ ≥ 1,5× (métrica principal)                  |
+| `phase1_s`                | no ↑ respecto al baseline                        |
+| `gpu_util_mean_pct`       | ↑                                                |
+| `energy_wh_per_1k_steps`  | ↓                                                |
+| `cpu_saturation_fraction` | no ↑                                             |
+| `solved_fraction`         | no ↓ —**sólo evaluable con ≥1500 iter** |
+| Código de salida           | `0`                                             |
 
 ---
 
@@ -943,19 +947,19 @@ Criterios de aceptación:
 
 ### 13.1 Riesgos conocidos
 
-| Riesgo                                                          | Mitigación implementada                                                     | Mitigación pendiente            |
-| --------------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------- |
-| BF16 agrava el*posterior collapse* (§8.2.4, §9.6.1)         | Guardarraíl de exactitud (exit 3); KL siempre en FP32; BF16 fuera de `full` | *Free-bits* del Eje B §9.4.1  |
-| **Compilación ×4,3 en VRAM → concurrencia 10→3**              | `memory_planning`; `--compile-memory-factor` para que el scheduler acierte  | **Riesgo inexistente**: era un artefacto de medición (§15.3) |
-| **Coste de compilación ~1 190 s/tarea en frío**                | Fase 1 eager (§10.3); `compile_threads=4`; caché persistente               | Medido en **~159 s/tarea** tras las correcciones (§15.8) |
-| **La compilación multiplica ×3–×5 la RAM de host**             | `--host-mem-per-worker-gb` acota la concurrencia (§15.4)                    | Calibrar el valor con el bloque G |
-| `--compile-memory-factor` es una constante empírica            | Recalibrada a **1,2** con VRAM de toda la GPU (§15.3)                       | —                               |
-| Compilar no amortiza en runs cortos                             | Punto de equilibrio real ~290 iteraciones/tarea (§15.8)                     | —                               |
-| `reduce-overhead` devuelve buffers de cudagraph reutilizados    | `accel._clone_wrap` copia las salidas (§15.9)                              | Bloque H debe confirmar que pass@2 se recupera |
-| Una ejecución de 400 tareas pierde todo si falla                | `.partial/{split}/` + `--resume` (§16.3)                                    | —                               |
-| Caché de Fase 1 obsoleta tras cambiar de preset                | La config de medición forma parte del fingerprint                            | —                               |
-| Fallo de compilación mata una tarea                            | `_EagerFallback` revierte a eager                                          | —                               |
-| El `peak=` que se loguea en Fase 2 mide **toda la GPU**        | — (no afecta al scheduler: la Fase 1 corre de una en una)                   | Añadir `max_memory_allocated()` al mensaje |
+| Riesgo                                                         | Mitigación implementada                                                       | Mitigación pendiente                                                |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| BF16 agrava el*posterior collapse* (§8.2.4, §9.6.1)        | Guardarraíl de exactitud (exit 3); KL siempre en FP32; BF16 fuera de`full`  | *Free-bits* del Eje B §9.4.1                                      |
+| **Compilación ×4,3 en VRAM → concurrencia 10→3**     | `memory_planning`; `--compile-memory-factor` para que el scheduler acierte | **Riesgo inexistente**: era un artefacto de medición (§15.3) |
+| **Coste de compilación ~1 190 s/tarea en frío**        | Fase 1 eager (§10.3);`compile_threads=4`; caché persistente                | Medido en**~159 s/tarea** tras las correcciones (§15.8)       |
+| **La compilación multiplica ×3–×5 la RAM de host**   | `--host-mem-per-worker-gb` acota la concurrencia (§15.4)                    | Calibrar el valor con el bloque G                                    |
+| `--compile-memory-factor` es una constante empírica         | Recalibrada a**1,2** con VRAM de toda la GPU (§15.3)                    | —                                                                   |
+| Compilar no amortiza en runs cortos                            | Punto de equilibrio real ~290 iteraciones/tarea (§15.8)                       | —                                                                   |
+| `reduce-overhead` devuelve buffers de cudagraph reutilizados | `accel._clone_wrap` copia las salidas (§15.9)                               | Bloque H debe confirmar que pass@2 se recupera                       |
+| Una ejecución de 400 tareas pierde todo si falla              | `.partial/{split}/` + `--resume` (§16.3)                                  | —                                                                   |
+| Caché de Fase 1 obsoleta tras cambiar de preset               | La config de medición forma parte del fingerprint                             | —                                                                   |
+| Fallo de compilación mata una tarea                           | `_EagerFallback` revierte a eager                                            | —                                                                   |
+| El`peak=` que se loguea en Fase 2 mide **toda la GPU** | — (no afecta al scheduler: la Fase 1 corre de una en una)                     | Añadir`max_memory_allocated()` al mensaje                         |
 
 ### 13.2 Fuera de alcance (deliberadamente)
 
@@ -987,16 +991,16 @@ con la misma semilla, y lo que se compara es el pass@2 agregado sobre el split.
 
 ## 14. Trazabilidad con el documento de arquitectura
 
-| Sección de[COMPRESS_ARCHITECTURE_30_06.md](COMPRESS_ARCHITECTURE_30_06.md) | Estado                                                   | Dónde                               |
-| -------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------ |
-| §9.6.1 Mixed precision BF16                                               | **Implementado, medido y descartado** (−2,7 %)     | `accel.apply` / §3.1, §6.4       |
-| §9.6.2`torch.compile` + Triton-ROCm                                     | **Implementado y validado** (13–26× por iteración) | `accel.apply` / §3.2             |
-| §9.6.3 punto 1 — concurrencia                                            | Ya existía (`--max-workers`); ahora **medible** | `parallel_train.py`, profiler      |
-| §9.6.3 puntos 2–4                                                        | No implementado                                          | Fuera de alcance (§13.2)            |
-| §9.2 sustitución de`allow_tf32`                                        | **Implementado**                                   | `accel.configure_process`          |
-| §9.2 acumulación de KL en FP32                                           | **Garantizado por construcción**                  | Análisis §6.1                      |
-| §9.11.3 paso 6 (`torch.compile`, único paso pendiente del Eje H)       | **Implementado**                        | `accel.apply`                      |
-| §9.11.4 contrato de instrumentación                                      | **Ampliado** con fases, silicio, energía y exactitud | `profile_parallel_train.py`        |
+| Sección de[COMPRESS_ARCHITECTURE_30_06.md](COMPRESS_ARCHITECTURE_30_06.md) | Estado                                                      | Dónde                          |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------- |
+| §9.6.1 Mixed precision BF16                                               | **Implementado, medido y descartado** (−2,7 %)       | `accel.apply` / §3.1, §6.4  |
+| §9.6.2`torch.compile` + Triton-ROCm                                     | **Implementado y validado** (13–26× por iteración) | `accel.apply` / §3.2         |
+| §9.6.3 punto 1 — concurrencia                                            | Ya existía (`--max-workers`); ahora **medible**    | `parallel_train.py`, profiler |
+| §9.6.3 puntos 2–4                                                        | No implementado                                             | Fuera de alcance (§13.2)       |
+| §9.2 sustitución de`allow_tf32`                                        | **Implementado**                                      | `accel.configure_process`     |
+| §9.2 acumulación de KL en FP32                                           | **Garantizado por construcción**                     | Análisis §6.1                 |
+| §9.11.3 paso 6 (`torch.compile`, único paso pendiente del Eje H)       | **Implementado**                                      | `accel.apply`                 |
+| §9.11.4 contrato de instrumentación                                      | **Ampliado** con fases, silicio, energía y exactitud | `profile_parallel_train.py`   |
 
 **Correcciones al documento de arquitectura** que esta campaña obliga a registrar:
 
@@ -1008,6 +1012,7 @@ con la misma semilla, y lo que se compara es el pass@2 agregado sobre el split.
    VRAM (×4,3), que resultaron ser los dos factores dominantes.
    > **⚠ Rectificación (§15.3, §15.4).** La inflación de VRAM no existe: es de **RAM de
    > host**. Y el coste de compilación baja a ~159 s/tarea con `compile_threads=4`.
+   >
 
 **Impacto MDL**: cero. Este eje no añade ni un bit a θ, no modifica KL(z) ni el error de
 reconstrucción. Cambia únicamente **cómo** se calculan valores cuyo resultado es el mismo.
@@ -1024,18 +1029,18 @@ el régimen real de trabajo, y por eso invierte varias conclusiones de §3 y §7
 
 ### 15.1 Tabla maestra
 
-| Run             | Preset            | Iter | Wall (s) | Fase 1 | Fase 2 | **steps/s F2** | GPU util | mem_busy | VRAM pico | W medios | Wh/1k | pass@2 |
-| --------------- | ----------------- | ---- | -------- | ------ | ------ | -------------- | -------- | -------- | --------- | -------- | ----- | ------ |
-| `e_base_mw4`    | baseline, mw=4    | 300  | 1 459,2  | 46,3   | 1 409,6| 2,13           | 96,6 %   | 2,7 %    | 5 226 MB  | 92,4     | 12,49 | 1/10   |
-| `e_base_mw10`   | baseline, mw=10   | 300  | 1 219,1  | 0      | 1 217,3| 2,46           | 99,2 %   | 2,0 %    | 8 890 MB  | 99,8     | 11,19 | 0/10   |
-| `e_comp_cold`   | compile, frío     | 300  | 2 641,3  | 44,3   | 2 595,3| 1,16           | 65,6 %   | 1,6 %    | 2 902 MB  | 65,2     | 15,87 | 1/10   |
-| `e_comp_warm`   | compile, caliente | 300  | 1 990,2  | 0      | 1 988,7| 1,51           | 60,9 %   | 1,1 %    | 2 635 MB  | 60,1     | 11,11 | 2/10   |
-| `e_comp_noexp`  | compile, `alloc=""`| 300 | 1 096,1  | 44,3   | 1 050,1| 2,86           | 74,8 %   | 0,9 %    | 2 843 MB  | 73,8     | 7,49  | 2/10   |
-| `e_comp_nomp`   | compile, sin m.p. | 300  | 2 611,3  | 44,3   | 2 565,3| 1,17           | 69,2 %   | 1,6 %    | 2 865 MB  | 65,0     | 15,70 | 2/10   |
-| `e_base_1500`   | baseline          | 1500 | 6 444,8  | 44,3   | 6 400,5| 2,34           | 99,0 %   | 2,7 %    | —         | 98,9     | 11,82 | 4/10   |
-| **`e_comp_1500`** | **compile**     | 1500 | **3 178,4**| 46,3 | 3 132,1| **4,79**       | 90,9 %   | 3,4 %    | —         | 86,6     | 5,09  | **5/10** |
-| `e_graphs`      | reduce-overhead   | 1500 | 2 044,3  | 0      | 2 042,9| **7,34**       | 75,4 %   | 2,2 %    | 2 847 MB  | 69,7     | 2,64  | **0/10** |
-| `e_bf16_1500`   | bf16              | 1500 | 9 727,3  | 52,3   | 9 673,0| 1,55           | 99,4 %   | 4,0 %    | 9 424 MB  | 92,1     | 16,60 | 2/10   |
+| Run                       | Preset               | Iter | Wall (s)          | Fase 1 | Fase 2  | **steps/s F2** | GPU util | mem_busy | VRAM pico | W medios | Wh/1k | pass@2         |
+| ------------------------- | -------------------- | ---- | ----------------- | ------ | ------- | -------------------- | -------- | -------- | --------- | -------- | ----- | -------------- |
+| `e_base_mw4`            | baseline, mw=4       | 300  | 1 459,2           | 46,3   | 1 409,6 | 2,13                 | 96,6 %   | 2,7 %    | 5 226 MB  | 92,4     | 12,49 | 1/10           |
+| `e_base_mw10`           | baseline, mw=10      | 300  | 1 219,1           | 0      | 1 217,3 | 2,46                 | 99,2 %   | 2,0 %    | 8 890 MB  | 99,8     | 11,19 | 0/10           |
+| `e_comp_cold`           | compile, frío       | 300  | 2 641,3           | 44,3   | 2 595,3 | 1,16                 | 65,6 %   | 1,6 %    | 2 902 MB  | 65,2     | 15,87 | 1/10           |
+| `e_comp_warm`           | compile, caliente    | 300  | 1 990,2           | 0      | 1 988,7 | 1,51                 | 60,9 %   | 1,1 %    | 2 635 MB  | 60,1     | 11,11 | 2/10           |
+| `e_comp_noexp`          | compile,`alloc=""` | 300  | 1 096,1           | 44,3   | 1 050,1 | 2,86                 | 74,8 %   | 0,9 %    | 2 843 MB  | 73,8     | 7,49  | 2/10           |
+| `e_comp_nomp`           | compile, sin m.p.    | 300  | 2 611,3           | 44,3   | 2 565,3 | 1,17                 | 69,2 %   | 1,6 %    | 2 865 MB  | 65,0     | 15,70 | 2/10           |
+| `e_base_1500`           | baseline             | 1500 | 6 444,8           | 44,3   | 6 400,5 | 2,34                 | 99,0 %   | 2,7 %    | —        | 98,9     | 11,82 | 4/10           |
+| **`e_comp_1500`** | **compile**    | 1500 | **3 178,4** | 46,3   | 3 132,1 | **4,79**       | 90,9 %   | 3,4 %    | —        | 86,6     | 5,09  | **5/10** |
+| `e_graphs`              | reduce-overhead      | 1500 | 2 044,3           | 0      | 2 042,9 | **7,34**       | 75,4 %   | 2,2 %    | 2 847 MB  | 69,7     | 2,64  | **0/10** |
+| `e_bf16_1500`           | bf16                 | 1500 | 9 727,3           | 52,3   | 9 673,0 | 1,55                 | 99,4 %   | 4,0 %    | 9 424 MB  | 92,1     | 16,60 | 2/10           |
 
 `mem_busy` no pasa del 4 % en ninguna ejecución y la placa nunca supera 100 W de 304 W de
 TDP. La carga sigue siendo **launch-bound**, exactamente como diagnosticó §3.1.
@@ -1066,10 +1071,10 @@ barrido de concurrencia no sirve de nada mientras el modelo corra eager**.
 La evidencia de que la imputación es falsa está en `mem_max_mb`, que lee la VRAM usada de
 **toda la GPU**:
 
-| Run                                  | Tareas residentes | VRAM total | Por tarea |
-| ------------------------------------ | ----------------- | ---------- | --------- |
-| `e_base_mw10` (eager)                | 10                | 8 890 MB   | 0,89 GB   |
-| `e_comp_cold` / `noexp` / `nomp` / `e_graphs` | 3        | 2 843–2 902 MB | **~0,95 GB** |
+| Run                                                   | Tareas residentes | VRAM total      | Por tarea          |
+| ----------------------------------------------------- | ----------------- | --------------- | ------------------ |
+| `e_base_mw10` (eager)                               | 10                | 8 890 MB        | 0,89 GB            |
+| `e_comp_cold` / `noexp` / `nomp` / `e_graphs` | 3                 | 2 843–2 902 MB | **~0,95 GB** |
 
 Una tarea compilada ocupa **un 7 % más** que una eager, no un 330 % más. El 3,87 GB de §3.3
 era el pico de una Fase 1 *compilada*, cuya lectura `total_vram - free_now` incluía los
@@ -1087,13 +1092,13 @@ aplicaciones: la cifra disponible para los workers es siempre bastante menor y *
 durante la ejecución**. Consumo real máximo de la campaña, tomando `host_mem_used_max_pct`
 sobre esos 96 GB:
 
-| Run            | Procesos de tarea    | `host_mem_used_max` | RAM real usada | Suma de RSS del árbol |
-| -------------- | -------------------- | ------------------- | -------------- | --------------------- |
-| `e_base_mw4`   | 4 (eager)            | 9,4 %               | 9,0 GB         | 9,0 GB                |
-| `e_base_mw10`  | 10 (eager)           | 16,4 %              | 15,7 GB        | 19,6 GB               |
-| `e_comp_noexp` | 3 (compilado)        | 26,5 %              | 25,4 GB        | 26,6 GB               |
-| `e_comp_cold`  | 3 (compilado, frío)  | 37,9 %              | 36,4 GB        | 48,0 GB               |
-| `e_graphs`     | 3–4 (cudagraphs)     | **39,3 %**          | **37,7 GB**    | 48,9 GB               |
+| Run              | Procesos de tarea    | `host_mem_used_max` | RAM real usada    | Suma de RSS del árbol |
+| ---------------- | -------------------- | --------------------- | ----------------- | ---------------------- |
+| `e_base_mw4`   | 4 (eager)            | 9,4 %                 | 9,0 GB            | 9,0 GB                 |
+| `e_base_mw10`  | 10 (eager)           | 16,4 %                | 15,7 GB           | 19,6 GB                |
+| `e_comp_noexp` | 3 (compilado)        | 26,5 %                | 25,4 GB           | 26,6 GB                |
+| `e_comp_cold`  | 3 (compilado, frío) | 37,9 %                | 36,4 GB           | 48,0 GB                |
+| `e_graphs`     | 3–4 (cudagraphs)    | **39,3 %**      | **37,7 GB** | 48,9 GB                |
 
 > **`tree_rss_max_mb` no es RAM real.** Es la **suma** del RSS de todos los procesos del
 > árbol, y el RSS contabiliza cada página compartida una vez por proceso. En `e_graphs`
@@ -1111,20 +1116,20 @@ El coste por **proceso de tarea** —que sí es mayoritariamente privado: pesos,
 y buffers de Inductor— queda así:
 
 | Configuración             | RSS pico por worker | Nota                                   |
-| ------------------------- | ------------------- | -------------------------------------- |
-| eager                     | 1,78 GB             | —                                      |
-| compilado, caché caliente | 4,5–5,8 GB          | ×3 sobre eager                         |
-| compilado, caché fría     | 8,3–9,5 GB          | incluye el pico de trabajo de Inductor  |
+| -------------------------- | ------------------- | -------------------------------------- |
+| eager                      | 1,78 GB             | —                                     |
+| compilado, caché caliente | 4,5–5,8 GB         | ×3 sobre eager                        |
+| compilado, caché fría    | 8,3–9,5 GB         | incluye el pico de trabajo de Inductor |
 
 El planificador empaqueta **únicamente sobre VRAM**
 ([parallel_train.py](../../parallel_train.py)), así que en cuanto se corrige el factor de
 memoria nada impide que admita 14 tareas. Con 96 GB compartidos eso es peligroso:
 
-| Escenario                           | RAM de workers | Veredicto                  |
-| ----------------------------------- | -------------- | -------------------------- |
-| 10 workers, caché caliente (5,5 GB) | ~55 GB         | holgado                    |
-| 14 workers, caché caliente          | ~77 GB         | **al límite**              |
-| 14 workers, caché fría (8,5 GB)     | ~119 GB        | **OOM / swap garantizado** |
+| Escenario                            | RAM de workers | Veredicto                        |
+| ------------------------------------ | -------------- | -------------------------------- |
+| 10 workers, caché caliente (5,5 GB) | ~55 GB         | holgado                          |
+| 14 workers, caché caliente          | ~77 GB         | **al límite**             |
+| 14 workers, caché fría (8,5 GB)    | ~119 GB        | **OOM / swap garantizado** |
 
 ### 15.4.1 Dos guardas, no una
 
@@ -1156,11 +1161,11 @@ Como un worker tarda un par de minutos en alcanzar su RSS pico, los lanzados en 
 Fase 1. Lo que ese run midió en realidad fue la tercera pasada consecutiva con caché de
 Inductor caliente:
 
-| Pasada | Run             | Fase 2 (300 iter) |
-| ------ | --------------- | ----------------- |
-| 1ª     | `e_comp_cold`   | 2 595,3 s         |
-| 2ª     | `e_comp_warm`   | 1 988,7 s         |
-| 3ª     | `e_comp_noexp`  | **1 050,1 s**     |
+| Pasada | Run              | Fase 2 (300 iter)   |
+| ------ | ---------------- | ------------------- |
+| 1ª    | `e_comp_cold`  | 2 595,3 s           |
+| 2ª    | `e_comp_warm`  | 1 988,7 s           |
+| 3ª    | `e_comp_noexp` | **1 050,1 s** |
 
 La caché no se satura en una repetición: sigue mejorando en la tercera. Es una curva que
 merece medirse sin confusiones — de ahí el bloque I de §15.12.
@@ -1174,25 +1179,25 @@ recompilación completa.
 Comparando los dos runs que sólo difieren en ese flag, una vez descontado que uno recompila
 desde cero:
 
-| Métrica    | `memory_planning=True` | `=False` |
-| ---------- | ---------------------- | -------- |
-| VRAM pico  | 2 843 MB               | 2 865 MB |
-| Fase 2     | 2 595 s (frío)         | 2 565 s (frío) |
+| Métrica  | `memory_planning=True` | `=False`      |
+| --------- | ------------------------ | --------------- |
+| VRAM pico | 2 843 MB                 | 2 865 MB        |
+| Fase 2    | 2 595 s (frío)          | 2 565 s (frío) |
 
 Ni memoria ni velocidad. Se mantiene activado en los presets sólo para no invalidar la
 caché de Inductor ya poblada, y el `--help` lo dice.
 
 ### 15.7 Bloque D: el veredicto, en el régimen real
 
-| Métrica                 | `e_base_1500` | `e_comp_1500` | Δ           |
-| ----------------------- | ------------- | ------------- | ----------- |
-| Wall                    | 6 444,8 s     | 3 178,4 s     | **−50,7 %** |
-| `steps_per_s_phase2`    | 2,34          | 4,79          | **+104,7 %**|
-| CPU media (24 cores)    | 72,4 %        | 22,4 %        | −69,1 %     |
-| Wh por 1 000 pasos      | 11,82         | 5,09          | −57,0 %     |
-| Vida media por tarea    | 2 728,2 s     | 308,6 s       | −88,7 %     |
-| pass@2                  | 4/10          | **5/10**      | +1          |
-| Tareas concurrentes     | 10            | **3**         | −7          |
+| Métrica               | `e_base_1500` | `e_comp_1500` | Δ                 |
+| ---------------------- | --------------- | --------------- | ------------------ |
+| Wall                   | 6 444,8 s       | 3 178,4 s       | **−50,7 %** |
+| `steps_per_s_phase2` | 2,34            | 4,79            | **+104,7 %** |
+| CPU media (24 cores)   | 72,4 %          | 22,4 %          | −69,1 %           |
+| Wh por 1 000 pasos     | 11,82           | 5,09            | −57,0 %           |
+| Vida media por tarea   | 2 728,2 s       | 308,6 s         | −88,7 %           |
+| pass@2                 | 4/10            | **5/10**  | +1                 |
+| Tareas concurrentes    | 10              | **3**     | −7                |
 
 Duplica el throughput con un tercio de la concurrencia y sin tocar la exactitud. El colapso
 de CPU de 72,4 % a 22,4 % es un resultado del Eje H obtenido por la puerta de atrás: los
@@ -1209,11 +1214,11 @@ tarea se resuelve como `T(N) = C + N/r`:
 
 → `r = 1200 / 624,6 = ` **1,92 it/s** y `C = ` **158,8 s**.
 
-| Configuración     | Coste fijo | Régimen permanente | Frente a baseline |
-| ----------------- | ---------- | ------------------ | ----------------- |
-| baseline          | ~0 s       | 0,234 it/s         | 1×                |
-| compile           | 159 s      | **1,92 it/s**      | **8,2×**          |
-| reduce-overhead   | ~159 s     | **3,30 it/s**      | **14,1×**         |
+| Configuración  | Coste fijo | Régimen permanente | Frente a baseline |
+| --------------- | ---------- | ------------------- | ----------------- |
+| baseline        | ~0 s       | 0,234 it/s          | 1×               |
+| compile         | 159 s      | **1,92 it/s** | **8,2×**   |
+| reduce-overhead | ~159 s     | **3,30 it/s** | **14,1×**  |
 
 El baseline no tiene coste fijo apreciable: 0,246 it/s medidos a 300 iteraciones y
 0,234 a 1500 son la misma cifra.
@@ -1257,13 +1262,13 @@ el culpable es el RNG y `reduce-overhead` queda descartado en este backend.
 
 ### 15.10 BF16: el error crece con las iteraciones
 
-| Métrica              | `e_base_1500` | `e_bf16_1500` | Δ       |
-| -------------------- | ------------- | ------------- | ------- |
-| Wall                 | 6 444,8 s     | 9 727,3 s     | +50,9 % |
-| `steps_per_s_phase2` | 2,34          | 1,55          | −33,8 % |
-| Wh por 1 000 pasos   | 11,82         | 16,60         | +40,4 % |
-| VRAM pico            | —             | 9 424 MB      | +6 %    |
-| pass@2               | 4/10          | 2/10          | −2      |
+| Métrica               | `e_base_1500` | `e_bf16_1500` | Δ       |
+| ---------------------- | --------------- | --------------- | -------- |
+| Wall                   | 6 444,8 s       | 9 727,3 s       | +50,9 %  |
+| `steps_per_s_phase2` | 2,34            | 1,55            | −33,8 % |
+| Wh por 1 000 pasos     | 11,82           | 16,60           | +40,4 %  |
+| VRAM pico              | —              | 9 424 MB        | +6 %     |
+| pass@2                 | 4/10            | 2/10            | −2      |
 
 A 300 iteraciones BF16 costaba un 2,7 % (§3.1); a 1500 cuesta un **34 %**. La progresión es
 la esperada de un sobrecoste **por paso**: cada `layers.affine` añade un kernel de cast, y
@@ -1299,12 +1304,12 @@ también daña pass@2. El preset se conserva sólo para reproducir la medida.
 [night_profile_run.sh](../../night_profile_run.sh) contiene ahora los cuatro bloques que
 cierran lo que quedó abierto:
 
-| Bloque | Runs                                                | Pregunta                                                                 |
-| ------ | --------------------------------------------------- | ------------------------------------------------------------------------ |
-| **G**  | `g_comp_mw03/06/10/14`                              | Con el factor a 1,2, ¿hasta dónde escala el throughput compilado?         |
-| **H**  | `h_graphs_clone`                                     | ¿El clonado de §15.9 recupera pass@2 con `reduce-overhead`?               |
-| **I**  | `i_warm_2`, `i_warm_3`                              | La curva de calentamiento de caché, sin el confuso `--alloc-conf`         |
-| **J**  | `j_base_50`, `j_comp_50`                            | ¿Son las 10 primeras tareas representativas de un split de 400?           |
+| Bloque      | Runs                         | Pregunta                                                            |
+| ----------- | ---------------------------- | ------------------------------------------------------------------- |
+| **G** | `g_comp_mw03/06/10/14`     | Con el factor a 1,2, ¿hasta dónde escala el throughput compilado? |
+| **H** | `h_graphs_clone`           | ¿El clonado de §15.9 recupera pass@2 con`reduce-overhead`?      |
+| **I** | `i_warm_2`, `i_warm_3`   | La curva de calentamiento de caché, sin el confuso`--alloc-conf` |
+| **J** | `j_base_50`, `j_comp_50` | ¿Son las 10 primeras tareas representativas de un split de 400?    |
 
 **G es el bloque decisivo**: toda la proyección de §16 depende de si el rendimiento por
 tarea se mantiene al subir de 3 a 10 slots o si la GPU satura antes. Los cuatro puntos
@@ -1330,13 +1335,13 @@ es decir **1,2 millones de pasos de entrenamiento**.
 
 Aplicando el modelo de §15.8 a 800 tareas:
 
-| Escenario                                                   | steps/s | Wall estimado |
-| ----------------------------------------------------------- | ------- | ------------- |
-| baseline                                                    | 2,34    | ~142 h        |
-| compile con el factor 4,5 de ayer (3 slots)                 | 4,79    | ~70 h         |
-| compile, factor 1,2, si la GPU satura en el caudal ya visto | ~5,8    | ~58 h         |
-| compile, factor 1,2, si el ritmo por tarea aguanta a 10 slots| ~19    | ~21 h         |
-| lo anterior + `reduce-overhead` con pass@2 recuperada        | ~33     | ~13 h         |
+| Escenario                                                     | steps/s | Wall estimado |
+| ------------------------------------------------------------- | ------- | ------------- |
+| baseline                                                      | 2,34    | ~142 h        |
+| compile con el factor 4,5 de ayer (3 slots)                   | 4,79    | ~70 h         |
+| compile, factor 1,2, si la GPU satura en el caudal ya visto   | ~5,8    | ~58 h         |
+| compile, factor 1,2, si el ritmo por tarea aguanta a 10 slots | ~19     | ~21 h         |
+| lo anterior +`reduce-overhead` con pass@2 recuperada        | ~33     | ~13 h         |
 
 Las dos últimas filas son **cotas superiores optimistas**: suponen escalado lineal de 3 a
 10 slots, que es justo lo que el bloque G va a medir. Las tareas reales son además mayores
@@ -1356,15 +1361,15 @@ porque queda cacheada.
 
 ### 16.2 Prerrequisitos
 
-| Prerrequisito                                  | Estado | Nota                                                                 |
-| ---------------------------------------------- | ------ | -------------------------------------------------------------------- |
-| Reanudación tras un fallo                      | ✅     | `--resume` + `.partial/{split}/` (§16.3)                              |
-| Concurrencia compilada realista                | ✅     | `--compile-memory-factor 1.2`                                         |
-| Límite de RAM de host                          | ✅     | `--host-mem-per-worker-gb` + `--host-mem-reserve-gb` (§15.4.1)         |
-| Métricas de concurrencia fiables               | ✅     | §15.11                                                                |
-| Punto óptimo de `--max-workers`                | ✅     | **6** — la GPU satura ahí (§17.4)                                     |
-| ¿`reduce-overhead` utilizable?                 | ❌     | No: 0/10 incluso con el clonado (§17.5)                               |
-| Multiplicador de tareas reales                 | ✅     | 50 tareas: 5,67 steps/s compilado (§17.6)                             |
+| Prerrequisito                     | Estado | Nota                                                                |
+| --------------------------------- | ------ | ------------------------------------------------------------------- |
+| Reanudación tras un fallo        | ✅     | `--resume` + `.partial/{split}/` (§16.3)                       |
+| Concurrencia compilada realista   | ✅     | `--compile-memory-factor 1.2`                                     |
+| Límite de RAM de host            | ✅     | `--host-mem-per-worker-gb` + `--host-mem-reserve-gb` (§15.4.1) |
+| Métricas de concurrencia fiables | ✅     | §15.11                                                             |
+| Punto óptimo de`--max-workers` | ✅     | **6** — la GPU satura ahí (§17.4)                          |
+| ¿`reduce-overhead` utilizable? | ❌     | No: 0/10 incluso con el clonado (§17.5)                            |
+| Multiplicador de tareas reales    | ✅     | 50 tareas: 5,67 steps/s compilado (§17.6)                          |
 
 No queda ningún pendiente: §18 es la receta definitiva.
 
@@ -1410,15 +1415,15 @@ Cuatro cosas que no hay que cambiar entre reanudaciones:
 
 ### 16.5 Contingencias
 
-| Síntoma                                     | Causa probable                              | Acción                                              |
-| ------------------------------------------- | ------------------------------------------- | --------------------------------------------------- |
-| `Holding back new tasks` en el log          | La reserva de RAM está frenando arranques   | Normal si es puntual; si es constante, subir `--host-mem-per-worker-gb` para que el tope estático lo prevea |
-| OOM de host / swapping                      | RSS de compilación con caché fría (§15.4)   | Subir `--host-mem-per-worker-gb` a 9 y `--host-mem-reserve-gb` a 12 |
-| Cierran otras aplicaciones de la máquina    | Los workers agotaron la RAM libre           | Subir `--host-mem-reserve-gb`; el default de 8 asume un escritorio ligero |
-| OOM de VRAM                                 | Alguna tarea grande supera el margen de 1 GB| Subir `--compile-memory-factor` a 1,5               |
-| El throughput no mejora al subir workers    | La GPU satura, como el baseline en §15.2    | Quedarse en el óptimo del bloque G                  |
-| pass@2 anormalmente baja                    | Cudagraphs, si se usó `reduce-overhead`     | Volver a `--compile default` (§15.9)                |
-| La Fase 1 se re-ejecuta sin motivo          | Cambió algún flag de aceleración            | Restaurar los flags exactos de la primera ejecución |
+| Síntoma                                  | Causa probable                                | Acción                                                                                                       |
+| ----------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `Holding back new tasks` en el log      | La reserva de RAM está frenando arranques    | Normal si es puntual; si es constante, subir`--host-mem-per-worker-gb` para que el tope estático lo prevea |
+| OOM de host / swapping                    | RSS de compilación con caché fría (§15.4) | Subir`--host-mem-per-worker-gb` a 9 y `--host-mem-reserve-gb` a 12                                        |
+| Cierran otras aplicaciones de la máquina | Los workers agotaron la RAM libre             | Subir`--host-mem-reserve-gb`; el default de 8 asume un escritorio ligero                                    |
+| OOM de VRAM                               | Alguna tarea grande supera el margen de 1 GB  | Subir`--compile-memory-factor` a 1,5                                                                        |
+| El throughput no mejora al subir workers  | La GPU satura, como el baseline en §15.2     | Quedarse en el óptimo del bloque G                                                                           |
+| pass@2 anormalmente baja                  | Cudagraphs, si se usó`reduce-overhead`     | Volver a`--compile default` (§15.9)                                                                        |
+| La Fase 1 se re-ejecuta sin motivo        | Cambió algún flag de aceleración           | Restaurar los flags exactos de la primera ejecución                                                          |
 
 ---
 
@@ -1431,17 +1436,17 @@ tareas**, cinco veces la muestra de §15.
 
 ### 17.1 Tabla maestra
 
-| Run              | Preset          | `--max-workers` | Tareas | Wall (s)   | **steps/s F2** | Workers medios | CPU     | GPU util | VRAM pico | RAM host | Wh/1k  | pass@2    |
-| ---------------- | --------------- | --------------- | ------ | ---------- | -------------- | -------------- | ------- | -------- | --------- | -------- | ------ | --------- |
-| `g_comp_mw03`    | compile         | 3               | 10     | 4 633,5    | 3,27           | 2,72           | 18,2 %  | 91,1 %   | 3 745 MB  | 36,7 %   | 7,43   | 3/10      |
-| `g_comp_mw06`    | compile         | 6               | 10     | 1 996,2    | **7,52**       | 4,85           | 32,0 %  | 98,7 %   | 5 411 MB  | 45,8 %   | 3,79   | 3/10      |
-| `g_comp_mw10`    | compile         | 10              | 10     | 1 923,2    | 7,81           | 7,76           | 56,7 %  | 98,0 %   | 7 856 MB  | 59,5 %   | 3,69   | 3/10      |
-| `g_comp_mw14`    | compile         | 14              | 10     | 1 842,2    | 8,15           | 7,81           | 56,9 %  | 97,7 %   | 7 862 MB  | 59,6 %   | 3,51   | 3/10      |
-| `h_graphs_clone` | reduce-overhead | 10              | 10     | 1 018,2    | **14,76**      | 9,04           | 61,9 %  | 98,1 %   | 7 048 MB  | 79,9 %   | 1,72   | **0/10**  |
-| `i_warm_2`       | compile         | 10              | 10     | 1 845,2    | 8,14           | 7,73           | 56,2 %  | 97,7 %   | 7 848 MB  | 59,6 %   | 3,49   | 3/10      |
-| `i_warm_3`       | compile         | 10              | 10     | 1 756,2    | 8,55           | 6,74           | 48,6 %  | 98,7 %   | 7 022 MB  | 55,1 %   | 3,33   | 3/10      |
-| `j_base_50`      | baseline        | 10              | **50** | 40 550,7   | 1,85           | 9,70           | 79,4 %  | 99,9 %   | 15 768 MB | 21,9 %   | 14,08  | 18/50     |
-| **`j_comp_50`**  | **compile**     | 10              | **50** | **13 476,0** | **5,67**     | 9,53           | 61,2 %  | 98,8 %   | 9 417 MB  | 89,5 %   | 5,08   | **19/50** |
+| Run                     | Preset            | `--max-workers` | Tareas       | Wall (s)           | **steps/s F2** | Workers medios | CPU    | GPU util | VRAM pico | RAM host | Wh/1k | pass@2          |
+| ----------------------- | ----------------- | ----------------- | ------------ | ------------------ | -------------------- | -------------- | ------ | -------- | --------- | -------- | ----- | --------------- |
+| `g_comp_mw03`         | compile           | 3                 | 10           | 4 633,5            | 3,27                 | 2,72           | 18,2 % | 91,1 %   | 3 745 MB  | 36,7 %   | 7,43  | 3/10            |
+| `g_comp_mw06`         | compile           | 6                 | 10           | 1 996,2            | **7,52**       | 4,85           | 32,0 % | 98,7 %   | 5 411 MB  | 45,8 %   | 3,79  | 3/10            |
+| `g_comp_mw10`         | compile           | 10                | 10           | 1 923,2            | 7,81                 | 7,76           | 56,7 % | 98,0 %   | 7 856 MB  | 59,5 %   | 3,69  | 3/10            |
+| `g_comp_mw14`         | compile           | 14                | 10           | 1 842,2            | 8,15                 | 7,81           | 56,9 % | 97,7 %   | 7 862 MB  | 59,6 %   | 3,51  | 3/10            |
+| `h_graphs_clone`      | reduce-overhead   | 10                | 10           | 1 018,2            | **14,76**      | 9,04           | 61,9 % | 98,1 %   | 7 048 MB  | 79,9 %   | 1,72  | **0/10**  |
+| `i_warm_2`            | compile           | 10                | 10           | 1 845,2            | 8,14                 | 7,73           | 56,2 % | 97,7 %   | 7 848 MB  | 59,6 %   | 3,49  | 3/10            |
+| `i_warm_3`            | compile           | 10                | 10           | 1 756,2            | 8,55                 | 6,74           | 48,6 % | 98,7 %   | 7 022 MB  | 55,1 %   | 3,33  | 3/10            |
+| `j_base_50`           | baseline          | 10                | **50** | 40 550,7           | 1,85                 | 9,70           | 79,4 % | 99,9 %   | 15 768 MB | 21,9 %   | 14,08 | 18/50           |
+| **`j_comp_50`** | **compile** | 10                | **50** | **13 476,0** | **5,67**       | 9,53           | 61,2 % | 98,8 %   | 9 417 MB  | 89,5 %   | 5,08  | **19/50** |
 
 ### 17.2 El barrido G tiene un punto muerto: `mw14` nunca existió
 
@@ -1449,10 +1454,10 @@ tareas**, cinco veces la muestra de §15.
 tareas**: subir el tope de 10 a 14 no cambió absolutamente nada. La prueba cruzada es
 exacta:
 
-| Run           | `--max-workers` | steps/s F2 |
-| ------------- | --------------- | ---------- |
-| `g_comp_mw14` | 14              | 8,15       |
-| `i_warm_2`    | 10              | 8,14       |
+| Run             | `--max-workers` | steps/s F2 |
+| --------------- | ----------------- | ---------- |
+| `g_comp_mw14` | 14                | 8,15       |
+| `i_warm_2`    | 10                | 8,14       |
 
 Dos runs con topes distintos y el mismo número. El «+4,4 %» de `mw10 → mw14` no era
 concurrencia.
@@ -1462,11 +1467,11 @@ concurrencia.
 El bloque I repite el mismo comando tres veces sin cambiar nada más — que es lo que el
 bloque C de §15.5 creyó estar haciendo y no hizo:
 
-| Pasada | Run           | steps/s F2 | Δ      |
-| ------ | ------------- | ---------- | ------ |
-| 1ª     | `g_comp_mw10` | 7,81       | —      |
-| 2ª     | `i_warm_2`    | 8,14       | +4,2 % |
-| 3ª     | `i_warm_3`    | 8,55       | +5,0 % |
+| Pasada | Run             | steps/s F2 | Δ     |
+| ------ | --------------- | ---------- | ------ |
+| 1ª    | `g_comp_mw10` | 7,81       | —     |
+| 2ª    | `i_warm_2`    | 8,14       | +4,2 % |
+| 3ª    | `i_warm_3`    | 8,55       | +5,0 % |
 
 **~4,5 % por pasada** con la concurrencia fija. Como los puntos del bloque G se ejecutaron
 en orden (3, 6, 10, 14), cada uno arrastra esa ventaja sobre el anterior y hay que
@@ -1476,12 +1481,12 @@ descontarla antes de atribuir nada a la concurrencia.
 
 Con el sesgo de caché descontado, el barrido real es de tres puntos, no de cuatro:
 
-| Concurrencia | steps/s bruto | Ganancia bruta | Ganancia neta |
-| ------------ | ------------- | -------------- | ------------- |
-| 3            | 3,27          | —              | —             |
-| **6**        | **7,52**      | **+130 %**     | **~+120 %**   |
-| 10           | 7,81          | +3,9 %         | **~0 %**      |
-| 14 (= 10)    | 8,15          | +4,4 %         | ~0 %          |
+| Concurrencia | steps/s bruto  | Ganancia bruta   | Ganancia neta     |
+| ------------ | -------------- | ---------------- | ----------------- |
+| 3            | 3,27           | —               | —                |
+| **6**  | **7,52** | **+130 %** | **~+120 %** |
+| 10           | 7,81           | +3,9 %           | **~0 %**    |
+| 14 (= 10)    | 8,15           | +4,4 %           | ~0 %              |
 
 De 3 a 6 el throughput se dobla largo. De 6 a 10 la ganancia bruta (+3,9 %) es **menor que
 el calentamiento de caché de una sola pasada** (+4,5 %): neta, es cero. Y `gpu_util` ya
@@ -1489,12 +1494,12 @@ marca **98,7 % con 6 workers**; el caudal está tomado.
 
 Lo que sí cuesta subir de 6 a 10:
 
-| Métrica                     | mw6     | mw10    | Δ       |
-| --------------------------- | ------- | ------- | ------- |
-| CPU media                   | 32,0 %  | 56,7 %  | **+77 %** |
-| RAM de host                 | 45,8 %  | 59,5 %  | +30 %   |
-| Procesos auxiliares (máx)   | 32      | 52      | +63 %   |
-| `steps_per_s_phase2`        | 7,52    | 7,81    | ~0 neto |
+| Métrica                   | mw6    | mw10   | Δ              |
+| -------------------------- | ------ | ------ | --------------- |
+| CPU media                  | 32,0 % | 56,7 % | **+77 %** |
+| RAM de host                | 45,8 % | 59,5 % | +30 %           |
+| Procesos auxiliares (máx) | 32     | 52     | +63 %           |
+| `steps_per_s_phase2`     | 7,52   | 7,81   | ~0 neto         |
 
 **Se pagan 25 puntos de CPU y 14 de RAM por nada.** Ésa es la decisión de fondo de §18.
 
@@ -1508,10 +1513,10 @@ Lo decisivo es que ya llevaba la corrección de §15.9: `accel._clone_wrap` copi
 salidas fuera del pool estático de cudagraph antes de que el `Logger` las retenga. El
 resultado no se movió ni un punto:
 
-| | Antes del clonado (`e_graphs`) | Después (`h_graphs_clone`) |
-| ------------ | ------------------------------ | -------------------------- |
-| steps/s F2   | 7,34                           | 14,76                      |
-| pass@2       | 0/10                           | **0/10**                   |
+|            | Antes del clonado (`e_graphs`) | Después (`h_graphs_clone`) |
+| ---------- | -------------------------------- | ----------------------------- |
+| steps/s F2 | 7,34                             | 14,76                         |
+| pass@2     | 0/10                             | **0/10**                |
 
 **La hipótesis del buffer sobrescrito queda refutada.** Queda la alternativa que §15.9
 dejaba planteada: el `torch.randn` de `layers.channel_layer` capturado dentro del grafo y
@@ -1531,16 +1536,16 @@ descarta.
 
 Cincuenta tareas, mismo split, mismos 1500 pasos, sólo cambia el preset:
 
-| Métrica                  | `j_base_50`        | `j_comp_50`        | Δ           |
-| ------------------------ | ------------------ | ------------------ | ----------- |
-| Wall                     | 40 550,7 s (11,3 h)| **13 476,0 s (3,7 h)** | **−66,8 %** |
-| `steps_per_s_phase2`     | 1,85               | **5,67**           | **+206,5 %**|
-| Vida media por tarea     | 7 869,1 s          | 1 259,7 s          | −84,0 %     |
-| CPU media                | 79,4 %             | 61,2 %             | −22,9 %     |
-| VRAM pico (toda la GPU)  | 15 768 MB          | **9 417 MB**       | −40,3 %     |
-| RAM de host pico         | 21,9 %             | **89,5 %**         | +307 %      |
-| Wh por 1 000 pasos       | 14,08              | **5,08**           | −64,0 %     |
-| **pass@2**               | 18/50 (36 %)       | **19/50 (38 %)**   | **+1**      |
+| Métrica                | `j_base_50`       | `j_comp_50`                | Δ                 |
+| ----------------------- | ------------------- | ---------------------------- | ------------------ |
+| Wall                    | 40 550,7 s (11,3 h) | **13 476,0 s (3,7 h)** | **−66,8 %** |
+| `steps_per_s_phase2`  | 1,85                | **5,67**               | **+206,5 %** |
+| Vida media por tarea    | 7 869,1 s           | 1 259,7 s                    | −84,0 %           |
+| CPU media               | 79,4 %              | 61,2 %                       | −22,9 %           |
+| VRAM pico (toda la GPU) | 15 768 MB           | **9 417 MB**           | −40,3 %           |
+| RAM de host pico        | 21,9 %              | **89,5 %**             | +307 %             |
+| Wh por 1 000 pasos      | 14,08               | **5,08**               | −64,0 %           |
+| **pass@2**        | 18/50 (36 %)        | **19/50 (38 %)**       | **+1**       |
 
 Cuatro lecturas:
 
@@ -1564,8 +1569,8 @@ representativo, frente a los 5,7 GB de las 10 tareas pequeñas de §15.4.
 §15.7 midió la CPU cayendo de 72,4 % a 22,4 %, pero eso comparaba 10 workers eager contra 3
 compilados. A concurrencia igualada el cuadro es otro:
 
-| | CPU por worker |
-| ------------------------- | -------------- |
+|                             | CPU por worker |
+| --------------------------- | -------------- |
 | baseline (`j_base_50`)    | ~195 %         |
 | compilado (`g_comp_mw10`) | ~175 %         |
 
@@ -1589,14 +1594,14 @@ Conviene leerlos así al interpretar [resultsprofile_27_8_26.txt](../../.profile
 
 ### 17.9 Decisiones que se derivan
 
-| Hallazgo                                                | Decisión                                              | Referencia |
-| ------------------------------------------------------- | ----------------------------------------------------- | ---------- |
-| La GPU satura a 6 workers compilados                    | `--max-workers 6` en los scripts de producción        | §17.4, §17.10 |
-| `reduce-overhead` resuelve 0/10 incluso con clonado     | Descartado; `--compile default` es la vía             | §17.5      |
-| BF16 pierde un 34 % a 1500 iteraciones                  | Descartado (confirmado en §15.10)                     | §15.10     |
-| RAM real ~8,6 GB/worker en un split representativo      | `--host-mem-per-worker-gb 9`, reserva 12 GB           | §17.6      |
-| 5,67 steps/s sobre 50 tareas compiladas                 | Proyección firme de ~30 h por split                   | §18.3      |
-| pass@2 36 % → 38 % con compilación                      | El Eje D es neutro en exactitud, como se diseñó       | §17.6      |
+| Hallazgo                                              | Decisión                                         | Referencia      |
+| ----------------------------------------------------- | ------------------------------------------------- | --------------- |
+| La GPU satura a 6 workers compilados                  | `--max-workers 6` en los scripts de producción | §17.4, §17.10 |
+| `reduce-overhead` resuelve 0/10 incluso con clonado | Descartado;`--compile default` es la vía       | §17.5          |
+| BF16 pierde un 34 % a 1500 iteraciones                | Descartado (confirmado en §15.10)                | §15.10         |
+| RAM real ~8,6 GB/worker en un split representativo    | `--host-mem-per-worker-gb 9`, reserva 12 GB     | §17.6          |
+| 5,67 steps/s sobre 50 tareas compiladas               | Proyección firme de ~30 h por split              | §18.3          |
+| pass@2 36 % → 38 % con compilación                  | El Eje D es neutro en exactitud, como se diseñó | §17.6          |
 
 ### 17.10 El coste de compilación y qué hace realmente la caché de Inductor
 
@@ -1607,12 +1612,12 @@ Este dato estaba en los logs desde que §15.12 añadió el volcado a `.profile/l
 Como [night_profile_run.sh](../../night_profile_run.sh) hace `rm -rf .inductor_cache` antes
 del bloque G, sus cuatro runs son una curva de calentamiento sobre **las mismas 10 tareas**:
 
-| Run           | Estado de la caché | Compilación media/tarea       |
-| ------------- | ------------------ | ---------------------------- |
-| `g_comp_mw03` | **fría**           | **538,1 s**                  |
-| `g_comp_mw06` | 2ª pasada          | 305,5 s (mediana 222,5)      |
-| `g_comp_mw10` | 3ª pasada          | 254,5 s                      |
-| `i_warm_3`    | 5ª pasada          | **241,4 s**                  |
+| Run             | Estado de la caché | Compilación media/tarea |
+| --------------- | ------------------- | ------------------------ |
+| `g_comp_mw03` | **fría**     | **538,1 s**        |
+| `g_comp_mw06` | 2ª pasada          | 305,5 s (mediana 222,5)  |
+| `g_comp_mw10` | 3ª pasada          | 254,5 s                  |
+| `i_warm_3`    | 5ª pasada          | **241,4 s**        |
 
 1. **La caché sirve, y mucho: 538 → ~250 s, un −53 %.** Dentro del propio run frío los
    tiempos caen de 621,9 s a 404,0 s a lo largo de diez tareas **distintas**, así que hay
@@ -1636,11 +1641,11 @@ no tenía fundamento.
 
 Los 50 valores de `j_comp_50` se separan en dos grupos limpios:
 
-| Grupo                                          | Compilación     |
-| ---------------------------------------------- | --------------- |
-| Las 10 tareas que `--demo 10` ya había cacheado | ~250–400 s      |
-| Las 40 nuevas                                  | **~690–1050 s** |
-| Media de las 50                                | 673,5 s         |
+| Grupo                                             | Compilación           |
+| ------------------------------------------------- | ---------------------- |
+| Las 10 tareas que`--demo 10` ya había cacheado | ~250–400 s            |
+| Las 40 nuevas                                     | **~690–1050 s** |
+| Media de las 50                                   | 673,5 s                |
 
 (`--demo 50` toma las 50 primeras tareas, luego es un superconjunto de `--demo 10`.)
 
@@ -1667,11 +1672,11 @@ configuración que las tres campañas han dejado establecida.
 
 ### 18.1 Los ficheros
 
-| Fichero                                                | Papel                                                          |
-| ------------------------------------------------------ | -------------------------------------------------------------- |
-| [run_training_full.sh](../../run_training_full.sh)     | Lanza los 400 puzzles de `training`                             |
-| [run_evaluation_full.sh](../../run_evaluation_full.sh) | Lanza los 400 puzzles de `evaluation`                           |
-| [run_full_split.sh](../../run_full_split.sh)           | Implementación compartida; no se invoca directamente            |
+| Fichero                                               | Papel                                                 |
+| ----------------------------------------------------- | ----------------------------------------------------- |
+| [run_training_full.sh](../../run_training_full.sh)     | Lanza los 400 puzzles de`training`                  |
+| [run_evaluation_full.sh](../../run_evaluation_full.sh) | Lanza los 400 puzzles de`evaluation`                |
+| [run_full_split.sh](../../run_full_split.sh)           | Implementación compartida; no se invoca directamente |
 
 La implementación está en un solo fichero **a propósito**: si los ajustes divergieran entre
 los dos splits, sus resultados dejarían de ser comparables entre sí.
@@ -1682,16 +1687,16 @@ resúmenes JSON de análisis. Sólo el log de la ejecución en `run_logs/`, los 
 
 ### 18.2 Configuración y por qué
 
-| Ajuste                        | Valor      | Justificación                                                                 |
-| ----------------------------- | ---------- | ----------------------------------------------------------------------------- |
-| `--accel-preset compile`      | —          | 3× de wall, −64 % de energía, pass@2 intacta (§17.6)                          |
-| `--max-workers`               | **6**      | La GPU satura ahí; 10 no aporta nada neto y cuesta +77 % de CPU (§17.4)       |
-| `--host-mem-per-worker-gb`    | **9**      | ~8,6 GB reales/worker en el split de 50; el completo tiene puzzles mayores (§17.6) |
-| `--host-mem-reserve-gb`       | **12**     | Ubuntu 24.04 y aplicaciones, sobre 96 GB compartidos (§15.4)                  |
-| `--task-stall-timeout`        | 2700 s     | Los workers reportan cada 10 pasos; margen de dos órdenes de magnitud          |
-| `--resume`                    | siempre    | Reanudación por tarea (§16.3)                                                  |
-| `--iterations`                | 1500       | El régimen en el que se midió todo                                             |
-| Reintentos                    | 5          | Con `--resume`, cada reintento sólo ejecuta lo que falta                        |
+| Ajuste                       | Valor        | Justificación                                                                      |
+| ---------------------------- | ------------ | ----------------------------------------------------------------------------------- |
+| `--accel-preset compile`   | —           | 3× de wall, −64 % de energía, pass@2 intacta (§17.6)                            |
+| `--max-workers`            | **6**  | La GPU satura ahí; 10 no aporta nada neto y cuesta +77 % de CPU (§17.4)           |
+| `--host-mem-per-worker-gb` | **9**  | ~8,6 GB reales/worker en el split de 50; el completo tiene puzzles mayores (§17.6) |
+| `--host-mem-reserve-gb`    | **12** | Ubuntu 24.04 y aplicaciones, sobre 96 GB compartidos (§15.4)                       |
+| `--task-stall-timeout`     | 2700 s       | Los workers reportan cada 10 pasos; margen de dos órdenes de magnitud              |
+| `--resume`                 | siempre      | Reanudación por tarea (§16.3)                                                     |
+| `--iterations`             | 1500         | El régimen en el que se midió todo                                                |
+| Reintentos                   | 5            | Con`--resume`, cada reintento sólo ejecuta lo que falta                          |
 
 Y lo que **no** llevan: `reduce-overhead` (0/10 dos veces, §17.5), `bf16` (−34 %, §15.10) y
 `--demo` (se quiere el split entero).
@@ -1703,12 +1708,12 @@ despejada; queda como red de seguridad junto a la reserva dinámica (§15.4.1).
 
 Extrapolando `j_comp_50` (13 476 s para 50 tareas):
 
-| Fase                             | Estimación         |
-| -------------------------------- | ------------------ |
-| Fase 1, 400 tareas               | ~34 min por split  |
-| Fase 2, `training` (400 tareas)  | **~30 h**          |
-| Fase 2, `evaluation` (400 tareas)| **~30–35 h**       |
-| **Total**                        | **~60–65 h**       |
+| Fase                               | Estimación         |
+| ---------------------------------- | ------------------- |
+| Fase 1, 400 tareas                 | ~34 min por split   |
+| Fase 2,`training` (400 tareas)   | **~30 h**     |
+| Fase 2,`evaluation` (400 tareas) | **~30–35 h** |
+| **Total**                    | **~60–65 h** |
 
 Frente a las ~142 h que habría costado el baseline.
 
@@ -1753,15 +1758,15 @@ virtual se haya activado en la shell.
 
 ### 18.5 Qué vigilar en el log
 
-| Línea                                          | Significado                                                       |
-| ---------------------------------------------- | ----------------------------------------------------------------- |
-| `Phase 2 VRAM budget: GPU0=...`                | Presupuesto tras el margen; debe dejar ~1 GiB                      |
-| `Host RAM: N GB free − 12 GB reserved → cap M` | Si `M < 6`, la máquina está cargada y el tope está mordiendo       |
-| `[6 running, X.X it/s, eta Nm]`                | Ritmo agregado y ETA. Sin `it/s` tras unos minutos, algo va mal    |
-| `<tarea>:init`                                 | El worker aún no ha entrado al bucle; normal durante ~1 min        |
-| `Holding back new tasks`                       | La reserva de RAM está frenando arranques (§16.5)                  |
-| `Inductor cache filesystem has ...`            | El disco de caché cruzó el mínimo; no arrancan tareas nuevas       |
-| `<tarea> stalled ... terminating it`           | Watchdog; la tarea se reintentará en la siguiente pasada           |
+| Línea                                             | Significado                                                      |
+| -------------------------------------------------- | ---------------------------------------------------------------- |
+| `Phase 2 VRAM budget: GPU0=...`                  | Presupuesto tras el margen; debe dejar ~1 GiB                    |
+| `Host RAM: N GB free − 12 GB reserved → cap M` | Si`M < 6`, la máquina está cargada y el tope está mordiendo |
+| `[6 running, X.X it/s, eta Nm]`                  | Ritmo agregado y ETA. Sin`it/s` tras unos minutos, algo va mal |
+| `<tarea>:init`                                   | El worker aún no ha entrado al bucle; normal durante ~1 min     |
+| `Holding back new tasks`                         | La reserva de RAM está frenando arranques (§16.5)              |
+| `Inductor cache filesystem has ...`              | El disco de caché cruzó el mínimo; no arrancan tareas nuevas  |
+| `<tarea> stalled ... terminating it`             | Watchdog; la tarea se reintentará en la siguiente pasada        |
 
 Al terminar quedan `submission_{split}.json` y `predictions_{split}.npz`, y
 `list_solved_puzzles.py` / `plot_accuracy.py` funcionan sobre ellos sin cambios.
@@ -1811,12 +1816,12 @@ CACHE_PREFLIGHT_ONLY=1 ./run_training_full.sh
 
 Los defaults operativos son:
 
-| Guarda                         | Default       | Acción                                                        |
-| ------------------------------ | ------------- | ------------------------------------------------------------- |
-| Aviso de espacio               | 400 GB libres | Escribe un warning antes de arrancar                          |
-| Corte de espacio               | 250 GB libres | No inicia el intento                                          |
-| Corte dinámico en Fase 2       | 250 GB libres | Deja terminar workers activos, persiste parciales y sale      |
-| Reserva de inodos              | 1 000 000      | No inicia el intento                                          |
+| Guarda                    | Default       | Acción                                                  |
+| ------------------------- | ------------- | -------------------------------------------------------- |
+| Aviso de espacio          | 400 GB libres | Escribe un warning antes de arrancar                     |
+| Corte de espacio          | 250 GB libres | No inicia el intento                                     |
+| Corte dinámico en Fase 2 | 250 GB libres | Deja terminar workers activos, persiste parciales y sale |
+| Reserva de inodos         | 1 000 000     | No inicia el intento                                     |
 
 `parallel_train.py` recibe la misma ruta mediante `--inductor-cache-dir` y
 `TORCHINDUCTOR_CACHE_DIR`, y guarda la ruta y el espacio final en
@@ -1836,14 +1841,14 @@ La copia se verificó con `rsync -aicn --delete`: tras un smoke test compilado, 
 destino siguieron siendo idénticos salvo por el `mtime` del directorio `locks/`. La tarea
 `007bbfb7`, ya ejecutada previamente, produjo:
 
-| Métrica                                      | LPX externo |
-| -------------------------------------------- | ----------- |
-| `FXGraph cache`                              | 2 hits, 0 misses, 0 bypasses |
-| Ficheros nuevos o modificados en la caché    | 0           |
-| `compile_inner`                              | 222,9 s     |
-| `fx_codegen_and_compile`                     | 6,4 s       |
-| `PyCodeCache.load_by_key_path`               | 2,4 s       |
-| Fase 2 completa, una iteración               | 241,5 s     |
+| Métrica                                   | LPX externo                  |
+| ------------------------------------------ | ---------------------------- |
+| `FXGraph cache`                          | 2 hits, 0 misses, 0 bypasses |
+| Ficheros nuevos o modificados en la caché | 0                            |
+| `compile_inner`                          | 222,9 s                      |
+| `fx_codegen_and_compile`                 | 6,4 s                        |
+| `PyCodeCache.load_by_key_path`           | 2,4 s                        |
+| Fase 2 completa, una iteración            | 241,5 s                      |
 
 Que `compile_inner` marque ~223 s **no significa que se recompilasen kernels**. La métrica
 engloba el tracing de Dynamo y AOTAutograd, que vuelven a recorrer el `forward` en cada
@@ -1869,11 +1874,11 @@ La escritura es atómica (`.tmp` + `os.replace`), así que un corte a media escr
 
 Al arrancar, `parallel_train.py:142` recorre las tareas del split y acepta un parcial sólo si pasa **tres** filtros:
 
-| Filtro | Código | Qué descarta |
-|---|---|---|
-| El fichero existe | `os.path.exists(path)` | Tareas nunca ejecutadas |
-| `n_steps` coincide | `payload.get('n_steps') != n_steps` | Parciales de otra `--iterations` |
-| La solución no está vacía | `not payload.get('solution')` | Tareas que fallaron o no produjeron nada |
+| Filtro                       | Código                               | Qué descarta                            |
+| ---------------------------- | ------------------------------------- | ---------------------------------------- |
+| El fichero existe            | `os.path.exists(path)`              | Tareas nunca ejecutadas                  |
+| `n_steps` coincide         | `payload.get('n_steps') != n_steps` | Parciales de otra`--iterations`        |
+| La solución no está vacía | `not payload.get('solution')`       | Tareas que fallaron o no produjeron nada |
 
 Las que pasan se eliminan de la lista de Fase 2 y verás en el log:
 
@@ -1910,14 +1915,79 @@ python -u parallel_train.py --split training --iterations 1500 \
 
 Es la confusión más probable, porque las tres se llaman «caché» en la documentación:
 
-| Qué | Dónde | Efecto de borrarla |
-|---|---|---|
-| Tareas ya resueltas | `.partial/{split}/` | **Reejecuta el split entero** |
-| Medición de VRAM (Fase 1) | `memory_cache_{split}.json` | Vuelve a medir, ~34 min |
-| Kernels compilados | `.inductor_cache/` | Compilación en frío: 538 s/tarea en vez de ~250 (§17.10) |
+| Qué                       | Dónde                        | Efecto de borrarla                                          |
+| -------------------------- | ----------------------------- | ----------------------------------------------------------- |
+| Tareas ya resueltas        | `.partial/{split}/`         | **Reejecuta el split entero**                         |
+| Medición de VRAM (Fase 1) | `memory_cache_{split}.json` | Vuelve a medir, ~34 min                                     |
+| Kernels compilados         | `.inductor_cache/`          | Compilación en frío: 538 s/tarea en vez de ~250 (§17.10) |
 
 Si lo que quieres es un split limpio **pero rápido**, borra sólo `.partial/`. Borrar las otras dos no cambia qué tareas se ejecutan, sólo te hace pagar tiempo de más.
 
 Si te resulta útil, puedo añadir a `run_full_split.sh` un `FRESH=1` que borre `.partial/${SPLIT}/` antes de arrancar, con confirmación explícita para que no se dispare por accidente. Son cuatro líneas.
 
+---
 
+## 19. Ejemplo individual compilado (`analyze_example.py`)
+
+El flujo de análisis y visualización de una tarea reutiliza la misma capa `accel.py` que
+los workers paralelos. El núcleo del modelo permanece intacto: después de construir
+`ARCCompressor`, `accel.apply(model, accel_cfg)` reasigna únicamente el `forward` de esa
+instancia.
+
+La aceleración es **opt-in**. El comando sin flags conserva el baseline y los valores
+históricos (`training`, `007bbfb7`, 2000 pasos):
+
+```bash
+python analyze_example.py
+```
+
+Una ejecución compilada sobre cualquier ejemplo se lanza así:
+
+```bash
+python analyze_example.py --split training --task-name 007bbfb7 \
+   --iterations 2000 --accel-preset compile --run-label compile-2000
+```
+
+La CLI expone `--split`, `--task-name`, `--iterations`, `--accel-preset`,
+`--inductor-cache-dir` y `--run-label`. Los presets son los definidos por
+`accel.PRESETS`; el único override operativo expuesto aquí es la ruta de caché.
+`compile` es la opción recomendada por §17; `bf16` se conserva sólo para reproducir
+experimentos y `reduce-overhead` no forma parte de ningún preset promovido.
+
+Los presets compilados usan por defecto la caché trasladada al NVMe dedicado:
+
+```text
+/mnt/supercompressarc-cache/.inductor_cache
+```
+
+`--inductor-cache-dir` permite seleccionar otra ruta. Como `_apply_env()` usa
+`os.environ.setdefault`, una variable `TORCHINDUCTOR_CACHE_DIR` ya definida tiene máxima
+precedencia. El script imprime la ruta efectiva antes de crear el modelo. La ruta no se
+inyecta en `baseline` ni en `bf16`, para que `AccelConfig.is_enabled()` siga identificando
+correctamente el baseline intacto.
+
+El orden de enganche replica `solve_task.py`:
+
+1. `accel.configure_process()` aplica entorno, precisión de matmul e hilos antes de que el
+   preprocesado cree tensores GPU.
+2. Se construyen la tarea y el modelo.
+3. `accel.apply()` envuelve o compila `model.forward` antes del primer `take_step`.
+4. Tras entrenar, `Logger.materialize_curves()` agrupa la transferencia de curvas a CPU y
+   `accel.compile_report()` imprime hits/misses y tiempos de Dynamo/Inductor.
+
+La sincronización CUDA por paso se mantiene deliberadamente: el CSV pretende medir cada
+paso completo, no sólo el tiempo de encolado en CPU. Sus cuatro columnas históricas se
+conservan y se añaden `accel_preset`, `accel_summary` e `inductor_cache_dir` al final. Las
+gráficas periódicas y el análisis posterior de latentes no cambian.
+
+Validación mínima:
+
+```bash
+python analyze_example.py --iterations 21 --accel-preset baseline --run-label smoke-baseline
+python analyze_example.py --iterations 21 --accel-preset compile --run-label smoke-compile
+```
+
+Para comparar rendimiento deben usarse la misma tarea y al menos 300 pasos, porque el
+primer paso compilado incluye el tracing. No se exige igualdad bit a bit: como documenta
+§13.3, `torch.compile` funcionaliza el RNG. Sí se exigen curvas finitas, artefactos
+completos y ausencia de regresión de pass@2 en una muestra representativa.

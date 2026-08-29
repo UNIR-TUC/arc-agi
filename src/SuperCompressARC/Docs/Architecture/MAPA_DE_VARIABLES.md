@@ -126,10 +126,15 @@ parametros ya modificados.
 
 | Orden | Variable | Tipo | Contenido | Consumidor |
 | --- | --- | --- | --- | --- |
-| 1 | `RUN_LABEL` | `str` | Etiqueta del experimento | Nombre del CSV de tiempos |
-| 2 | `split` | `str` | `training`, `evaluation` o `test` | `preprocess_tasks` |
-| 3 | `task_name` | `str` | Identificador `007bbfb7` | Carga del JSON y nombres de archivos |
-| 4 | `folder` | `str` | Directorio de resultados | Graficas, NPZ y CSV |
+| 1 | `args.accel_preset` | `str` | Preset `baseline`, `bf16`, `compile` o `full` | `accel.config_from_preset` |
+| 2 | `args.inductor_cache_dir` | `str` | Cache dedicada; por defecto `/mnt/supercompressarc-cache/.inductor_cache` | Presets compilados |
+| 3 | `accel_cfg` | `AccelConfig` | Configuracion efectiva del proceso y del `forward` | `accel.configure_process`, `accel.apply` |
+| 4 | `effective_cache_dir` | `str \| None` | `TORCHINDUCTOR_CACHE_DIR` efectivo tras aplicar precedencias | Log y CSV |
+| 5 | `run_label` | `str` | `--run-label` o, por defecto, el preset | Nombre del CSV de tiempos |
+| 6 | `split` | `str` | `training`, `evaluation` o `test` | `preprocess_tasks` |
+| 7 | `task_name` | `str` | Identificador de la tarea | Carga del JSON y nombres de archivos |
+| 8 | `n_iterations` | `int` | Pasos solicitados por `--iterations` | Bucle de entrenamiento |
+| 9 | `folder` | `str` | `results/<task_name>/` | Graficas, NPZ y CSV |
 
 Todavia no existe ningun tensor neuronal.
 

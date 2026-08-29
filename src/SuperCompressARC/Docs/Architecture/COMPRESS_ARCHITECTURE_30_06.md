@@ -2017,7 +2017,7 @@ Para ejecutar los pasos 1–7 con evidencia y no "a ciegas", este eje se apoya e
 | [solve_task.py](solve_task.py) | Entry point para una tarea individual, captura de VRAM pico |
 | [solution_selection.py](solution_selection.py) | Clase `Logger`, EMA, scoring, selección pass@2 |
 | [parallel_train.py](parallel_train.py) | Scheduler greedy multi-GPU, TF32, cudnn benchmark |
-| [analyze_example.py](analyze_example.py) | Script interactivo para analizar una tarea con visualizaciones |
+| [analyze_example.py](analyze_example.py) | CLI para analizar y compilar una tarea concreta con visualizaciones |
 | [scoring.py](scoring.py) | Validación de submissions contra ground-truth |
 | [list_solved_puzzles.py](list_solved_puzzles.py) | Tabla de puzzles resueltos a partir de un `.npz` |
 | [plot_problems.py](plot_problems.py) / [plot_accuracy.py](plot_accuracy.py) / [visualization.py](visualization.py) | Utilidades de visualización |
