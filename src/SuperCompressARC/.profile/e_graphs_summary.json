@@ -1,0 +1,1258 @@
+{
+  "label": "e_graphs",
+  "timestamp": "2026-07-29 01:27:51",
+  "command": [
+    "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python",
+    "-u",
+    "parallel_train.py",
+    "--split",
+    "training",
+    "--demo",
+    "10",
+    "--iterations",
+    "1500",
+    "--compile",
+    "reduce-overhead",
+    "--accel-preset",
+    "compile"
+  ],
+  "return_code": 0,
+  "wall_time_s": 2044.3,
+  "n_cores": 24,
+  "sample_interval_s": 1.0,
+  "n_samples": 2044,
+  "cpu": {
+    "mean_pct": 22.6,
+    "median_pct": 16.9,
+    "p95_pct": 50.7,
+    "max_pct": 83.9,
+    "saturation_threshold_pct": 90.0,
+    "saturation_fraction": 0.0
+  },
+  "concurrency": {
+    "mean_workers": 14.11,
+    "max_workers": 26,
+    "workers_completed": 140
+  },
+  "throughput": {
+    "workers_completed": 140,
+    "wall_time_s": 2044.3,
+    "workers_per_hour": 246.54,
+    "mean_worker_lifetime_s": 176.9
+  },
+  "memory": {
+    "tree_rss_max_mb": 48928.2,
+    "host_mem_used_max_pct": 39.3
+  },
+  "gpu": {
+    "vendor": "sysfs(amdgpu)",
+    "util_mean_pct": 75.4,
+    "util_max_pct": 100.0,
+    "mem_max_mb": 2847.1,
+    "mem_busy_mean_pct": 2.2,
+    "power_mean_w": 69.7,
+    "power_max_w": 152.0,
+    "energy_wh": 39.627
+  },
+  "efficiency": {
+    "planned_train_steps": 15000,
+    "steps_per_s_aggregate": 7.3,
+    "phase1_s": null,
+    "phase2_s": 2042.9,
+    "steps_per_s_phase2": 7.34,
+    "energy_wh_per_worker": 0.2831,
+    "energy_wh_per_1k_steps": 2.6418
+  },
+  "accuracy": {
+    "n_solved": 0,
+    "n_tasks": 10,
+    "min_n_steps": 1500,
+    "solved_fraction": 0.0
+  },
+  "accel_preset": "compile",
+  "run_metadata": [
+    {
+      "split": "training",
+      "timestamp": "2026-07-29 01:27:51",
+      "n_tasks": 10,
+      "n_steps": 1500,
+      "n_solved": 0,
+      "elapsed_s": 2042.9,
+      "n_gpus": 1,
+      "max_workers": 24,
+      "postprocess_stride": 4,
+      "phase1_s": 0.0,
+      "phase2_s": 2042.9,
+      "compile_memory_factor": 4.5,
+      "accel": {
+        "amp": "off",
+        "compile_mode": "reduce-overhead",
+        "matmul_precision": "high",
+        "threads_per_worker": 1,
+        "alloc_conf": null,
+        "inductor_cache_dir": ".inductor_cache",
+        "compile_threads": 4,
+        "memory_planning": true,
+        "enabled": true
+      },
+      "accel_measurement": {
+        "amp": "off",
+        "compile_mode": "off",
+        "matmul_precision": "high",
+        "threads_per_worker": 1,
+        "alloc_conf": null,
+        "inductor_cache_dir": ".inductor_cache",
+        "compile_threads": 4,
+        "memory_planning": true,
+        "enabled": true
+      },
+      "backend": {
+        "torch_version": "2.14.0.dev20260712+rocm7.2",
+        "hip_version": "7.2.53211",
+        "cuda_version": null,
+        "is_rocm": true,
+        "gpu_names": [
+          "AMD Radeon RX 9070 XT"
+        ]
+      }
+    }
+  ],
+  "workers": [
+    {
+      "pid": 67056,
+      "name": "python",
+      "lifetime_s": 2042.3,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 12.6
+    },
+    {
+      "pid": 67057,
+      "name": "python",
+      "lifetime_s": 2042.3,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 5.0,
+      "peak_rss_mb": 927.8
+    },
+    {
+      "pid": 67105,
+      "name": "python",
+      "lifetime_s": 719.1,
+      "mean_cpu_pct": 135.7,
+      "peak_cpu_pct": 2540.0,
+      "peak_rss_mb": 8895.1
+    },
+    {
+      "pid": 67106,
+      "name": "python",
+      "lifetime_s": 702.1,
+      "mean_cpu_pct": 132.5,
+      "peak_cpu_pct": 202.0,
+      "peak_rss_mb": 9091.1
+    },
+    {
+      "pid": 67365,
+      "name": "python",
+      "lifetime_s": 607.1,
+      "mean_cpu_pct": 0.6,
+      "peak_cpu_pct": 269.0,
+      "peak_rss_mb": 1084.7
+    },
+    {
+      "pid": 67362,
+      "name": "python",
+      "lifetime_s": 623.1,
+      "mean_cpu_pct": 0.3,
+      "peak_cpu_pct": 100.0,
+      "peak_rss_mb": 1082.0
+    },
+    {
+      "pid": 67448,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.6
+    },
+    {
+      "pid": 67451,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.4
+    },
+    {
+      "pid": 67454,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.4
+    },
+    {
+      "pid": 67457,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.4
+    },
+    {
+      "pid": 67426,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.4
+    },
+    {
+      "pid": 67429,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 67432,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.2
+    },
+    {
+      "pid": 67435,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 67974,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 34.6,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 842.7
+    },
+    {
+      "pid": 67977,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 35.1,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 850.2
+    },
+    {
+      "pid": 67980,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 34.1,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 843.0
+    },
+    {
+      "pid": 67983,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 35.2,
+      "peak_cpu_pct": 101.1,
+      "peak_rss_mb": 843.3
+    },
+    {
+      "pid": 68034,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 31.4,
+      "peak_cpu_pct": 101.1,
+      "peak_rss_mb": 839.0
+    },
+    {
+      "pid": 68037,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 32.0,
+      "peak_cpu_pct": 101.1,
+      "peak_rss_mb": 833.3
+    },
+    {
+      "pid": 68040,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 32.2,
+      "peak_cpu_pct": 101.1,
+      "peak_rss_mb": 830.6
+    },
+    {
+      "pid": 68043,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 31.6,
+      "peak_cpu_pct": 101.1,
+      "peak_rss_mb": 854.5
+    },
+    {
+      "pid": 68587,
+      "name": "python",
+      "lifetime_s": 89.0,
+      "mean_cpu_pct": 0.7,
+      "peak_cpu_pct": 5.0,
+      "peak_rss_mb": 642.3
+    },
+    {
+      "pid": 68590,
+      "name": "python",
+      "lifetime_s": 89.0,
+      "mean_cpu_pct": 0.8,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 641.8
+    },
+    {
+      "pid": 68593,
+      "name": "python",
+      "lifetime_s": 89.0,
+      "mean_cpu_pct": 0.8,
+      "peak_cpu_pct": 6.0,
+      "peak_rss_mb": 642.5
+    },
+    {
+      "pid": 68596,
+      "name": "python",
+      "lifetime_s": 89.0,
+      "mean_cpu_pct": 0.8,
+      "peak_cpu_pct": 6.0,
+      "peak_rss_mb": 642.9
+    },
+    {
+      "pid": 68647,
+      "name": "python",
+      "lifetime_s": 82.0,
+      "mean_cpu_pct": 0.8,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 639.2
+    },
+    {
+      "pid": 68650,
+      "name": "python",
+      "lifetime_s": 82.0,
+      "mean_cpu_pct": 0.8,
+      "peak_cpu_pct": 9.0,
+      "peak_rss_mb": 639.3
+    },
+    {
+      "pid": 68653,
+      "name": "python",
+      "lifetime_s": 82.0,
+      "mean_cpu_pct": 0.8,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 640.0
+    },
+    {
+      "pid": 68656,
+      "name": "python",
+      "lifetime_s": 82.0,
+      "mean_cpu_pct": 0.8,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 639.5
+    },
+    {
+      "pid": 68828,
+      "name": "python",
+      "lifetime_s": 731.1,
+      "mean_cpu_pct": 130.2,
+      "peak_cpu_pct": 202.0,
+      "peak_rss_mb": 8698.1
+    },
+    {
+      "pid": 68905,
+      "name": "python",
+      "lifetime_s": 678.1,
+      "mean_cpu_pct": 131.3,
+      "peak_cpu_pct": 202.5,
+      "peak_rss_mb": 8279.8
+    },
+    {
+      "pid": 68906,
+      "name": "python",
+      "lifetime_s": 697.1,
+      "mean_cpu_pct": 131.9,
+      "peak_cpu_pct": 202.3,
+      "peak_rss_mb": 8263.4
+    },
+    {
+      "pid": 68907,
+      "name": "python",
+      "lifetime_s": 681.1,
+      "mean_cpu_pct": 131.7,
+      "peak_cpu_pct": 202.0,
+      "peak_rss_mb": 8207.4
+    },
+    {
+      "pid": 69159,
+      "name": "python",
+      "lifetime_s": 632.1,
+      "mean_cpu_pct": 0.6,
+      "peak_cpu_pct": 260.1,
+      "peak_rss_mb": 1073.9
+    },
+    {
+      "pid": 69196,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.7
+    },
+    {
+      "pid": 69199,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 69202,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.1
+    },
+    {
+      "pid": 69205,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 69233,
+      "name": "python",
+      "lifetime_s": 586.1,
+      "mean_cpu_pct": 0.7,
+      "peak_cpu_pct": 259.9,
+      "peak_rss_mb": 1074.8
+    },
+    {
+      "pid": 69296,
+      "name": "python",
+      "lifetime_s": 587.1,
+      "mean_cpu_pct": 0.6,
+      "peak_cpu_pct": 252.9,
+      "peak_rss_mb": 1078.1
+    },
+    {
+      "pid": 69262,
+      "name": "python",
+      "lifetime_s": 603.1,
+      "mean_cpu_pct": 0.3,
+      "peak_cpu_pct": 99.0,
+      "peak_rss_mb": 1083.5
+    },
+    {
+      "pid": 69299,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.4
+    },
+    {
+      "pid": 69302,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.2
+    },
+    {
+      "pid": 69305,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.2
+    },
+    {
+      "pid": 69308,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.2
+    },
+    {
+      "pid": 69348,
+      "name": "python",
+      "lifetime_s": 61.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.4
+    },
+    {
+      "pid": 69351,
+      "name": "python",
+      "lifetime_s": 61.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.4
+    },
+    {
+      "pid": 69354,
+      "name": "python",
+      "lifetime_s": 61.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.4
+    },
+    {
+      "pid": 69372,
+      "name": "python",
+      "lifetime_s": 90.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.9
+    },
+    {
+      "pid": 69375,
+      "name": "python",
+      "lifetime_s": 90.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.4
+    },
+    {
+      "pid": 69378,
+      "name": "python",
+      "lifetime_s": 90.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 69381,
+      "name": "python",
+      "lifetime_s": 90.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.5
+    },
+    {
+      "pid": 69357,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.5
+    },
+    {
+      "pid": 69879,
+      "name": "python",
+      "lifetime_s": 210.0,
+      "mean_cpu_pct": 30.4,
+      "peak_cpu_pct": 101.6,
+      "peak_rss_mb": 822.6
+    },
+    {
+      "pid": 69882,
+      "name": "python",
+      "lifetime_s": 210.0,
+      "mean_cpu_pct": 37.6,
+      "peak_cpu_pct": 1245.6,
+      "peak_rss_mb": 818.4
+    },
+    {
+      "pid": 69885,
+      "name": "python",
+      "lifetime_s": 210.0,
+      "mean_cpu_pct": 30.1,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 814.7
+    },
+    {
+      "pid": 69888,
+      "name": "python",
+      "lifetime_s": 210.0,
+      "mean_cpu_pct": 29.6,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 829.7
+    },
+    {
+      "pid": 69921,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 44.0,
+      "peak_cpu_pct": 101.2,
+      "peak_rss_mb": 814.5
+    },
+    {
+      "pid": 69924,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 43.9,
+      "peak_cpu_pct": 101.3,
+      "peak_rss_mb": 829.4
+    },
+    {
+      "pid": 69927,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 43.9,
+      "peak_cpu_pct": 101.1,
+      "peak_rss_mb": 830.7
+    },
+    {
+      "pid": 69930,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 44.4,
+      "peak_cpu_pct": 101.1,
+      "peak_rss_mb": 840.3
+    },
+    {
+      "pid": 69945,
+      "name": "python",
+      "lifetime_s": 181.0,
+      "mean_cpu_pct": 39.4,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 814.7
+    },
+    {
+      "pid": 69948,
+      "name": "python",
+      "lifetime_s": 181.0,
+      "mean_cpu_pct": 43.8,
+      "peak_cpu_pct": 647.5,
+      "peak_rss_mb": 828.2
+    },
+    {
+      "pid": 69951,
+      "name": "python",
+      "lifetime_s": 181.0,
+      "mean_cpu_pct": 39.6,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 841.3
+    },
+    {
+      "pid": 69954,
+      "name": "python",
+      "lifetime_s": 181.0,
+      "mean_cpu_pct": 40.5,
+      "peak_cpu_pct": 101.1,
+      "peak_rss_mb": 829.2
+    },
+    {
+      "pid": 69986,
+      "name": "python",
+      "lifetime_s": 182.0,
+      "mean_cpu_pct": 35.8,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 820.2
+    },
+    {
+      "pid": 69989,
+      "name": "python",
+      "lifetime_s": 182.0,
+      "mean_cpu_pct": 35.3,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 818.8
+    },
+    {
+      "pid": 69992,
+      "name": "python",
+      "lifetime_s": 182.0,
+      "mean_cpu_pct": 35.4,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 841.5
+    },
+    {
+      "pid": 69995,
+      "name": "python",
+      "lifetime_s": 182.0,
+      "mean_cpu_pct": 35.6,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 830.6
+    },
+    {
+      "pid": 70515,
+      "name": "python",
+      "lifetime_s": 79.0,
+      "mean_cpu_pct": 0.9,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 632.7
+    },
+    {
+      "pid": 70518,
+      "name": "python",
+      "lifetime_s": 79.0,
+      "mean_cpu_pct": 0.9,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 632.0
+    },
+    {
+      "pid": 70521,
+      "name": "python",
+      "lifetime_s": 79.0,
+      "mean_cpu_pct": 0.9,
+      "peak_cpu_pct": 10.0,
+      "peak_rss_mb": 632.2
+    },
+    {
+      "pid": 70524,
+      "name": "python",
+      "lifetime_s": 79.0,
+      "mean_cpu_pct": 0.9,
+      "peak_cpu_pct": 9.0,
+      "peak_rss_mb": 632.9
+    },
+    {
+      "pid": 70559,
+      "name": "python",
+      "lifetime_s": 70.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 9.0,
+      "peak_rss_mb": 635.8
+    },
+    {
+      "pid": 70562,
+      "name": "python",
+      "lifetime_s": 70.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 9.0,
+      "peak_rss_mb": 636.4
+    },
+    {
+      "pid": 70565,
+      "name": "python",
+      "lifetime_s": 70.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 10.0,
+      "peak_rss_mb": 636.1
+    },
+    {
+      "pid": 70568,
+      "name": "python",
+      "lifetime_s": 70.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 637.0
+    },
+    {
+      "pid": 70597,
+      "name": "python",
+      "lifetime_s": 74.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 9.0,
+      "peak_rss_mb": 641.9
+    },
+    {
+      "pid": 70600,
+      "name": "python",
+      "lifetime_s": 74.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 10.0,
+      "peak_rss_mb": 641.7
+    },
+    {
+      "pid": 70603,
+      "name": "python",
+      "lifetime_s": 74.0,
+      "mean_cpu_pct": 1.0,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 641.4
+    },
+    {
+      "pid": 70606,
+      "name": "python",
+      "lifetime_s": 74.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 641.6
+    },
+    {
+      "pid": 70634,
+      "name": "python",
+      "lifetime_s": 79.0,
+      "mean_cpu_pct": 0.8,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 632.1
+    },
+    {
+      "pid": 70637,
+      "name": "python",
+      "lifetime_s": 79.0,
+      "mean_cpu_pct": 0.8,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 631.7
+    },
+    {
+      "pid": 70640,
+      "name": "python",
+      "lifetime_s": 79.0,
+      "mean_cpu_pct": 0.9,
+      "peak_cpu_pct": 9.0,
+      "peak_rss_mb": 632.3
+    },
+    {
+      "pid": 70643,
+      "name": "python",
+      "lifetime_s": 79.0,
+      "mean_cpu_pct": 0.8,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 632.3
+    },
+    {
+      "pid": 70810,
+      "name": "python",
+      "lifetime_s": 643.1,
+      "mean_cpu_pct": 130.7,
+      "peak_cpu_pct": 243.1,
+      "peak_rss_mb": 8278.2
+    },
+    {
+      "pid": 70854,
+      "name": "python",
+      "lifetime_s": 599.1,
+      "mean_cpu_pct": 130.0,
+      "peak_cpu_pct": 243.9,
+      "peak_rss_mb": 7233.9
+    },
+    {
+      "pid": 70929,
+      "name": "python",
+      "lifetime_s": 574.1,
+      "mean_cpu_pct": 134.2,
+      "peak_cpu_pct": 202.0,
+      "peak_rss_mb": 6832.3
+    },
+    {
+      "pid": 70997,
+      "name": "python",
+      "lifetime_s": 557.1,
+      "mean_cpu_pct": 134.8,
+      "peak_cpu_pct": 202.0,
+      "peak_rss_mb": 6685.9
+    },
+    {
+      "pid": 71142,
+      "name": "python",
+      "lifetime_s": 510.1,
+      "mean_cpu_pct": 0.3,
+      "peak_cpu_pct": 100.0,
+      "peak_rss_mb": 1060.7
+    },
+    {
+      "pid": 71179,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.7
+    },
+    {
+      "pid": 71182,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 71185,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.5
+    },
+    {
+      "pid": 71188,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 71196,
+      "name": "python",
+      "lifetime_s": 548.1,
+      "mean_cpu_pct": 0.3,
+      "peak_cpu_pct": 91.0,
+      "peak_rss_mb": 1073.7
+    },
+    {
+      "pid": 71233,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.5
+    },
+    {
+      "pid": 71236,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 71239,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 71242,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 71261,
+      "name": "python",
+      "lifetime_s": 492.1,
+      "mean_cpu_pct": 0.7,
+      "peak_cpu_pct": 260.0,
+      "peak_rss_mb": 1074.5
+    },
+    {
+      "pid": 71302,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.5
+    },
+    {
+      "pid": 71305,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.5
+    },
+    {
+      "pid": 71308,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.5
+    },
+    {
+      "pid": 71311,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.4
+    },
+    {
+      "pid": 71348,
+      "name": "python",
+      "lifetime_s": 474.1,
+      "mean_cpu_pct": 0.3,
+      "peak_cpu_pct": 82.0,
+      "peak_rss_mb": 1069.7
+    },
+    {
+      "pid": 71385,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.3
+    },
+    {
+      "pid": 71388,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.1
+    },
+    {
+      "pid": 71391,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 607.9
+    },
+    {
+      "pid": 71394,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 608.1
+    },
+    {
+      "pid": 71801,
+      "name": "python",
+      "lifetime_s": 150.0,
+      "mean_cpu_pct": 29.7,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 795.1
+    },
+    {
+      "pid": 71804,
+      "name": "python",
+      "lifetime_s": 150.0,
+      "mean_cpu_pct": 29.4,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 807.3
+    },
+    {
+      "pid": 71807,
+      "name": "python",
+      "lifetime_s": 150.0,
+      "mean_cpu_pct": 29.7,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 797.0
+    },
+    {
+      "pid": 71810,
+      "name": "python",
+      "lifetime_s": 150.0,
+      "mean_cpu_pct": 28.5,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 800.8
+    },
+    {
+      "pid": 71836,
+      "name": "python",
+      "lifetime_s": 150.0,
+      "mean_cpu_pct": 29.9,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 809.7
+    },
+    {
+      "pid": 71839,
+      "name": "python",
+      "lifetime_s": 150.0,
+      "mean_cpu_pct": 29.8,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 806.0
+    },
+    {
+      "pid": 71842,
+      "name": "python",
+      "lifetime_s": 150.0,
+      "mean_cpu_pct": 29.9,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 798.2
+    },
+    {
+      "pid": 71845,
+      "name": "python",
+      "lifetime_s": 150.0,
+      "mean_cpu_pct": 30.0,
+      "peak_cpu_pct": 101.6,
+      "peak_rss_mb": 796.3
+    },
+    {
+      "pid": 71858,
+      "name": "python",
+      "lifetime_s": 181.0,
+      "mean_cpu_pct": 0.5,
+      "peak_cpu_pct": 19.0,
+      "peak_rss_mb": 722.1
+    },
+    {
+      "pid": 71861,
+      "name": "python",
+      "lifetime_s": 181.0,
+      "mean_cpu_pct": 0.5,
+      "peak_cpu_pct": 13.0,
+      "peak_rss_mb": 724.0
+    },
+    {
+      "pid": 71864,
+      "name": "python",
+      "lifetime_s": 181.0,
+      "mean_cpu_pct": 0.5,
+      "peak_cpu_pct": 22.0,
+      "peak_rss_mb": 723.3
+    },
+    {
+      "pid": 71867,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 0.4,
+      "peak_cpu_pct": 6.0,
+      "peak_rss_mb": 616.8
+    },
+    {
+      "pid": 71903,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 28.9,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 840.3
+    },
+    {
+      "pid": 71906,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 27.4,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 817.4
+    },
+    {
+      "pid": 71909,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 28.6,
+      "peak_cpu_pct": 101.1,
+      "peak_rss_mb": 833.5
+    },
+    {
+      "pid": 71912,
+      "name": "python",
+      "lifetime_s": 180.0,
+      "mean_cpu_pct": 28.0,
+      "peak_cpu_pct": 101.0,
+      "peak_rss_mb": 820.1
+    },
+    {
+      "pid": 72340,
+      "name": "python",
+      "lifetime_s": 70.0,
+      "mean_cpu_pct": 1.0,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 618.1
+    },
+    {
+      "pid": 72343,
+      "name": "python",
+      "lifetime_s": 70.0,
+      "mean_cpu_pct": 5.2,
+      "peak_cpu_pct": 295.8,
+      "peak_rss_mb": 618.0
+    },
+    {
+      "pid": 72346,
+      "name": "python",
+      "lifetime_s": 70.0,
+      "mean_cpu_pct": 1.0,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 618.5
+    },
+    {
+      "pid": 72349,
+      "name": "python",
+      "lifetime_s": 70.0,
+      "mean_cpu_pct": 1.0,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 618.0
+    },
+    {
+      "pid": 72357,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 632.3
+    },
+    {
+      "pid": 72360,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 9.0,
+      "peak_rss_mb": 632.5
+    },
+    {
+      "pid": 72363,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 633.2
+    },
+    {
+      "pid": 72366,
+      "name": "python",
+      "lifetime_s": 60.0,
+      "mean_cpu_pct": 1.1,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 632.9
+    },
+    {
+      "pid": 72380,
+      "name": "python",
+      "lifetime_s": 56.0,
+      "mean_cpu_pct": 1.3,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 627.9
+    },
+    {
+      "pid": 72383,
+      "name": "python",
+      "lifetime_s": 56.0,
+      "mean_cpu_pct": 1.3,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 627.9
+    },
+    {
+      "pid": 72386,
+      "name": "python",
+      "lifetime_s": 56.0,
+      "mean_cpu_pct": 1.4,
+      "peak_cpu_pct": 9.0,
+      "peak_rss_mb": 628.2
+    },
+    {
+      "pid": 72389,
+      "name": "python",
+      "lifetime_s": 56.0,
+      "mean_cpu_pct": 1.3,
+      "peak_cpu_pct": 9.0,
+      "peak_rss_mb": 628.1
+    },
+    {
+      "pid": 72473,
+      "name": "python",
+      "lifetime_s": 66.0,
+      "mean_cpu_pct": 1.0,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 631.5
+    },
+    {
+      "pid": 72476,
+      "name": "python",
+      "lifetime_s": 66.0,
+      "mean_cpu_pct": 0.9,
+      "peak_cpu_pct": 5.0,
+      "peak_rss_mb": 631.6
+    },
+    {
+      "pid": 72479,
+      "name": "python",
+      "lifetime_s": 66.0,
+      "mean_cpu_pct": 1.0,
+      "peak_cpu_pct": 8.0,
+      "peak_rss_mb": 632.0
+    },
+    {
+      "pid": 72482,
+      "name": "python",
+      "lifetime_s": 66.0,
+      "mean_cpu_pct": 1.0,
+      "peak_cpu_pct": 7.0,
+      "peak_rss_mb": 632.3
+    }
+  ]
+}
