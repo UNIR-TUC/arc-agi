@@ -998,7 +998,6 @@ if __name__ == '__main__':
         ),
     )
     parser.add_argument(
-
         '--no-tui',
         action='store_true',
         help='Disable the interactive ANSI dashboard and use line-oriented output.',
@@ -1285,7 +1284,7 @@ if __name__ == '__main__':
         except BaseException:
             arc_logger.close_dashboard()
             raise
-        
+
         total_solved += n_solved
         total_tasks  += n_tasks
 
