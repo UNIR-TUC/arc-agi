@@ -1855,4 +1855,69 @@ ficheros tardó 1,47 s en el SSD raíz y 1,43 s en el LPX. No se observa penaliz
 traslado en este patrón; la compilación está dominada por CPU/tracing, no por ancho de banda
 del NVMe.
 
+### 18.9 Donde esta la cache
+
+No hay checkpoint ni fichero de estado global. **Cada tarea que termina escribe su propio fichero** en `parallel_train.py:117`:
+
+```
+.partial/training/007bbfb7.json     →  {"n_steps": 1500, "solution": [...], "logger": {...}}
+.partial/training/00d62c1b.json
+...
+```
+
+La escritura es atómica (`.tmp` + `os.replace`), así que un corte a media escritura no deja un JSON corrupto. Y ocurre **siempre**, lleves o no `--resume`: lo que activa el flag es sólo la *lectura*.
+
+Al arrancar, `parallel_train.py:142` recorre las tareas del split y acepta un parcial sólo si pasa **tres** filtros:
+
+| Filtro | Código | Qué descarta |
+|---|---|---|
+| El fichero existe | `os.path.exists(path)` | Tareas nunca ejecutadas |
+| `n_steps` coincide | `payload.get('n_steps') != n_steps` | Parciales de otra `--iterations` |
+| La solución no está vacía | `not payload.get('solution')` | Tareas que fallaron o no produjeron nada |
+
+Las que pasan se eliminan de la lista de Fase 2 y verás en el log:
+
+```
+Resume: 137/400 tasks already complete in .partial/training — Phase 2 will run the remaining 263
+```
+
+**Tres consecuencias que conviene tener claras:**
+
+1. **La granularidad es la tarea completa, no el paso.** Una tarea interrumpida en el paso 1 400 de 1 500 se rehace desde cero. Con ~1 260 s por tarea, un corte te cuesta como mucho ~20 min de trabajo perdido por cada worker activo (6 en tu configuración).
+2. **Una tarea sin solución no se guarda** (`if not solution: return`), así que se reintenta sola en la siguiente pasada. Es también lo que hace que el bucle de 5 reintentos del script sirva de algo.
+3. **Cambiar `--iterations` invalida los 400 parciales en silencio.** No hay aviso: simplemente `n_steps` no coincide y vuelve a ejecutarlo todo. Es deliberado —un parcial de 300 iteraciones no puede satisfacer una ejecución de 1 500— pero es fácil pegarse el tiro solo con `ITERATIONS=1000 ./run_training_full.sh`.
+
+#### Cómo forzar la ejecución completa
+
+Borrar el directorio de parciales del split:
+
+```bash
+cd src/SuperCompressARC
+rm -rf .partial/training        # o .partial/evaluation
+./run_training_full.sh
+```
+
+Es lo único que hace falta. Alternativa sin borrar nada, ejecutando el comando a mano sin `--resume` (el script lo lleva fijo):
+
+```bash
+python -u parallel_train.py --split training --iterations 1500 \
+    --accel-preset compile --max-workers 6 \
+    --host-mem-per-worker-gb 9 --host-mem-reserve-gb 12 \
+    --task-stall-timeout 2700
+```
+
+#### Ojo: hay tres cachés distintas y sólo una controla el resume
+
+Es la confusión más probable, porque las tres se llaman «caché» en la documentación:
+
+| Qué | Dónde | Efecto de borrarla |
+|---|---|---|
+| Tareas ya resueltas | `.partial/{split}/` | **Reejecuta el split entero** |
+| Medición de VRAM (Fase 1) | `memory_cache_{split}.json` | Vuelve a medir, ~34 min |
+| Kernels compilados | `.inductor_cache/` | Compilación en frío: 538 s/tarea en vez de ~250 (§17.10) |
+
+Si lo que quieres es un split limpio **pero rápido**, borra sólo `.partial/`. Borrar las otras dos no cambia qué tareas se ejecutan, sólo te hace pagar tiempo de más.
+
+Si te resulta útil, puedo añadir a `run_full_split.sh` un `FRESH=1` que borre `.partial/${SPLIT}/` antes de arrancar, con confirmación explícita para que no se dispare por accidente. Son cuatro líneas.
+
 
