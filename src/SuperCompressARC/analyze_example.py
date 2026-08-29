@@ -1,3 +1,4 @@
+import argparse
 import csv
 import os
 import pickle
@@ -16,6 +17,7 @@ import multitensor_systems
 import layers
 import solution_selection
 import visualization
+import accel
 
 
 """
@@ -35,32 +37,98 @@ the task code, and it will:
 np.random.seed(0)
 torch.manual_seed(0)
 torch.set_default_dtype(torch.float32)
-torch.set_default_device('cuda')
+
+WARMUP_STEPS = 20
+DEFAULT_INDUCTOR_CACHE_DIR = '/mnt/supercompressarc-cache/.inductor_cache'
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Train and analyse one ARC-AGI task.',
+    )
+    parser.add_argument(
+        '--task-name',
+        default='007bbfb7',
+        help='ARC task identifier. Default: 007bbfb7.',
+    )
+    parser.add_argument(
+        '--split',
+        choices=('training', 'evaluation', 'test'),
+        default='training',
+        help='Dataset split containing the task. Default: training.',
+    )
+    parser.add_argument(
+        '--iterations',
+        type=int,
+        default=2000,
+        help='Number of training steps. Must be greater than 20. Default: 2000.',
+    )
+    parser.add_argument(
+        '--accel-preset',
+        choices=sorted(accel.PRESETS),
+        default='baseline',
+        help=(
+            'Acceleration preset from accel.py. "compile" enables the '
+            'recommended torch.compile configuration. Default: baseline.'
+        ),
+    )
+    parser.add_argument(
+        '--inductor-cache-dir',
+        default=DEFAULT_INDUCTOR_CACHE_DIR,
+        metavar='DIR',
+        help=(
+            'Persistent TorchInductor cache directory used by compiled presets. '
+            f'Default: {DEFAULT_INDUCTOR_CACHE_DIR}. An existing '
+            'TORCHINDUCTOR_CACHE_DIR environment variable takes precedence.'
+        ),
+    )
+    parser.add_argument(
+        '--run-label',
+        default=None,
+        help='Label used in the timing CSV name. Defaults to the accel preset.',
+    )
+    args = parser.parse_args()
+    if args.iterations <= WARMUP_STEPS:
+        parser.error(f'--iterations must be greater than {WARMUP_STEPS}')
+    return args
+
+
+def configure_acceleration(preset, inductor_cache_dir):
+    preset_cfg = accel.config_from_preset(preset)
+    if preset_cfg.compile_mode != 'off':
+        preset_cfg = accel.config_from_preset(
+            preset,
+            inductor_cache_dir=inductor_cache_dir,
+        )
+    return accel.configure_process(preset_cfg)
 
 if __name__ == "__main__":
 
-    # Change RUN_LABEL between runs to distinguish baseline vs optimised results.
-    # Workflow:
-    #   1. git stash  →  RUN_LABEL = 'baseline'  →  run
-    #   2. git stash pop  →  RUN_LABEL = 'optimised'  →  run
-    #   3. Load both CSVs into a DataFrame to plot comparisons.
-    RUN_LABEL = 'baseline'
+    args = parse_args()
+    run_label = args.run_label or args.accel_preset
+    accel_cfg = configure_acceleration(
+        args.accel_preset,
+        args.inductor_cache_dir,
+    )
+    torch.set_default_device('cuda')
 
     # Some interesting tasks: 272f95fa, 6d75e8bb, 6cdd2623, 41e4d17e, 2bee17df
     # 228f6490, 508bd3b6, 2281f1f4, ecdecbb3
-    # split = input('Enter which split you want to find the task in (training, evaluation, test): ')
-    split = 'training'
-    # task_name = input('Enter which task you want to analyze (eg. 272f95fa): ')
-    # task_name = '6d75e8bb'
-    task_name = '007bbfb7'
+    split = args.split
+    task_name = args.task_name
     folder = 'results/' + task_name + '/'
     print('Performing a training run on task', task_name,
           'and placing the results in', folder)
+    print('Acceleration:', accel_cfg.summary())
+    effective_cache_dir = os.environ.get('TORCHINDUCTOR_CACHE_DIR')
+    if accel_cfg.compile_mode != 'off':
+        print('Inductor cache:', effective_cache_dir)
     os.makedirs(folder, exist_ok=True)
 
     # Preprocess the task, set up the training
     task = preprocessing.preprocess_tasks(split, [task_name])[0]
     model = arc_compressor.ARCCompressor(task)
+    accel.apply(model, accel_cfg)
     optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
     try:
         train_history_logger = solution_selection.Logger(
@@ -72,8 +140,7 @@ if __name__ == "__main__":
     visualization.plot_problem(train_history_logger)
 
     # ── Training with per-step CPU / wall-clock profiling ────────────────────
-    n_iterations = 2000
-    WARMUP_STEPS = 20   # skip first N steps (CUDA / JIT warm-up)
+    n_iterations = args.iterations
     step_profile  = []  # (step, wall_s, cpu_s)
 
     t_wall = time.perf_counter()
@@ -101,13 +168,18 @@ if __name__ == "__main__":
                 fname=folder + task_name + '_at_' + str(train_step+1) + ' steps.pdf',
                 task_name=task_name)
 
+    train_history_logger.materialize_curves()
+    compile_report = accel.compile_report(accel_cfg)
+    if compile_report:
+        print(f'[accel][{task_name}] torch.compile report: {compile_report}', flush=True)
+
     # ── Timing summary ────────────────────────────────────────────────────────
     wall_arr  = np.array([r[1] for r in step_profile])
     cpu_arr   = np.array([r[2] for r in step_profile])
     cpu_ratio = cpu_arr / np.maximum(wall_arr, 1e-9)
 
     print(f'\n{"="*62}')
-    print(f'  Performance Summary — label: {RUN_LABEL}')
+    print(f'  Performance Summary — label: {run_label}')
     print(f'  Task: {task_name}   Steps profiled: {len(step_profile)}')
     print(f'{"="*62}')
     print(f'  Wall time / step : {wall_arr.mean()*1e3:7.2f} ms  ±  {wall_arr.std()*1e3:.2f} ms')
@@ -118,13 +190,18 @@ if __name__ == "__main__":
     print(f'{"="*62}\n')
 
     # ── Export CSV ────────────────────────────────────────────────────────────
-    csv_path = os.path.join(folder, f'{task_name}_step_times_{RUN_LABEL}.csv')
+    csv_path = os.path.join(folder, f'{task_name}_step_times_{run_label}.csv')
     with open(csv_path, 'w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(['step', 'wall_s', 'cpu_s', 'cpu_pct'])
+        writer.writerow([
+            'step', 'wall_s', 'cpu_s', 'cpu_pct',
+            'accel_preset', 'accel_summary', 'inductor_cache_dir',
+        ])
         for step, wall_s, cpu_s in step_profile:
             writer.writerow([step, f'{wall_s:.6f}', f'{cpu_s:.6f}',
-                             f'{cpu_s / max(wall_s, 1e-9) * 100:.1f}'])
+                             f'{cpu_s / max(wall_s, 1e-9) * 100:.1f}',
+                             args.accel_preset, accel_cfg.summary(),
+                             effective_cache_dir or ''])
     print(f'  Step timing saved → {csv_path}')
 
     # Save the metrics, model weights, and learned representations.

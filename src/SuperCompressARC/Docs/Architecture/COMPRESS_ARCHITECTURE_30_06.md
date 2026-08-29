@@ -2457,23 +2457,23 @@ Para ejecutar los pasos 1–7 con evidencia y no "a ciegas", este eje se apoya e
 
 ### Archivos del repositorio
 
-| Archivo                                                                                                                           | Contenido                                                                                                                                                                        |
-| --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [arc_compressor.py](../../arc_compressor.py)                                                                                       | Clase`ARCCompressor`, hiperparámetros, forward pass                                                                                                                           |
-| [multitensor_systems.py](../../multitensor_systems.py)                                                                             | `MultiTensorSystem`, `MultiTensor`, decorador `@multify`                                                                                                                   |
-| [layers.py](../../layers.py)                                                                                                       | Implementación de todas las capas (`channel_layer`, `share_*`, `softmax`, `cummax`, `shift`, `direction_share`, `nonlinear`, `normalize`, `postprocess_mask`) |
-| [initializers.py](../../initializers.py)                                                                                           | Inicialización Xavier,`symmetrize_xy`, `symmetrize_direction_sharing`, `initialize_head`                                                                                  |
-| [preprocessing.py](../../preprocessing.py)                                                                                         | Clase`Task`, predicción de shapes, construcción del multitensor                                                                                                              |
-| [train.py](../../train.py)                                                                                                         | `take_step`, `mask_select_logprobs`, cómputo del loss, loop secuencial                                                                                                      |
-| [solve_task.py](../../solve_task.py)                                                                                               | Entry point para una tarea individual, captura de VRAM pico                                                                                                                      |
-| [solution_selection.py](../../solution_selection.py)                                                                               | Clase`Logger`, EMA, scoring, selección pass@2                                                                                                                                 |
-| [parallel_train.py](../../parallel_train.py)                                                                                       | Scheduler greedy multi-GPU, TF32, cudnn benchmark                                                                                                                                |
-| [analyze_example.py](../../analyze_example.py)                                                                                     | Script interactivo para analizar una tarea con visualizaciones                                                                                                                   |
-| [scoring.py](../../scoring.py)                                                                                                     | Validación de submissions contra ground-truth                                                                                                                                   |
-| [list_solved_puzzles.py](../../list_solved_puzzles.py)                                                                             | Tabla de puzzles resueltos a partir de un`.npz`                                                                                                                                |
-| [plot_problems.py](../../plot_problems.py) / [plot_accuracy.py](../../plot_accuracy.py) / [visualization.py](../../visualization.py) | Utilidades de visualización                                                                                                                                                     |
-| [README.md](../../README.md)                                                                                                       | Instrucciones de uso, tips de lectura                                                                                                                                            |
-| [requirements.txt](../../requirements.txt)                                                                                         | Dependencias Python                                                                                                                                                              |
+| Archivo | Contenido |
+|---------|-----------|
+| [arc_compressor.py](arc_compressor.py) | Clase `ARCCompressor`, hiperparámetros, forward pass |
+| [multitensor_systems.py](multitensor_systems.py) | `MultiTensorSystem`, `MultiTensor`, decorador `@multify` |
+| [layers.py](layers.py) | Implementación de todas las capas (`channel_layer`, `share_*`, `softmax`, `cummax`, `shift`, `direction_share`, `nonlinear`, `normalize`, `postprocess_mask`) |
+| [initializers.py](initializers.py) | Inicialización Xavier, `symmetrize_xy`, `symmetrize_direction_sharing`, `initialize_head` |
+| [preprocessing.py](preprocessing.py) | Clase `Task`, predicción de shapes, construcción del multitensor |
+| [train.py](train.py) | `take_step`, `mask_select_logprobs`, cómputo del loss, loop secuencial |
+| [solve_task.py](solve_task.py) | Entry point para una tarea individual, captura de VRAM pico |
+| [solution_selection.py](solution_selection.py) | Clase `Logger`, EMA, scoring, selección pass@2 |
+| [parallel_train.py](parallel_train.py) | Scheduler greedy multi-GPU, TF32, cudnn benchmark |
+| [analyze_example.py](analyze_example.py) | CLI para analizar y compilar una tarea concreta con visualizaciones |
+| [scoring.py](scoring.py) | Validación de submissions contra ground-truth |
+| [list_solved_puzzles.py](list_solved_puzzles.py) | Tabla de puzzles resueltos a partir de un `.npz` |
+| [plot_problems.py](plot_problems.py) / [plot_accuracy.py](plot_accuracy.py) / [visualization.py](visualization.py) | Utilidades de visualización |
+| [README.md](README.md) | Instrucciones de uso, tips de lectura |
+| [requirements.txt](requirements.txt) | Dependencias Python |
 
 ### Recursos externos
 

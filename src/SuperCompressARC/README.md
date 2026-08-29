@@ -15,18 +15,27 @@ This is the code base for the [ARC-AGI Without Pretraining](https://iliao2345.gi
 
 # How to solve an ARC-AGI task
 
-Run `analyze_example.py` to initialize a new model and train from scratch:
+Run `analyze_example.py` to initialize a new model and train one task from scratch:
 
 ```
-> python analyze_example.py
-Enter which split you want to find the task in (training, evaluation, test): <split>
-Enter which task you want to analyze (eg. 272f95fa): <task>
-Performing a training run on task <task> and placing the results in <task>/
-|100%|███████████████████████████████████████████████| 1500/1500 [12:22<00:00, 2.01it/s]
-done
+python analyze_example.py --split training --task-name 272f95fa --iterations 2000
 ```
 
-The code will create a folder `<task>/` and put plots there after 1500 steps of training:
+Acceleration is disabled by default. Use the same measured `torch.compile` preset as the
+parallel runner with:
+
+```
+python analyze_example.py --split training --task-name 272f95fa \
+    --iterations 2000 --accel-preset compile
+```
+
+Compiled runs use `/mnt/supercompressarc-cache/.inductor_cache` by default. Override it
+with `--inductor-cache-dir`; an existing `TORCHINDUCTOR_CACHE_DIR` environment variable
+takes precedence over both.
+
+The code creates `results/<task>/` and writes the plots, learned representations and a
+per-step timing CSV there. Use `--run-label` to keep multiple runs of the same preset
+separate.
 
 - solutions at every 50 steps
 - interpretable tensors of task representations
@@ -140,12 +149,11 @@ The expected **pass@2 rate across the full split is the same** (~34.75 % on trai
 
 > **GPU required.** All scripts call `torch.set_default_device('cuda')` at import time. Running on a machine without a CUDA GPU will fail immediately. Verify with: `python -c "import torch; print(torch.cuda.is_available())"`.
 
-Use `analyze_example.py` as the debug entry point — it runs a single task interactively, produces plots, and is the easiest place to insert breakpoints.
+Use `analyze_example.py` as the debug entry point. It runs one configurable task,
+produces plots, and is the easiest place to insert breakpoints.
 
 ```
-> python analyze_example.py
-Enter which split you want to find the task in (training, evaluation, test): training
-Enter which task you want to analyze (eg. 272f95fa): 272f95fa
+python analyze_example.py --split training --task-name 272f95fa
 ```
 
 Some known-interesting tasks to start with: `272f95fa`, `6d75e8bb`, `6cdd2623`, `41e4d17e`, `2bee17df`.

@@ -322,7 +322,9 @@ class ArcLogger:
         self.dashboard = TerminalDashboard(split, stream=stream, enabled=enable_tui)
         project_root = os.path.dirname(os.path.abspath(__file__))
         default_log_dir = os.path.join(project_root, '.log')
-        self.log_dir = default_log_dir if log_dir in (None, '', '.') else log_dir
+        base_log_dir = default_log_dir if log_dir in (None, '', '.') else log_dir
+        day_folder = time.strftime('%Y-%m-%d')
+        self.log_dir = os.path.join(base_log_dir, day_folder)
         self.results_file = results_file
         timestamp = time.strftime('%Y%m%d_%H%M%S')
         os.makedirs(self.log_dir, exist_ok=True)

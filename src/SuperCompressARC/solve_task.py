@@ -19,13 +19,14 @@ import multitensor_systems
 import layers
 import solution_selection
 import visualization
+import accel
 
 """
 A script that solves one puzzle, to be imported and used with parallel_train.py and multiprocessing.
 """
 
 def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_dict, solutions_dict, error_queue,
-               loggers_dict=None, progress_dict=None, postprocess_stride=1):
+               loggers_dict=None, progress_dict=None, postprocess_stride=1, accel_config=None):
     """
     Solves a puzzle.
     Args:
@@ -46,9 +47,16 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
             training steps so the parent process can log percentage progress.
         postprocess_stride (int): Run full pass@2 candidate postprocessing every N
             training steps instead of every step (Eje H, H3). Default 1 (no change).
+        accel_config (dict, optional): Serialized accel.AccelConfig (Eje D, §9.6):
+            BF16 autocast, torch.compile and host/silicon tuning. None or an
+            all-defaults config reproduces the untouched baseline.
     """
 
     try:  # Error catching block that puts errors on the error_queue
+
+        # Eje D: must run before any GPU tensor exists, so allocator/Inductor
+        # environment variables and the matmul precision policy take effect.
+        accel_cfg = accel.configure_process(accel_config)
 
         torch.set_default_device('cuda')
         torch.cuda.set_device(gpu_id)
@@ -62,15 +70,22 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
 
         # Set up the training
         model = arc_compressor.ARCCompressor(task)
+        # Eje D: rebinds model.forward with BF16 autocast / torch.compile.
+        # No-op when accel is disabled; never changes the model's parameters.
+        accel.apply(model, accel_cfg)
         optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
         train_history_logger = solution_selection.Logger(task, postprocess_stride=postprocess_stride)
         train_history_logger.solution_most_frequent = tuple(((0, 0), (0, 0)) for example_num in range(task.n_test))
         train_history_logger.solution_second_most_frequent = tuple(((0, 0), (0, 0)) for example_num in range(task.n_test))
 
         # Training loop
+        if progress_dict is not None:
+            progress_dict[task_name] = 0   # reached the loop: no longer "init"
         for train_step in range(n_train_iterations):
             train.take_step(task, model, optimizer, train_step, train_history_logger)
-            if progress_dict is not None and train_step % 100 == 0:
+            # Every 10 steps, not 100: the parent's stall watchdog needs finer
+            # resolution than a slow task's 100-step interval.
+            if progress_dict is not None and train_step % 10 == 0:
                 progress_dict[task_name] = train_step
             if time.time() > time_limit:
                 break
@@ -81,6 +96,12 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         # Batch-convert accumulated GPU scalar tensors to floats in a single sync
         # (Eje H, H2) instead of one sync per training step.
         train_history_logger.materialize_curves()
+
+        # Eje D: where did torch.compile spend its time? Compilation dominates
+        # this workload, so the breakdown drives which mitigation to pursue.
+        report = accel.compile_report(accel_cfg)
+        if report:
+            print(f'[accel][{task_name}] torch.compile report: {report}', flush=True)
 
         # Get the solution
         example_list = []
