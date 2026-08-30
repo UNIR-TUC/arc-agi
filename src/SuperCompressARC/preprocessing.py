@@ -114,6 +114,78 @@ class Task:
 
         self.problem = torch.from_numpy(np.argmax(self.problem, axis=1)).to(torch.get_default_device())
 
+    def debug_problem_dataframe(
+            self, example_index=0, mode=0, include_padding=False,
+            full_problem=False):
+        """
+        Return a grid or the complete problem as a pandas DataFrame.
+        """
+        import pandas as pd
+
+        if full_problem:
+            if isinstance(self.problem, np.ndarray):
+                problem_array = self.problem
+            elif torch.is_tensor(self.problem):
+                problem_array = self.problem.detach().cpu().numpy()
+            else:
+                raise ValueError("self.problem must be a NumPy array or a tensor")
+
+            if problem_array.ndim == 5:
+                axis_names = ['example', 'color_index', 'row', 'column', 'mode']
+            elif problem_array.ndim == 4:
+                axis_names = ['example', 'row', 'column', 'mode']
+            else:
+                raise ValueError("self.problem must have four or five dimensions")
+
+            coordinates = np.indices(problem_array.shape, dtype=np.int64)
+            coordinates = coordinates.reshape(problem_array.ndim, -1).T
+            dataframe = pd.DataFrame(coordinates, columns=axis_names)
+            dataframe['value'] = problem_array.reshape(-1)
+            dataframe['mode'] = dataframe['mode'].map({0: 'input', 1: 'output'})
+
+            if problem_array.ndim == 5:
+                color_indices = dataframe['color_index'].to_numpy()
+                dataframe['color'] = np.asarray(self.colors)[color_indices]
+                return dataframe[
+                    ['example', 'color_index', 'color', 'row', 'column',
+                     'mode', 'value']
+                ]
+
+            color_indices = dataframe['value'].to_numpy(dtype=np.int64)
+            dataframe['color_index'] = color_indices
+            dataframe['color'] = np.asarray(self.colors)[color_indices]
+            return dataframe[
+                ['example', 'row', 'column', 'mode', 'color_index', 'color',
+                 'value']
+            ]
+
+        if not 0 <= example_index < self.n_examples:
+            raise IndexError(f"example_index must be between 0 and {self.n_examples - 1}")
+
+        if mode in ('input', 'output'):
+            mode = 0 if mode == 'input' else 1
+        if mode not in (0, 1):
+            raise ValueError("mode must be 0, 1, 'input', or 'output'")
+
+        if isinstance(self.problem, np.ndarray) and self.problem.ndim == 5:
+            color_layers = self.problem[example_index, :, :, :, mode]
+            grid_indices = np.argmax(color_layers, axis=0)
+        elif torch.is_tensor(self.problem) and self.problem.ndim == 4:
+            grid_indices = self.problem[example_index, :, :, mode].detach().cpu().numpy()
+        else:
+            raise ValueError(
+                "self.problem must be the one-hot ndarray or the converted tensor"
+            )
+
+        grid = np.asarray(self.colors)[grid_indices]
+        if not include_padding:
+            shape = self.shapes[example_index][mode]
+            if shape:
+                grid = grid[:shape[0], :shape[1]]
+
+        x = pd.DataFrame(grid)
+        return x
+
     def _create_grid_tensor(self, grid):
         return np.array([
             [[1 if self.colors.index(color) == ref_color else 0

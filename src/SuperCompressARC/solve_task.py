@@ -90,6 +90,9 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
             if time.time() > time_limit:
                 break
 
+        if progress_dict is not None:
+            progress_dict[task_name] = train_step + 1
+
         # Batch-convert accumulated GPU scalar tensors to floats in a single sync
         # (Eje H, H2) instead of one sync per training step.
         train_history_logger.materialize_curves()
