@@ -17,7 +17,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 PYTHON_BIN="${PYTHON_BIN:-${SCRIPT_DIR}/arcagi/bin/python}"
-ITERATIONS="${ITERATIONS:-1500}"
+ITERATIONS="${ITERATIONS:-2000}"
 
 # 6, not 10: the concurrency sweep showed the GPU saturates here. Going to 10
 # bought +3.9 % throughput — inside the +4-5 % that the Inductor cache gains on
@@ -44,7 +44,7 @@ CACHE_EXPECTED_UUID="${CACHE_EXPECTED_UUID:-7171729e-8a92-40d6-a172-634a85f1ce7f
 CACHE_EXPECTED_SERIAL="${CACHE_EXPECTED_SERIAL:-A5JQB532006XN1}"
 INDUCTOR_CACHE_DIR="${INDUCTOR_CACHE_DIR:-${CACHE_MOUNT}/.inductor_cache}"
 CACHE_WARN_FREE_GB="${CACHE_WARN_FREE_GB:-400}"
-CACHE_MIN_FREE_GB="${CACHE_MIN_FREE_GB:-250}"
+CACHE_MIN_FREE_GB="${CACHE_MIN_FREE_GB:-50}"
 CACHE_MIN_FREE_INODES="${CACHE_MIN_FREE_INODES:-1000000}"
 CACHE_PREFLIGHT_ONLY="${CACHE_PREFLIGHT_ONLY:-0}"
 
@@ -146,6 +146,8 @@ while (( attempt <= MAX_ATTEMPTS )); do
     exit 1
   fi
   echo "[run] ===== ${SPLIT}: attempt ${attempt}/${MAX_ATTEMPTS} at $(date '+%F %T') ====="
+  # Keep stdout on the terminal: piping it makes the dashboard's isatty() check fail.
+  # Mirror stderr for tracebacks while ArcLogger keeps the full structured .log file.
   "$PYTHON_BIN" -u parallel_train.py \
       --split "${SPLIT}" \
       --iterations "${ITERATIONS}" \
@@ -156,8 +158,8 @@ while (( attempt <= MAX_ATTEMPTS )); do
       --task-stall-timeout "${STALL_TIMEOUT_S}" \
       --inductor-cache-dir "${INDUCTOR_CACHE_DIR}" \
       --cache-min-free-gb "${CACHE_MIN_FREE_GB}" \
-      --resume 2>&1 | tee -a "${LOG}"
-  rc=${PIPESTATUS[0]}
+      --resume 2> >(tee -a "${LOG}" >&2)
+  rc=$?
 
   if (( rc == 0 )); then
     echo "[run] ${SPLIT} complete at $(date '+%F %T')"
