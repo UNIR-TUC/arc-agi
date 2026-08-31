@@ -112,12 +112,12 @@ La idea central es **inteligencia = compresión** (principio MDL, *Minimum Descr
       - [9.4.4 Selección pass@2 aprendida en lugar de constantes mágicas](#944-selección-pass2-aprendida-en-lugar-de-constantes-mágicas)
     - [9.5 Eje C: compresión cross-puzzle (meta-aprendizaje MDL-compatible)](#95-eje-c-compresión-cross-puzzle-meta-aprendizaje-mdl-compatible)
     - [9.6 Eje D: eficiencia computacional y aprovechamiento del silicio](#96-eje-d-eficiencia-computacional-y-aprovechamiento-del-silicio)
-      - [9.6.1 Mixed precision BF16/FP16 sobre AI Accelerators](#961-mixed-precision-bf16fp16-sobre-ai-accelerators)
+      - [9.6.1 Mixed precision BF16/FP16 sobre AI Accelerators	](#961-mixed-precision-bf16fp16-sobre-ai-accelerators)
       - [9.6.2 Fusión de kernels: torch.compile + Triton-ROCm](#962-fusión-de-kernels-torchcompile--triton-rocm)
       - [9.6.3 Paralelización extendida con 16 GB VRAM y 94 GB RAM](#963-paralelización-extendida-con-16-gb-vram-y-94-gb-ram)
     - [9.7 Eje E: profundidad adaptativa y razonamiento iterativo](#97-eje-e-profundidad-adaptativa-y-razonamiento-iterativo)
     - [9.8 Síntesis: presupuesto de cómputo, roadmap experimental y riesgos](#98-síntesis-presupuesto-de-cómputo-roadmap-experimental-y-riesgos)
-    - [9.9 Eje F: interpretabilidad activa como mecanismo de control](#99-eje-f-interpretabilidad-activa-como-mecanismo-de-control)
+    - [9.9 Eje F: interpretabilidad activa como mecanismo de control	](#99-eje-f-interpretabilidad-activa-como-mecanismo-de-control)
     - [9.10 Eje G: compresión explícita de θ (MDL completo)](#910-eje-g-compresión-explícita-de-θ-mdl-completo)
     - [9.11 Eje H: eliminación del cuello de botella de CPU (dispatch, sincronización y sobre-concurrencia) — **PRIORIDAD 0**](#911-eje-h-eliminación-del-cuello-de-botella-de-cpu-dispatch-sincronización-y-sobre-concurrencia--prioridad-0)
       - [9.11.1 Diagnóstico: ¿por qué la CPU está al 100 %?](#9111-diagnóstico-por-qué-la-cpu-está-al-100-)
@@ -1585,13 +1585,13 @@ pero no autoriza a llamar “no entrenables” a los posteriores.
 
 Para una tarea **típica** con `n_examples = 4`, `n_colors = 10`, `n_x = n_y = 30`, los tensores más grandes del multitensor (los que contienen `x` e `y`) tienen forma del orden de $4 \cdot 10 \cdot 30 \cdot 30 = 36\,000$ elementos por canal (y hasta 8× más para los que añaden `direction`). Las operaciones dominantes en FLOPS son:
 
-| Operación                                                                       | FLOPS aprox. por capa | Comentario                      |
-| -------------------------------------------------------------------------------- | --------------------- | ------------------------------- |
-| `affine` de las proyecciones down/up de cada `add_residual`                  | ~$10^8$             | matmul sobre tensor más grande |
-| `direction_share`: 64 matrices `8×8` aplicadas a cada tensor con dirección | ~$5 \cdot 10^8$     | dominante                       |
-| `softmax` (genera $2^k - 1$ canales)                                         | ~$10^8$             |                                 |
-| `cummax` direccional (8 direcciones + scan log diagonal)                       | ~$10^8$             |                                 |
-| `shift`, `nonlinear`, `normalize`                                          | ~$10^7$ cada una    |                                 |
+| Operación                                                                                   | FLOPS aprox. por capa | Comentario                      |
+| -------------------------------------------------------------------------------------------- | --------------------- | ------------------------------- |
+| `affine` de las proyecciones down/up de cada `add_residual`                              | ~$10^8$             | matmul sobre tensor más grande |
+| `direction_share`: 64 matrices `8×8` aplicadas a cada tensor con dirección             | ~$5 \cdot 10^8$     | dominante                       |
+| `softmax` (genera $2^k - 1$ canales)                                         | ~$10^8$ |                       |                                 |
+| `cummax` direccional (8 direcciones + scan log diagonal)                                   | ~$10^8$             |                                 |
+| `shift`, `nonlinear`, `normalize`                                                      | ~$10^7$ cada una    |                                 |
 
 **Estimación por capa**: ~$10^9$ FLOPS.
 **Por forward pass (4 capas + decode + heads)**: ~$5 \cdot 10^9$ FLOPS ≈ **5 GFLOPS**.
@@ -2068,7 +2068,7 @@ Apéndice K.3 del paper Liao & Gu sugiere exactamente esto, con la mejora de **s
 
 **Evidencia empírica y fundamento REC**: la §5.2.1 y la Figura 6 de este documento muestran un caso donde un tensor crítico (`[color, direction, channel]`) casi colapsa y se **rescata** alrededor de la iteración 200, momento a partir del cual aparecen las muestras correctas — evidencia directa de que el colapso es reversible y de que un floor lo estabilizaría. Además, la interpretación por **Relative Entropy Coding** (Apéndice B del paper) da fundamento al free-bits: como la KL de cada tensor son los **bits reales** de su semilla, forzar un mínimo $\tau$ equivale a reservar un presupuesto de información no-negativo, y al hacer $\tau \to 0$ la pérdida converge exactamente al MDL óptimo. El free-bits no es, por tanto, una heurística sino una modificación *principiada* de la trayectoria de optimización.
 
-#### 9.4.2 Ensemble multi-semilla en paralelo (free pass@N → pass@2)
+#### 9.4.2 	 multi-semilla en paralelo (free pass@N → pass@2)
 
 **Problema atacado**: §8.1.2 (la trayectoria depende fuertemente de la semilla; runs distintas resuelven puzzles distintos).
 
@@ -2457,23 +2457,23 @@ Para ejecutar los pasos 1–7 con evidencia y no "a ciegas", este eje se apoya e
 
 ### Archivos del repositorio
 
-| Archivo | Contenido |
-|---------|-----------|
-| [arc_compressor.py](arc_compressor.py) | Clase `ARCCompressor`, hiperparámetros, forward pass |
-| [multitensor_systems.py](multitensor_systems.py) | `MultiTensorSystem`, `MultiTensor`, decorador `@multify` |
-| [layers.py](layers.py) | Implementación de todas las capas (`channel_layer`, `share_*`, `softmax`, `cummax`, `shift`, `direction_share`, `nonlinear`, `normalize`, `postprocess_mask`) |
-| [initializers.py](initializers.py) | Inicialización Xavier, `symmetrize_xy`, `symmetrize_direction_sharing`, `initialize_head` |
-| [preprocessing.py](preprocessing.py) | Clase `Task`, predicción de shapes, construcción del multitensor |
-| [train.py](train.py) | `take_step`, `mask_select_logprobs`, cómputo del loss, loop secuencial |
-| [solve_task.py](solve_task.py) | Entry point para una tarea individual, captura de VRAM pico |
-| [solution_selection.py](solution_selection.py) | Clase `Logger`, EMA, scoring, selección pass@2 |
-| [parallel_train.py](parallel_train.py) | Scheduler greedy multi-GPU, TF32, cudnn benchmark |
-| [analyze_example.py](analyze_example.py) | CLI para analizar y compilar una tarea concreta con visualizaciones |
-| [scoring.py](scoring.py) | Validación de submissions contra ground-truth |
-| [list_solved_puzzles.py](list_solved_puzzles.py) | Tabla de puzzles resueltos a partir de un `.npz` |
-| [plot_problems.py](plot_problems.py) / [plot_accuracy.py](plot_accuracy.py) / [visualization.py](visualization.py) | Utilidades de visualización |
-| [README.md](README.md) | Instrucciones de uso, tips de lectura |
-| [requirements.txt](requirements.txt) | Dependencias Python |
+| Archivo                                                                                                         | Contenido                                                                                                                                                                        |
+| --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [arc_compressor.py](arc_compressor.py)                                                                           | Clase`ARCCompressor`, hiperparámetros, forward pass                                                                                                                           |
+| [multitensor_systems.py](multitensor_systems.py)                                                                 | `MultiTensorSystem`, `MultiTensor`, decorador `@multify`                                                                                                                   |
+| [layers.py](layers.py)                                                                                           | Implementación de todas las capas (`channel_layer`, `share_*`, `softmax`, `cummax`, `shift`, `direction_share`, `nonlinear`, `normalize`, `postprocess_mask`) |
+| [initializers.py](initializers.py)                                                                               | Inicialización Xavier,`symmetrize_xy`, `symmetrize_direction_sharing`, `initialize_head`                                                                                  |
+| [preprocessing.py](preprocessing.py)                                                                             | Clase`Task`, predicción de shapes, construcción del multitensor                                                                                                              |
+| [train.py](train.py)                                                                                             | `take_step`, `mask_select_logprobs`, cómputo del loss, loop secuencial                                                                                                      |
+| [solve_task.py](solve_task.py)                                                                                   | Entry point para una tarea individual, captura de VRAM pico                                                                                                                      |
+| [solution_selection.py](solution_selection.py)                                                                   | Clase`Logger`, EMA, scoring, selección pass@2                                                                                                                                 |
+| [parallel_train.py](parallel_train.py)                                                                           | Scheduler greedy multi-GPU, TF32, cudnn benchmark                                                                                                                                |
+| [analyze_example.py](analyze_example.py)                                                                         | CLI para analizar y compilar una tarea concreta con visualizaciones                                                                                                              |
+| [scoring.py](scoring.py)                                                                                         | Validación de submissions contra ground-truth                                                                                                                                   |
+| [list_solved_puzzles.py](list_solved_puzzles.py)                                                                 | Tabla de puzzles resueltos a partir de un`.npz`                                                                                                                                |
+| [plot_problems.py](plot_problems.py) / [plot_accuracy.py](plot_accuracy.py) / [visualization.py](visualization.py) | Utilidades de visualización                                                                                                                                                     |
+| [README.md](README.md)                                                                                           | Instrucciones de uso, tips de lectura                                                                                                                                            |
+| [requirements.txt](requirements.txt)                                                                             | Dependencias Python                                                                                                                                                              |
 
 ### Recursos externos
 
