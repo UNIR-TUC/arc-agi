@@ -30,6 +30,10 @@ import json
 import shutil
 import argparse
 import multiprocessing
+import queue
+import signal
+import traceback
+from contextlib import contextmanager
 from dataclasses import dataclass, asdict
 from typing import Optional
 
@@ -52,6 +56,7 @@ import visualization
 import solve_task
 import arc_logging
 import accel
+import task_persistence
 
 # ── Global PyTorch settings (must run at import time for the main process) ──
 multiprocessing.set_start_method('spawn', force=True)
@@ -101,67 +106,9 @@ def _print_progress_line(task_names, tasks_started, tasks_finished, progress_dic
     sys.stdout.flush()
 
 
-# ── Crash-resumable per-task results ─────────────────────────────────────────
-
-def _safe_task_name(task_name):
-    """Reject anything that is not a plain ARC task id before it reaches a path."""
-    if not task_name or not all(ch.isalnum() or ch in '-_' for ch in task_name):
-        raise ValueError(f'unsafe task name for a file path: {task_name!r}')
-    return task_name
-
-
-def _partial_dir(split):
-    return os.path.join('.partial', split)
-
-
-def save_task_partial(split, task_name, n_steps, solution, logger_data,
-                      arc_logger=None):
-    """Persist one finished task so an interrupted split can be resumed.
-
-    A 400-task split takes tens of hours and its results otherwise live only in
-    the Manager dict, so any failure loses the whole run.
-    """
-    if not solution:
-        return
-    try:
-        arc_logger.info(f'Saving partial result for {task_name}')
-        directory = _partial_dir(split)
-        os.makedirs(directory, exist_ok=True)
-        path = os.path.join(directory, f'{_safe_task_name(task_name)}.json')
-        tmp = path + '.tmp'
-        with open(tmp, 'w') as f:
-            json.dump({'n_steps': n_steps,
-                       'solution': solution,
-                       'logger': logger_data}, f)
-        os.replace(tmp, path)
-    except Exception as exc:
-        if arc_logger is not None:
-            arc_logger.warning(f'Could not save partial result for {task_name}: {exc}')
-
-
-def load_task_partials(split, task_names, n_steps):
-    """Return (solutions, loggers) for tasks already completed at this n_steps."""
-    arc_logger.info(f'Loading partial results for split {split}')
-    solutions, loggers = {}, {}
-    directory = _partial_dir(split)
-    if not os.path.isdir(directory):
-        return solutions, loggers
-    for name in task_names:
-        try:
-            path = os.path.join(directory, f'{_safe_task_name(name)}.json')
-            if not os.path.exists(path):
-                continue
-            with open(path, 'r') as f:
-                payload = json.load(f)
-        except Exception:
-            continue
-        # A --demo 300-iteration partial must never satisfy a 1500-iteration run.
-        if payload.get('n_steps') != n_steps or not payload.get('solution'):
-            continue
-        solutions[name] = payload['solution']
-        if payload.get('logger'):
-            loggers[name] = payload['logger']
-    return solutions, loggers
+# Keep these local names for the existing run_split call sites and log messages.
+_partial_dir = task_persistence.partial_dir
+load_task_partials = task_persistence.load_task_partials
 
 
 # A worker needs a couple of minutes of Inductor work to reach its peak RSS, so
@@ -229,6 +176,166 @@ def _cache_free_gb(cache_dir):
     return shutil.disk_usage(cache_dir).free / 1024**3
 
 
+class WorkerFailure(RuntimeError):
+    """A task worker failed, so the current attempt must be resumed."""
+
+    def __init__(self, message, *, task_name=None, gpu_id=None, exit_code=None,
+                 last_step=None, stage=None, compile_mode=None,
+                 exception_type=None, recoverable_task=False):
+        super().__init__(message)
+        self.task_name = task_name
+        self.gpu_id = gpu_id
+        self.exit_code = exit_code
+        self.last_step = last_step
+        self.stage = stage
+        self.compile_mode = compile_mode
+        self.exception_type = exception_type
+        self.recoverable_task = recoverable_task
+
+    def recovery_record(self):
+        return {
+            'timestamp': time.strftime('%Y-%m-%dT%H:%M:%S%z'),
+            'stage': self.stage,
+            'gpu_id': self.gpu_id,
+            'exit_code': self.exit_code,
+            'last_step': self.last_step,
+            'compile_mode': self.compile_mode,
+            'exception_type': self.exception_type,
+            'message': str(self)[-4000:],
+        }
+
+
+def _drain_worker_errors(error_queue):
+    records = []
+    while True:
+        try:
+            records.append(error_queue.get_nowait())
+        except queue.Empty:
+            return records
+
+
+def _step_location(step):
+    return f'after step {step}' if step is not None and step >= 0 else 'before training'
+
+
+def _format_reported_worker_error(record):
+    if not isinstance(record, dict):
+        return f'Worker reported an exception:\n{record}'
+    task_name = record.get('task_name', '<unknown>')
+    gpu_id = record.get('gpu_id', '?')
+    pid = record.get('pid', '?')
+    location = _step_location(record.get('last_step'))
+    traceback_text = record.get('traceback') or '<no traceback reported>'
+    return (
+        f'Worker {task_name} on GPU {gpu_id} (pid {pid}) failed {location}:\n'
+        f'{traceback_text.rstrip()}'
+    )
+
+
+def _worker_failure_from_report(record):
+    message = _format_reported_worker_error(record)
+    if not isinstance(record, dict):
+        return WorkerFailure(message)
+    stage = record.get('stage')
+    return WorkerFailure(
+        message,
+        task_name=record.get('task_name'),
+        gpu_id=record.get('gpu_id'),
+        exit_code=record.get('exit_code', 1),
+        last_step=record.get('last_step'),
+        stage=stage,
+        compile_mode=record.get('compile_mode'),
+        exception_type=record.get('exception_type'),
+        recoverable_task=stage in ('training', 'postprocess'),
+    )
+
+
+def _format_worker_exit(task_name, gpu_id, exitcode, last_step):
+    location = _step_location(last_step)
+    if exitcode is None:
+        detail = 'ended without an exit code'
+    elif exitcode < 0:
+        signum = -exitcode
+        try:
+            signal_name = signal.Signals(signum).name
+        except ValueError:
+            signal_name = f'signal {signum}'
+        detail = f'was terminated by signal {signum} ({signal_name})'
+        if signum == signal.SIGKILL:
+            detail += (
+                '; no Python traceback is possible. This may indicate the OS '
+                'OOM killer or another external kill'
+            )
+    else:
+        detail = f'exited with code {exitcode} without reporting a traceback'
+    return f'Worker {task_name} on GPU {gpu_id} {detail} {location}'
+
+
+def _worker_failure_from_exit(task_name, gpu_id, exitcode, last_step,
+                              compile_mode=None):
+    stage = 'training' if last_step is not None and last_step >= 0 else 'setup'
+    return WorkerFailure(
+        _format_worker_exit(task_name, gpu_id, exitcode, last_step),
+        task_name=task_name,
+        gpu_id=gpu_id,
+        exit_code=exitcode,
+        last_step=last_step,
+        stage=stage,
+        compile_mode=compile_mode,
+        recoverable_task=stage == 'training',
+    )
+
+
+def _validate_worker_outputs(task_name, memory_dict, solutions_dict,
+                             loggers_dict, require_logger):
+    missing = []
+    if task_name not in memory_dict:
+        missing.append('memory measurement')
+    if not solutions_dict.get(task_name):
+        missing.append('solution')
+    if require_logger and not task_persistence.is_complete_logger(
+        loggers_dict.get(task_name) if loggers_dict is not None else None
+    ):
+        missing.append('logger data')
+    if missing:
+        raise WorkerFailure(
+            f'Worker {task_name} exited successfully but did not publish: '
+            + ', '.join(missing)
+        )
+
+
+def _stop_process(process, timeout=30):
+    if process is None:
+        return
+    if process.is_alive():
+        process.terminate()
+        process.join(timeout=timeout)
+    if process.is_alive():
+        process.kill()
+        process.join(timeout=timeout)
+    else:
+        process.join(timeout=0)
+
+
+def _terminate_active_processes(processes):
+    for process in processes:
+        try:
+            _stop_process(process)
+        except Exception:
+            pass
+
+
+@contextmanager
+def _worker_process_guard(processes, arc_logger):
+    try:
+        yield
+    except BaseException:
+        _terminate_active_processes(processes)
+        if arc_logger is not None:
+            arc_logger.close_dashboard()
+        raise
+
+
 # ── Core scheduler ───────────────────────────────────────────────────────────
 
 @dataclass(frozen=True)
@@ -256,6 +363,7 @@ class ParallelRunOptions:
     verbose: bool = False
     postprocess_stride: int = 1
     accel_config: Optional[dict] = None
+    task_accel_configs: Optional[dict] = None
     partial_split: Optional[str] = None
     partial_n_steps: Optional[int] = None
     host_mem_per_worker_gb: float = 0.0
@@ -263,6 +371,12 @@ class ParallelRunOptions:
     stall_timeout_s: float = 1800.0
     cache_dir: Optional[str] = None
     cache_min_free_gb: float = 0.0
+
+
+def _effective_task_accel_config(task_name, default_config, task_configs=None):
+    task_configs = task_configs or {}
+    selected = task_configs.get(task_name, default_config)
+    return accel.AccelConfig.from_dict(selected).to_dict()
 
 def parallelize_runs(
     gpu_quotas,
@@ -296,6 +410,11 @@ def parallelize_runs(
         loggers_data   (dict)            : logger data per task (empty if not collected).
         time_taken     (float)           : wall-clock seconds.
     """
+    if n_gpus < 1:
+        raise ValueError('parallel ARC training requires at least one GPU')
+    if n_cpus < 1:
+        raise ValueError('parallel ARC training requires at least one worker')
+
     options = options or ParallelRunOptions()
     collect_logger_data = options.collect_logger_data
     track_progress = options.track_progress
@@ -307,6 +426,7 @@ def parallelize_runs(
     verbose = options.verbose
     postprocess_stride = options.postprocess_stride
     accel_config = options.accel_config
+    task_accel_configs = options.task_accel_configs
     partial_split = options.partial_split
     partial_n_steps = options.partial_n_steps
     host_mem_per_worker_gb = options.host_mem_per_worker_gb
@@ -325,6 +445,7 @@ def parallelize_runs(
     tasks_finished   = [False] * n_tasks
     processes        = [None]  * n_tasks
     process_gpu_ids  = [None]  * n_tasks
+    process_compile_modes = [None] * n_tasks
     task_start_times = [None]  * n_tasks
     task_last_pct    = {}   # task_name → last 10%-bucket logged
     task_last_step   = {}   # task_name → (step, when it last changed)
@@ -332,7 +453,9 @@ def parallelize_runs(
     mem_blocked      = False
     cache_blocked    = False
 
-    with multiprocessing.Manager() as manager:
+    with multiprocessing.Manager() as manager, _worker_process_guard(
+        processes, arc_logger,
+    ):
 
         # ── Shared inter-process structures ──────────────────────────────
         memory_dict    = manager.dict()
@@ -344,17 +467,33 @@ def parallelize_runs(
         # ── Main monitoring loop ──────────────────────────────────────────
         while not all(tasks_finished):
 
-            # Check for errors propagated from workers
-            if not error_queue.empty():
-                if arc_logger is not None:
-                    arc_logger.close_dashboard()
-                raise ValueError(error_queue.get())
+            reported_errors = _drain_worker_errors(error_queue)
+            if reported_errors:
+                raise _worker_failure_from_report(reported_errors[0])
 
             # ── Detect finished tasks ─────────────────────────────────
             for i in range(n_tasks):
                 if tasks_started[i] and not tasks_finished[i]:
-                    processes[i].join(timeout=0)
-                    if not processes[i].is_alive():
+                    process = processes[i]
+                    process.join(timeout=0)
+                    if not process.is_alive():
+                        reported_errors = _drain_worker_errors(error_queue)
+                        if reported_errors:
+                            raise _worker_failure_from_report(reported_errors[0])
+                        if process.exitcode != 0:
+                            last_step = (
+                                int(_progress_dict.get(task_names[i], -1))
+                                if _progress_dict is not None else None
+                            )
+                            raise _worker_failure_from_exit(
+                                task_names[i], process_gpu_ids[i],
+                                process.exitcode, last_step,
+                                process_compile_modes[i],
+                            )
+                        _validate_worker_outputs(
+                            task_names[i], memory_dict, solutions_dict,
+                            _loggers_dict, collect_logger_data,
+                        )
                         tasks_finished[i] = True
                         gpu_quotas[process_gpu_ids[i]] += task_usages[i]
 
@@ -367,15 +506,6 @@ def parallelize_runs(
                         solved_info = _check_solved(
                             task_names[i], solutions_json, solutions_dict
                         )
-
-                        if partial_split is not None:
-                            save_task_partial(
-                                partial_split, task_names[i], partial_n_steps,
-                                solutions_dict.get(task_names[i]),
-                                (_loggers_dict.get(task_names[i])
-                                 if _loggers_dict is not None else None),
-                                arc_logger,
-                            )
 
                         if arc_logger is not None:
                             arc_logger.log_task_finished(
@@ -428,8 +558,7 @@ def parallelize_runs(
 
             # ── Stall watchdog ────────────────────────────────────────
             # A wedged worker spins on the GPU forever and takes the whole
-            # campaign with it (j_base_50, 2026-08-27). Kill it and move on;
-            # with no partial written, --resume retries it next time.
+            # campaign with it. Abort this attempt so the wrapper can resume it.
             if _progress_dict is not None and stall_timeout_s > 0:
                 now = time.time()
                 for i in range(n_tasks):
@@ -447,14 +576,21 @@ def parallelize_runs(
                     if arc_logger is not None:
                         arc_logger.warning(
                             f'{name} stalled {where} for '
-                            f'{stall_timeout_s:.0f}s — terminating it'
+                            f'{stall_timeout_s:.0f}s — aborting this attempt'
                         )
-                    processes[i].terminate()
-                    processes[i].join(timeout=30)
-                    if processes[i].is_alive():
-                        processes[i].kill()
-                    tasks_finished[i] = True
-                    gpu_quotas[process_gpu_ids[i]] += task_usages[i]
+                    _stop_process(processes[i])
+                    raise WorkerFailure(
+                        f'Worker {name} on GPU {process_gpu_ids[i]} stalled '
+                        f'{where} for {stall_timeout_s:.0f}s and was terminated; '
+                        f'the task will be retried from its last completed partial',
+                        task_name=name,
+                        gpu_id=process_gpu_ids[i],
+                        exit_code=None,
+                        last_step=step,
+                        stage='training',
+                        compile_mode=process_compile_modes[i],
+                        recoverable_task=True,
+                    )
 
             # ── Schedule new tasks ────────────────────────────────────
             # One launch per tick: ten workers racing into the HIP allocator in
@@ -516,12 +652,15 @@ def parallelize_runs(
 
                     orig_idx = (task_original_idx.get(task_names[i], i)
                                 if task_original_idx else i)
+                    task_accel_config = _effective_task_accel_config(
+                        task_names[i], accel_config, task_accel_configs,
+                    )
 
                     worker_args = (
                         task_names[i], split, 1e20, n_iterations,
                         gpu_id, memory_dict, solutions_dict, error_queue,
                         _loggers_dict, _progress_dict, postprocess_stride,
-                        accel_config,
+                        task_accel_config, partial_split, partial_n_steps,
                     )
                     p = multiprocessing.Process(
                         target=solve_task.solve_task, args=worker_args
@@ -530,6 +669,7 @@ def parallelize_runs(
                     processes[i]       = p
                     tasks_started[i]   = True
                     process_gpu_ids[i] = gpu_id
+                    process_compile_modes[i] = task_accel_config['compile_mode']
                     recent_launches.append(time.time())
                     launched = True
 
@@ -552,11 +692,9 @@ def parallelize_runs(
             sys.stdout.write('\n')
             sys.stdout.flush()
 
-        # Final error scan
-        if not error_queue.empty():
-            if arc_logger is not None:
-                arc_logger.close_dashboard()
-            raise ValueError(error_queue.get())
+        reported_errors = _drain_worker_errors(error_queue)
+        if reported_errors:
+            raise _worker_failure_from_report(reported_errors[0])
 
         # ── Collect results before Manager shuts down ─────────────────
         memory_dict_out    = dict(memory_dict)
@@ -615,10 +753,20 @@ def load_memory_cache(split, n_gpus, required_task_names, accel_config=None):
 
 def save_memory_cache(split, n_gpus, memory_dict, accel_config=None):
     path = _cache_path(split)
+    fingerprint = _gpu_fingerprint(n_gpus, accel_config)
+    measurements = {}
+    try:
+        with open(path, 'r') as f:
+            existing = json.load(f)
+        if existing.get('fingerprint') == fingerprint:
+            measurements.update(existing.get('measurements', {}))
+    except (FileNotFoundError, OSError, ValueError, TypeError, json.JSONDecodeError):
+        pass
+    measurements.update({k: int(v) for k, v in memory_dict.items()})
     cache = {
-        'fingerprint':  _gpu_fingerprint(n_gpus, accel_config),
+        'fingerprint':  fingerprint,
         'created_at':   time.strftime('%Y-%m-%d %H:%M:%S'),
-        'measurements': {k: int(v) for k, v in memory_dict.items()},
+        'measurements': measurements,
     }
     with open(path, 'w') as f:
         json.dump(cache, f, indent=2)
@@ -626,9 +774,133 @@ def save_memory_cache(split, n_gpus, memory_dict, accel_config=None):
 
 # ── Per-split runner ─────────────────────────────────────────────────────────
 
+
+def _validate_recovery_task_ids(task_names, eager_tasks, retry_quarantined):
+    known = set(task_names)
+    unknown = (set(eager_tasks) | set(retry_quarantined)) - known
+    if unknown:
+        raise ValueError(
+            'unknown recovery task id(s): ' + ', '.join(sorted(unknown))
+        )
+
+
+def _parse_task_id_list(value):
+    if not value:
+        return set()
+    task_ids = set()
+    for raw_task_id in value.split(','):
+        task_id = raw_task_id.strip()
+        if not task_id:
+            continue
+        try:
+            task_ids.add(task_persistence.safe_task_name(task_id))
+        except ValueError as exc:
+            raise argparse.ArgumentTypeError(str(exc)) from exc
+    return task_ids
+
+
+def _recovery_task_sets(task_names, recovery_entries, eager_tasks,
+                        retry_quarantined):
+    """Resolve durable and operator-requested task recovery policy."""
+    _validate_recovery_task_ids(task_names, eager_tasks, retry_quarantined)
+    quarantined = {
+        name for name, entry in recovery_entries.items()
+        if name in task_names and entry.get('state') == 'quarantined'
+    }
+    invalid_retries = set(retry_quarantined) - quarantined
+    if invalid_retries:
+        raise ValueError(
+            'task id(s) are not quarantined: '
+            + ', '.join(sorted(invalid_retries))
+        )
+    automatic_eager = {
+        name for name, entry in recovery_entries.items()
+        if name in task_names
+        and entry.get('state') in ('retry_eager', 'recovered_eager')
+    }
+    effective_eager = (
+        set(eager_tasks) | automatic_eager | set(retry_quarantined)
+    )
+    skipped = quarantined - set(retry_quarantined)
+    effective_eager -= skipped
+    return effective_eager, skipped
+
+
+def _task_eager_config(accel_config):
+    return {**accel.AccelConfig.from_dict(accel_config).to_dict(),
+            'compile_mode': 'off'}
+
+
+def _activate_quarantined_retries(split, n_steps, task_names,
+                                  recovery_entries, arc_logger=None):
+    """Make an operator-requested eager retry durable across attempts."""
+    for task_name in task_names:
+        entry = task_persistence.update_task_recovery(
+            split, task_name, n_steps, 'retry_eager',
+        )
+        recovery_entries[task_name] = entry
+    if task_names and arc_logger is not None:
+        arc_logger.info(
+            'Reactivated quarantined tasks for eager retry: '
+            + ', '.join(sorted(task_names))
+        )
+
+
+def _record_task_recovery_failure(split, n_steps, failure, enabled, arc_logger):
+    """Persist the next recovery state, returning whether it was handled."""
+    if (
+        not enabled
+        or not isinstance(failure, WorkerFailure)
+        or not failure.recoverable_task
+        or not failure.task_name
+        or failure.compile_mode not in accel.COMPILE_CHOICES
+    ):
+        return False
+    state = (
+        'quarantined' if failure.compile_mode == 'off'
+        else 'retry_eager'
+    )
+    task_persistence.update_task_recovery(
+        split, failure.task_name, n_steps, state,
+        failure.recovery_record(),
+    )
+    if arc_logger is not None:
+        if state == 'retry_eager':
+            action = 'will retry eagerly in a fresh attempt'
+        else:
+            action = 'quarantined after an eager failure'
+        arc_logger.warning(f'{failure.task_name}: {action}')
+    return True
+
+
+def _quarantined_fallback(n_test):
+    """Return the solver's deterministic initial guess for a skipped task."""
+    return [
+        {
+            'attempt_1': [[0, 0], [0, 0]],
+            'attempt_2': [[0, 0], [0, 0]],
+        }
+        for _ in range(n_test)
+    ]
+
+
+def _apply_quarantined_fallbacks(solutions, loggers, task_names,
+                                 task_test_counts):
+    for task_name in task_names:
+        solutions[task_name] = _quarantined_fallback(
+            task_test_counts[task_name]
+        )
+        loggers[task_name] = {
+            'solution_contributions_log': [],
+            'solution_picks_history': [],
+        }
+
+
 def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
               postprocess_stride=4, accel_cfg=None, n_steps=1500,
-              compile_memory_factor=1.2, resume=False, limits=None):
+              compile_memory_factor=1.2, resume=False, limits=None,
+              recover_task_failures=False, eager_tasks=None,
+              retry_quarantined=None):
     """
     Execute the full two-phase pipeline for one split and save all outputs.
 
@@ -647,6 +919,10 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             earlier interrupted run at the same n_steps.
         limits (ResourceLimits|None): host-RAM caps, VRAM packing margin and the
             stall watchdog timeout.
+        recover_task_failures (bool): persist task-level compiled-to-eager and
+            eager-to-quarantine transitions before aborting a failed attempt.
+        eager_tasks (set[str]|None): task ids forced to use eager forward mode.
+        retry_quarantined (set[str]|None): quarantined task ids to retry eagerly.
 
     Returns:
         n_solved (int)         : tasks solved (always 0 for 'test').
@@ -656,6 +932,8 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     """
     split_start = time.time()
     limits = limits or ResourceLimits()
+    eager_tasks = set(eager_tasks or ())
+    retry_quarantined = set(retry_quarantined or ())
     accel_cfg = accel.AccelConfig.from_dict(accel_cfg)
     accel_config = accel_cfg.to_dict()
     # Phase 1 never compiles (Eje D): compiling to run 2 iterations cost ~1200 s
@@ -687,6 +965,10 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     with open(f'dataset/arc-agi_{split}_challenges.json', 'r') as f:
         problems = json.load(f)
     original_task_names = list(problems.keys())
+    task_test_counts = {
+        name: len(problem.get('test', ()))
+        for name, problem in problems.items()
+    }
     del problems
 
     if demo_n is not None:
@@ -698,6 +980,39 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         )
 
     n_tasks = len(original_task_names)
+    recovery_entries = task_persistence.load_task_recovery(split, n_steps)
+    effective_eager_tasks, quarantined_tasks = _recovery_task_sets(
+        original_task_names, recovery_entries, eager_tasks, retry_quarantined,
+    )
+    _activate_quarantined_retries(
+        split, n_steps, retry_quarantined, recovery_entries, arc_logger,
+    )
+    if resume:
+        arc_logger.info(f'Loading partial results for split {split}')
+        resume_solutions, resume_loggers = load_task_partials(
+            split, original_task_names, n_steps,
+        )
+    else:
+        resume_solutions, resume_loggers = {}, {}
+    resolved_quarantines = quarantined_tasks & set(resume_solutions)
+    for task_name in resolved_quarantines:
+        task_persistence.update_task_recovery(
+            split, task_name, n_steps, 'recovered_eager',
+        )
+    quarantined_tasks -= resolved_quarantines
+    runnable_task_names = [
+        name for name in original_task_names if name not in quarantined_tasks
+    ]
+    if effective_eager_tasks:
+        arc_logger.info(
+            'Task-specific eager mode: '
+            + ', '.join(sorted(effective_eager_tasks))
+        )
+    if quarantined_tasks:
+        arc_logger.warning(
+            'Skipping quarantined tasks: '
+            + ', '.join(sorted(quarantined_tasks))
+        )
 
     arc_logger.log_run_start(n_tasks, n_gpus)
     arc_logger.info(f'Acceleration (Eje D): {accel_cfg.summary()}')
@@ -707,7 +1022,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     gpu_memory_quotas = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
 
     cached_memory_dict = load_memory_cache(
-        split, n_gpus, original_task_names, measure_config
+        split, n_gpus, runnable_task_names, measure_config
     )
     if cached_memory_dict is not None:
         t_p1 = 0.0
@@ -722,17 +1037,18 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         memory_dict = cached_memory_dict
     else:
         arc_logger.log_phase(
-            f'Phase 1 — Memory measurement  (2 iterations × {n_tasks} tasks)'
+            f'Phase 1 — Memory measurement  '
+            f'(2 iterations × {len(runnable_task_names)} tasks)'
         )
         gpu_task_quotas = [1] * n_gpus  # one task at a time → clean individual measurements
 
         memory_dict, _, _, t_p1 = parallelize_runs(
             gpu_task_quotas,
-            [1] * n_tasks,
+            [1] * len(runnable_task_names),
             2,
-            original_task_names,
+            runnable_task_names,
             split,
-            n_tasks, n_gpus, n_cpus,
+            len(runnable_task_names), n_gpus, n_cpus,
             ParallelRunOptions(
                 arc_logger=arc_logger,
                 n_original_tasks=n_tasks,
@@ -766,15 +1082,12 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     sorted_mem_usages = [mem  for _, mem  in sorted_tasks]
 
     # Skip tasks a previous interrupted run already finished at this n_steps.
-    resume_solutions, resume_loggers = (
-        load_task_partials(split, original_task_names, n_steps) if resume
-        else ({}, {})
-    )
     if resume_solutions:
+        remaining = n_tasks - len(resume_solutions) - len(quarantined_tasks)
         arc_logger.info(
             f'Resume: {len(resume_solutions)}/{n_tasks} tasks already complete in '
             f'{_partial_dir(split)} — Phase 2 will run the remaining '
-            f'{n_tasks - len(resume_solutions)}'
+            f'{remaining}'
         )
         pending = [(name, mem) for name, mem in zip(sorted_names, sorted_mem_usages)
                    if name not in resume_solutions]
@@ -805,38 +1118,95 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     )
 
     if sorted_names:
-        _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
-            safe_gpu_memory_quotas,
-            sorted_mem_usages,
-            n_steps,
-            sorted_names,
-            split,
-            len(sorted_names), n_gpus, n_cpus,
-            ParallelRunOptions(
-                collect_logger_data=True,
-                track_progress=True,
-                arc_logger=arc_logger,
-                solutions_json=solutions_json,
-                task_original_idx=task_original_idx,
-                n_original_tasks=n_tasks,
-                quiet=False,
-                verbose=True,
-                postprocess_stride=postprocess_stride,
-                accel_config=accel_config,
-                partial_split=split,
-                partial_n_steps=n_steps,
-                host_mem_per_worker_gb=limits.host_mem_per_worker_gb,
-                host_mem_reserve_gb=limits.host_mem_reserve_gb,
-                stall_timeout_s=limits.stall_timeout_s,
-                cache_dir=cache_dir,
-                cache_min_free_gb=limits.cache_min_free_gb,
-            ),
-        )
+        eager_config = _task_eager_config(accel_config)
+        task_accel_configs = {
+            name: eager_config for name in effective_eager_tasks
+            if name in sorted_names
+        }
+        try:
+            _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                safe_gpu_memory_quotas,
+                sorted_mem_usages,
+                n_steps,
+                sorted_names,
+                split,
+                len(sorted_names), n_gpus, n_cpus,
+                ParallelRunOptions(
+                    collect_logger_data=True,
+                    track_progress=True,
+                    arc_logger=arc_logger,
+                    solutions_json=solutions_json,
+                    task_original_idx=task_original_idx,
+                    n_original_tasks=n_tasks,
+                    quiet=False,
+                    verbose=True,
+                    postprocess_stride=postprocess_stride,
+                    accel_config=accel_config,
+                    task_accel_configs=task_accel_configs,
+                    partial_split=split,
+                    partial_n_steps=n_steps,
+                    host_mem_per_worker_gb=limits.host_mem_per_worker_gb,
+                    host_mem_reserve_gb=limits.host_mem_reserve_gb,
+                    stall_timeout_s=limits.stall_timeout_s,
+                    cache_dir=cache_dir,
+                    cache_min_free_gb=limits.cache_min_free_gb,
+                ),
+            )
+        except WorkerFailure as failure:
+            _record_task_recovery_failure(
+                split, n_steps, failure, recover_task_failures, arc_logger,
+            )
+            raise
     else:
         solutions_dict, loggers_data, t_p2 = {}, {}, 0.0
+    trained_this_attempt = len(solutions_dict)
     solutions_dict = {**resume_solutions, **solutions_dict}
     loggers_data   = {**resume_loggers,   **loggers_data}
     arc_logger.info(f'Phase 2 complete in {t_p2:.1f}s')
+
+    recovered_eager_tasks = {
+        name for name in effective_eager_tasks
+        if solutions_dict.get(name)
+    }
+    for task_name in recovered_eager_tasks:
+        if recovery_entries.get(task_name, {}).get('state') != 'recovered_eager':
+            task_persistence.update_task_recovery(
+                split, task_name, n_steps, 'recovered_eager',
+            )
+
+    fallback_quarantined = {
+        name for name in quarantined_tasks if not solutions_dict.get(name)
+    }
+    _apply_quarantined_fallbacks(
+        solutions_dict, loggers_data, fallback_quarantined, task_test_counts,
+    )
+    if fallback_quarantined:
+        arc_logger.warning(
+            f'{n_tasks - len(fallback_quarantined)} tasks have real results; '
+            f'{len(fallback_quarantined)} quarantined task(s) use the '
+            f'deterministic 2x2-zero fallback: '
+            + ', '.join(sorted(fallback_quarantined))
+        )
+
+    missing_solutions = [
+        name for name in original_task_names if not solutions_dict.get(name)
+    ]
+    missing_loggers = [
+        name for name in original_task_names
+        if not task_persistence.is_complete_logger(loggers_data.get(name))
+    ]
+    if missing_solutions or missing_loggers:
+        details = []
+        if missing_solutions:
+            details.append(f'{len(missing_solutions)} missing solutions')
+        if missing_loggers:
+            details.append(f'{len(missing_loggers)} missing logger records')
+        raise WorkerFailure(
+            'Refusing to write incomplete split outputs: ' + ', '.join(details)
+        )
+    solutions_dict = {
+        name: solutions_dict[name] for name in original_task_names
+    }
 
     # ── Save predictions_{split}.npz in original JSON task order ─────
     predictions_file = f'predictions_{split}.npz'
@@ -869,12 +1239,9 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     arc_logger.info(f'Saved {submission_file}')
 
     # ── Count solved tasks ────────────────────────────────────────────
-    n_solved = 0
-    if solutions_json is not None:
-        for task_name, pred in solutions_dict.items():
-            true_sol = solutions_json.get(task_name)
-            if true_sol and pred and _check_all_examples(pred, true_sol) is not None:
-                n_solved += 1
+    n_solved = _count_solved_tasks(
+        solutions_dict, solutions_json, fallback_quarantined,
+    )
 
     elapsed = time.time() - split_start
     arc_logger.log_run_summary(n_solved, n_tasks, elapsed, predictions_file)
@@ -901,6 +1268,20 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             'phase1_s':           round(t_p1, 1),
             'phase2_s':           round(t_p2, 1),
             'resumed_tasks':      len(resume_solutions),
+            'trained_this_attempt': trained_this_attempt,
+            'real_result_tasks':  n_tasks - len(fallback_quarantined),
+            'degraded':           bool(fallback_quarantined),
+            'recovery': {
+                'enabled': recover_task_failures,
+                'manifest': task_persistence.recovery_path(split),
+                'explicit_eager_tasks': sorted(eager_tasks),
+                'effective_eager_tasks': sorted(effective_eager_tasks),
+                'recovered_eager_tasks': sorted(recovered_eager_tasks),
+                'quarantined_tasks': sorted(fallback_quarantined),
+                'fallback_strategy': (
+                    '2x2_zero_initial_guess' if fallback_quarantined else None
+                ),
+            },
             'limits':             asdict(limits),
             'inductor_cache': {
                 'path': cache_dir,
@@ -931,6 +1312,19 @@ def _check_solved(task_name, solutions_json, solutions_dict):
     if not pred:
         return None
     return _check_all_examples(pred, true_sol)
+
+
+def _count_solved_tasks(solutions_dict, solutions_json, excluded_tasks=()):
+    if solutions_json is None:
+        return 0
+    excluded_tasks = set(excluded_tasks)
+    return sum(
+        1 for task_name, pred in solutions_dict.items()
+        if task_name not in excluded_tasks
+        and solutions_json.get(task_name)
+        and pred
+        and _check_all_examples(pred, solutions_json[task_name]) is not None
+    )
 
 
 def _check_all_examples(pred, true_sol):
@@ -1020,6 +1414,35 @@ if __name__ == '__main__':
             'interrupted run at the same --iterations. Results are always '
             'written there; this flag only controls whether they are consumed. '
             'Delete the directory to force a clean run.'
+        ),
+    )
+    parser.add_argument(
+        '--recover-task-failures',
+        action='store_true',
+        help=(
+            'Persist recoverable task failures across attempts. A compiled '
+            'task is retried eagerly in a fresh worker; an eager task that '
+            'also fails is quarantined so the remaining split can finish.'
+        ),
+    )
+    parser.add_argument(
+        '--eager-tasks',
+        type=_parse_task_id_list,
+        default=set(),
+        metavar='TASK_IDS',
+        help=(
+            'Comma-separated task ids that must run without torch.compile. '
+            'Other tasks retain the selected acceleration preset.'
+        ),
+    )
+    parser.add_argument(
+        '--retry-quarantined',
+        type=_parse_task_id_list,
+        default=set(),
+        metavar='TASK_IDS',
+        help=(
+            'Comma-separated quarantined task ids to retry eagerly. Use for '
+            'one deliberate recovery attempt after investigating the failure.'
         ),
     )
     parser.add_argument(
@@ -1236,6 +1659,17 @@ if __name__ == '__main__':
         ['training', 'evaluation', 'test'] if args.split == 'all'
         else [args.split]
     )
+    split_task_ids = {}
+    for selected_split in splits_to_run:
+        with open(
+            f'dataset/arc-agi_{selected_split}_challenges.json', 'r'
+        ) as handle:
+            split_task_ids[selected_split] = set(json.load(handle))
+    _validate_recovery_task_ids(
+        set().union(*split_task_ids.values()),
+        args.eager_tasks,
+        args.retry_quarantined,
+    )
 
     overall_start = time.time()
     n_cpus = args.max_workers if args.max_workers else multiprocessing.cpu_count()
@@ -1280,9 +1714,14 @@ if __name__ == '__main__':
                 compile_memory_factor=args.compile_memory_factor,
                 resume=args.resume,
                 limits=limits,
+                recover_task_failures=args.recover_task_failures,
+                eager_tasks=args.eager_tasks & split_task_ids[split],
+                retry_quarantined=(
+                    args.retry_quarantined & split_task_ids[split]
+                ),
             )
         except BaseException:
-            arc_logger.close_dashboard()
+            arc_logger.log_run_failed(traceback.format_exc())
             raise
 
         total_solved += n_solved

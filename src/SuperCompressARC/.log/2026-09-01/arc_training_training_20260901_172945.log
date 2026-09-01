@@ -1,0 +1,51 @@
+2026-09-01 17:29:45 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1525.9 GB free, minimum 50.0 GB)
+2026-09-01 17:29:45 | INFO     | ========================================================================
+2026-09-01 17:29:45 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-01 17:29:45 | INFO     |   Tasks       : 400
+2026-09-01 17:29:45 | INFO     |   GPUs        : 1
+2026-09-01 17:29:45 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-01/arc_training_training_20260901_172945.log
+2026-09-01 17:29:45 | INFO     |   Results file: results_2026-09-01_17-29-45.txt
+2026-09-01 17:29:45 | INFO     | ========================================================================
+2026-09-01 17:29:45 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:29:45 | INFO     | Acceleration (Eje D): accel amp=off compile=default matmul=high threads=1 alloc=-
+2026-09-01 17:29:45 | INFO     | ------------------------------------------------------------------------
+2026-09-01 17:29:45 | INFO     | PHASE: Phase 1 — SKIPPED — loaded 400 task measurements from memory_cache_training.json
+2026-09-01 17:29:45 | INFO     | ------------------------------------------------------------------------
+2026-09-01 17:29:45 | INFO     | GPU fingerprint matches cached run. Delete memory_cache_training.json to force re-measurement.
+2026-09-01 17:29:45 | INFO     | Compiled Phase 2: scaled eager Phase-1 measurements by 1.2x  (mean 1098 MB/task)
+2026-09-01 17:29:45 | INFO     | Loading partial results for split training
+2026-09-01 17:29:45 | INFO     | Resume: 97/400 tasks already complete in .partial/training — Phase 2 will run the remaining 303
+2026-09-01 17:29:45 | INFO     | Phase 2 VRAM budget: GPU0=14.86 GB of 15.86 GB free
+2026-09-01 17:29:45 | INFO     | ------------------------------------------------------------------------
+2026-09-01 17:29:45 | INFO     | PHASE: Phase 2 — Full training  (2000 iterations × 303 tasks)
+2026-09-01 17:29:45 | INFO     | ------------------------------------------------------------------------
+2026-09-01 17:29:45 | INFO     | Host RAM: 90 GB free − 12 GB reserved = 78 GB for workers → cap 8 (at 9.0 GB/worker)
+2026-09-01 17:29:46 | INFO     | START [293/400] ba97ae07  →  GPU 0
+2026-09-01 17:29:46 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:29:46 | INFO     | START [340/400] d687bc17  →  GPU 0
+2026-09-01 17:29:46 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:29:46 | INFO     | START [  2/400] 00d62c1b  →  GPU 0
+2026-09-01 17:29:46 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:29:46 | INFO     | START [ 55/400] 272f95fa  →  GPU 0
+2026-09-01 17:29:46 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:29:46 | INFO     | START [396/400] fcb5c309  →  GPU 0
+2026-09-01 17:29:46 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:29:46 | INFO     | START [358/400] e21d9049  →  GPU 0
+2026-09-01 17:29:46 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:29:47 | DEBUG    | PROG  ba97ae07  step    0/2000  (  0.0%)
+2026-09-01 17:29:47 | DEBUG    | PROG  d687bc17  step    0/2000  (  0.0%)
+2026-09-01 17:29:47 | DEBUG    | PROG  00d62c1b  step    0/2000  (  0.0%)
+2026-09-01 17:29:47 | DEBUG    | PROG  272f95fa  step    0/2000  (  0.0%)
+2026-09-01 17:29:47 | DEBUG    | PROG  fcb5c309  step    0/2000  (  0.0%)
+2026-09-01 17:29:47 | DEBUG    | PROG  e21d9049  step    0/2000  (  0.0%)
+2026-09-01 17:34:05 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 425, in parallelize_runs
+    raise WorkerFailure(_format_worker_exit(
+WorkerFailure: Worker fcb5c309 on GPU 0 was terminated by signal 6 (SIGABRT) after step 10

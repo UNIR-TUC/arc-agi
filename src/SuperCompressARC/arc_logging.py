@@ -445,6 +445,13 @@ class ArcLogger:
             self.logger.info(f'  Predictions saved : {predictions_file}')
         self.logger.info('=' * 72)
 
+    def log_run_failed(self, traceback_text):
+        self.dashboard.close()
+        self.logger.error(
+            'RUN FAILED — completed task partials remain resumable\n%s',
+            str(traceback_text).rstrip(),
+        )
+
     def log_gpu_stats(self, gpu_id):
         self._log_single_gpu(gpu_id)
 

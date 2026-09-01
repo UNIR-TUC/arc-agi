@@ -63,6 +63,66 @@ python list_solved_puzzles.py results_for_the_blog_post/predictions_training.npz
 
 # Running All Tasks and Debugging Guide
 
+## Crash-resumable production runs
+
+Use the shell wrappers for unattended runs. They validate the dedicated
+TorchInductor cache, bound host-memory concurrency, persist every completed
+task under `.partial/<split>/`, and retry a failed Python attempt up to five
+times (the initial attempt plus four retries):
+
+```bash
+./run_training_full.sh
+./run_evaluation_full.sh
+./run_test_full.sh
+./run_all_full.sh
+```
+
+`run_all_full.sh` is the canonical three-split campaign. It runs training,
+evaluation and test in order and writes `campaign_summary.json` plus
+`timing_result.txt`. Individual wrappers write `run_summary_<split>.json`.
+These distinguish cumulative Python attempt time from total wall time, which
+also includes cache checks and retry waits.
+
+Completed tasks survive failures and are skipped by `--resume`; tasks still
+running when an attempt fails restart from iteration zero. Python tracebacks
+and worker-exit diagnoses are written to both `.log/YYYY-MM-DD/` and
+`run_logs/`. A process killed by `SIGKILL` cannot provide a Python traceback,
+so the runner records the signal and notes that an OS OOM kill is one possible
+cause.
+
+### Recovering a failing GPU task
+
+The production wrappers enable task recovery by default. If a compiled worker
+fails during training, the attempt stops so every GPU process is replaced, and
+the failed task is retried eagerly on the next `--resume` attempt. If that eager
+attempt also fails, the task is quarantined and later attempts finish the rest
+of the split. Recovery state is stored in
+`.partial/<split>/.task_recovery.json`; real completed task partials are never
+replaced by recovery records.
+
+To resume while forcing a known compile-unsafe task to eager mode:
+
+```bash
+EAGER_TASKS=fcb5c309 ./run_training_full.sh
+```
+
+Other tasks still use the `compile` preset. To retry a quarantined task later,
+after investigating its failure:
+
+```bash
+RETRY_QUARANTINED_TASKS=fcb5c309 ./run_training_full.sh
+```
+
+A quarantined task receives the solver's deterministic 2x2-zero initial guess
+only in the final artifacts. It is not saved as a completed partial, is excluded
+from solved counts, and is named under `recovery.quarantined_tasks` with
+`degraded: true` in `run_metadata_<split>.json` and the run summaries.
+
+For an emergency all-eager resume, use
+`ACCEL_PRESET=baseline ./run_training_full.sh`. Deleting
+`memory_cache_<split>.json` does not address a Triton illegal-memory-access:
+Phase 1 already runs eagerly and only measures scheduling memory.
+
 ## Running all tasks in one command
 
 Two scripts already support running the full training split (400 tasks) in a single command. They differ only in execution strategy — the algorithm, number of iterations (2000), and optimizer settings are identical for every task.
