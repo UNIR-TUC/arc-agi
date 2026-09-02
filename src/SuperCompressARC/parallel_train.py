@@ -295,6 +295,7 @@ def parallelize_runs(
         solutions_dict (dict)            : Kaggle-format predictions per task.
         loggers_data   (dict)            : logger data per task (empty if not collected).
         time_taken     (float)           : wall-clock seconds.
+        gpu_metrics    (dict[str, dict])  : process-local peaks and device-wide usage.
     """
     options = options or ParallelRunOptions()
     collect_logger_data = options.collect_logger_data
@@ -337,6 +338,7 @@ def parallelize_runs(
         # ── Shared inter-process structures ──────────────────────────────
         memory_dict    = manager.dict()
         solutions_dict = manager.dict()
+        gpu_metrics_dict = manager.dict()
         error_queue    = manager.Queue()
         _loggers_dict  = manager.dict() if collect_logger_data else None
         _progress_dict = manager.dict() if track_progress       else None
@@ -359,7 +361,10 @@ def parallelize_runs(
                         gpu_quotas[process_gpu_ids[i]] += task_usages[i]
 
                         elapsed  = time.time() - task_start_times[i]
-                        peak_mb  = memory_dict.get(task_names[i], 0) / 1024**2
+                        metrics = gpu_metrics_dict.get(task_names[i], {})
+                        peak_mb = metrics.get(
+                            'peak_reserved_bytes', memory_dict.get(task_names[i], 0)
+                        ) / 1024**2
                         orig_idx = (task_original_idx.get(task_names[i], i)
                                     if task_original_idx else i)
 
@@ -521,7 +526,7 @@ def parallelize_runs(
                         task_names[i], split, 1e20, n_iterations,
                         gpu_id, memory_dict, solutions_dict, error_queue,
                         _loggers_dict, _progress_dict, postprocess_stride,
-                        accel_config,
+                        accel_config, gpu_metrics_dict,
                     )
                     p = multiprocessing.Process(
                         target=solve_task.solve_task, args=worker_args
@@ -561,6 +566,7 @@ def parallelize_runs(
         # ── Collect results before Manager shuts down ─────────────────
         memory_dict_out    = dict(memory_dict)
         solutions_dict_out = dict(solutions_dict)
+        gpu_metrics_out    = dict(gpu_metrics_dict)
         loggers_data = dict(_loggers_dict) if _loggers_dict is not None else {}
 
     time_taken = time.time() - t
@@ -569,7 +575,7 @@ def parallelize_runs(
     if verbose:
         print('All jobs finished in', time_taken, 'seconds.')
 
-    return memory_dict_out, solutions_dict_out, loggers_data, time_taken
+    return memory_dict_out, solutions_dict_out, loggers_data, time_taken, gpu_metrics_out
 
 
 # ── Phase 1 memory-measurement cache ────────────────────────────────────────
@@ -711,6 +717,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     )
     if cached_memory_dict is not None:
         t_p1 = 0.0
+        phase1_gpu_metrics = None
         arc_logger.log_phase(
             f'Phase 1 — SKIPPED — loaded {len(cached_memory_dict)} task '
             f'measurements from {_cache_path(split)}'
@@ -726,7 +733,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         )
         gpu_task_quotas = [1] * n_gpus  # one task at a time → clean individual measurements
 
-        memory_dict, _, _, t_p1 = parallelize_runs(
+        memory_dict, _, _, t_p1, phase1_gpu_metrics = parallelize_runs(
             gpu_task_quotas,
             [1] * n_tasks,
             2,
@@ -805,7 +812,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     )
 
     if sorted_names:
-        _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+        _, solutions_dict, loggers_data, t_p2, phase2_gpu_metrics = parallelize_runs(
             safe_gpu_memory_quotas,
             sorted_mem_usages,
             n_steps,
@@ -834,6 +841,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         )
     else:
         solutions_dict, loggers_data, t_p2 = {}, {}, 0.0
+        phase2_gpu_metrics = {}
     solutions_dict = {**resume_solutions, **solutions_dict}
     loggers_data   = {**resume_loggers,   **loggers_data}
     arc_logger.info(f'Phase 2 complete in {t_p2:.1f}s')
@@ -902,6 +910,10 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             'phase2_s':           round(t_p2, 1),
             'resumed_tasks':      len(resume_solutions),
             'limits':             asdict(limits),
+            'gpu_memory': {
+                'phase1_workers': phase1_gpu_metrics,
+                'phase2_workers': phase2_gpu_metrics,
+            },
             'inductor_cache': {
                 'path': cache_dir,
                 'free_gb_at_end': (

@@ -701,6 +701,23 @@ permiten recalibrarla.
 > tareas en los nueve runs de la batería nocturna. Hoy `--compile-memory-factor`
 > vale **1,2** y sólo aporta margen de seguridad.
 
+#### Telemetría de memoria por worker
+
+Cada worker publica tres valores adicionales en `run_metadata_{split}.json`, bajo
+`gpu_memory.phase1_workers` o `gpu_memory.phase2_workers`:
+
+| Campo | Alcance | Significado |
+|---|---|---|
+| `peak_allocated_bytes` | proceso | Máximo de memoria de tensores registrada por el allocator de PyTorch |
+| `peak_reserved_bytes` | proceso | Máximo del pool reservado por el allocator de PyTorch |
+| `device_used_bytes` | dispositivo | VRAM total usada cuando termina el worker; incluye los demás procesos |
+
+El entero histórico de `memory_dict` y `memory_cache_{split}.json` sigue siendo
+`device_used_bytes` para no alterar el empaquetado del scheduler durante esta fase. El
+profiler agrega por separado los máximos de proceso y etiqueta la instantánea global como
+`device_used_at_worker_exit_max_mb`. Metadatos antiguos sin `gpu_memory` siguen siendo
+válidos y producen cero reports y valores `null`.
+
 ### 10.4 Invalidación de la caché de medición de VRAM
 
 **Este es el punto más sutil de la integración.** La Fase 1 mide el *footprint* de VRAM de

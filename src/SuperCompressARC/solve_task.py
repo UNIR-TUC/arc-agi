@@ -20,13 +20,15 @@ import layers
 import solution_selection
 import visualization
 import accel
+import gpu_memory
 
 """
 A script that solves one puzzle, to be imported and used with parallel_train.py and multiprocessing.
 """
 
 def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_dict, solutions_dict, error_queue,
-               loggers_dict=None, progress_dict=None, postprocess_stride=1, accel_config=None):
+               loggers_dict=None, progress_dict=None, postprocess_stride=1, accel_config=None,
+               gpu_metrics_dict=None):
     """
     Solves a puzzle.
     Args:
@@ -50,6 +52,8 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         accel_config (dict, optional): Serialized accel.AccelConfig (Eje D, §9.6):
             BF16 autocast, torch.compile and host/silicon tuning. None or an
             all-defaults config reproduces the untouched baseline.
+        gpu_metrics_dict (multiprocessing.Dict, optional): Shared dict receiving
+            process-local allocator peaks and device-wide usage for this task.
     """
 
     try:  # Error catching block that puts errors on the error_queue
@@ -118,12 +122,12 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
             }
 
         # Measure actual GPU memory BEFORE cleanup: includes HIP/CUDA context +
-        # PyTorch reserved allocator pool + active tensors.  Much more accurate
-        # than max_memory_allocated(), which misses the per-process context overhead
-        # (~200-400 MB on ROCm/RDNA4) that caused Phase 2 to schedule too many tasks.
-        torch.cuda.synchronize()
-        free_now, total_vram = torch.cuda.mem_get_info()
-        task_peak_memory = total_vram - free_now
+        # Keep the legacy scheduler/cache value as device-wide usage.  The
+        # separate report distinguishes process-local allocator peaks from this
+        # global snapshot so profiler output does not attribute other workers'
+        # memory to the task that happens to finish now.
+        gpu_metrics = gpu_memory.capture(torch.cuda)
+        task_peak_memory = gpu_metrics['device_used_bytes']
 
         del task
         del model
@@ -134,6 +138,8 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
 
         # Store the result
         memory_dict[task_name] = task_peak_memory
+        if gpu_metrics_dict is not None:
+            gpu_metrics_dict[task_name] = gpu_metrics
         solutions_dict[task_name] = example_list
 
     except Exception as e:  # If error, write to the error queue

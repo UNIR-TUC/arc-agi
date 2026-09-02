@@ -95,6 +95,8 @@ import time
 
 import psutil
 
+import gpu_memory
+
 
 # ── GPU sampling (best effort, vendor-agnostic) ──────────────────────────────
 
@@ -575,6 +577,7 @@ def run_and_profile(args, passthrough):
     # Metadata written by parallel_train.py: lets us report *training* throughput
     # (steps/s) and pass@2 accuracy, not just process counts.
     run_metadata, run_derived = _collect_run_metadata(t0)
+    worker_gpu_memory = gpu_memory.summarize_run_metadata(run_metadata)
     planned_steps = run_derived['planned_train_steps']
     n_solved = run_derived['n_solved']
     n_meta_tasks = run_derived['n_tasks']
@@ -621,6 +624,19 @@ def run_and_profile(args, passthrough):
             'util_mean_pct': round(statistics.mean(gpu_util_series), 1) if gpu_util_series else None,
             'util_max_pct': round(max(gpu_util_series), 1) if gpu_util_series else None,
             'mem_max_mb': round(max(gpu_mem_series), 1) if gpu_mem_series else None,
+            'worker_reports': worker_gpu_memory['worker_reports'],
+            'process_peak_allocated_max_mb': (
+                round(worker_gpu_memory['process_peak_allocated_max_bytes'] / 1024**2, 1)
+                if worker_gpu_memory['process_peak_allocated_max_bytes'] is not None else None
+            ),
+            'process_peak_reserved_max_mb': (
+                round(worker_gpu_memory['process_peak_reserved_max_bytes'] / 1024**2, 1)
+                if worker_gpu_memory['process_peak_reserved_max_bytes'] is not None else None
+            ),
+            'device_used_at_worker_exit_max_mb': (
+                round(worker_gpu_memory['device_used_at_worker_exit_max_bytes'] / 1024**2, 1)
+                if worker_gpu_memory['device_used_at_worker_exit_max_bytes'] is not None else None
+            ),
             'mem_busy_mean_pct': round(statistics.mean(gpu_mem_busy_series), 1) if gpu_mem_busy_series else None,
             'power_mean_w': round(statistics.mean(gpu_power_series), 1) if gpu_power_series else None,
             'power_max_w': round(max(gpu_power_series), 1) if gpu_power_series else None,
