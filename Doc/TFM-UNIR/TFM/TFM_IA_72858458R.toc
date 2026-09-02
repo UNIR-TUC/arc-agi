@@ -56,10 +56,17 @@
 \contentsline {section}{\numberline {4.3}Utilidades externas de ARC-AGI}{53}{section.4.3}%
 \contentsline {chapter}{\numberline {5}Desarrollo}{54}{chapter.5}%
 \contentsline {subsection}{\numberline {5.0.1}Análisis exploratorio de datos}{57}{subsection.5.0.1}%
-\contentsline {section}{\numberline {5.1}Arquitectura}{61}{section.5.1}%
-\contentsline {chapter}{\numberline {6}Resultados}{62}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Planificación}{63}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Estudio económico}{64}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{65}{chapter.9}%
-\contentsline {section}{Referencias}{65}{section*.12}%
-\contentsline {chapter}{\numberline {A}Apéndices}{67}{appendix.Alph1}%
+\contentsline {section}{\numberline {5.1}Sistema de referencia}{61}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Multitensors}{62}{subsection.5.1.1}%
+\contentsline {subsubsection}{Arquitectura de referencia}{63}{subsubsection*.12}%
+\contentsline {subsection}{\numberline {5.1.2}Limitaciones}{63}{subsection.5.1.2}%
+\contentsline {section}{\numberline {5.2}Ejes de mejora}{63}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Eje H: Reducción de saturación de procesos en paralelo}{63}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{63}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del conjuntos de tensores}{63}{subsection.5.2.3}%
+\contentsline {chapter}{\numberline {6}Resultados}{64}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Planificación}{65}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Estudio económico}{66}{chapter.8}%
+\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{67}{chapter.9}%
+\contentsline {section}{Referencias}{67}{section*.13}%
+\contentsline {chapter}{\numberline {A}Apéndices}{69}{appendix.Alph1}%

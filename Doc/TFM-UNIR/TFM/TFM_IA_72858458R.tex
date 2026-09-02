@@ -1656,9 +1656,63 @@ el tiempo de inferencia (\textit{Test-Time Training}).
 % multitemporales (\textit{multitensors}), buscando una arquitectura que no solo sea compacta en parámetros, sino también más robusta ante la diversidad de tareas planteadas. 
 % En las siguientes secciones se detallan los componentes, capas y el proceso iterativo que conforman el núcleo de esta solución.
 
-\subsection{Multitensors}
+Un Autocodificador es un modelo de aprendizaje profundo que aprende a generar variables latentes que representen
+características ocultas de los datos, para posteriormente, decodificarlas y reconstruir los datos de entrada. Estos modelos
+son especialmente útiles para tareas de reducción de dimensionalidad, compresión de datos y generación de nuevas muestras a partir de las características aprendidas.
+El problema de estos modelos es que aprenden los datos hasta el punto de memorizar en lugar de generalizar, 
+haciendo que sean especialmente buenas para clonar comportamientos concretos. Los autocodificadores en concreto
+son capaces de generar representaciones discretas, como puede ser un vector variables simple binario.
 
-\subsubsection{Arquitectura de referencia}
+Los Autocodificadores Varicionales o VAE son un tipo de autocodificadores con ciertas particularidades. A diferencia de los
+autocodificadores tradicionales, codifican representaciones continuas y probabilísticas en un espacio latente. En vez de codificar
+un vector de valores determinísticos, típicamente se genera una media y una desviación estándar por cada variable latente.
+Este mecanismo tiene una ventaja, lo convierte en un modelo de aprendizaje profundo generativo capaz de reconstruir con
+precisión la entrada general exacta y además variaciones que se parecen a los datos originales.
+
+Profundizando más acerca de los Autocodificadores Varicionales, destacar que se compone típicamente de dos componentes principales;
+un codificador y un decodificador. Ambos componentes son redes neuronales densas, la diferencia es que el codificador codifica la entrada
+convirtiendo la salida en variables de medias y desviaciones estándar y el decodificador recoge estas variables para reconstruir 
+la entrada original. Este proceso permite que el modelo capture la incertidumbre inherente en los datos y genere nuevas muestras que sean coherentes con la distribución aprendida.
+El espacio latente es un conjunto de variables latentes. Estas variables latentes son características ocultas de los datos, representaciones
+que no son directamente observables en los datos de entrada, pero que capturan información relevante para la generación y reconstrucción de los mismos.
+
+\textit{CompressARC} es un sistema basado en autocodificadores varicionales, hasta cierto punto. Este sistema es mucho más profundo y complejo y contiene
+un sistema de estructuras con diversas variaciones. Las tareas de ARC-AGI son complejas y variadas. Cada tarea puede contener
+diversos ejemplos, colores, tamaños y patrones diferentes. Todas estas variaciones en los datos deben ser capturados y representados en variables
+latentes. Este proceso es mucho más complejo a simple vista y requiere de un diseño sofisticado. Para poder realizar este cometido,
+\textit{CompressARC} hace uso de un sistema denominado Multitensors, y posteriormente se descodifica mediante una compleja arquitectura 
+de redes neuronales densas.
+
+FOTO SISTEMA COMPLETO
+
+El objetivo del modelo es el mismo que cualquier Autocodificador Varicional, codificar un espacio latente y posteriormente decodificarlo 
+para reconstruirlo mediante los denominados \textit{logits}. En los siguientes apartados se explicará con todos tipo de detalles
+el funcionamiento de cada sistema en detalle.
+
+\subsection{Codificador Multitensors}
+
+Las tareas de ARC-AGI típicamente contienen en los datos de entrenamiento entre 2 y 7 ejemplos. También puede contener entre 2 y 5 colores,
+además de cambios espaciales. En ARC-AGI, las tareas que presentan una variación en el tamaño de la matriz se puede ver reflejado
+en las salidas de los propios ejemplos. Si tomamos todas estas características en conjunto podemos tener una representación compleja
+de 5 dimensiones: [número de ejemplos, número de colores, direcciones, número de filas, número de columnas]. El sistema al principio
+almacena toda esta información de un vector de estas características. Debido a las grandes variaciones de las 800 tareas que
+representa ARC-AGI, se recurre a la creación de una estructura denominada Multitensors.
+
+Los Multitensors son un conjunto de tensores, cada tensor guarda combinaciones dimensionales. No todas las combinaciones posibles pueden contener
+información relevante. Para aquellas combinaciones que no representan información relevante se le considera inválida. Una máscara binaria de
+5 dimensiones da como resultado 32 posibles combinaciones binarias. De estas 32 posibles combinaciones, se consideran
+sólo 18 como tensores válidos.
+
+TABLA TENSORES
+
+A estos tensores se le añade una dimensión adicional denominada espacio latente. Cada posible valor de las hojas contendrán un vector de 4
+valores que representará el espacio latente. Para recorrer todas las posibilidades de los diferentes tensores, en el que haya datos
+representados, se hará uso de una máscara binaria de 5 dimensiones. Posteriormente se representará todo el estado latente con mediante un
+vector denominado z.
+
+
+
+\subsubsection{Arquitectura de decodificación}
 
 \subsection{Limitaciones}
 
