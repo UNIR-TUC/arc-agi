@@ -1,0 +1,676 @@
+2026-09-02 16:56:49 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1317.7 GB free, minimum 50.0 GB)
+2026-09-02 16:56:49 | INFO     | Loading partial results for split training
+2026-09-02 16:56:50 | INFO     | Task-specific eager mode: 4258a5f9, dbc1a6ce, fcb5c309
+2026-09-02 16:56:50 | INFO     | ========================================================================
+2026-09-02 16:56:50 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-02 16:56:50 | INFO     |   Tasks       : 400
+2026-09-02 16:56:50 | INFO     |   GPUs        : 1
+2026-09-02 16:56:50 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-02/arc_training_training_20260902_165649.log
+2026-09-02 16:56:50 | INFO     |   Results file: results_2026-09-02_16-56-49.txt
+2026-09-02 16:56:50 | INFO     | ========================================================================
+2026-09-02 16:56:50 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 16:56:50 | INFO     | Acceleration (Eje D): accel amp=off compile=default matmul=high threads=1 alloc=-
+2026-09-02 16:56:50 | INFO     | ------------------------------------------------------------------------
+2026-09-02 16:56:50 | INFO     | PHASE: Phase 1 — SKIPPED — loaded 400 task measurements from memory_cache_training.json
+2026-09-02 16:56:50 | INFO     | ------------------------------------------------------------------------
+2026-09-02 16:56:50 | INFO     | GPU fingerprint matches cached run. Delete memory_cache_training.json to force re-measurement.
+2026-09-02 16:56:50 | INFO     | Compiled Phase 2: scaled eager Phase-1 measurements by 1.2x  (mean 1098 MB/task)
+2026-09-02 16:56:50 | INFO     | Resume: 354/400 tasks already complete in .partial/training — Phase 2 will run the remaining 46
+2026-09-02 16:56:50 | INFO     | Phase 2 VRAM budget: GPU0=14.86 GB of 15.86 GB free
+2026-09-02 16:56:50 | INFO     | ------------------------------------------------------------------------
+2026-09-02 16:56:50 | INFO     | PHASE: Phase 2 — Full training  (2000 iterations × 46 tasks)
+2026-09-02 16:56:50 | INFO     | ------------------------------------------------------------------------
+2026-09-02 16:56:50 | INFO     | Host RAM: 88 GB free − 12 GB reserved = 76 GB for workers → cap 8 (at 9.0 GB/worker)
+2026-09-02 16:56:51 | INFO     | START [239/400] 9af7a82c  →  GPU 0
+2026-09-02 16:56:51 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 16:56:51 | INFO     | START [395/400] fafffa47  →  GPU 0
+2026-09-02 16:56:51 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 16:56:51 | INFO     | START [ 95/400] 4258a5f9  →  GPU 0
+2026-09-02 16:56:51 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 16:56:51 | INFO     | START [104/400] 4522001f  →  GPU 0
+2026-09-02 16:56:51 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 16:56:51 | INFO     | START [139/400] 60b61512  →  GPU 0
+2026-09-02 16:56:51 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 16:56:51 | INFO     | START [211/400] 8d5021e8  →  GPU 0
+2026-09-02 16:56:51 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 16:56:52 | DEBUG    | PROG  9af7a82c  step    0/2000  (  0.0%)
+2026-09-02 16:56:52 | DEBUG    | PROG  fafffa47  step    0/2000  (  0.0%)
+2026-09-02 16:56:52 | DEBUG    | PROG  4258a5f9  step    0/2000  (  0.0%)
+2026-09-02 16:56:52 | DEBUG    | PROG  4522001f  step    0/2000  (  0.0%)
+2026-09-02 16:56:52 | DEBUG    | PROG  60b61512  step    0/2000  (  0.0%)
+2026-09-02 16:56:52 | DEBUG    | PROG  8d5021e8  step    0/2000  (  0.0%)
+2026-09-02 16:58:49 | DEBUG    | PROG  4258a5f9  step  200/2000  ( 10.0%)
+2026-09-02 17:01:00 | DEBUG    | PROG  9af7a82c  step  200/2000  ( 10.0%)
+2026-09-02 17:01:15 | DEBUG    | PROG  4258a5f9  step  400/2000  ( 20.0%)
+2026-09-02 17:01:50 | DEBUG    | PROG  fafffa47  step  200/2000  ( 10.0%)
+2026-09-02 17:02:28 | DEBUG    | PROG  9af7a82c  step  400/2000  ( 20.0%)
+2026-09-02 17:03:09 | DEBUG    | PROG  fafffa47  step  400/2000  ( 20.0%)
+2026-09-02 17:03:23 | DEBUG    | PROG  4258a5f9  step  600/2000  ( 30.0%)
+2026-09-02 17:04:13 | DEBUG    | PROG  9af7a82c  step  600/2000  ( 30.0%)
+2026-09-02 17:04:34 | DEBUG    | PROG  fafffa47  step  600/2000  ( 30.0%)
+2026-09-02 17:06:18 | DEBUG    | PROG  fafffa47  step  800/2000  ( 40.0%)
+2026-09-02 17:06:20 | DEBUG    | PROG  60b61512  step  200/2000  ( 10.0%)
+2026-09-02 17:06:23 | DEBUG    | PROG  9af7a82c  step  800/2000  ( 40.0%)
+2026-09-02 17:06:45 | DEBUG    | PROG  4522001f  step  200/2000  ( 10.0%)
+2026-09-02 17:07:56 | DEBUG    | PROG  fafffa47  step 1000/2000  ( 50.0%)
+2026-09-02 17:08:03 | DEBUG    | PROG  60b61512  step  400/2000  ( 20.0%)
+2026-09-02 17:08:32 | DEBUG    | PROG  9af7a82c  step 1000/2000  ( 50.0%)
+2026-09-02 17:08:34 | DEBUG    | PROG  4522001f  step  400/2000  ( 20.0%)
+2026-09-02 17:08:48 | DEBUG    | PROG  4258a5f9  step  800/2000  ( 40.0%)
+2026-09-02 17:09:55 | DEBUG    | PROG  fafffa47  step 1200/2000  ( 60.0%)
+2026-09-02 17:10:05 | DEBUG    | PROG  60b61512  step  600/2000  ( 30.0%)
+2026-09-02 17:10:35 | DEBUG    | PROG  4522001f  step  600/2000  ( 30.0%)
+2026-09-02 17:11:02 | DEBUG    | PROG  9af7a82c  step 1200/2000  ( 60.0%)
+2026-09-02 17:11:07 | DEBUG    | PROG  8d5021e8  step  200/2000  ( 10.0%)
+2026-09-02 17:11:56 | DEBUG    | PROG  fafffa47  step 1400/2000  ( 70.0%)
+2026-09-02 17:12:12 | DEBUG    | PROG  60b61512  step  800/2000  ( 40.0%)
+2026-09-02 17:12:41 | DEBUG    | PROG  4522001f  step  800/2000  ( 40.0%)
+2026-09-02 17:13:07 | DEBUG    | PROG  8d5021e8  step  400/2000  ( 20.0%)
+2026-09-02 17:13:27 | DEBUG    | PROG  9af7a82c  step 1400/2000  ( 70.0%)
+2026-09-02 17:13:56 | DEBUG    | PROG  fafffa47  step 1600/2000  ( 80.0%)
+2026-09-02 17:14:13 | DEBUG    | PROG  60b61512  step 1000/2000  ( 50.0%)
+2026-09-02 17:14:40 | DEBUG    | PROG  4522001f  step 1000/2000  ( 50.0%)
+2026-09-02 17:15:07 | DEBUG    | PROG  8d5021e8  step  600/2000  ( 30.0%)
+2026-09-02 17:15:57 | DEBUG    | PROG  9af7a82c  step 1600/2000  ( 80.0%)
+2026-09-02 17:15:59 | DEBUG    | PROG  fafffa47  step 1800/2000  ( 90.0%)
+2026-09-02 17:16:17 | DEBUG    | PROG  60b61512  step 1200/2000  ( 60.0%)
+2026-09-02 17:16:45 | DEBUG    | PROG  4522001f  step 1200/2000  ( 60.0%)
+2026-09-02 17:17:07 | DEBUG    | PROG  8d5021e8  step  800/2000  ( 40.0%)
+2026-09-02 17:17:13 | DEBUG    | PROG  4258a5f9  step 1000/2000  ( 50.0%)
+2026-09-02 17:18:03 | DEBUG    | PROG  fafffa47  step 2000/2000  (100.0%)
+2026-09-02 17:18:06 | INFO     | DONE  [395/400] fafffa47  1274.9s  peak= 15742 MB  [not solved]
+2026-09-02 17:18:06 | INFO     | START [282/400] b60334d2  →  GPU 0
+2026-09-02 17:18:06 | DEBUG    |   GPU 0 | Used: 12.52/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:18:07 | DEBUG    | PROG  b60334d2  step    0/2000  (  0.0%)
+2026-09-02 17:18:17 | DEBUG    | PROG  60b61512  step 1400/2000  ( 70.0%)
+2026-09-02 17:18:22 | DEBUG    | PROG  9af7a82c  step 1800/2000  ( 90.0%)
+2026-09-02 17:18:38 | DEBUG    | PROG  4522001f  step 1400/2000  ( 70.0%)
+2026-09-02 17:18:59 | DEBUG    | PROG  8d5021e8  step 1000/2000  ( 50.0%)
+2026-09-02 17:20:01 | DEBUG    | PROG  60b61512  step 1600/2000  ( 80.0%)
+2026-09-02 17:20:22 | DEBUG    | PROG  4522001f  step 1600/2000  ( 80.0%)
+2026-09-02 17:20:26 | DEBUG    | PROG  9af7a82c  step 2000/2000  (100.0%)
+2026-09-02 17:20:30 | INFO     | DONE  [239/400] 9af7a82c  1419.1s  peak= 12996 MB  [not solved]
+2026-09-02 17:20:30 | INFO     | START [317/400] ce22a75a  →  GPU 0
+2026-09-02 17:20:30 | DEBUG    |   GPU 0 | Used: 9.47/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:20:31 | DEBUG    | PROG  ce22a75a  step    0/2000  (  0.0%)
+2026-09-02 17:20:35 | DEBUG    | PROG  8d5021e8  step 1200/2000  ( 60.0%)
+2026-09-02 17:21:29 | DEBUG    | PROG  60b61512  step 1800/2000  ( 90.0%)
+2026-09-02 17:21:46 | DEBUG    | PROG  4522001f  step 1800/2000  ( 90.0%)
+2026-09-02 17:21:59 | DEBUG    | PROG  8d5021e8  step 1400/2000  ( 70.0%)
+2026-09-02 17:22:54 | DEBUG    | PROG  60b61512  step 2000/2000  (100.0%)
+2026-09-02 17:23:08 | INFO     | DONE  [139/400] 60b61512  1577.3s  peak= 12624 MB  [SOLVED @guess1]
+2026-09-02 17:23:08 | INFO     | START [348/400] db3e9e38  →  GPU 0
+2026-09-02 17:23:08 | DEBUG    |   GPU 0 | Used: 9.44/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:23:09 | DEBUG    | PROG  db3e9e38  step    0/2000  (  0.0%)
+2026-09-02 17:23:13 | DEBUG    | PROG  4522001f  step 2000/2000  (100.0%)
+2026-09-02 17:23:18 | DEBUG    | PROG  8d5021e8  step 1600/2000  ( 80.0%)
+2026-09-02 17:23:24 | DEBUG    | PROG  4258a5f9  step 1200/2000  ( 60.0%)
+2026-09-02 17:23:27 | INFO     | DONE  [104/400] 4522001f  1596.4s  peak=  9820 MB  [SOLVED @guess1]
+2026-09-02 17:23:27 | INFO     | START [  6/400] 0520fde7  →  GPU 0
+2026-09-02 17:23:27 | DEBUG    |   GPU 0 | Used: 6.70/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:23:28 | DEBUG    | PROG  0520fde7  step    0/2000  (  0.0%)
+2026-09-02 17:24:01 | DEBUG    | PROG  8d5021e8  step 1800/2000  ( 90.0%)
+2026-09-02 17:24:07 | DEBUG    | PROG  b60334d2  step  200/2000  ( 10.0%)
+2026-09-02 17:24:41 | DEBUG    | PROG  8d5021e8  step 2000/2000  (100.0%)
+2026-09-02 17:24:55 | INFO     | DONE  [211/400] 8d5021e8  1684.5s  peak=  7018 MB  [SOLVED @guess1]
+2026-09-02 17:24:55 | INFO     | START [114/400] 49d1d64f  →  GPU 0
+2026-09-02 17:24:55 | DEBUG    |   GPU 0 | Used: 5.34/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:24:56 | DEBUG    | PROG  49d1d64f  step    0/2000  (  0.0%)
+2026-09-02 17:25:36 | DEBUG    | PROG  b60334d2  step  400/2000  ( 20.0%)
+2026-09-02 17:25:42 | DEBUG    | PROG  ce22a75a  step  200/2000  ( 10.0%)
+2026-09-02 17:26:25 | DEBUG    | PROG  ce22a75a  step  400/2000  ( 20.0%)
+2026-09-02 17:27:04 | DEBUG    | PROG  b60334d2  step  600/2000  ( 30.0%)
+2026-09-02 17:27:26 | DEBUG    | PROG  ce22a75a  step  600/2000  ( 30.0%)
+2026-09-02 17:28:04 | DEBUG    | PROG  0520fde7  step  200/2000  ( 10.0%)
+2026-09-02 17:28:28 | DEBUG    | PROG  b60334d2  step  800/2000  ( 40.0%)
+2026-09-02 17:28:48 | DEBUG    | PROG  ce22a75a  step  800/2000  ( 40.0%)
+2026-09-02 17:29:03 | DEBUG    | PROG  4258a5f9  step 1400/2000  ( 70.0%)
+2026-09-02 17:29:25 | DEBUG    | PROG  0520fde7  step  400/2000  ( 20.0%)
+2026-09-02 17:29:50 | DEBUG    | PROG  b60334d2  step 1000/2000  ( 50.0%)
+2026-09-02 17:30:08 | DEBUG    | PROG  ce22a75a  step 1000/2000  ( 50.0%)
+2026-09-02 17:30:43 | DEBUG    | PROG  0520fde7  step  600/2000  ( 30.0%)
+2026-09-02 17:31:16 | DEBUG    | PROG  b60334d2  step 1200/2000  ( 60.0%)
+2026-09-02 17:31:31 | DEBUG    | PROG  ce22a75a  step 1200/2000  ( 60.0%)
+2026-09-02 17:32:02 | DEBUG    | PROG  0520fde7  step  800/2000  ( 40.0%)
+2026-09-02 17:32:39 | DEBUG    | PROG  b60334d2  step 1400/2000  ( 70.0%)
+2026-09-02 17:32:55 | DEBUG    | PROG  ce22a75a  step 1400/2000  ( 70.0%)
+2026-09-02 17:33:22 | DEBUG    | PROG  0520fde7  step 1000/2000  ( 50.0%)
+2026-09-02 17:34:38 | DEBUG    | PROG  b60334d2  step 1600/2000  ( 80.0%)
+2026-09-02 17:35:04 | DEBUG    | PROG  ce22a75a  step 1600/2000  ( 80.0%)
+2026-09-02 17:35:30 | DEBUG    | PROG  0520fde7  step 1200/2000  ( 60.0%)
+2026-09-02 17:35:34 | DEBUG    | PROG  4258a5f9  step 1600/2000  ( 80.0%)
+2026-09-02 17:36:17 | DEBUG    | PROG  db3e9e38  step  200/2000  ( 10.0%)
+2026-09-02 17:37:01 | DEBUG    | PROG  b60334d2  step 1800/2000  ( 90.0%)
+2026-09-02 17:37:27 | DEBUG    | PROG  ce22a75a  step 1800/2000  ( 90.0%)
+2026-09-02 17:37:42 | DEBUG    | PROG  0520fde7  step 1400/2000  ( 70.0%)
+2026-09-02 17:39:10 | DEBUG    | PROG  db3e9e38  step  400/2000  ( 20.0%)
+2026-09-02 17:40:09 | DEBUG    | PROG  b60334d2  step 2000/2000  (100.0%)
+2026-09-02 17:40:14 | INFO     | DONE  [282/400] b60334d2  1328.0s  peak= 15002 MB  [SOLVED @guess1]
+2026-09-02 17:40:14 | INFO     | START [181/400] 760b3cac  →  GPU 0
+2026-09-02 17:40:14 | DEBUG    |   GPU 0 | Used: 11.78/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:40:15 | DEBUG    | PROG  760b3cac  step    0/2000  (  0.0%)
+2026-09-02 17:40:34 | DEBUG    | PROG  0520fde7  step 1600/2000  ( 80.0%)
+2026-09-02 17:40:36 | DEBUG    | PROG  ce22a75a  step 2000/2000  (100.0%)
+2026-09-02 17:40:40 | INFO     | DONE  [317/400] ce22a75a  1209.8s  peak= 12226 MB  [not solved]
+2026-09-02 17:40:40 | INFO     | START [227/400] 94f9d214  →  GPU 0
+2026-09-02 17:40:40 | DEBUG    |   GPU 0 | Used: 9.07/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:40:41 | DEBUG    | PROG  94f9d214  step    0/2000  (  0.0%)
+2026-09-02 17:40:51 | DEBUG    | PROG  49d1d64f  step  200/2000  ( 10.0%)
+2026-09-02 17:41:45 | DEBUG    | PROG  db3e9e38  step  600/2000  ( 30.0%)
+2026-09-02 17:42:28 | DEBUG    | PROG  0520fde7  step 1800/2000  ( 90.0%)
+2026-09-02 17:43:04 | DEBUG    | PROG  49d1d64f  step  400/2000  ( 20.0%)
+2026-09-02 17:43:27 | DEBUG    | PROG  db3e9e38  step  800/2000  ( 40.0%)
+2026-09-02 17:43:46 | DEBUG    | PROG  0520fde7  step 2000/2000  (100.0%)
+2026-09-02 17:43:50 | INFO     | DONE  [  6/400] 0520fde7  1222.9s  peak=  9764 MB  [not solved]
+2026-09-02 17:43:50 | INFO     | START [  3/400] 017c7c7b  →  GPU 0
+2026-09-02 17:43:50 | DEBUG    |   GPU 0 | Used: 6.73/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:43:51 | DEBUG    | PROG  017c7c7b  step    0/2000  (  0.0%)
+2026-09-02 17:44:11 | DEBUG    | PROG  49d1d64f  step  600/2000  ( 30.0%)
+2026-09-02 17:44:18 | DEBUG    | PROG  4258a5f9  step 1800/2000  ( 90.0%)
+2026-09-02 17:44:54 | DEBUG    | PROG  db3e9e38  step 1000/2000  ( 50.0%)
+2026-09-02 17:44:57 | DEBUG    | PROG  49d1d64f  step  800/2000  ( 40.0%)
+2026-09-02 17:45:41 | DEBUG    | PROG  49d1d64f  step 1000/2000  ( 50.0%)
+2026-09-02 17:46:22 | DEBUG    | PROG  db3e9e38  step 1200/2000  ( 60.0%)
+2026-09-02 17:46:35 | DEBUG    | PROG  49d1d64f  step 1200/2000  ( 60.0%)
+2026-09-02 17:47:37 | DEBUG    | PROG  49d1d64f  step 1400/2000  ( 70.0%)
+2026-09-02 17:47:48 | DEBUG    | PROG  db3e9e38  step 1400/2000  ( 70.0%)
+2026-09-02 17:48:48 | DEBUG    | PROG  017c7c7b  step  200/2000  ( 10.0%)
+2026-09-02 17:49:27 | DEBUG    | PROG  db3e9e38  step 1600/2000  ( 80.0%)
+2026-09-02 17:49:28 | DEBUG    | PROG  49d1d64f  step 1600/2000  ( 80.0%)
+2026-09-02 17:49:55 | DEBUG    | PROG  4258a5f9  step 2000/2000  (100.0%)
+2026-09-02 17:49:56 | INFO     | DONE  [ 95/400] 4258a5f9  3184.8s  peak= 12424 MB  [SOLVED @guess1]
+2026-09-02 17:49:56 | INFO     | START [357/400] e179c5f4  →  GPU 0
+2026-09-02 17:49:56 | DEBUG    |   GPU 0 | Used: 11.55/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:49:57 | DEBUG    | PROG  e179c5f4  step    0/2000  (  0.0%)
+2026-09-02 17:50:14 | DEBUG    | PROG  017c7c7b  step  400/2000  ( 20.0%)
+2026-09-02 17:50:23 | DEBUG    | PROG  db3e9e38  step 1800/2000  ( 90.0%)
+2026-09-02 17:51:03 | DEBUG    | PROG  db3e9e38  step 2000/2000  (100.0%)
+2026-09-02 17:51:07 | DEBUG    | PROG  49d1d64f  step 1800/2000  ( 90.0%)
+2026-09-02 17:51:18 | INFO     | DONE  [348/400] db3e9e38  1689.6s  peak= 12002 MB  [not solved]
+2026-09-02 17:51:18 | INFO     | START [142/400] 62c24649  →  GPU 0
+2026-09-02 17:51:18 | DEBUG    |   GPU 0 | Used: 8.83/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:51:19 | DEBUG    | PROG  62c24649  step    0/2000  (  0.0%)
+2026-09-02 17:51:30 | DEBUG    | PROG  017c7c7b  step  600/2000  ( 30.0%)
+2026-09-02 17:52:44 | DEBUG    | PROG  49d1d64f  step 2000/2000  (100.0%)
+2026-09-02 17:52:46 | DEBUG    | PROG  017c7c7b  step  800/2000  ( 40.0%)
+2026-09-02 17:52:58 | INFO     | DONE  [114/400] 49d1d64f  1682.5s  peak= 15062 MB  [not solved]
+2026-09-02 17:52:58 | INFO     | START [276/400] b1948b0a  →  GPU 0
+2026-09-02 17:52:58 | DEBUG    |   GPU 0 | Used: 10.81/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:52:59 | DEBUG    | PROG  b1948b0a  step    0/2000  (  0.0%)
+2026-09-02 17:53:32 | DEBUG    | PROG  017c7c7b  step 1000/2000  ( 50.0%)
+2026-09-02 17:53:35 | DEBUG    | PROG  94f9d214  step  200/2000  ( 10.0%)
+2026-09-02 17:54:11 | DEBUG    | PROG  017c7c7b  step 1200/2000  ( 60.0%)
+2026-09-02 17:54:35 | DEBUG    | PROG  760b3cac  step  200/2000  ( 10.0%)
+2026-09-02 17:54:50 | DEBUG    | PROG  017c7c7b  step 1400/2000  ( 70.0%)
+2026-09-02 17:54:59 | DEBUG    | PROG  94f9d214  step  400/2000  ( 20.0%)
+2026-09-02 17:55:29 | DEBUG    | PROG  017c7c7b  step 1600/2000  ( 80.0%)
+2026-09-02 17:56:00 | DEBUG    | PROG  760b3cac  step  400/2000  ( 20.0%)
+2026-09-02 17:56:10 | DEBUG    | PROG  017c7c7b  step 1800/2000  ( 90.0%)
+2026-09-02 17:56:20 | DEBUG    | PROG  94f9d214  step  600/2000  ( 30.0%)
+2026-09-02 17:56:52 | DEBUG    | PROG  017c7c7b  step 2000/2000  (100.0%)
+2026-09-02 17:56:55 | INFO     | DONE  [  3/400] 017c7c7b   785.2s  peak=  9820 MB  [not solved]
+2026-09-02 17:56:55 | INFO     | START [ 87/400] 3c9b0459  →  GPU 0
+2026-09-02 17:56:55 | DEBUG    |   GPU 0 | Used: 6.68/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 17:56:56 | DEBUG    | PROG  3c9b0459  step    0/2000  (  0.0%)
+2026-09-02 17:57:24 | DEBUG    | PROG  760b3cac  step  600/2000  ( 30.0%)
+2026-09-02 17:57:40 | DEBUG    | PROG  94f9d214  step  800/2000  ( 40.0%)
+2026-09-02 17:58:42 | DEBUG    | PROG  760b3cac  step  800/2000  ( 40.0%)
+2026-09-02 17:59:03 | DEBUG    | PROG  94f9d214  step 1000/2000  ( 50.0%)
+2026-09-02 18:00:04 | DEBUG    | PROG  760b3cac  step 1000/2000  ( 50.0%)
+2026-09-02 18:00:21 | DEBUG    | PROG  94f9d214  step 1200/2000  ( 60.0%)
+2026-09-02 18:01:26 | DEBUG    | PROG  760b3cac  step 1200/2000  ( 60.0%)
+2026-09-02 18:01:41 | DEBUG    | PROG  94f9d214  step 1400/2000  ( 70.0%)
+2026-09-02 18:01:51 | DEBUG    | PROG  3c9b0459  step  200/2000  ( 10.0%)
+2026-09-02 18:02:45 | DEBUG    | PROG  760b3cac  step 1400/2000  ( 70.0%)
+2026-09-02 18:03:00 | DEBUG    | PROG  94f9d214  step 1600/2000  ( 80.0%)
+2026-09-02 18:03:13 | DEBUG    | PROG  3c9b0459  step  400/2000  ( 20.0%)
+2026-09-02 18:03:51 | DEBUG    | PROG  e179c5f4  step  200/2000  ( 10.0%)
+2026-09-02 18:04:11 | DEBUG    | PROG  760b3cac  step 1600/2000  ( 80.0%)
+2026-09-02 18:04:24 | DEBUG    | PROG  94f9d214  step 1800/2000  ( 90.0%)
+2026-09-02 18:04:39 | DEBUG    | PROG  3c9b0459  step  600/2000  ( 30.0%)
+2026-09-02 18:05:32 | DEBUG    | PROG  e179c5f4  step  400/2000  ( 20.0%)
+2026-09-02 18:05:54 | DEBUG    | PROG  760b3cac  step 1800/2000  ( 90.0%)
+2026-09-02 18:06:08 | DEBUG    | PROG  94f9d214  step 2000/2000  (100.0%)
+2026-09-02 18:06:15 | DEBUG    | PROG  62c24649  step  200/2000  ( 10.0%)
+2026-09-02 18:06:21 | INFO     | DONE  [227/400] 94f9d214  1541.3s  peak= 16290 MB  [not solved]
+2026-09-02 18:06:21 | INFO     | START [207/400] 88a62173  →  GPU 0
+2026-09-02 18:06:21 | DEBUG    |   GPU 0 | Used: 14.55/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:06:22 | DEBUG    | PROG  3c9b0459  step  800/2000  ( 40.0%)
+2026-09-02 18:06:22 | DEBUG    | PROG  88a62173  step    0/2000  (  0.0%)
+2026-09-02 18:07:18 | DEBUG    | PROG  b1948b0a  step  200/2000  ( 10.0%)
+2026-09-02 18:07:19 | DEBUG    | PROG  e179c5f4  step  600/2000  ( 30.0%)
+2026-09-02 18:07:37 | DEBUG    | PROG  760b3cac  step 2000/2000  (100.0%)
+2026-09-02 18:07:51 | INFO     | DONE  [181/400] 760b3cac  1657.5s  peak= 15033 MB  [not solved]
+2026-09-02 18:07:51 | INFO     | START [347/400] dae9d2b5  →  GPU 0
+2026-09-02 18:07:51 | DEBUG    |   GPU 0 | Used: 11.50/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:07:52 | DEBUG    | PROG  dae9d2b5  step    0/2000  (  0.0%)
+2026-09-02 18:07:53 | DEBUG    | PROG  62c24649  step  400/2000  ( 20.0%)
+2026-09-02 18:07:56 | DEBUG    | PROG  3c9b0459  step 1000/2000  ( 50.0%)
+2026-09-02 18:08:41 | DEBUG    | PROG  e179c5f4  step  800/2000  ( 40.0%)
+2026-09-02 18:08:42 | DEBUG    | PROG  b1948b0a  step  400/2000  ( 20.0%)
+2026-09-02 18:09:11 | DEBUG    | PROG  62c24649  step  600/2000  ( 30.0%)
+2026-09-02 18:09:15 | DEBUG    | PROG  3c9b0459  step 1200/2000  ( 60.0%)
+2026-09-02 18:10:05 | DEBUG    | PROG  e179c5f4  step 1000/2000  ( 50.0%)
+2026-09-02 18:10:06 | DEBUG    | PROG  b1948b0a  step  600/2000  ( 30.0%)
+2026-09-02 18:10:31 | DEBUG    | PROG  62c24649  step  800/2000  ( 40.0%)
+2026-09-02 18:10:34 | DEBUG    | PROG  3c9b0459  step 1400/2000  ( 70.0%)
+2026-09-02 18:11:26 | DEBUG    | PROG  e179c5f4  step 1200/2000  ( 60.0%)
+2026-09-02 18:11:29 | DEBUG    | PROG  b1948b0a  step  800/2000  ( 40.0%)
+2026-09-02 18:11:54 | DEBUG    | PROG  3c9b0459  step 1600/2000  ( 80.0%)
+2026-09-02 18:11:55 | DEBUG    | PROG  62c24649  step 1000/2000  ( 50.0%)
+2026-09-02 18:12:49 | DEBUG    | PROG  e179c5f4  step 1400/2000  ( 70.0%)
+2026-09-02 18:12:51 | DEBUG    | PROG  b1948b0a  step 1000/2000  ( 50.0%)
+2026-09-02 18:13:10 | DEBUG    | PROG  3c9b0459  step 1800/2000  ( 90.0%)
+2026-09-02 18:13:18 | DEBUG    | PROG  62c24649  step 1200/2000  ( 60.0%)
+2026-09-02 18:14:09 | DEBUG    | PROG  e179c5f4  step 1600/2000  ( 80.0%)
+2026-09-02 18:14:12 | DEBUG    | PROG  b1948b0a  step 1200/2000  ( 60.0%)
+2026-09-02 18:14:28 | DEBUG    | PROG  3c9b0459  step 2000/2000  (100.0%)
+2026-09-02 18:14:32 | INFO     | DONE  [ 87/400] 3c9b0459  1056.6s  peak= 12144 MB  [SOLVED @guess1]
+2026-09-02 18:14:32 | INFO     | START [380/400] ed36ccf7  →  GPU 0
+2026-09-02 18:14:32 | DEBUG    |   GPU 0 | Used: 9.20/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:14:33 | DEBUG    | PROG  ed36ccf7  step    0/2000  (  0.0%)
+2026-09-02 18:14:41 | DEBUG    | PROG  62c24649  step 1400/2000  ( 70.0%)
+2026-09-02 18:15:05 | DEBUG    | PROG  e179c5f4  step 1800/2000  ( 90.0%)
+2026-09-02 18:15:33 | DEBUG    | PROG  b1948b0a  step 1400/2000  ( 70.0%)
+2026-09-02 18:15:59 | DEBUG    | PROG  e179c5f4  step 2000/2000  (100.0%)
+2026-09-02 18:16:06 | DEBUG    | PROG  62c24649  step 1600/2000  ( 80.0%)
+2026-09-02 18:16:12 | INFO     | DONE  [357/400] e179c5f4  1576.4s  peak= 10814 MB  [not solved]
+2026-09-02 18:16:12 | INFO     | START [266/400] a9f96cdd  →  GPU 0
+2026-09-02 18:16:12 | DEBUG    |   GPU 0 | Used: 7.46/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:16:13 | DEBUG    | PROG  a9f96cdd  step    0/2000  (  0.0%)
+2026-09-02 18:16:56 | DEBUG    | PROG  b1948b0a  step 1600/2000  ( 80.0%)
+2026-09-02 18:17:28 | DEBUG    | PROG  62c24649  step 1800/2000  ( 90.0%)
+2026-09-02 18:18:19 | DEBUG    | PROG  b1948b0a  step 1800/2000  ( 90.0%)
+2026-09-02 18:18:46 | DEBUG    | PROG  62c24649  step 2000/2000  (100.0%)
+2026-09-02 18:19:00 | INFO     | DONE  [142/400] 62c24649  1662.5s  peak= 13150 MB  [not solved]
+2026-09-02 18:19:00 | INFO     | START [ 53/400] 25ff71a9  →  GPU 0
+2026-09-02 18:19:00 | DEBUG    |   GPU 0 | Used: 8.62/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:19:01 | DEBUG    | PROG  25ff71a9  step    0/2000  (  0.0%)
+2026-09-02 18:19:24 | DEBUG    | PROG  b1948b0a  step 2000/2000  (100.0%)
+2026-09-02 18:19:38 | INFO     | DONE  [276/400] b1948b0a  1600.4s  peak=  7981 MB  [SOLVED @guess1]
+2026-09-02 18:19:38 | INFO     | START [147/400] 67385a82  →  GPU 0
+2026-09-02 18:19:38 | DEBUG    |   GPU 0 | Used: 8.68/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:19:39 | DEBUG    | PROG  67385a82  step    0/2000  (  0.0%)
+2026-09-02 18:19:58 | DEBUG    | PROG  88a62173  step  200/2000  ( 10.0%)
+2026-09-02 18:21:19 | DEBUG    | PROG  88a62173  step  400/2000  ( 20.0%)
+2026-09-02 18:21:22 | DEBUG    | PROG  dae9d2b5  step  200/2000  ( 10.0%)
+2026-09-02 18:22:41 | DEBUG    | PROG  88a62173  step  600/2000  ( 30.0%)
+2026-09-02 18:22:50 | DEBUG    | PROG  dae9d2b5  step  400/2000  ( 20.0%)
+2026-09-02 18:24:03 | DEBUG    | PROG  88a62173  step  800/2000  ( 40.0%)
+2026-09-02 18:24:17 | DEBUG    | PROG  dae9d2b5  step  600/2000  ( 30.0%)
+2026-09-02 18:25:26 | DEBUG    | PROG  88a62173  step 1000/2000  ( 50.0%)
+2026-09-02 18:25:41 | DEBUG    | PROG  dae9d2b5  step  800/2000  ( 40.0%)
+2026-09-02 18:26:21 | DEBUG    | PROG  ed36ccf7  step  200/2000  ( 10.0%)
+2026-09-02 18:26:49 | DEBUG    | PROG  88a62173  step 1200/2000  ( 60.0%)
+2026-09-02 18:27:02 | DEBUG    | PROG  dae9d2b5  step 1000/2000  ( 50.0%)
+2026-09-02 18:27:30 | DEBUG    | PROG  ed36ccf7  step  400/2000  ( 20.0%)
+2026-09-02 18:28:15 | DEBUG    | PROG  88a62173  step 1400/2000  ( 70.0%)
+2026-09-02 18:28:21 | DEBUG    | PROG  ed36ccf7  step  600/2000  ( 30.0%)
+2026-09-02 18:28:23 | DEBUG    | PROG  dae9d2b5  step 1200/2000  ( 60.0%)
+2026-09-02 18:29:41 | DEBUG    | PROG  88a62173  step 1600/2000  ( 80.0%)
+2026-09-02 18:29:41 | DEBUG    | PROG  ed36ccf7  step  800/2000  ( 40.0%)
+2026-09-02 18:29:50 | DEBUG    | PROG  dae9d2b5  step 1400/2000  ( 70.0%)
+2026-09-02 18:30:04 | DEBUG    | PROG  a9f96cdd  step  200/2000  ( 10.0%)
+2026-09-02 18:31:11 | DEBUG    | PROG  ed36ccf7  step 1000/2000  ( 50.0%)
+2026-09-02 18:31:15 | DEBUG    | PROG  88a62173  step 1800/2000  ( 90.0%)
+2026-09-02 18:31:26 | DEBUG    | PROG  dae9d2b5  step 1600/2000  ( 80.0%)
+2026-09-02 18:31:47 | DEBUG    | PROG  a9f96cdd  step  400/2000  ( 20.0%)
+2026-09-02 18:32:14 | DEBUG    | PROG  25ff71a9  step  200/2000  ( 10.0%)
+2026-09-02 18:32:45 | DEBUG    | PROG  ed36ccf7  step 1200/2000  ( 60.0%)
+2026-09-02 18:33:01 | DEBUG    | PROG  88a62173  step 2000/2000  (100.0%)
+2026-09-02 18:33:12 | DEBUG    | PROG  dae9d2b5  step 1800/2000  ( 90.0%)
+2026-09-02 18:33:15 | INFO     | DONE  [207/400] 88a62173  1613.5s  peak= 16291 MB  [SOLVED @guess1]
+2026-09-02 18:33:15 | INFO     | START [179/400] 74dd1130  →  GPU 0
+2026-09-02 18:33:15 | DEBUG    |   GPU 0 | Used: 15.92/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:33:16 | DEBUG    | PROG  74dd1130  step    0/2000  (  0.0%)
+2026-09-02 18:33:26 | DEBUG    | PROG  a9f96cdd  step  600/2000  ( 30.0%)
+2026-09-02 18:33:50 | DEBUG    | PROG  25ff71a9  step  400/2000  ( 20.0%)
+2026-09-02 18:34:18 | DEBUG    | PROG  ed36ccf7  step 1400/2000  ( 70.0%)
+2026-09-02 18:34:56 | DEBUG    | PROG  dae9d2b5  step 2000/2000  (100.0%)
+2026-09-02 18:35:05 | DEBUG    | PROG  a9f96cdd  step  800/2000  ( 40.0%)
+2026-09-02 18:35:09 | INFO     | DONE  [347/400] dae9d2b5  1637.5s  peak= 14644 MB  [not solved]
+2026-09-02 18:35:09 | INFO     | START [ 81/400] 3aa6fb7a  →  GPU 0
+2026-09-02 18:35:09 | DEBUG    |   GPU 0 | Used: 11.38/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:35:10 | DEBUG    | PROG  3aa6fb7a  step    0/2000  (  0.0%)
+2026-09-02 18:35:19 | DEBUG    | PROG  25ff71a9  step  600/2000  ( 30.0%)
+2026-09-02 18:35:20 | DEBUG    | PROG  67385a82  step  200/2000  ( 10.0%)
+2026-09-02 18:35:42 | DEBUG    | PROG  ed36ccf7  step 1600/2000  ( 80.0%)
+2026-09-02 18:36:29 | DEBUG    | PROG  a9f96cdd  step 1000/2000  ( 50.0%)
+2026-09-02 18:36:33 | DEBUG    | PROG  25ff71a9  step  800/2000  ( 40.0%)
+2026-09-02 18:36:49 | DEBUG    | PROG  67385a82  step  400/2000  ( 20.0%)
+2026-09-02 18:36:56 | DEBUG    | PROG  ed36ccf7  step 1800/2000  ( 90.0%)
+2026-09-02 18:38:04 | DEBUG    | PROG  25ff71a9  step 1000/2000  ( 50.0%)
+2026-09-02 18:38:05 | DEBUG    | PROG  a9f96cdd  step 1200/2000  ( 60.0%)
+2026-09-02 18:38:30 | DEBUG    | PROG  ed36ccf7  step 2000/2000  (100.0%)
+2026-09-02 18:38:30 | DEBUG    | PROG  74dd1130  step  200/2000  ( 10.0%)
+2026-09-02 18:38:31 | DEBUG    | PROG  67385a82  step  600/2000  ( 30.0%)
+2026-09-02 18:38:43 | INFO     | DONE  [380/400] ed36ccf7  1451.2s  peak= 14324 MB  [not solved]
+2026-09-02 18:38:43 | INFO     | START [171/400] 6f8cd79b  →  GPU 0
+2026-09-02 18:38:43 | DEBUG    |   GPU 0 | Used: 11.35/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:38:44 | DEBUG    | PROG  6f8cd79b  step    0/2000  (  0.0%)
+2026-09-02 18:39:26 | DEBUG    | PROG  25ff71a9  step 1200/2000  ( 60.0%)
+2026-09-02 18:39:32 | DEBUG    | PROG  a9f96cdd  step 1400/2000  ( 70.0%)
+2026-09-02 18:39:51 | DEBUG    | PROG  67385a82  step  800/2000  ( 40.0%)
+2026-09-02 18:39:51 | DEBUG    | PROG  74dd1130  step  400/2000  ( 20.0%)
+2026-09-02 18:40:40 | DEBUG    | PROG  25ff71a9  step 1400/2000  ( 70.0%)
+2026-09-02 18:40:56 | DEBUG    | PROG  a9f96cdd  step 1600/2000  ( 80.0%)
+2026-09-02 18:41:06 | DEBUG    | PROG  74dd1130  step  600/2000  ( 30.0%)
+2026-09-02 18:41:13 | DEBUG    | PROG  67385a82  step 1000/2000  ( 50.0%)
+2026-09-02 18:41:58 | DEBUG    | PROG  25ff71a9  step 1600/2000  ( 80.0%)
+2026-09-02 18:42:15 | DEBUG    | PROG  a9f96cdd  step 1800/2000  ( 90.0%)
+2026-09-02 18:42:22 | DEBUG    | PROG  74dd1130  step  800/2000  ( 40.0%)
+2026-09-02 18:42:37 | DEBUG    | PROG  67385a82  step 1200/2000  ( 60.0%)
+2026-09-02 18:43:13 | DEBUG    | PROG  25ff71a9  step 1800/2000  ( 90.0%)
+2026-09-02 18:43:33 | DEBUG    | PROG  a9f96cdd  step 2000/2000  (100.0%)
+2026-09-02 18:43:36 | DEBUG    | PROG  74dd1130  step 1000/2000  ( 50.0%)
+2026-09-02 18:43:46 | INFO     | DONE  [266/400] a9f96cdd  1654.5s  peak= 11951 MB  [SOLVED @guess1]
+2026-09-02 18:43:46 | INFO     | START [299/400] bdad9b1f  →  GPU 0
+2026-09-02 18:43:46 | DEBUG    |   GPU 0 | Used: 8.78/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:43:47 | DEBUG    | PROG  bdad9b1f  step    0/2000  (  0.0%)
+2026-09-02 18:44:04 | DEBUG    | PROG  67385a82  step 1400/2000  ( 70.0%)
+2026-09-02 18:44:10 | DEBUG    | PROG  25ff71a9  step 2000/2000  (100.0%)
+2026-09-02 18:44:23 | INFO     | DONE  [ 53/400] 25ff71a9  1522.3s  peak=  9135 MB  [not solved]
+2026-09-02 18:44:23 | INFO     | START [164/400] 6d0aefbc  →  GPU 0
+2026-09-02 18:44:23 | DEBUG    |   GPU 0 | Used: 9.93/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:44:24 | DEBUG    | PROG  6d0aefbc  step    0/2000  (  0.0%)
+2026-09-02 18:44:41 | DEBUG    | PROG  74dd1130  step 1200/2000  ( 60.0%)
+2026-09-02 18:44:58 | DEBUG    | PROG  67385a82  step 1600/2000  ( 80.0%)
+2026-09-02 18:45:25 | DEBUG    | PROG  74dd1130  step 1400/2000  ( 70.0%)
+2026-09-02 18:45:42 | DEBUG    | PROG  67385a82  step 1800/2000  ( 90.0%)
+2026-09-02 18:46:07 | DEBUG    | PROG  74dd1130  step 1600/2000  ( 80.0%)
+2026-09-02 18:46:28 | DEBUG    | PROG  67385a82  step 2000/2000  (100.0%)
+2026-09-02 18:46:42 | INFO     | DONE  [147/400] 67385a82  1623.5s  peak=  7848 MB  [SOLVED @guess1]
+2026-09-02 18:46:42 | INFO     | START [186/400] 794b24be  →  GPU 0
+2026-09-02 18:46:42 | DEBUG    |   GPU 0 | Used: 4.47/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:46:43 | DEBUG    | PROG  794b24be  step    0/2000  (  0.0%)
+2026-09-02 18:46:47 | DEBUG    | PROG  74dd1130  step 1800/2000  ( 90.0%)
+2026-09-02 18:47:32 | DEBUG    | PROG  74dd1130  step 2000/2000  (100.0%)
+2026-09-02 18:47:36 | INFO     | DONE  [179/400] 74dd1130   861.3s  peak=  4906 MB  [not solved]
+2026-09-02 18:47:36 | INFO     | START [248/400] a3df8b1e  →  GPU 0
+2026-09-02 18:47:36 | DEBUG    |   GPU 0 | Used: 2.47/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:47:37 | DEBUG    | PROG  a3df8b1e  step    0/2000  (  0.0%)
+2026-09-02 18:48:46 | DEBUG    | PROG  3aa6fb7a  step  200/2000  ( 10.0%)
+2026-09-02 18:49:30 | DEBUG    | PROG  3aa6fb7a  step  400/2000  ( 20.0%)
+2026-09-02 18:50:11 | DEBUG    | PROG  3aa6fb7a  step  600/2000  ( 30.0%)
+2026-09-02 18:51:01 | DEBUG    | PROG  3aa6fb7a  step  800/2000  ( 40.0%)
+2026-09-02 18:51:50 | DEBUG    | PROG  6f8cd79b  step  200/2000  ( 10.0%)
+2026-09-02 18:51:51 | DEBUG    | PROG  3aa6fb7a  step 1000/2000  ( 50.0%)
+2026-09-02 18:52:35 | DEBUG    | PROG  3aa6fb7a  step 1200/2000  ( 60.0%)
+2026-09-02 18:52:36 | DEBUG    | PROG  6f8cd79b  step  400/2000  ( 20.0%)
+2026-09-02 18:53:41 | DEBUG    | PROG  6f8cd79b  step  600/2000  ( 30.0%)
+2026-09-02 18:53:43 | DEBUG    | PROG  3aa6fb7a  step 1400/2000  ( 70.0%)
+2026-09-02 18:55:00 | DEBUG    | PROG  6f8cd79b  step  800/2000  ( 40.0%)
+2026-09-02 18:55:09 | DEBUG    | PROG  3aa6fb7a  step 1600/2000  ( 80.0%)
+2026-09-02 18:56:24 | DEBUG    | PROG  3aa6fb7a  step 1800/2000  ( 90.0%)
+2026-09-02 18:56:26 | DEBUG    | PROG  6f8cd79b  step 1000/2000  ( 50.0%)
+2026-09-02 18:57:43 | DEBUG    | PROG  3aa6fb7a  step 2000/2000  (100.0%)
+2026-09-02 18:57:43 | DEBUG    | PROG  6f8cd79b  step 1200/2000  ( 60.0%)
+2026-09-02 18:57:57 | INFO     | DONE  [ 81/400] 3aa6fb7a  1368.1s  peak= 16298 MB  [SOLVED @guess1]
+2026-09-02 18:57:57 | INFO     | START [309/400] c8f0f002  →  GPU 0
+2026-09-02 18:57:57 | DEBUG    |   GPU 0 | Used: 13.27/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 18:57:58 | DEBUG    | PROG  c8f0f002  step    0/2000  (  0.0%)
+2026-09-02 18:58:14 | DEBUG    | PROG  bdad9b1f  step  200/2000  ( 10.0%)
+2026-09-02 18:58:24 | DEBUG    | PROG  6d0aefbc  step  200/2000  ( 10.0%)
+2026-09-02 18:59:00 | DEBUG    | PROG  6f8cd79b  step 1400/2000  ( 70.0%)
+2026-09-02 18:59:33 | DEBUG    | PROG  bdad9b1f  step  400/2000  ( 20.0%)
+2026-09-02 18:59:37 | DEBUG    | PROG  794b24be  step  200/2000  ( 10.0%)
+2026-09-02 18:59:41 | DEBUG    | PROG  6d0aefbc  step  400/2000  ( 20.0%)
+2026-09-02 19:00:24 | DEBUG    | PROG  6f8cd79b  step 1600/2000  ( 80.0%)
+2026-09-02 19:01:06 | DEBUG    | PROG  bdad9b1f  step  600/2000  ( 30.0%)
+2026-09-02 19:01:19 | DEBUG    | PROG  6d0aefbc  step  600/2000  ( 30.0%)
+2026-09-02 19:01:22 | DEBUG    | PROG  794b24be  step  400/2000  ( 20.0%)
+2026-09-02 19:01:58 | DEBUG    | PROG  a3df8b1e  step  200/2000  ( 10.0%)
+2026-09-02 19:02:02 | DEBUG    | PROG  6f8cd79b  step 1800/2000  ( 90.0%)
+2026-09-02 19:02:46 | DEBUG    | PROG  bdad9b1f  step  800/2000  ( 40.0%)
+2026-09-02 19:02:58 | DEBUG    | PROG  6d0aefbc  step  800/2000  ( 40.0%)
+2026-09-02 19:03:09 | DEBUG    | PROG  794b24be  step  600/2000  ( 30.0%)
+2026-09-02 19:03:36 | DEBUG    | PROG  a3df8b1e  step  400/2000  ( 20.0%)
+2026-09-02 19:03:43 | DEBUG    | PROG  6f8cd79b  step 2000/2000  (100.0%)
+2026-09-02 19:03:57 | INFO     | DONE  [171/400] 6f8cd79b  1514.3s  peak= 13332 MB  [SOLVED @guess1]
+2026-09-02 19:03:57 | INFO     | START [339/400] d631b094  →  GPU 0
+2026-09-02 19:03:57 | DEBUG    |   GPU 0 | Used: 10.78/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:03:58 | DEBUG    | PROG  d631b094  step    0/2000  (  0.0%)
+2026-09-02 19:04:16 | DEBUG    | PROG  bdad9b1f  step 1000/2000  ( 50.0%)
+2026-09-02 19:04:22 | DEBUG    | PROG  6d0aefbc  step 1000/2000  ( 50.0%)
+2026-09-02 19:04:41 | DEBUG    | PROG  794b24be  step  800/2000  ( 40.0%)
+2026-09-02 19:04:58 | DEBUG    | PROG  a3df8b1e  step  600/2000  ( 30.0%)
+2026-09-02 19:05:36 | DEBUG    | PROG  bdad9b1f  step 1200/2000  ( 60.0%)
+2026-09-02 19:05:42 | DEBUG    | PROG  6d0aefbc  step 1200/2000  ( 60.0%)
+2026-09-02 19:06:07 | DEBUG    | PROG  794b24be  step 1000/2000  ( 50.0%)
+2026-09-02 19:06:19 | DEBUG    | PROG  a3df8b1e  step  800/2000  ( 40.0%)
+2026-09-02 19:07:00 | DEBUG    | PROG  bdad9b1f  step 1400/2000  ( 70.0%)
+2026-09-02 19:07:09 | DEBUG    | PROG  6d0aefbc  step 1400/2000  ( 70.0%)
+2026-09-02 19:07:39 | DEBUG    | PROG  794b24be  step 1200/2000  ( 60.0%)
+2026-09-02 19:07:42 | DEBUG    | PROG  a3df8b1e  step 1000/2000  ( 50.0%)
+2026-09-02 19:08:21 | DEBUG    | PROG  bdad9b1f  step 1600/2000  ( 80.0%)
+2026-09-02 19:08:26 | DEBUG    | PROG  6d0aefbc  step 1600/2000  ( 80.0%)
+2026-09-02 19:09:01 | DEBUG    | PROG  a3df8b1e  step 1200/2000  ( 60.0%)
+2026-09-02 19:09:03 | DEBUG    | PROG  794b24be  step 1400/2000  ( 70.0%)
+2026-09-02 19:09:40 | DEBUG    | PROG  bdad9b1f  step 1800/2000  ( 90.0%)
+2026-09-02 19:09:48 | DEBUG    | PROG  6d0aefbc  step 1800/2000  ( 90.0%)
+2026-09-02 19:10:31 | DEBUG    | PROG  a3df8b1e  step 1400/2000  ( 70.0%)
+2026-09-02 19:10:42 | DEBUG    | PROG  794b24be  step 1600/2000  ( 80.0%)
+2026-09-02 19:11:15 | DEBUG    | PROG  bdad9b1f  step 2000/2000  (100.0%)
+2026-09-02 19:11:22 | DEBUG    | PROG  6d0aefbc  step 2000/2000  (100.0%)
+2026-09-02 19:11:29 | INFO     | DONE  [299/400] bdad9b1f  1662.5s  peak= 13952 MB  [SOLVED @guess1]
+2026-09-02 19:11:29 | INFO     | START [229/400] 9565186b  →  GPU 0
+2026-09-02 19:11:29 | DEBUG    |   GPU 0 | Used: 10.93/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:11:30 | DEBUG    | PROG  9565186b  step    0/2000  (  0.0%)
+2026-09-02 19:11:36 | INFO     | DONE  [164/400] 6d0aefbc  1633.5s  peak= 13918 MB  [SOLVED @guess2]
+2026-09-02 19:11:36 | INFO     | START [ 73/400] 3618c87e  →  GPU 0
+2026-09-02 19:11:36 | DEBUG    |   GPU 0 | Used: 8.27/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:11:37 | DEBUG    | PROG  3618c87e  step    0/2000  (  0.0%)
+2026-09-02 19:11:44 | DEBUG    | PROG  c8f0f002  step  200/2000  ( 10.0%)
+2026-09-02 19:11:54 | DEBUG    | PROG  a3df8b1e  step 1600/2000  ( 80.0%)
+2026-09-02 19:12:07 | DEBUG    | PROG  794b24be  step 1800/2000  ( 90.0%)
+2026-09-02 19:12:44 | DEBUG    | PROG  c8f0f002  step  400/2000  ( 20.0%)
+2026-09-02 19:12:58 | DEBUG    | PROG  a3df8b1e  step 1800/2000  ( 90.0%)
+2026-09-02 19:13:19 | DEBUG    | PROG  794b24be  step 2000/2000  (100.0%)
+2026-09-02 19:13:32 | INFO     | DONE  [186/400] 794b24be  1610.4s  peak= 10054 MB  [SOLVED @guess1]
+2026-09-02 19:13:32 | INFO     | START [103/400] 44f52bb0  →  GPU 0
+2026-09-02 19:13:32 | DEBUG    |   GPU 0 | Used: 7.12/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:13:33 | DEBUG    | PROG  44f52bb0  step    0/2000  (  0.0%)
+2026-09-02 19:13:41 | DEBUG    | PROG  a3df8b1e  step 2000/2000  (100.0%)
+2026-09-02 19:13:42 | DEBUG    | PROG  c8f0f002  step  600/2000  ( 30.0%)
+2026-09-02 19:13:54 | INFO     | DONE  [248/400] a3df8b1e  1578.4s  peak=  7436 MB  [not solved]
+2026-09-02 19:13:54 | INFO     | START [167/400] 6e02f1e3  →  GPU 0
+2026-09-02 19:13:54 | DEBUG    |   GPU 0 | Used: 5.10/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:13:55 | DEBUG    | PROG  6e02f1e3  step    0/2000  (  0.0%)
+2026-09-02 19:14:27 | DEBUG    | PROG  c8f0f002  step  800/2000  ( 40.0%)
+2026-09-02 19:15:12 | DEBUG    | PROG  c8f0f002  step 1000/2000  ( 50.0%)
+2026-09-02 19:15:54 | DEBUG    | PROG  c8f0f002  step 1200/2000  ( 60.0%)
+2026-09-02 19:16:26 | DEBUG    | PROG  d631b094  step  200/2000  ( 10.0%)
+2026-09-02 19:16:37 | DEBUG    | PROG  c8f0f002  step 1400/2000  ( 70.0%)
+2026-09-02 19:17:09 | DEBUG    | PROG  d631b094  step  400/2000  ( 20.0%)
+2026-09-02 19:17:20 | DEBUG    | PROG  c8f0f002  step 1600/2000  ( 80.0%)
+2026-09-02 19:18:00 | DEBUG    | PROG  d631b094  step  600/2000  ( 30.0%)
+2026-09-02 19:18:09 | DEBUG    | PROG  c8f0f002  step 1800/2000  ( 90.0%)
+2026-09-02 19:18:46 | DEBUG    | PROG  d631b094  step  800/2000  ( 40.0%)
+2026-09-02 19:18:50 | DEBUG    | PROG  c8f0f002  step 2000/2000  (100.0%)
+2026-09-02 19:19:04 | INFO     | DONE  [309/400] c8f0f002  1266.9s  peak=  6990 MB  [SOLVED @guess1]
+2026-09-02 19:19:04 | INFO     | START [261/400] a79310a0  →  GPU 0
+2026-09-02 19:19:04 | DEBUG    |   GPU 0 | Used: 3.84/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:19:05 | DEBUG    | PROG  a79310a0  step    0/2000  (  0.0%)
+2026-09-02 19:19:36 | DEBUG    | PROG  d631b094  step 1000/2000  ( 50.0%)
+2026-09-02 19:20:31 | DEBUG    | PROG  d631b094  step 1200/2000  ( 60.0%)
+2026-09-02 19:21:25 | DEBUG    | PROG  d631b094  step 1400/2000  ( 70.0%)
+2026-09-02 19:22:14 | DEBUG    | PROG  d631b094  step 1600/2000  ( 80.0%)
+2026-09-02 19:23:09 | DEBUG    | PROG  d631b094  step 1800/2000  ( 90.0%)
+2026-09-02 19:23:58 | DEBUG    | PROG  9565186b  step  200/2000  ( 10.0%)
+2026-09-02 19:24:28 | DEBUG    | PROG  d631b094  step 2000/2000  (100.0%)
+2026-09-02 19:24:42 | INFO     | DONE  [339/400] d631b094  1244.9s  peak= 15736 MB  [not solved]
+2026-09-02 19:24:42 | INFO     | START [129/400] 5582e5ca  →  GPU 0
+2026-09-02 19:24:42 | DEBUG    |   GPU 0 | Used: 10.69/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:24:43 | DEBUG    | PROG  5582e5ca  step    0/2000  (  0.0%)
+2026-09-02 19:24:46 | DEBUG    | PROG  9565186b  step  400/2000  ( 20.0%)
+2026-09-02 19:24:49 | DEBUG    | PROG  3618c87e  step  200/2000  ( 10.0%)
+2026-09-02 19:25:37 | DEBUG    | PROG  44f52bb0  step  200/2000  ( 10.0%)
+2026-09-02 19:26:09 | DEBUG    | PROG  9565186b  step  600/2000  ( 30.0%)
+2026-09-02 19:26:11 | DEBUG    | PROG  3618c87e  step  400/2000  ( 20.0%)
+2026-09-02 19:26:59 | DEBUG    | PROG  44f52bb0  step  400/2000  ( 20.0%)
+2026-09-02 19:27:26 | DEBUG    | PROG  6e02f1e3  step  200/2000  ( 10.0%)
+2026-09-02 19:27:45 | DEBUG    | PROG  9565186b  step  800/2000  ( 40.0%)
+2026-09-02 19:27:49 | DEBUG    | PROG  3618c87e  step  600/2000  ( 30.0%)
+2026-09-02 19:29:09 | DEBUG    | PROG  44f52bb0  step  600/2000  ( 30.0%)
+2026-09-02 19:29:55 | DEBUG    | PROG  6e02f1e3  step  400/2000  ( 20.0%)
+2026-09-02 19:30:13 | DEBUG    | PROG  9565186b  step 1000/2000  ( 50.0%)
+2026-09-02 19:30:20 | DEBUG    | PROG  3618c87e  step  800/2000  ( 40.0%)
+2026-09-02 19:30:40 | DEBUG    | PROG  a79310a0  step  200/2000  ( 10.0%)
+2026-09-02 19:31:49 | DEBUG    | PROG  44f52bb0  step  800/2000  ( 40.0%)
+2026-09-02 19:32:29 | DEBUG    | PROG  6e02f1e3  step  600/2000  ( 30.0%)
+2026-09-02 19:32:43 | DEBUG    | PROG  9565186b  step 1200/2000  ( 60.0%)
+2026-09-02 19:32:54 | DEBUG    | PROG  3618c87e  step 1000/2000  ( 50.0%)
+2026-09-02 19:33:12 | DEBUG    | PROG  a79310a0  step  400/2000  ( 20.0%)
+2026-09-02 19:34:15 | DEBUG    | PROG  44f52bb0  step 1000/2000  ( 50.0%)
+2026-09-02 19:34:54 | DEBUG    | PROG  6e02f1e3  step  800/2000  ( 40.0%)
+2026-09-02 19:35:07 | DEBUG    | PROG  9565186b  step 1400/2000  ( 70.0%)
+2026-09-02 19:35:21 | DEBUG    | PROG  3618c87e  step 1200/2000  ( 60.0%)
+2026-09-02 19:35:44 | DEBUG    | PROG  a79310a0  step  600/2000  ( 30.0%)
+2026-09-02 19:36:51 | DEBUG    | PROG  44f52bb0  step 1200/2000  ( 60.0%)
+2026-09-02 19:37:21 | DEBUG    | PROG  6e02f1e3  step 1000/2000  ( 50.0%)
+2026-09-02 19:37:29 | DEBUG    | PROG  9565186b  step 1600/2000  ( 80.0%)
+2026-09-02 19:37:47 | DEBUG    | PROG  3618c87e  step 1400/2000  ( 70.0%)
+2026-09-02 19:38:15 | DEBUG    | PROG  a79310a0  step  800/2000  ( 40.0%)
+2026-09-02 19:39:43 | DEBUG    | PROG  44f52bb0  step 1400/2000  ( 70.0%)
+2026-09-02 19:40:22 | DEBUG    | PROG  6e02f1e3  step 1200/2000  ( 60.0%)
+2026-09-02 19:40:30 | DEBUG    | PROG  9565186b  step 1800/2000  ( 90.0%)
+2026-09-02 19:40:30 | DEBUG    | PROG  5582e5ca  step  200/2000  ( 10.0%)
+2026-09-02 19:40:56 | DEBUG    | PROG  3618c87e  step 1600/2000  ( 80.0%)
+2026-09-02 19:41:23 | DEBUG    | PROG  a79310a0  step 1000/2000  ( 50.0%)
+2026-09-02 19:42:53 | DEBUG    | PROG  44f52bb0  step 1600/2000  ( 80.0%)
+2026-09-02 19:43:26 | DEBUG    | PROG  6e02f1e3  step 1400/2000  ( 70.0%)
+2026-09-02 19:43:27 | DEBUG    | PROG  5582e5ca  step  400/2000  ( 20.0%)
+2026-09-02 19:43:32 | DEBUG    | PROG  9565186b  step 2000/2000  (100.0%)
+2026-09-02 19:43:45 | INFO     | DONE  [229/400] 9565186b  1935.9s  peak= 16282 MB  [not solved]
+2026-09-02 19:43:45 | INFO     | START [140/400] 6150a2bd  →  GPU 0
+2026-09-02 19:43:45 | DEBUG    |   GPU 0 | Used: 13.24/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:43:46 | DEBUG    | PROG  6150a2bd  step    0/2000  (  0.0%)
+2026-09-02 19:43:57 | DEBUG    | PROG  3618c87e  step 1800/2000  ( 90.0%)
+2026-09-02 19:44:21 | DEBUG    | PROG  a79310a0  step 1200/2000  ( 60.0%)
+2026-09-02 19:45:38 | DEBUG    | PROG  44f52bb0  step 1800/2000  ( 90.0%)
+2026-09-02 19:45:55 | DEBUG    | PROG  5582e5ca  step  600/2000  ( 30.0%)
+2026-09-02 19:46:04 | DEBUG    | PROG  6e02f1e3  step 1600/2000  ( 80.0%)
+2026-09-02 19:46:35 | DEBUG    | PROG  3618c87e  step 2000/2000  (100.0%)
+2026-09-02 19:46:50 | INFO     | DONE  [ 73/400] 3618c87e  2114.2s  peak= 13867 MB  [SOLVED @guess1]
+2026-09-02 19:46:50 | INFO     | START [272/400] aedd82e4  →  GPU 0
+2026-09-02 19:46:50 | DEBUG    |   GPU 0 | Used: 10.88/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:46:51 | DEBUG    | PROG  a79310a0  step 1400/2000  ( 70.0%)
+2026-09-02 19:46:51 | DEBUG    | PROG  aedd82e4  step    0/2000  (  0.0%)
+2026-09-02 19:47:49 | DEBUG    | PROG  44f52bb0  step 2000/2000  (100.0%)
+2026-09-02 19:48:01 | DEBUG    | PROG  5582e5ca  step  800/2000  ( 40.0%)
+2026-09-02 19:48:02 | INFO     | DONE  [103/400] 44f52bb0  2070.2s  peak= 11288 MB  [not solved]
+2026-09-02 19:48:02 | INFO     | START [322/400] d037b0a7  →  GPU 0
+2026-09-02 19:48:02 | DEBUG    |   GPU 0 | Used: 8.57/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:48:03 | DEBUG    | PROG  d037b0a7  step    0/2000  (  0.0%)
+2026-09-02 19:48:09 | DEBUG    | PROG  6e02f1e3  step 1800/2000  ( 90.0%)
+2026-09-02 19:48:26 | DEBUG    | PROG  a79310a0  step 1600/2000  ( 80.0%)
+2026-09-02 19:48:43 | DEBUG    | PROG  5582e5ca  step 1000/2000  ( 50.0%)
+2026-09-02 19:49:25 | DEBUG    | PROG  5582e5ca  step 1200/2000  ( 60.0%)
+2026-09-02 19:50:10 | DEBUG    | PROG  5582e5ca  step 1400/2000  ( 70.0%)
+2026-09-02 19:50:18 | DEBUG    | PROG  6e02f1e3  step 2000/2000  (100.0%)
+2026-09-02 19:50:24 | DEBUG    | PROG  a79310a0  step 1800/2000  ( 90.0%)
+2026-09-02 19:50:31 | INFO     | DONE  [167/400] 6e02f1e3  2196.4s  peak=  8946 MB  [SOLVED @guess2]
+2026-09-02 19:50:31 | INFO     | START [373/400] e9afcf9a  →  GPU 0
+2026-09-02 19:50:31 | DEBUG    |   GPU 0 | Used: 6.04/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:50:32 | DEBUG    | PROG  e9afcf9a  step    0/2000  (  0.0%)
+2026-09-02 19:50:53 | DEBUG    | PROG  5582e5ca  step 1600/2000  ( 80.0%)
+2026-09-02 19:51:03 | DEBUG    | PROG  a79310a0  step 2000/2000  (100.0%)
+2026-09-02 19:51:16 | INFO     | DONE  [261/400] a79310a0  1932.0s  peak=  6348 MB  [not solved]
+2026-09-02 19:51:16 | INFO     | START [262/400] a85d4709  →  GPU 0
+2026-09-02 19:51:16 | DEBUG    |   GPU 0 | Used: 4.71/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:51:17 | DEBUG    | PROG  a85d4709  step    0/2000  (  0.0%)
+2026-09-02 19:51:33 | DEBUG    | PROG  5582e5ca  step 1800/2000  ( 90.0%)
+2026-09-02 19:52:11 | DEBUG    | PROG  d037b0a7  step  200/2000  ( 10.0%)
+2026-09-02 19:52:15 | DEBUG    | PROG  5582e5ca  step 2000/2000  (100.0%)
+2026-09-02 19:52:27 | INFO     | DONE  [129/400] 5582e5ca  1664.6s  peak=  7388 MB  [SOLVED @guess1]
+2026-09-02 19:52:27 | INFO     | START [210/400] 8be77c9e  →  GPU 0
+2026-09-02 19:52:27 | DEBUG    |   GPU 0 | Used: 4.53/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 19:52:28 | DEBUG    | PROG  8be77c9e  step    0/2000  (  0.0%)
+2026-09-02 19:52:52 | DEBUG    | PROG  d037b0a7  step  400/2000  ( 20.0%)
+2026-09-02 19:53:33 | DEBUG    | PROG  d037b0a7  step  600/2000  ( 30.0%)
+2026-09-02 19:54:15 | DEBUG    | PROG  d037b0a7  step  800/2000  ( 40.0%)
+2026-09-02 19:55:04 | DEBUG    | PROG  d037b0a7  step 1000/2000  ( 50.0%)
+2026-09-02 19:55:53 | DEBUG    | PROG  a85d4709  step  200/2000  ( 10.0%)
+2026-09-02 19:56:05 | DEBUG    | PROG  6150a2bd  step  200/2000  ( 10.0%)
+2026-09-02 19:56:41 | DEBUG    | PROG  a85d4709  step  400/2000  ( 20.0%)
+2026-09-02 19:56:50 | DEBUG    | PROG  d037b0a7  step 1200/2000  ( 60.0%)
+2026-09-02 19:57:20 | DEBUG    | PROG  a85d4709  step  600/2000  ( 30.0%)
+2026-09-02 19:58:01 | DEBUG    | PROG  6150a2bd  step  400/2000  ( 20.0%)
+2026-09-02 19:58:05 | DEBUG    | PROG  a85d4709  step  800/2000  ( 40.0%)
+2026-09-02 19:58:30 | DEBUG    | PROG  d037b0a7  step 1400/2000  ( 70.0%)
+2026-09-02 19:58:59 | DEBUG    | PROG  a85d4709  step 1000/2000  ( 50.0%)
+2026-09-02 19:59:33 | DEBUG    | PROG  6150a2bd  step  600/2000  ( 30.0%)
+2026-09-02 20:00:10 | DEBUG    | PROG  d037b0a7  step 1600/2000  ( 80.0%)
+2026-09-02 20:00:17 | DEBUG    | PROG  a85d4709  step 1200/2000  ( 60.0%)
+2026-09-02 20:01:16 | DEBUG    | PROG  6150a2bd  step  800/2000  ( 40.0%)
+2026-09-02 20:01:32 | DEBUG    | PROG  aedd82e4  step  200/2000  ( 10.0%)
+2026-09-02 20:01:57 | DEBUG    | PROG  d037b0a7  step 1800/2000  ( 90.0%)
+2026-09-02 20:02:10 | DEBUG    | PROG  a85d4709  step 1400/2000  ( 70.0%)
+2026-09-02 20:03:21 | DEBUG    | PROG  6150a2bd  step 1000/2000  ( 50.0%)
+2026-09-02 20:03:47 | DEBUG    | PROG  aedd82e4  step  400/2000  ( 20.0%)
+2026-09-02 20:04:15 | DEBUG    | PROG  e9afcf9a  step  200/2000  ( 10.0%)
+2026-09-02 20:04:25 | DEBUG    | PROG  d037b0a7  step 2000/2000  (100.0%)
+2026-09-02 20:04:29 | INFO     | DONE  [322/400] d037b0a7   986.5s  peak= 15930 MB  [not solved]
+2026-09-02 20:04:29 | INFO     | START [311/400] c9e6f938  →  GPU 0
+2026-09-02 20:04:29 | DEBUG    |   GPU 0 | Used: 12.90/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-02 20:04:30 | DEBUG    | PROG  c9e6f938  step    0/2000  (  0.0%)
+2026-09-02 20:04:40 | DEBUG    | PROG  a85d4709  step 1600/2000  ( 80.0%)
+2026-09-02 20:05:50 | DEBUG    | PROG  6150a2bd  step 1200/2000  ( 60.0%)
+2026-09-02 20:06:04 | DEBUG    | PROG  8be77c9e  step  200/2000  ( 10.0%)
+2026-09-02 20:06:30 | DEBUG    | PROG  aedd82e4  step  600/2000  ( 30.0%)
+2026-09-02 20:06:38 | DEBUG    | PROG  e9afcf9a  step  400/2000  ( 20.0%)
+2026-09-02 20:07:10 | DEBUG    | PROG  a85d4709  step 1800/2000  ( 90.0%)
+2026-09-02 20:08:17 | DEBUG    | PROG  6150a2bd  step 1400/2000  ( 70.0%)
+2026-09-02 20:08:20 | DEBUG    | PROG  8be77c9e  step  400/2000  ( 20.0%)
+2026-09-02 20:09:02 | DEBUG    | PROG  e9afcf9a  step  600/2000  ( 30.0%)
+2026-09-02 20:09:06 | DEBUG    | PROG  aedd82e4  step  800/2000  ( 40.0%)
+2026-09-02 20:09:41 | DEBUG    | PROG  a85d4709  step 2000/2000  (100.0%)
+2026-09-02 20:09:45 | INFO     | DONE  [262/400] a85d4709  1109.7s  peak= 13404 MB  [not solved]
+2026-09-02 20:10:24 | DEBUG    | PROG  8be77c9e  step  600/2000  ( 30.0%)
+2026-09-02 20:10:31 | DEBUG    | PROG  6150a2bd  step 1600/2000  ( 80.0%)
+2026-09-02 20:11:01 | DEBUG    | PROG  e9afcf9a  step  800/2000  ( 40.0%)
+2026-09-02 20:11:11 | DEBUG    | PROG  aedd82e4  step 1000/2000  ( 50.0%)
+2026-09-02 20:12:15 | DEBUG    | PROG  8be77c9e  step  800/2000  ( 40.0%)
+2026-09-02 20:12:21 | DEBUG    | PROG  6150a2bd  step 1800/2000  ( 90.0%)
+2026-09-02 20:12:49 | DEBUG    | PROG  e9afcf9a  step 1000/2000  ( 50.0%)
+2026-09-02 20:13:10 | DEBUG    | PROG  aedd82e4  step 1200/2000  ( 60.0%)
+2026-09-02 20:13:55 | DEBUG    | PROG  8be77c9e  step 1000/2000  ( 50.0%)
+2026-09-02 20:14:11 | DEBUG    | PROG  6150a2bd  step 2000/2000  (100.0%)
+2026-09-02 20:14:22 | DEBUG    | PROG  e9afcf9a  step 1200/2000  ( 60.0%)
+2026-09-02 20:14:24 | INFO     | DONE  [140/400] 6150a2bd  1838.8s  peak= 11664 MB  [SOLVED @guess2]
+2026-09-02 20:15:05 | DEBUG    | PROG  e9afcf9a  step 1400/2000  ( 70.0%)
+2026-09-02 20:15:15 | DEBUG    | PROG  aedd82e4  step 1400/2000  ( 70.0%)
+2026-09-02 20:15:38 | DEBUG    | PROG  8be77c9e  step 1200/2000  ( 60.0%)
+2026-09-02 20:16:39 | DEBUG    | PROG  e9afcf9a  step 1600/2000  ( 80.0%)
+2026-09-02 20:17:11 | DEBUG    | PROG  aedd82e4  step 1600/2000  ( 80.0%)
+2026-09-02 20:17:17 | DEBUG    | PROG  c9e6f938  step  200/2000  ( 10.0%)
+2026-09-02 20:17:25 | DEBUG    | PROG  8be77c9e  step 1400/2000  ( 70.0%)
+2026-09-02 20:18:31 | DEBUG    | PROG  e9afcf9a  step 1800/2000  ( 90.0%)
+2026-09-02 20:19:07 | DEBUG    | PROG  c9e6f938  step  400/2000  ( 20.0%)
+2026-09-02 20:19:13 | DEBUG    | PROG  aedd82e4  step 1800/2000  ( 90.0%)
+2026-09-02 20:19:15 | DEBUG    | PROG  8be77c9e  step 1600/2000  ( 80.0%)
+2026-09-02 20:20:18 | DEBUG    | PROG  e9afcf9a  step 2000/2000  (100.0%)
+2026-09-02 20:20:30 | INFO     | DONE  [373/400] e9afcf9a  1799.7s  peak= 10022 MB  [SOLVED @guess2]
+2026-09-02 20:20:36 | DEBUG    | PROG  aedd82e4  step 2000/2000  (100.0%)
+2026-09-02 20:20:48 | INFO     | DONE  [272/400] aedd82e4  2038.0s  peak=  7114 MB  [not solved]
+2026-09-02 20:21:00 | DEBUG    | PROG  c9e6f938  step  600/2000  ( 30.0%)
+2026-09-02 20:21:08 | DEBUG    | PROG  8be77c9e  step 1800/2000  ( 90.0%)
+2026-09-02 20:22:57 | DEBUG    | PROG  c9e6f938  step  800/2000  ( 40.0%)
+2026-09-02 20:23:03 | DEBUG    | PROG  8be77c9e  step 2000/2000  (100.0%)
+2026-09-02 20:23:15 | INFO     | DONE  [210/400] 8be77c9e  1848.7s  peak=  4046 MB  [SOLVED @guess2]
+2026-09-02 20:23:36 | DEBUG    | PROG  c9e6f938  step 1000/2000  ( 50.0%)
+2026-09-02 20:24:09 | DEBUG    | PROG  c9e6f938  step 1200/2000  ( 60.0%)
+2026-09-02 20:24:45 | DEBUG    | PROG  c9e6f938  step 1400/2000  ( 70.0%)
+2026-09-02 20:25:19 | DEBUG    | PROG  c9e6f938  step 1600/2000  ( 80.0%)
+2026-09-02 20:25:52 | DEBUG    | PROG  c9e6f938  step 1800/2000  ( 90.0%)
+2026-09-02 20:26:27 | DEBUG    | PROG  c9e6f938  step 2000/2000  (100.0%)
+2026-09-02 20:26:39 | INFO     | DONE  [311/400] c9e6f938  1329.7s  peak=  2082 MB  [SOLVED @guess1]
+2026-09-02 20:26:40 | DEBUG    | parallelize_runs done in 12590.5s
+2026-09-02 20:26:40 | INFO     | Phase 2 complete in 12590.5s
+2026-09-02 20:26:41 | INFO     | Saved predictions_training.npz
+2026-09-02 20:26:41 | INFO     | Saved submission_training.json
+2026-09-02 20:26:41 | INFO     | ========================================================================
+2026-09-02 20:26:41 | INFO     | RUN COMPLETE — 140/400 tasks solved (35.0%)  in 12591.8s (3.50h)
+2026-09-02 20:26:41 | INFO     |   Predictions saved : predictions_training.npz
+2026-09-02 20:26:41 | INFO     | ========================================================================
+2026-09-02 20:26:41 | INFO     | Saved run_metadata_training.json

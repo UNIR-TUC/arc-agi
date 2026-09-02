@@ -1,44 +1,71 @@
 {
   "split": "training",
-  "timestamp": "2026-08-28 04:00:56",
-  "n_tasks": 50,
-  "n_steps": 1500,
-  "n_solved": 18,
-  "elapsed_s": 40548.5,
+  "timestamp": "2026-09-02 20:26:41",
+  "n_tasks": 400,
+  "n_steps": 2000,
+  "n_solved": 140,
+  "elapsed_s": 12591.8,
   "n_gpus": 1,
-  "max_workers": 10,
+  "max_workers": 6,
   "postprocess_stride": 4,
   "phase1_s": 0.0,
-  "phase2_s": 40548.4,
-  "resumed_tasks": 0,
-  "limits": {
-    "host_mem_per_worker_gb": 6.0,
-    "host_mem_reserve_gb": 10.0,
-    "vram_margin_frac": 0.0,
-    "stall_timeout_s": 1800.0
+  "phase2_s": 12590.5,
+  "resumed_tasks": 354,
+  "trained_this_attempt": 46,
+  "real_result_tasks": 400,
+  "degraded": false,
+  "recovery": {
+    "enabled": true,
+    "manifest": ".partial/training/.task_recovery.json",
+    "explicit_eager_tasks": [
+      "fcb5c309"
+    ],
+    "effective_eager_tasks": [
+      "4258a5f9",
+      "dbc1a6ce",
+      "fcb5c309"
+    ],
+    "recovered_eager_tasks": [
+      "4258a5f9",
+      "dbc1a6ce",
+      "fcb5c309"
+    ],
+    "quarantined_tasks": [],
+    "fallback_strategy": null
   },
-  "compile_memory_factor": null,
+  "limits": {
+    "host_mem_per_worker_gb": 9.0,
+    "host_mem_reserve_gb": 12.0,
+    "vram_margin_frac": 0.0,
+    "stall_timeout_s": 2700.0,
+    "cache_min_free_gb": 50.0
+  },
+  "inductor_cache": {
+    "path": "/mnt/supercompressarc-cache/.inductor_cache",
+    "free_gb_at_end": 1280.3
+  },
+  "compile_memory_factor": 1.2,
   "accel": {
     "amp": "off",
-    "compile_mode": "off",
-    "matmul_precision": "highest",
-    "threads_per_worker": 0,
+    "compile_mode": "default",
+    "matmul_precision": "high",
+    "threads_per_worker": 1,
     "alloc_conf": null,
-    "inductor_cache_dir": null,
-    "compile_threads": 1,
-    "memory_planning": false,
-    "enabled": false
+    "inductor_cache_dir": "/mnt/supercompressarc-cache/.inductor_cache",
+    "compile_threads": 4,
+    "memory_planning": true,
+    "enabled": true
   },
   "accel_measurement": {
     "amp": "off",
     "compile_mode": "off",
-    "matmul_precision": "highest",
-    "threads_per_worker": 0,
+    "matmul_precision": "high",
+    "threads_per_worker": 1,
     "alloc_conf": null,
-    "inductor_cache_dir": null,
-    "compile_threads": 1,
-    "memory_planning": false,
-    "enabled": false
+    "inductor_cache_dir": "/mnt/supercompressarc-cache/.inductor_cache",
+    "compile_threads": 4,
+    "memory_planning": true,
+    "enabled": true
   },
   "backend": {
     "torch_version": "2.14.0.dev20260712+rocm7.2",
@@ -48,5 +75,15 @@
     "gpu_names": [
       "AMD Radeon RX 9070 XT"
     ]
+  },
+  "runner": {
+    "run_id": "20260901_185903_209607",
+    "campaign_id": "20260901_185903_209607",
+    "attempt_count": 3,
+    "retry_count": 2,
+    "cumulative_active_s": 91597.566,
+    "total_wall_s": 91657.712,
+    "retry_wait_and_overhead_s": 60.146,
+    "summary_path": "run_logs/training_20260901_185903_209607_summary.json"
   }
 }
