@@ -1455,11 +1455,11 @@ una serie de desarrollos básicos previos:
 \end{enumerate}
 
 Como se ha visto en la sección \ref{sec:arc}, el espíritu de ARC-AGI es encontrar soluciones que sean lo más eficientes posible, no solo en términos de precisión, sino también en términos de coste computacional. La inteligencia
-no se debe comprar con datos ni con cómputo masivo. Este trabajo se construye a partir de este espírito de la norma y se ha estudiado numerosos modelos y soluciones para tratar de buscar un enfoque de acuerdo con este principio.
+no se debe comprar con datos ni con cómputo masivo. Este trabajo se construye a partir de este espíritu de la norma y se ha estudiado numerosos modelos y soluciones para tratar de buscar un enfoque de acuerdo con este principio.
 
 Dejando al margen los grandes modelos de lenguaje y los modelos de frontera, se han estudiado diferentes enfoques de modelos compactos y eficientes. 
 La figura \ref{fig:fig1SECTION5} muestra una comparativa del coste por tarea entre diferentes modelos compactos, donde el tamaño de los círculos representa la capacidad computacional en TFLOPs FP16 usada en cada modelo.
-Esta representación es más fiel a la realidad que el porpio tamaño del modelo, ya que un modelo pequeño puede requerir una gran capacidad de cómputo para su entrenamiento y ajuste fino.
+Esta representación es más fiel a la realidad que el propio tamaño del modelo, ya que un modelo pequeño puede requerir una gran capacidad de cómputo para su entrenamiento y ajuste fino.
 
 \begin{figure}[h]
 	\centering
@@ -1472,7 +1472,7 @@ Esta representación es más fiel a la realidad que el porpio tamaño del modelo
 \FloatBarrier
 
 Algunas soluciones como los modelos TRM requieren de una capacidad de cómputo muy elevada y no que no está al alcance de cualquier investigador. Por otra parte, este enfoque también se encuentra en el filo
-del espírito de ARC-AGI, ya que es necesario realizar pre-entrenamientos sin ningún límite de capacidad de computación para posteriormente realizar ajustes finos e inferencia
+del espíritu de ARC-AGI, ya que es necesario realizar pre-entrenamientos sin ningún límite de capacidad de computación para posteriormente realizar ajustes finos e inferencia
 en la las GPUs obligadas por los órganos de ARC-PRIZE. La diferencia de la capacidad de cómputo usada para el modelo TRM en comparación al modelo de CompressARC es de 7.916 PFLOPs frente a 116,6 TFLOPs, 
 lo que supone una diferencia de más de 67 veces. En cuestión de eficiencia computacional es realmente destacable el modelo de CompressARC.
 
@@ -1680,39 +1680,144 @@ que no son directamente observables en los datos de entrada, pero que capturan i
 un sistema de estructuras con diversas variaciones. Las tareas de ARC-AGI son complejas y variadas. Cada tarea puede contener
 diversos ejemplos, colores, tamaños y patrones diferentes. Todas estas variaciones en los datos deben ser capturados y representados en variables
 latentes. Este proceso es mucho más complejo a simple vista y requiere de un diseño sofisticado. Para poder realizar este cometido,
-\textit{CompressARC} hace uso de un sistema denominado Multitensors, y posteriormente se descodifica mediante una compleja arquitectura 
+\textit{CompressARC} hace uso de un sistema denominado Multitensor, y posteriormente se descodifica mediante una compleja arquitectura 
 de redes neuronales densas.
 
-FOTO SISTEMA COMPLETO
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.90\textwidth]{image/images/SuperCompressARC-Arquitectura Baseline_dia.png}
+	\caption[Arquitectura \textit{CompressARC}]{Arquitectura \textit{CompressARC}.}
+	\label{fig:fig9SECTION5}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
 
 El objetivo del modelo es el mismo que cualquier Autocodificador Varicional, codificar un espacio latente y posteriormente decodificarlo 
 para reconstruirlo mediante los denominados \textit{logits}. En los siguientes apartados se explicará con todos tipo de detalles
 el funcionamiento de cada sistema en detalle.
 
-\subsection{Codificador Multitensors}
+El flujo completo de entrenamiento en tiempo de inferencia de manera simple podría ser el siguiente:
+\begin{enumerate}
+	\item Se recibe una tarea con sus ejemplos y se extraen las características relevantes: número de ejemplos, número de colores, direcciones, número de filas y número de columnas.
+	\item Se construye el Multitensor a partir de estas características, aplicando la máscara binaria para identificar los tensores válidos.
+	\item Cada tensor válido se recorre y se representa en el espacio latente mediante un vector de 4 dimensiones.
+	\item Se combina toda la información del espacio latente en un vector único denominado \(z\).
+	\item El vector \(z\) se pasa a través de la arquitectura de decodificación para reconstruir los \textit{logits}.
+	\item Se calcula la pérdida comparando los \textit{logits} reconstruidos con los datos originales.
+	\item Se actualizan los parámetros del modelo mediante retropropagación.
+\end{enumerate}
+
+El autor del modelo \citeauthor{liao2025arcagiwithoutpretraining} muestra una seria de métricas del laboratorio de pruebas realizadas en 
+exhaustivos documentos explicativos. El entrenamiento del modelo para todas las tareas se realizan de manera secuencial, es decir, se realiza
+el entrenamiento de una tarea, se compara el resultado y continua con el siguiente. Este procedimiento se realiza al completo en ambos 
+conjuntos de datos de entrenamiento y evaluación.
+
+\subsection{Codificador Multitensor}
 
 Las tareas de ARC-AGI típicamente contienen en los datos de entrenamiento entre 2 y 7 ejemplos. También puede contener entre 2 y 5 colores,
 además de cambios espaciales. En ARC-AGI, las tareas que presentan una variación en el tamaño de la matriz se puede ver reflejado
 en las salidas de los propios ejemplos. Si tomamos todas estas características en conjunto podemos tener una representación compleja
 de 5 dimensiones: [número de ejemplos, número de colores, direcciones, número de filas, número de columnas]. El sistema al principio
 almacena toda esta información de un vector de estas características. Debido a las grandes variaciones de las 800 tareas que
-representa ARC-AGI, se recurre a la creación de una estructura denominada Multitensors.
+representa ARC-AGI, se recurre a la creación de una estructura denominada Multitensor.
 
-Los Multitensors son un conjunto de tensores, cada tensor guarda combinaciones dimensionales. No todas las combinaciones posibles pueden contener
+El Multitensor es un conjunto de tensores, cada tensor guarda combinaciones dimensionales. No todas las combinaciones posibles pueden contener
 información relevante. Para aquellas combinaciones que no representan información relevante se le considera inválida. Una máscara binaria de
 5 dimensiones da como resultado 32 posibles combinaciones binarias. De estas 32 posibles combinaciones, se consideran
 sólo 18 como tensores válidos.
 
-TABLA TENSORES
+En la tabla \ref{tab:multitensor-dimensions}, $E$ representa los ejemplos, $C$ los colores, $D$ las direcciones y
+$X$ e $Y$ las dimensiones espaciales. El último eje corresponde siempre a los canales de cada representación.
 
-A estos tensores se le añade una dimensión adicional denominada espacio latente. Cada posible valor de las hojas contendrán un vector de 4
-valores que representará el espacio latente. Para recorrer todas las posibilidades de los diferentes tensores, en el que haya datos
-representados, se hará uso de una máscara binaria de 5 dimensiones. Posteriormente se representará todo el estado latente con mediante un
-vector denominado z.
+\begin{table}[h]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{|c|c|p{9.2cm}|}
+	\hline
+	Máscara (\texttt{ECDXY}) & Estado & \multicolumn{1}{c|}{Dimensiones generales o motivo} \\
+	\hline
+	\texttt{00000} & Inválido & No contiene ningún eje informativo. \\
+	\hline
+	\texttt{00001} & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\hline
+	\texttt{00010} & Inválido & El eje $X$ requiere el eje $E$. \\
+	\hline
+	\texttt{00011} & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\hline
+	\texttt{00100} & Válido & $[D,\mathrm{canal}]$ \\
+	\hline
+	\texttt{00101} & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\hline
+	\texttt{00110} & Inválido & El eje $X$ requiere el eje $E$. \\
+	\hline
+	\texttt{00111} & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\hline
+	\texttt{01000} & Válido & $[C,\mathrm{canal}]$ \\
+	\hline
+	\texttt{01001} & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\hline
+	\texttt{01010} & Inválido & El eje $X$ requiere el eje $E$. \\
+	\hline
+	\texttt{01011} & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\hline
+	\texttt{01100} & Válido & $[C,D,\mathrm{canal}]$ \\
+	\hline
+	\texttt{01101} & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\hline
+	\texttt{01110} & Inválido & El eje $X$ requiere el eje $E$. \\
+	\hline
+	\texttt{01111} & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\hline
+	\texttt{10000} & Inválido & Sólo contiene $E$; falta al menos uno de los ejes $C$, $D$, $X$ o $Y$. \\
+	\hline
+	\texttt{10001} & Válido & $[E,Y,\mathrm{canal}]$ \\
+	\hline
+	\texttt{10010} & Válido & $[E,X,\mathrm{canal}]$ \\
+	\hline
+	\texttt{10011} & Válido & $[E,X,Y,\mathrm{canal}]$ \\
+	\hline
+	\texttt{10100} & Válido & $[E,D,\mathrm{canal}]$ \\
+	\hline
+	\texttt{10101} & Válido & $[E,D,Y,\mathrm{canal}]$ \\
+	\hline
+	\texttt{10110} & Válido & $[E,D,X,\mathrm{canal}]$ \\
+	\hline
+	\texttt{10111} & Válido & $[E,D,X,Y,\mathrm{canal}]$ \\
+	\hline
+	\texttt{11000} & Válido & $[E,C,\mathrm{canal}]$ \\
+	\hline
+	\texttt{11001} & Válido & $[E,C,Y,\mathrm{canal}]$ \\
+	\hline
+	\texttt{11010} & Válido & $[E,C,X,\mathrm{canal}]$ \\
+	\hline
+	\texttt{11011} & Válido & $[E,C,X,Y,\mathrm{canal}]$ \\
+	\hline
+	\texttt{11100} & Válido & $[E,C,D,\mathrm{canal}]$ \\
+	\hline
+	\texttt{11101} & Válido & $[E,C,D,Y,\mathrm{canal}]$ \\
+	\hline
+	\texttt{11110} & Válido & $[E,C,D,X,\mathrm{canal}]$ \\
+	\hline
+	\texttt{11111} & Válido & $[E,C,D,X,Y,\mathrm{canal}]$ \\
+	\hline
+\end{tabular}
+\caption{Combinaciones dimensionales del sistema Multitensor.}
+\label{tab:multitensor-dimensions}
+\end{table}
 
+\FloatBarrier
 
+A estos tensores se le añade una dimensión adicional denominada canal o más correctamente espacio latente. Cada posible valor de las hojas contendrán un vector de 4
+valores que representará este espacio. Para recorrer todas las posibilidades de los diferentes tensores, en el que haya datos
+representados, se hará uso de una máscara binaria de 5 dimensiones. Posteriormente se representará todo el estado latente mediante un
+vector denominado \(z\).
 
 \subsubsection{Arquitectura de decodificación}
+
+\subsubsection{Ejemplo de entrenamiento al detalle}
 
 \subsection{Limitaciones}
 
