@@ -18,8 +18,9 @@ Design constraints
    callable. `ARCCompressor` is a plain class (not `nn.Module`), so this works.
 2. **Everything is off by default.** An `AccelConfig()` with default values
    reproduces exactly today's behaviour (`is_enabled()` is False).
-3. **Never fail a task because of the accelerator.** Compilation problems fall
-   back to eager mode with a warning; an unsupported dtype falls back to FP32.
+3. **Recover safely from accelerator failures.** Ordinary compilation problems
+    fall back to eager mode. Fatal device errors are re-raised so the scheduler
+    can retry in a fresh process without issuing more work to a poisoned context.
 
 Why plain `torch.autocast` is numerically safe here
 ---------------------------------------------------
@@ -344,26 +345,55 @@ def compile_report(cfg):
 
 # ── Forward-pass wrapping (the only contact point with the model) ────────────
 
+_FATAL_ACCELERATOR_ERROR_MARKERS = (
+    'illegal memory access',
+    'driver error: 700',
+    'hiperrorillegaladdress',
+    'device-side assert',
+    'device side assert',
+    'unspecified launch failure',
+)
+
+
+def _is_fatal_accelerator_error(exc):
+    """Return whether continuing to issue device work is unsafe."""
+    accelerator_error = getattr(torch, 'AcceleratorError', None)
+    if accelerator_error is not None and isinstance(exc, accelerator_error):
+        return True
+    message = str(exc).lower()
+    return any(marker in message for marker in _FATAL_ACCELERATOR_ERROR_MARKERS)
+
+
 class _EagerFallback:
-    """Call a compiled callable, permanently reverting to eager on first error.
+    """Call a compiled callable, reverting to eager on a non-fatal error.
 
     `torch.compile` is lazy: failures surface on the first call, not at
-    decoration time. A compilation problem must never kill a task, so the very
-    first exception switches this wrapper to the original eager callable for the
-    rest of the run.
+    decoration time. Fatal accelerator failures remain fatal for this wrapper;
+    only a fresh worker process may safely recover from them.
     """
 
     def __init__(self, compiled, eager):
         self._compiled = compiled
         self._eager = eager
         self._failed = False
+        self._fatal_error = None
 
     def __call__(self, *args, **kwargs):
+        if self._fatal_error is not None:
+            raise self._fatal_error
         if self._failed:
             return self._eager(*args, **kwargs)
         try:
             return self._compiled(*args, **kwargs)
         except Exception as exc:
+            if _is_fatal_accelerator_error(exc):
+                self._fatal_error = exc
+                warnings.warn(
+                    f'[accel] torch.compile hit a fatal accelerator error '
+                    f'({exc}); refusing eager fallback because the device '
+                    f'context may be corrupted.'
+                )
+                raise
             self._failed = True
             warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
                           f'falling back to eager for the rest of this task.')

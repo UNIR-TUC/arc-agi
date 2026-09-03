@@ -1,0 +1,8 @@
+2026-08-31 23:27:20 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1528.3 GB free, minimum 50.0 GB)
+2026-08-31 23:27:20 | INFO     | ========================================================================
+2026-08-31 23:27:20 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-08-31 23:27:20 | INFO     |   Tasks       : 400
+2026-08-31 23:27:20 | INFO     |   GPUs        : 1
+2026-08-31 23:27:20 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-08-31/arc_training_training_20260831_232720.log
+2026-08-31 23:27:20 | INFO     |   Results file: results_2026-08-31_23-27-20.txt
+2026-08-31 23:27:20 | INFO     | ========================================================================

@@ -1,5 +1,6 @@
 import io
 import os
+import tempfile
 import unittest
 from unittest import mock
 
@@ -94,6 +95,23 @@ class TerminalDashboardTests(unittest.TestCase):
         for percentage in (0, 50, 100):
             bar = dashboard._bar(percentage, 20)
             self.assertEqual(len(_ANSI_RE.sub('', bar)), 20)
+
+    def test_run_failure_is_written_to_structured_log(self):
+        from arc_logging import ArcLogger
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            logger = ArcLogger(
+                'failure_test', log_dir=temp_dir, enable_tui=False,
+            )
+            logger.log_run_failed('Traceback\nMemoryError: injected')
+            for handler in logger.logger.handlers:
+                handler.flush()
+
+            with open(logger.log_file, encoding='utf-8') as handle:
+                contents = handle.read()
+
+        self.assertIn('RUN FAILED', contents)
+        self.assertIn('MemoryError: injected', contents)
 
 
 if __name__ == '__main__':

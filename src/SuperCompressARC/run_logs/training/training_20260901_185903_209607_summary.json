@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "run_id": "20260901_185903_209607",
+  "campaign_id": "20260901_185903_209607",
+  "split": "training",
+  "status": "success",
+  "started_at_epoch": 1788281943.7568517,
+  "started_at": "2026-09-01T18:59:03+02:00",
+  "ended_at_epoch": 1788373601.4689846,
+  "ended_at": "2026-09-02T20:26:41+02:00",
+  "attempt_count": 3,
+  "retry_count": 2,
+  "cumulative_active_s": 91597.566,
+  "total_wall_s": 91657.712,
+  "retry_wait_and_overhead_s": 60.146,
+  "log_path": "run_logs/training_20260901_185903_209607.log",
+  "degraded": false,
+  "quarantined_tasks": [],
+  "attempts": [
+    {
+      "attempt": 1,
+      "started_at_epoch": 1788281943.7757792,
+      "started_at": "2026-09-01T18:59:03+02:00",
+      "log_path": "run_logs/training_20260901_185903_209607.log",
+      "ended_at_epoch": 1788288538.0677607,
+      "ended_at": "2026-09-01T20:48:58+02:00",
+      "exit_code": 1,
+      "outcome": "failed",
+      "elapsed_s": 6594.292
+    },
+    {
+      "attempt": 2,
+      "started_at_epoch": 1788288568.1175783,
+      "started_at": "2026-09-01T20:49:28+02:00",
+      "log_path": "run_logs/training_20260901_185903_209607.log",
+      "ended_at_epoch": 1788360978.1193612,
+      "ended_at": "2026-09-02T16:56:18+02:00",
+      "exit_code": 1,
+      "outcome": "failed",
+      "elapsed_s": 72410.002
+    },
+    {
+      "attempt": 3,
+      "started_at_epoch": 1788361008.1692479,
+      "started_at": "2026-09-02T16:56:48+02:00",
+      "log_path": "run_logs/training_20260901_185903_209607.log",
+      "ended_at_epoch": 1788373601.4410024,
+      "ended_at": "2026-09-02T20:26:41+02:00",
+      "exit_code": 0,
+      "outcome": "success",
+      "elapsed_s": 12593.272
+    }
+  ],
+  "outputs": {
+    "submission": "submission_training.json",
+    "predictions": "predictions_training.npz",
+    "run_metadata": "run_metadata_training.json"
+  },
+  "real_result_tasks": 400
+}

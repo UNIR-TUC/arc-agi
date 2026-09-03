@@ -1,3 +1,3 @@
-Splits run   : test
-Total solved : 0/1
-Total time   : 241.5s
+Splits run   : training
+Total solved : 140/400
+Total time   : 12591.9s

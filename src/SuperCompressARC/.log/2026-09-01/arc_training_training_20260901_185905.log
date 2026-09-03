@@ -1,0 +1,380 @@
+2026-09-01 18:59:05 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1525.9 GB free, minimum 50.0 GB)
+2026-09-01 18:59:05 | INFO     | Loading partial results for split training
+2026-09-01 18:59:05 | INFO     | Task-specific eager mode: fcb5c309
+2026-09-01 18:59:05 | INFO     | ========================================================================
+2026-09-01 18:59:05 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-01 18:59:05 | INFO     |   Tasks       : 400
+2026-09-01 18:59:05 | INFO     |   GPUs        : 1
+2026-09-01 18:59:05 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-01/arc_training_training_20260901_185905.log
+2026-09-01 18:59:05 | INFO     |   Results file: results_2026-09-01_18-59-05.txt
+2026-09-01 18:59:05 | INFO     | ========================================================================
+2026-09-01 18:59:05 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 18:59:05 | INFO     | Acceleration (Eje D): accel amp=off compile=default matmul=high threads=1 alloc=-
+2026-09-01 18:59:05 | INFO     | ------------------------------------------------------------------------
+2026-09-01 18:59:05 | INFO     | PHASE: Phase 1 — SKIPPED — loaded 400 task measurements from memory_cache_training.json
+2026-09-01 18:59:05 | INFO     | ------------------------------------------------------------------------
+2026-09-01 18:59:05 | INFO     | GPU fingerprint matches cached run. Delete memory_cache_training.json to force re-measurement.
+2026-09-01 18:59:05 | INFO     | Compiled Phase 2: scaled eager Phase-1 measurements by 1.2x  (mean 1098 MB/task)
+2026-09-01 18:59:05 | INFO     | Resume: 97/400 tasks already complete in .partial/training — Phase 2 will run the remaining 303
+2026-09-01 18:59:05 | INFO     | Phase 2 VRAM budget: GPU0=14.84 GB of 15.84 GB free
+2026-09-01 18:59:05 | INFO     | ------------------------------------------------------------------------
+2026-09-01 18:59:05 | INFO     | PHASE: Phase 2 — Full training  (2000 iterations × 303 tasks)
+2026-09-01 18:59:05 | INFO     | ------------------------------------------------------------------------
+2026-09-01 18:59:05 | INFO     | Host RAM: 84 GB free − 12 GB reserved = 72 GB for workers → cap 7 (at 9.0 GB/worker)
+2026-09-01 18:59:06 | INFO     | START [293/400] ba97ae07  →  GPU 0
+2026-09-01 18:59:06 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 18:59:06 | INFO     | START [340/400] d687bc17  →  GPU 0
+2026-09-01 18:59:06 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 18:59:06 | INFO     | START [  2/400] 00d62c1b  →  GPU 0
+2026-09-01 18:59:06 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 18:59:06 | INFO     | START [ 55/400] 272f95fa  →  GPU 0
+2026-09-01 18:59:06 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 18:59:06 | INFO     | START [396/400] fcb5c309  →  GPU 0
+2026-09-01 18:59:06 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 18:59:06 | INFO     | START [358/400] e21d9049  →  GPU 0
+2026-09-01 18:59:06 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 18:59:07 | DEBUG    | PROG  ba97ae07  step    0/2000  (  0.0%)
+2026-09-01 18:59:07 | DEBUG    | PROG  d687bc17  step    0/2000  (  0.0%)
+2026-09-01 18:59:07 | DEBUG    | PROG  00d62c1b  step    0/2000  (  0.0%)
+2026-09-01 18:59:07 | DEBUG    | PROG  272f95fa  step    0/2000  (  0.0%)
+2026-09-01 18:59:07 | DEBUG    | PROG  fcb5c309  step    0/2000  (  0.0%)
+2026-09-01 18:59:07 | DEBUG    | PROG  e21d9049  step    0/2000  (  0.0%)
+2026-09-01 19:01:28 | DEBUG    | PROG  fcb5c309  step  200/2000  ( 10.0%)
+2026-09-01 19:04:42 | DEBUG    | PROG  fcb5c309  step  400/2000  ( 20.0%)
+2026-09-01 19:05:14 | DEBUG    | PROG  d687bc17  step  200/2000  ( 10.0%)
+2026-09-01 19:05:29 | DEBUG    | PROG  00d62c1b  step  200/2000  ( 10.0%)
+2026-09-01 19:05:30 | DEBUG    | PROG  ba97ae07  step  200/2000  ( 10.0%)
+2026-09-01 19:05:38 | DEBUG    | PROG  e21d9049  step  200/2000  ( 10.0%)
+2026-09-01 19:05:54 | DEBUG    | PROG  272f95fa  step  200/2000  ( 10.0%)
+2026-09-01 19:07:38 | DEBUG    | PROG  d687bc17  step  400/2000  ( 20.0%)
+2026-09-01 19:07:55 | DEBUG    | PROG  ba97ae07  step  400/2000  ( 20.0%)
+2026-09-01 19:07:58 | DEBUG    | PROG  00d62c1b  step  400/2000  ( 20.0%)
+2026-09-01 19:08:01 | DEBUG    | PROG  e21d9049  step  400/2000  ( 20.0%)
+2026-09-01 19:08:14 | DEBUG    | PROG  272f95fa  step  400/2000  ( 20.0%)
+2026-09-01 19:10:07 | DEBUG    | PROG  d687bc17  step  600/2000  ( 30.0%)
+2026-09-01 19:10:16 | DEBUG    | PROG  ba97ae07  step  600/2000  ( 30.0%)
+2026-09-01 19:10:18 | DEBUG    | PROG  00d62c1b  step  600/2000  ( 30.0%)
+2026-09-01 19:10:23 | DEBUG    | PROG  e21d9049  step  600/2000  ( 30.0%)
+2026-09-01 19:10:34 | DEBUG    | PROG  272f95fa  step  600/2000  ( 30.0%)
+2026-09-01 19:11:38 | DEBUG    | PROG  fcb5c309  step  600/2000  ( 30.0%)
+2026-09-01 19:12:37 | DEBUG    | PROG  00d62c1b  step  800/2000  ( 40.0%)
+2026-09-01 19:12:38 | DEBUG    | PROG  ba97ae07  step  800/2000  ( 40.0%)
+2026-09-01 19:12:38 | DEBUG    | PROG  d687bc17  step  800/2000  ( 40.0%)
+2026-09-01 19:12:50 | DEBUG    | PROG  272f95fa  step  800/2000  ( 40.0%)
+2026-09-01 19:12:53 | DEBUG    | PROG  e21d9049  step  800/2000  ( 40.0%)
+2026-09-01 19:15:01 | DEBUG    | PROG  00d62c1b  step 1000/2000  ( 50.0%)
+2026-09-01 19:15:03 | DEBUG    | PROG  ba97ae07  step 1000/2000  ( 50.0%)
+2026-09-01 19:15:07 | DEBUG    | PROG  272f95fa  step 1000/2000  ( 50.0%)
+2026-09-01 19:15:11 | DEBUG    | PROG  d687bc17  step 1000/2000  ( 50.0%)
+2026-09-01 19:15:24 | DEBUG    | PROG  e21d9049  step 1000/2000  ( 50.0%)
+2026-09-01 19:17:26 | DEBUG    | PROG  272f95fa  step 1200/2000  ( 60.0%)
+2026-09-01 19:17:27 | DEBUG    | PROG  00d62c1b  step 1200/2000  ( 60.0%)
+2026-09-01 19:17:32 | DEBUG    | PROG  ba97ae07  step 1200/2000  ( 60.0%)
+2026-09-01 19:17:50 | DEBUG    | PROG  d687bc17  step 1200/2000  ( 60.0%)
+2026-09-01 19:18:00 | DEBUG    | PROG  e21d9049  step 1200/2000  ( 60.0%)
+2026-09-01 19:18:43 | DEBUG    | PROG  fcb5c309  step  800/2000  ( 40.0%)
+2026-09-01 19:19:48 | DEBUG    | PROG  272f95fa  step 1400/2000  ( 70.0%)
+2026-09-01 19:19:53 | DEBUG    | PROG  00d62c1b  step 1400/2000  ( 70.0%)
+2026-09-01 19:20:01 | DEBUG    | PROG  ba97ae07  step 1400/2000  ( 70.0%)
+2026-09-01 19:20:30 | DEBUG    | PROG  d687bc17  step 1400/2000  ( 70.0%)
+2026-09-01 19:20:35 | DEBUG    | PROG  e21d9049  step 1400/2000  ( 70.0%)
+2026-09-01 19:22:10 | DEBUG    | PROG  272f95fa  step 1600/2000  ( 80.0%)
+2026-09-01 19:22:19 | DEBUG    | PROG  00d62c1b  step 1600/2000  ( 80.0%)
+2026-09-01 19:22:28 | DEBUG    | PROG  ba97ae07  step 1600/2000  ( 80.0%)
+2026-09-01 19:23:05 | DEBUG    | PROG  d687bc17  step 1600/2000  ( 80.0%)
+2026-09-01 19:23:11 | DEBUG    | PROG  e21d9049  step 1600/2000  ( 80.0%)
+2026-09-01 19:24:29 | DEBUG    | PROG  272f95fa  step 1800/2000  ( 90.0%)
+2026-09-01 19:24:44 | DEBUG    | PROG  00d62c1b  step 1800/2000  ( 90.0%)
+2026-09-01 19:24:56 | DEBUG    | PROG  ba97ae07  step 1800/2000  ( 90.0%)
+2026-09-01 19:25:40 | DEBUG    | PROG  d687bc17  step 1800/2000  ( 90.0%)
+2026-09-01 19:25:45 | DEBUG    | PROG  e21d9049  step 1800/2000  ( 90.0%)
+2026-09-01 19:25:56 | DEBUG    | PROG  fcb5c309  step 1000/2000  ( 50.0%)
+2026-09-01 19:26:47 | DEBUG    | PROG  272f95fa  step 2000/2000  (100.0%)
+2026-09-01 19:26:52 | INFO     | DONE  [ 55/400] 272f95fa  1666.5s  peak= 16304 MB  [SOLVED @guess1]
+2026-09-01 19:26:52 | INFO     | START [112/400] 4938f0c2  →  GPU 0
+2026-09-01 19:26:52 | DEBUG    |   GPU 0 | Used: 14.84/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 19:26:53 | DEBUG    | PROG  4938f0c2  step    0/2000  (  0.0%)
+2026-09-01 19:27:05 | DEBUG    | PROG  00d62c1b  step 2000/2000  (100.0%)
+2026-09-01 19:27:10 | INFO     | DONE  [  2/400] 00d62c1b  1684.5s  peak= 15228 MB  [not solved]
+2026-09-01 19:27:10 | INFO     | START [247/400] a3325580  →  GPU 0
+2026-09-01 19:27:10 | DEBUG    |   GPU 0 | Used: 11.52/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 19:27:11 | DEBUG    | PROG  a3325580  step    0/2000  (  0.0%)
+2026-09-01 19:27:16 | DEBUG    | PROG  ba97ae07  step 2000/2000  (100.0%)
+2026-09-01 19:27:20 | INFO     | DONE  [293/400] ba97ae07  1694.5s  peak= 11954 MB  [SOLVED @guess1]
+2026-09-01 19:27:20 | INFO     | START [115/400] 4be741c5  →  GPU 0
+2026-09-01 19:27:20 | DEBUG    |   GPU 0 | Used: 8.54/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 19:27:21 | DEBUG    | PROG  4be741c5  step    0/2000  (  0.0%)
+2026-09-01 19:27:40 | DEBUG    | PROG  e21d9049  step 2000/2000  (100.0%)
+2026-09-01 19:27:44 | INFO     | DONE  [358/400] e21d9049  1718.6s  peak=  8910 MB  [not solved]
+2026-09-01 19:27:44 | INFO     | START [ 66/400] 2dd70a9a  →  GPU 0
+2026-09-01 19:27:44 | DEBUG    |   GPU 0 | Used: 5.29/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 19:27:45 | DEBUG    | PROG  2dd70a9a  step    0/2000  (  0.0%)
+2026-09-01 19:27:57 | DEBUG    | PROG  d687bc17  step 2000/2000  (100.0%)
+2026-09-01 19:28:01 | INFO     | DONE  [340/400] d687bc17  1735.6s  peak=  5590 MB  [SOLVED @guess1]
+2026-09-01 19:28:01 | INFO     | START [286/400] b782dc8a  →  GPU 0
+2026-09-01 19:28:01 | DEBUG    |   GPU 0 | Used: 1.51/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 19:28:02 | DEBUG    | PROG  b782dc8a  step    0/2000  (  0.0%)
+2026-09-01 19:29:46 | DEBUG    | PROG  fcb5c309  step 1200/2000  ( 60.0%)
+2026-09-01 19:32:59 | DEBUG    | PROG  4938f0c2  step  200/2000  ( 10.0%)
+2026-09-01 19:33:35 | DEBUG    | PROG  a3325580  step  200/2000  ( 10.0%)
+2026-09-01 19:33:38 | DEBUG    | PROG  4be741c5  step  200/2000  ( 10.0%)
+2026-09-01 19:33:57 | DEBUG    | PROG  2dd70a9a  step  200/2000  ( 10.0%)
+2026-09-01 19:34:29 | DEBUG    | PROG  fcb5c309  step 1400/2000  ( 70.0%)
+2026-09-01 19:35:18 | DEBUG    | PROG  4938f0c2  step  400/2000  ( 20.0%)
+2026-09-01 19:36:10 | DEBUG    | PROG  2dd70a9a  step  400/2000  ( 20.0%)
+2026-09-01 19:36:13 | DEBUG    | PROG  a3325580  step  400/2000  ( 20.0%)
+2026-09-01 19:36:26 | DEBUG    | PROG  4be741c5  step  400/2000  ( 20.0%)
+2026-09-01 19:37:35 | DEBUG    | PROG  4938f0c2  step  600/2000  ( 30.0%)
+2026-09-01 19:38:18 | DEBUG    | PROG  2dd70a9a  step  600/2000  ( 30.0%)
+2026-09-01 19:38:54 | DEBUG    | PROG  a3325580  step  600/2000  ( 30.0%)
+2026-09-01 19:39:19 | DEBUG    | PROG  4be741c5  step  600/2000  ( 30.0%)
+2026-09-01 19:39:50 | DEBUG    | PROG  4938f0c2  step  800/2000  ( 40.0%)
+2026-09-01 19:40:28 | DEBUG    | PROG  2dd70a9a  step  800/2000  ( 40.0%)
+2026-09-01 19:41:12 | DEBUG    | PROG  fcb5c309  step 1600/2000  ( 80.0%)
+2026-09-01 19:41:36 | DEBUG    | PROG  a3325580  step  800/2000  ( 40.0%)
+2026-09-01 19:42:06 | DEBUG    | PROG  4938f0c2  step 1000/2000  ( 50.0%)
+2026-09-01 19:42:10 | DEBUG    | PROG  4be741c5  step  800/2000  ( 40.0%)
+2026-09-01 19:42:38 | DEBUG    | PROG  2dd70a9a  step 1000/2000  ( 50.0%)
+2026-09-01 19:44:27 | DEBUG    | PROG  a3325580  step 1000/2000  ( 50.0%)
+2026-09-01 19:44:30 | DEBUG    | PROG  4938f0c2  step 1200/2000  ( 60.0%)
+2026-09-01 19:45:02 | DEBUG    | PROG  2dd70a9a  step 1200/2000  ( 60.0%)
+2026-09-01 19:45:29 | DEBUG    | PROG  b782dc8a  step  200/2000  ( 10.0%)
+2026-09-01 19:45:36 | DEBUG    | PROG  4be741c5  step 1000/2000  ( 50.0%)
+2026-09-01 19:47:08 | DEBUG    | PROG  4938f0c2  step 1400/2000  ( 70.0%)
+2026-09-01 19:47:25 | DEBUG    | PROG  a3325580  step 1200/2000  ( 60.0%)
+2026-09-01 19:47:32 | DEBUG    | PROG  2dd70a9a  step 1400/2000  ( 70.0%)
+2026-09-01 19:48:05 | DEBUG    | PROG  b782dc8a  step  400/2000  ( 20.0%)
+2026-09-01 19:49:10 | DEBUG    | PROG  4be741c5  step 1200/2000  ( 60.0%)
+2026-09-01 19:49:12 | DEBUG    | PROG  fcb5c309  step 1800/2000  ( 90.0%)
+2026-09-01 19:49:44 | DEBUG    | PROG  4938f0c2  step 1600/2000  ( 80.0%)
+2026-09-01 19:50:02 | DEBUG    | PROG  2dd70a9a  step 1600/2000  ( 80.0%)
+2026-09-01 19:50:24 | DEBUG    | PROG  a3325580  step 1400/2000  ( 70.0%)
+2026-09-01 19:50:42 | DEBUG    | PROG  b782dc8a  step  600/2000  ( 30.0%)
+2026-09-01 19:52:22 | DEBUG    | PROG  4938f0c2  step 1800/2000  ( 90.0%)
+2026-09-01 19:52:32 | DEBUG    | PROG  2dd70a9a  step 1800/2000  ( 90.0%)
+2026-09-01 19:52:47 | DEBUG    | PROG  4be741c5  step 1400/2000  ( 70.0%)
+2026-09-01 19:53:17 | DEBUG    | PROG  b782dc8a  step  800/2000  ( 40.0%)
+2026-09-01 19:53:22 | DEBUG    | PROG  a3325580  step 1600/2000  ( 80.0%)
+2026-09-01 19:54:57 | DEBUG    | PROG  4938f0c2  step 2000/2000  (100.0%)
+2026-09-01 19:54:59 | DEBUG    | PROG  2dd70a9a  step 2000/2000  (100.0%)
+2026-09-01 19:55:02 | INFO     | DONE  [112/400] 4938f0c2  1689.5s  peak= 16304 MB  [not solved]
+2026-09-01 19:55:02 | INFO     | START [ 84/400] 3bd67248  →  GPU 0
+2026-09-01 19:55:02 | DEBUG    |   GPU 0 | Used: 14.93/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 19:55:03 | DEBUG    | PROG  3bd67248  step    0/2000  (  0.0%)
+2026-09-01 19:55:04 | INFO     | DONE  [ 66/400] 2dd70a9a  1639.5s  peak= 16304 MB  [not solved]
+2026-09-01 19:55:04 | INFO     | START [117/400] 4c5c2cf0  →  GPU 0
+2026-09-01 19:55:04 | DEBUG    |   GPU 0 | Used: 11.87/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 19:55:05 | DEBUG    | PROG  4c5c2cf0  step    0/2000  (  0.0%)
+2026-09-01 19:55:34 | DEBUG    | PROG  b782dc8a  step 1000/2000  ( 50.0%)
+2026-09-01 19:55:55 | DEBUG    | PROG  a3325580  step 1800/2000  ( 90.0%)
+2026-09-01 19:56:01 | DEBUG    | PROG  4be741c5  step 1600/2000  ( 80.0%)
+2026-09-01 19:56:40 | DEBUG    | PROG  fcb5c309  step 2000/2000  (100.0%)
+2026-09-01 19:56:41 | INFO     | DONE  [396/400] fcb5c309  3455.2s  peak= 12490 MB  [not solved]
+2026-09-01 19:56:41 | INFO     | START [378/400] ec883f72  →  GPU 0
+2026-09-01 19:56:41 | DEBUG    |   GPU 0 | Used: 11.26/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 19:56:42 | DEBUG    | PROG  ec883f72  step    0/2000  (  0.0%)
+2026-09-01 19:57:11 | DEBUG    | PROG  b782dc8a  step 1200/2000  ( 60.0%)
+2026-09-01 19:57:24 | DEBUG    | PROG  a3325580  step 2000/2000  (100.0%)
+2026-09-01 19:57:28 | INFO     | DONE  [247/400] a3325580  1817.8s  peak= 11698 MB  [not solved]
+2026-09-01 19:57:28 | INFO     | START [ 51/400] 25d487eb  →  GPU 0
+2026-09-01 19:57:28 | DEBUG    |   GPU 0 | Used: 8.14/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 19:57:29 | DEBUG    | PROG  25d487eb  step    0/2000  (  0.0%)
+2026-09-01 19:58:20 | DEBUG    | PROG  4be741c5  step 1800/2000  ( 90.0%)
+2026-09-01 19:58:58 | DEBUG    | PROG  b782dc8a  step 1400/2000  ( 70.0%)
+2026-09-01 20:00:34 | DEBUG    | PROG  4be741c5  step 2000/2000  (100.0%)
+2026-09-01 20:00:38 | INFO     | DONE  [115/400] 4be741c5  1998.0s  peak=  8830 MB  [not solved]
+2026-09-01 20:00:38 | INFO     | START [141/400] 623ea044  →  GPU 0
+2026-09-01 20:00:38 | DEBUG    |   GPU 0 | Used: 4.86/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 20:00:39 | DEBUG    | PROG  623ea044  step    0/2000  (  0.0%)
+2026-09-01 20:00:42 | DEBUG    | PROG  b782dc8a  step 1600/2000  ( 80.0%)
+2026-09-01 20:02:00 | DEBUG    | PROG  b782dc8a  step 1800/2000  ( 90.0%)
+2026-09-01 20:03:11 | DEBUG    | PROG  b782dc8a  step 2000/2000  (100.0%)
+2026-09-01 20:03:26 | INFO     | DONE  [286/400] b782dc8a  2124.2s  peak=  5124 MB  [not solved]
+2026-09-01 20:03:26 | INFO     | START [163/400] 6d0160f0  →  GPU 0
+2026-09-01 20:03:26 | DEBUG    |   GPU 0 | Used: 1.20/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 20:03:27 | DEBUG    | PROG  6d0160f0  step    0/2000  (  0.0%)
+2026-09-01 20:10:12 | DEBUG    | PROG  4c5c2cf0  step  200/2000  ( 10.0%)
+2026-09-01 20:10:34 | DEBUG    | PROG  3bd67248  step  200/2000  ( 10.0%)
+2026-09-01 20:12:06 | DEBUG    | PROG  4c5c2cf0  step  400/2000  ( 20.0%)
+2026-09-01 20:12:36 | DEBUG    | PROG  3bd67248  step  400/2000  ( 20.0%)
+2026-09-01 20:13:09 | DEBUG    | PROG  ec883f72  step  200/2000  ( 10.0%)
+2026-09-01 20:13:33 | DEBUG    | PROG  25d487eb  step  200/2000  ( 10.0%)
+2026-09-01 20:14:16 | DEBUG    | PROG  4c5c2cf0  step  600/2000  ( 30.0%)
+2026-09-01 20:14:39 | DEBUG    | PROG  3bd67248  step  600/2000  ( 30.0%)
+2026-09-01 20:15:09 | DEBUG    | PROG  ec883f72  step  400/2000  ( 20.0%)
+2026-09-01 20:15:14 | DEBUG    | PROG  6d0160f0  step  200/2000  ( 10.0%)
+2026-09-01 20:15:32 | DEBUG    | PROG  25d487eb  step  400/2000  ( 20.0%)
+2026-09-01 20:16:23 | DEBUG    | PROG  4c5c2cf0  step  800/2000  ( 40.0%)
+2026-09-01 20:16:51 | DEBUG    | PROG  3bd67248  step  800/2000  ( 40.0%)
+2026-09-01 20:17:22 | DEBUG    | PROG  ec883f72  step  600/2000  ( 30.0%)
+2026-09-01 20:17:48 | DEBUG    | PROG  25d487eb  step  600/2000  ( 30.0%)
+2026-09-01 20:18:46 | DEBUG    | PROG  4c5c2cf0  step 1000/2000  ( 50.0%)
+2026-09-01 20:18:55 | DEBUG    | PROG  623ea044  step  200/2000  ( 10.0%)
+2026-09-01 20:19:25 | DEBUG    | PROG  3bd67248  step 1000/2000  ( 50.0%)
+2026-09-01 20:19:47 | DEBUG    | PROG  ec883f72  step  800/2000  ( 40.0%)
+2026-09-01 20:20:17 | DEBUG    | PROG  25d487eb  step  800/2000  ( 40.0%)
+2026-09-01 20:21:14 | DEBUG    | PROG  4c5c2cf0  step 1200/2000  ( 60.0%)
+2026-09-01 20:21:28 | DEBUG    | PROG  623ea044  step  400/2000  ( 20.0%)
+2026-09-01 20:21:50 | DEBUG    | PROG  6d0160f0  step  400/2000  ( 20.0%)
+2026-09-01 20:22:01 | DEBUG    | PROG  3bd67248  step 1200/2000  ( 60.0%)
+2026-09-01 20:22:06 | DEBUG    | PROG  ec883f72  step 1000/2000  ( 50.0%)
+2026-09-01 20:22:40 | DEBUG    | PROG  25d487eb  step 1000/2000  ( 50.0%)
+2026-09-01 20:23:41 | DEBUG    | PROG  4c5c2cf0  step 1400/2000  ( 70.0%)
+2026-09-01 20:23:58 | DEBUG    | PROG  623ea044  step  600/2000  ( 30.0%)
+2026-09-01 20:24:31 | DEBUG    | PROG  ec883f72  step 1200/2000  ( 60.0%)
+2026-09-01 20:24:37 | DEBUG    | PROG  3bd67248  step 1400/2000  ( 70.0%)
+2026-09-01 20:25:06 | DEBUG    | PROG  25d487eb  step 1200/2000  ( 60.0%)
+2026-09-01 20:26:18 | DEBUG    | PROG  4c5c2cf0  step 1600/2000  ( 80.0%)
+2026-09-01 20:26:26 | DEBUG    | PROG  623ea044  step  800/2000  ( 40.0%)
+2026-09-01 20:26:51 | DEBUG    | PROG  ec883f72  step 1400/2000  ( 70.0%)
+2026-09-01 20:27:11 | DEBUG    | PROG  3bd67248  step 1600/2000  ( 80.0%)
+2026-09-01 20:27:30 | DEBUG    | PROG  25d487eb  step 1400/2000  ( 70.0%)
+2026-09-01 20:28:40 | DEBUG    | PROG  6d0160f0  step  600/2000  ( 30.0%)
+2026-09-01 20:28:49 | DEBUG    | PROG  623ea044  step 1000/2000  ( 50.0%)
+2026-09-01 20:28:58 | DEBUG    | PROG  4c5c2cf0  step 1800/2000  ( 90.0%)
+2026-09-01 20:29:12 | DEBUG    | PROG  ec883f72  step 1600/2000  ( 80.0%)
+2026-09-01 20:29:45 | DEBUG    | PROG  3bd67248  step 1800/2000  ( 90.0%)
+2026-09-01 20:29:51 | DEBUG    | PROG  25d487eb  step 1600/2000  ( 80.0%)
+2026-09-01 20:31:12 | DEBUG    | PROG  623ea044  step 1200/2000  ( 60.0%)
+2026-09-01 20:31:33 | DEBUG    | PROG  4c5c2cf0  step 2000/2000  (100.0%)
+2026-09-01 20:31:33 | DEBUG    | PROG  ec883f72  step 1800/2000  ( 90.0%)
+2026-09-01 20:31:48 | INFO     | DONE  [117/400] 4c5c2cf0  2204.4s  peak= 16290 MB  [not solved]
+2026-09-01 20:31:48 | INFO     | START [193/400] 7f4411dc  →  GPU 0
+2026-09-01 20:31:48 | DEBUG    |   GPU 0 | Used: 14.81/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 20:31:49 | DEBUG    | PROG  7f4411dc  step    0/2000  (  0.0%)
+2026-09-01 20:32:07 | DEBUG    | PROG  25d487eb  step 1800/2000  ( 90.0%)
+2026-09-01 20:32:12 | DEBUG    | PROG  3bd67248  step 2000/2000  (100.0%)
+2026-09-01 20:32:26 | INFO     | DONE  [ 84/400] 3bd67248  2244.5s  peak= 15316 MB  [SOLVED @guess1]
+2026-09-01 20:32:26 | INFO     | START [280/400] b527c5c6  →  GPU 0
+2026-09-01 20:32:26 | DEBUG    |   GPU 0 | Used: 11.57/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 20:32:27 | DEBUG    | PROG  b527c5c6  step    0/2000  (  0.0%)
+2026-09-01 20:33:06 | DEBUG    | PROG  623ea044  step 1400/2000  ( 70.0%)
+2026-09-01 20:33:24 | DEBUG    | PROG  ec883f72  step 2000/2000  (100.0%)
+2026-09-01 20:33:39 | INFO     | DONE  [378/400] ec883f72  2217.5s  peak= 12012 MB  [SOLVED @guess1]
+2026-09-01 20:33:39 | INFO     | START [350/400] dbc1a6ce  →  GPU 0
+2026-09-01 20:33:39 | DEBUG    |   GPU 0 | Used: 8.45/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 20:33:40 | DEBUG    | PROG  dbc1a6ce  step    0/2000  (  0.0%)
+2026-09-01 20:34:01 | DEBUG    | PROG  25d487eb  step 2000/2000  (100.0%)
+2026-09-01 20:34:02 | DEBUG    | PROG  6d0160f0  step  800/2000  ( 40.0%)
+2026-09-01 20:34:15 | INFO     | DONE  [ 51/400] 25d487eb  2206.5s  peak=  8799 MB  [SOLVED @guess1]
+2026-09-01 20:34:15 | INFO     | START [275/400] b190f7f5  →  GPU 0
+2026-09-01 20:34:15 | DEBUG    |   GPU 0 | Used: 4.78/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 20:34:16 | DEBUG    | PROG  b190f7f5  step    0/2000  (  0.0%)
+2026-09-01 20:34:24 | DEBUG    | PROG  623ea044  step 1600/2000  ( 80.0%)
+2026-09-01 20:35:17 | DEBUG    | PROG  623ea044  step 1800/2000  ( 90.0%)
+2026-09-01 20:36:13 | DEBUG    | PROG  623ea044  step 2000/2000  (100.0%)
+2026-09-01 20:36:19 | DEBUG    | PROG  6d0160f0  step 1000/2000  ( 50.0%)
+2026-09-01 20:36:29 | INFO     | DONE  [141/400] 623ea044  2150.4s  peak=  5206 MB  [SOLVED @guess1]
+2026-09-01 20:36:29 | INFO     | START [201/400] 846bdb03  →  GPU 0
+2026-09-01 20:36:29 | DEBUG    |   GPU 0 | Used: 1.74/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 20:36:30 | DEBUG    | PROG  846bdb03  step    0/2000  (  0.0%)
+2026-09-01 20:38:51 | DEBUG    | PROG  6d0160f0  step 1200/2000  ( 60.0%)
+2026-09-01 20:41:24 | DEBUG    | PROG  6d0160f0  step 1400/2000  ( 70.0%)
+2026-09-01 20:42:37 | DEBUG    | PROG  b190f7f5  step  200/2000  ( 10.0%)
+2026-09-01 20:44:14 | DEBUG    | PROG  7f4411dc  step  200/2000  ( 10.0%)
+2026-09-01 20:45:16 | DEBUG    | PROG  6d0160f0  step 1600/2000  ( 80.0%)
+2026-09-01 20:45:51 | DEBUG    | PROG  b190f7f5  step  400/2000  ( 20.0%)
+2026-09-01 20:46:06 | DEBUG    | PROG  7f4411dc  step  400/2000  ( 20.0%)
+2026-09-01 20:47:50 | DEBUG    | PROG  7f4411dc  step  600/2000  ( 30.0%)
+2026-09-01 20:48:54 | WARNING  | dbc1a6ce: will retry eagerly in a fresh attempt
+2026-09-01 20:48:54 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1708, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1127, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 472, in parallelize_runs
+    raise _worker_failure_from_report(reported_errors[0])
+WorkerFailure: Worker dbc1a6ce on GPU 0 (pid 235353) failed before training:
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/solve_task.py", line 96, in solve_task
+    train.take_step(task, model, optimizer, train_step, train_history_logger)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/train.py", line 120, in take_step
+    loss.backward()
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 614, in backward
+    return handle_torch_function(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/overrides.py", line 1773, in handle_torch_function
+    result = mode.__torch_function__(public_api, types, args, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 623, in backward
+    torch.autograd.backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/__init__.py", line 395, in backward
+    _engine_run_backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/graph.py", line 979, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/function.py", line 333, in apply_boxed
+    return self._get_user_fn()(self, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3529, in backward
+    return CompiledFunction._bwd_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 16, in _compiled_backward
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 10, in impl_fn
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3585, in _backward_impl
+    compiled_bw = backward_compiler.get_or_compile(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 2901, in get_or_compile
+    self.compiled_bw = self.bw_compiler(
+                       ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/schemas.py", line 1502, in __call__
+    output_code = self.compiler_fn(gm, example_inputs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/backends/common.py", line 108, in _wrapped_bw_compiler
+    disable(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1468, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_utils_internal.py", line 96, in wrapper_function
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 3105, in bw_compiler
+    return compile_fx_backward(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 2748, in compile_fx_backward
+    return inner_compile(
+           ^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 861, in compile_fx_inner
+    compiled_graph = wrap_compiler_debug(
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/repro/after_aot.py", line 325, in debug_wrapper
+    inner_compiled_fn = compiler_fn(gm, example_inputs)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1132, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1109, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1929, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1677, in codegen_and_compile
+    compiled_module = graph.compile_to_module()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2985, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2995, in _compile_to_module
+    mod = self._compile_to_module_lines(wrapper_code)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 3071, in _compile_to_module_lines
+    mod = PyCodeCache.load_by_key_path(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/codecache.py", line 4742, in load_by_key_path
+    mod = _reload_python_module(key, path, set_sys_modules=set_sys_modules)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/compile_tasks.py", line 35, in _reload_python_module
+    exec(code, mod.__dict__, mod.__dict__)
+  File "/mnt/supercompressarc-cache/.inductor_cache/vf/cvfr6w7jg4vrz45gxwilpys3pdpzyamctlnirfzve5eadqmz5ro5.py", line 81682, in <module>
+    async_compile.wait(globals())
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 866, in wait
+    self._wait_futures(scope)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 908, in _wait_futures
+    raise RuntimeError(
+torch._inductor.exc.InductorError: RuntimeError: A compilation subprocess exited unexpectedly. This is likely due to a crash. To facilitate debugging, you can re-run with TORCHINDUCTOR_COMPILE_THREADS=1 to cause compilation to occur in the main process.

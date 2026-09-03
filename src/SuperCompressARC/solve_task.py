@@ -20,13 +20,16 @@ import layers
 import solution_selection
 import visualization
 import accel
+import task_persistence
 
 """
 A script that solves one puzzle, to be imported and used with parallel_train.py and multiprocessing.
 """
 
-def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_dict, solutions_dict, error_queue,
-               loggers_dict=None, progress_dict=None, postprocess_stride=1, accel_config=None):
+def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id,
+               memory_dict, solutions_dict, error_queue, loggers_dict=None,
+               progress_dict=None, postprocess_stride=1, accel_config=None,
+               partial_split=None, partial_n_steps=None):
     """
     Solves a puzzle.
     Args:
@@ -50,13 +53,20 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         accel_config (dict, optional): Serialized accel.AccelConfig (Eje D, §9.6):
             BF16 autocast, torch.compile and host/silicon tuning. None or an
             all-defaults config reproduces the untouched baseline.
+        partial_split (str, optional): Persist a final Phase-2 result for this split
+            before publishing worker success. None disables persistence.
+        partial_n_steps (int, optional): Iteration count stored with the partial.
     """
 
-    try:  # Error catching block that puts errors on the error_queue
+    last_step = -1
+    failure_stage = 'setup'
+    effective_compile_mode = 'unknown'
+    try:
 
         # Eje D: must run before any GPU tensor exists, so allocator/Inductor
         # environment variables and the matmul precision policy take effect.
         accel_cfg = accel.configure_process(accel_config)
+        effective_compile_mode = accel_cfg.compile_mode
 
         torch.set_default_device('cuda')
         torch.cuda.set_device(gpu_id)
@@ -79,10 +89,12 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         train_history_logger.solution_second_most_frequent = tuple(((0, 0), (0, 0)) for example_num in range(task.n_test))
 
         # Training loop
+        failure_stage = 'training'
         if progress_dict is not None:
             progress_dict[task_name] = 0   # reached the loop: no longer "init"
         for train_step in range(n_train_iterations):
             train.take_step(task, model, optimizer, train_step, train_history_logger)
+            last_step = train_step
             # Every 10 steps, not 100: the parent's stall watchdog needs finer
             # resolution than a slow task's 100-step interval.
             if progress_dict is not None and train_step % 10 == 0:
@@ -91,10 +103,11 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
                 break
 
         if progress_dict is not None:
-            progress_dict[task_name] = train_step + 1
+            progress_dict[task_name] = last_step + 1
 
         # Batch-convert accumulated GPU scalar tensors to floats in a single sync
         # (Eje H, H2) instead of one sync per training step.
+        failure_stage = 'postprocess'
         train_history_logger.materialize_curves()
 
         # Eje D: where did torch.compile spend its time? Compilation dominates
@@ -110,9 +123,9 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
             attempt_2 = [list(row) for row in train_history_logger.solution_second_most_frequent[example_num]]
             example_list.append({'attempt_1': attempt_1, 'attempt_2': attempt_2})
 
-        # Store logger data for predictions.npz before cleanup
+        logger_data = None
         if loggers_dict is not None:
-            loggers_dict[task_name] = {
+            logger_data = {
                 'solution_contributions_log': train_history_logger.solution_contributions_log,
                 'solution_picks_history':     train_history_logger.solution_picks_history,
             }
@@ -125,6 +138,16 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         free_now, total_vram = torch.cuda.mem_get_info()
         task_peak_memory = total_vram - free_now
 
+        if partial_split is not None:
+            failure_stage = 'persistence'
+            if partial_n_steps is None:
+                raise ValueError('partial_n_steps is required with partial_split')
+            task_persistence.save_task_partial(
+                partial_split, task_name, partial_n_steps,
+                example_list, logger_data,
+            )
+
+        failure_stage = 'publish'
         del task
         del model
         del optimizer
@@ -135,6 +158,22 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id, memory_
         # Store the result
         memory_dict[task_name] = task_peak_memory
         solutions_dict[task_name] = example_list
+        if loggers_dict is not None:
+            loggers_dict[task_name] = logger_data
 
-    except Exception as e:  # If error, write to the error queue
-        error_queue.put(traceback.format_exc())
+    except BaseException as exc:
+        failure = {
+            'task_name': task_name,
+            'gpu_id': gpu_id,
+            'pid': os.getpid(),
+            'last_step': last_step,
+            'stage': failure_stage,
+            'compile_mode': effective_compile_mode,
+            'exception_type': type(exc).__name__,
+            'traceback': traceback.format_exc(),
+        }
+        try:
+            error_queue.put(failure)
+        except BaseException:
+            pass
+        raise
