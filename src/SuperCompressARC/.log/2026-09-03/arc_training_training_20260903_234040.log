@@ -1,0 +1,16 @@
+2026-09-03 23:40:40 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1280.3 GB free, minimum 50.0 GB)
+2026-09-03 23:40:40 | INFO     | Loading Eje B seed partials for split training
+2026-09-03 23:40:40 | INFO     | ========================================================================
+2026-09-03 23:40:40 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-03 23:40:40 | INFO     |   Tasks       : 11
+2026-09-03 23:40:40 | INFO     |   GPUs        : 1
+2026-09-03 23:40:40 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-03/arc_training_training_20260903_234040.log
+2026-09-03 23:40:40 | INFO     |   Results file: results_2026-09-03_23-40-40.txt
+2026-09-03 23:40:40 | INFO     | ========================================================================
+2026-09-03 23:40:40 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-03 23:40:40 | INFO     | Acceleration (Eje D): accel amp=off compile=default matmul=high threads=1 alloc=- eje-b=on seeds=0,1,2,3
+2026-09-03 23:40:40 | INFO     | ------------------------------------------------------------------------
+2026-09-03 23:40:40 | INFO     | PHASE: Phase 1 — Memory measurement  (2 iterations × 11 tasks)
+2026-09-03 23:40:40 | INFO     | ------------------------------------------------------------------------
+2026-09-03 23:40:42 | DEBUG    | START [  1/11] 025d127b  →  GPU 0
+2026-09-03 23:40:42 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB

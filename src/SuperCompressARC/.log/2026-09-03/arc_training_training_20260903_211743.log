@@ -1,0 +1,44 @@
+2026-09-03 21:17:43 | INFO     | Inductor cache: /home/asier/repos/arc-agi/src/SuperCompressARC/.inductor_cache (510.6 GB free, minimum 0.0 GB)
+2026-09-03 21:17:43 | INFO     | ========================================================================
+2026-09-03 21:17:43 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-03 21:17:43 | INFO     |   Tasks       : 1
+2026-09-03 21:17:43 | INFO     |   GPUs        : 1
+2026-09-03 21:17:43 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-03/arc_training_training_20260903_211743.log
+2026-09-03 21:17:43 | INFO     |   Results file: results_2026-09-03_21-17-43.txt
+2026-09-03 21:17:43 | INFO     | ========================================================================
+2026-09-03 21:17:43 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-03 21:17:43 | INFO     | Acceleration (Eje D): accel amp=off compile=default matmul=high threads=1 alloc=- eje-b=on seeds=0,1
+2026-09-03 21:17:43 | INFO     | ------------------------------------------------------------------------
+2026-09-03 21:17:43 | INFO     | PHASE: Phase 1 — Memory measurement  (2 iterations × 1 tasks)
+2026-09-03 21:17:43 | INFO     | ------------------------------------------------------------------------
+2026-09-03 21:17:44 | DEBUG    | START [  1/1] 007bbfb7  →  GPU 0
+2026-09-03 21:17:44 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-03 21:17:49 | DEBUG    | DONE  [  1/1] 007bbfb7     5.0s  peak=   768 MB  [not solved]
+2026-09-03 21:17:51 | DEBUG    | parallelize_runs done in 7.4s
+2026-09-03 21:17:51 | INFO     | Phase 1 complete in 7.4s
+2026-09-03 21:17:51 | INFO     | Saved Phase 1 measurements to memory_cache_training.json
+2026-09-03 21:17:51 | INFO     | Compiled Phase 2: scaled eager Phase-1 measurements by 1.2x  (mean 922 MB/task)
+2026-09-03 21:17:51 | INFO     | Phase 2 VRAM budget: GPU0=14.84 GB of 15.84 GB free
+2026-09-03 21:17:51 | INFO     | Eje B seed jobs: 0 resumed, 2 pending
+2026-09-03 21:17:51 | INFO     | ------------------------------------------------------------------------
+2026-09-03 21:17:51 | INFO     | PHASE: Phase 2 — Full training  (5 iterations × 2 jobs)
+2026-09-03 21:17:51 | INFO     | ------------------------------------------------------------------------
+2026-09-03 21:17:52 | INFO     | START [  1/1] 007bbfb7__seed_0  →  GPU 0
+2026-09-03 21:17:52 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-03 21:17:52 | INFO     | START [  1/1] 007bbfb7__seed_1  →  GPU 0
+2026-09-03 21:17:52 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-03 21:17:53 | DEBUG    | PROG  007bbfb7__seed_0  step    0/5  (  0.0%)
+2026-09-03 21:17:53 | DEBUG    | PROG  007bbfb7__seed_1  step    0/5  (  0.0%)
+2026-09-03 21:21:49 | DEBUG    | PROG  007bbfb7__seed_0  step    5/5  (100.0%)
+2026-09-03 21:21:50 | DEBUG    | PROG  007bbfb7__seed_1  step    5/5  (100.0%)
+2026-09-03 21:21:53 | INFO     | DONE  [  1/1] 007bbfb7__seed_0   241.1s  peak=  5934 MB  [not solved]
+2026-09-03 21:21:54 | INFO     | DONE  [  1/1] 007bbfb7__seed_1   242.1s  peak=  6328 MB  [not solved]
+2026-09-03 21:21:55 | DEBUG    | parallelize_runs done in 244.6s
+2026-09-03 21:21:55 | INFO     | Phase 2 complete in 244.6s
+2026-09-03 21:21:55 | INFO     | Saved .profile/eje_b_smoke/predictions_training.npz
+2026-09-03 21:21:55 | INFO     | Saved .profile/eje_b_smoke/submission_training.json
+2026-09-03 21:21:55 | INFO     | ========================================================================
+2026-09-03 21:21:55 | INFO     | RUN COMPLETE — 0/1 tasks solved (0.0%)  in 252.0s (0.07h)
+2026-09-03 21:21:55 | INFO     |   Predictions saved : .profile/eje_b_smoke/predictions_training.npz
+2026-09-03 21:21:55 | INFO     | ========================================================================
+2026-09-03 21:21:55 | INFO     | Saved .profile/eje_b_smoke/run_metadata_training.json

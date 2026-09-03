@@ -76,6 +76,12 @@ class SolveTaskFailureTests(unittest.TestCase):
             solution_second_most_frequent=(((2,),),),
             solution_contributions_log=[],
             solution_picks_history=[],
+            total_KL_curve=[],
+            effective_total_KL_curve=[],
+            kl_free_bits_curve=[],
+            n_kl_below_floor_curve=[],
+            curriculum_weights_curve=[],
+            candidate_evidence=mock.Mock(return_value=[]),
             materialize_curves=mock.Mock(),
         )
 
@@ -385,6 +391,38 @@ class SchedulerFailureTests(unittest.TestCase):
         self.assertEqual(selected['compile_mode'], 'off')
         self.assertEqual(untouched['compile_mode'], 'default')
         self.assertEqual(selected['matmul_precision'], 'high')
+
+    def test_seed_jobs_preserve_usage_and_skip_only_completed_jobs(self):
+        job_ids, usages, specs = parallel_train._expand_seed_jobs(
+            ['task_a', 'task_b'], [100, 200], (0, 1), {'task_a__seed_0'},
+        )
+
+        self.assertEqual(
+            job_ids, ['task_a__seed_1', 'task_b__seed_0', 'task_b__seed_1']
+        )
+        self.assertEqual(usages, [100, 200, 200])
+        self.assertEqual(
+            parallel_train._resolve_job('task_b__seed_1', specs),
+            ('task_b', 1),
+        )
+
+    def test_worker_failure_keeps_seed_job_identity(self):
+        failure = parallel_train._worker_failure_from_report({
+            'task_name': '007bbfb7',
+            'job_id': '007bbfb7__seed_3',
+            'seed': 3,
+            'gpu_id': 0,
+            'last_step': 12,
+            'stage': 'training',
+            'compile_mode': 'default',
+            'exception_type': 'RuntimeError',
+            'traceback': 'RuntimeError: failed',
+        })
+
+        self.assertEqual(failure.task_name, '007bbfb7')
+        self.assertEqual(failure.job_id, '007bbfb7__seed_3')
+        self.assertEqual(failure.seed, 3)
+        self.assertEqual(failure.recovery_record()['seed'], 3)
 
     def test_scheduler_rejects_zero_gpus_before_starting_manager(self):
         with mock.patch.object(

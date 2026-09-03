@@ -1,0 +1,104 @@
+{
+  "split": "training",
+  "timestamp": "2026-09-03 21:22:59",
+  "n_tasks": 1,
+  "task_ids": [
+    "007bbfb7"
+  ],
+  "n_steps": 5,
+  "n_solved": 0,
+  "elapsed_s": 7.5,
+  "n_gpus": 1,
+  "max_workers": 2,
+  "postprocess_stride": 1,
+  "phase1_s": 7.4,
+  "phase2_s": 0.0,
+  "resumed_tasks": 0,
+  "trained_this_attempt": 0,
+  "trained_seed_jobs": 0,
+  "resumed_seed_jobs": 2,
+  "total_seed_jobs": 2,
+  "total_optimizer_steps": 10,
+  "seeds": [
+    0,
+    1
+  ],
+  "eje_b_fingerprint": "dfd57a32ec607460",
+  "seed_solved_task_ids": {
+    "0": [],
+    "1": []
+  },
+  "output_dir": "/home/asier/repos/arc-agi/src/SuperCompressARC/.profile/eje_b_smoke_resume",
+  "state_dir": "/home/asier/repos/arc-agi/src/SuperCompressARC/.profile/eje_b_smoke_state",
+  "real_result_tasks": 1,
+  "degraded": false,
+  "recovery": {
+    "enabled": false,
+    "manifest": ".partial/training/.task_recovery.json",
+    "explicit_eager_tasks": [],
+    "effective_eager_tasks": [],
+    "recovered_eager_tasks": [],
+    "quarantined_tasks": [],
+    "fallback_strategy": null
+  },
+  "limits": {
+    "host_mem_per_worker_gb": 0.0,
+    "host_mem_reserve_gb": 8.0,
+    "vram_margin_frac": 0.0,
+    "stall_timeout_s": 1800.0,
+    "cache_min_free_gb": 0.0
+  },
+  "inductor_cache": {
+    "path": "/home/asier/repos/arc-agi/src/SuperCompressARC/.inductor_cache",
+    "free_gb_at_end": 510.4
+  },
+  "compile_memory_factor": 1.2,
+  "accel": {
+    "amp": "off",
+    "compile_mode": "default",
+    "matmul_precision": "high",
+    "threads_per_worker": 1,
+    "alloc_conf": null,
+    "inductor_cache_dir": ".inductor_cache",
+    "compile_threads": 4,
+    "memory_planning": true,
+    "eje_b": true,
+    "seeds": [
+      0,
+      1
+    ],
+    "kl_free_bits_initial": 2.0,
+    "curriculum": true,
+    "curriculum_beta_max": 1.0,
+    "curriculum_ema_decay": 0.9,
+    "enabled": true
+  },
+  "accel_measurement": {
+    "amp": "off",
+    "compile_mode": "off",
+    "matmul_precision": "high",
+    "threads_per_worker": 1,
+    "alloc_conf": null,
+    "inductor_cache_dir": ".inductor_cache",
+    "compile_threads": 4,
+    "memory_planning": true,
+    "eje_b": false,
+    "seeds": [
+      0
+    ],
+    "kl_free_bits_initial": 0.0,
+    "curriculum": false,
+    "curriculum_beta_max": 1.0,
+    "curriculum_ema_decay": 0.9,
+    "enabled": true
+  },
+  "backend": {
+    "torch_version": "2.14.0.dev20260712+rocm7.2",
+    "hip_version": "7.2.53211",
+    "cuda_version": null,
+    "is_rocm": true,
+    "gpu_names": [
+      "AMD Radeon RX 9070 XT"
+    ]
+  }
+}

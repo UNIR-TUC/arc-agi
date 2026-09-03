@@ -2,6 +2,7 @@ import argparse
 import csv
 import os
 import pickle
+import random
 import time
 from tqdm import tqdm
 
@@ -87,19 +88,40 @@ def parse_args():
         default=None,
         help='Label used in the timing CSV name. Defaults to the accel preset.',
     )
+    parser.add_argument(
+        '--eje-b',
+        action='store_true',
+        help='Enable Eje B for this seed. Requires --accel-preset compile.',
+    )
+    parser.add_argument(
+        '--seed',
+        type=int,
+        default=0,
+        help='Random seed for model initialization and latent samples. Default: 0.',
+    )
     args = parser.parse_args()
     if args.iterations <= WARMUP_STEPS:
         parser.error(f'--iterations must be greater than {WARMUP_STEPS}')
+    if args.seed < 0:
+        parser.error('--seed must be non-negative')
+    if args.eje_b and args.accel_preset != 'compile':
+        parser.error('Eje B must run with --accel-preset compile')
     return args
 
 
-def configure_acceleration(preset, inductor_cache_dir):
-    preset_cfg = accel.config_from_preset(preset)
+def configure_acceleration(preset, inductor_cache_dir, eje_b=False, seed=0):
+    preset_cfg = accel.config_from_preset(
+        preset,
+        eje_b=eje_b,
+        seeds=(seed,) if eje_b else (0,),
+        kl_free_bits_initial=2.0 if eje_b else 0.0,
+        curriculum=eje_b,
+    )
     if preset_cfg.compile_mode != 'off':
-        preset_cfg = accel.config_from_preset(
-            preset,
-            inductor_cache_dir=inductor_cache_dir,
-        )
+        preset_cfg = accel.AccelConfig.from_dict({
+            **preset_cfg.to_dict(),
+            'inductor_cache_dir': inductor_cache_dir,
+        })
     return accel.configure_process(preset_cfg)
 
 if __name__ == "__main__":
@@ -109,8 +131,14 @@ if __name__ == "__main__":
     accel_cfg = configure_acceleration(
         args.accel_preset,
         args.inductor_cache_dir,
+        args.eje_b,
+        args.seed,
     )
     torch.set_default_device('cuda')
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed(args.seed)
 
     # Some interesting tasks: 272f95fa, 6d75e8bb, 6cdd2623, 41e4d17e, 2bee17df
     # 228f6490, 508bd3b6, 2281f1f4, ecdecbb3
@@ -141,13 +169,23 @@ if __name__ == "__main__":
 
     # ── Training with per-step CPU / wall-clock profiling ────────────────────
     n_iterations = args.iterations
+    eje_b_state = train.EjeBTrainingState() if accel_cfg.curriculum else None
     step_profile  = []  # (step, wall_s, cpu_s)
 
     t_wall = time.perf_counter()
     t_cpu  = time.process_time()
 
     for train_step in tqdm(range(n_iterations)):
-        train.take_step(task, model, optimizer, train_step, train_history_logger)
+        train.take_step(
+            task,
+            model,
+            optimizer,
+            train_step,
+            train_history_logger,
+            accel_config=accel_cfg,
+            n_train_iterations=n_iterations,
+            eje_b_state=eje_b_state,
+        )
 
         # Flush GPU so each slice covers one complete step (CPU work + GPU kernels).
         torch.cuda.synchronize()
@@ -207,6 +245,14 @@ if __name__ == "__main__":
     # Save the metrics, model weights, and learned representations.
     np.savez(folder + task_name + '_KL_curves.npz',
              KL_curves={key:np.array(val) for key, val in train_history_logger.KL_curves.items()},
+             effective_total_KL_curve=np.array(
+                 train_history_logger.effective_total_KL_curve),
+             kl_free_bits_curve=np.array(
+                 train_history_logger.kl_free_bits_curve),
+             n_kl_below_floor_curve=np.array(
+                 train_history_logger.n_kl_below_floor_curve),
+             curriculum_weights_curve=np.array(
+                 train_history_logger.curriculum_weights_curve),
              reconstruction_error_curve=np.array(train_history_logger.reconstruction_error_curve),
              multiposteriors=model.multiposteriors,
              target_capacities=model.target_capacities,

@@ -1,0 +1,40 @@
+2026-09-03 21:12:13 | INFO     | Inductor cache: /home/asier/repos/arc-agi/src/SuperCompressARC/.inductor_cache (510.6 GB free, minimum 0.0 GB)
+2026-09-03 21:12:13 | INFO     | ========================================================================
+2026-09-03 21:12:13 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-03 21:12:13 | INFO     |   Tasks       : 1
+2026-09-03 21:12:13 | INFO     |   GPUs        : 1
+2026-09-03 21:12:13 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-03/arc_training_training_20260903_211213.log
+2026-09-03 21:12:13 | INFO     |   Results file: results_2026-09-03_21-12-13.txt
+2026-09-03 21:12:13 | INFO     | ========================================================================
+2026-09-03 21:12:13 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-03 21:12:13 | INFO     | Acceleration (Eje D): accel amp=off compile=default matmul=high threads=1 alloc=- eje-b=on seeds=0,1
+2026-09-03 21:12:13 | INFO     | ------------------------------------------------------------------------
+2026-09-03 21:12:13 | INFO     | PHASE: Phase 1 — Memory measurement  (2 iterations × 1 tasks)
+2026-09-03 21:12:13 | INFO     | ------------------------------------------------------------------------
+2026-09-03 21:12:14 | DEBUG    | START [  1/1] 007bbfb7  →  GPU 0
+2026-09-03 21:12:14 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-03 21:12:19 | DEBUG    | DONE  [  1/1] 007bbfb7     5.0s  peak=   768 MB  [not solved]
+2026-09-03 21:12:21 | DEBUG    | parallelize_runs done in 7.4s
+2026-09-03 21:12:21 | INFO     | Phase 1 complete in 7.4s
+2026-09-03 21:12:21 | INFO     | Saved Phase 1 measurements to memory_cache_training.json
+2026-09-03 21:12:21 | INFO     | Compiled Phase 2: scaled eager Phase-1 measurements by 1.2x  (mean 922 MB/task)
+2026-09-03 21:12:21 | INFO     | Phase 2 VRAM budget: GPU0=14.84 GB of 15.84 GB free
+2026-09-03 21:12:21 | INFO     | Eje B seed jobs: 0 resumed, 2 pending
+2026-09-03 21:12:21 | INFO     | ------------------------------------------------------------------------
+2026-09-03 21:12:21 | INFO     | PHASE: Phase 2 — Full training  (5 iterations × 2 jobs)
+2026-09-03 21:12:21 | INFO     | ------------------------------------------------------------------------
+2026-09-03 21:12:22 | INFO     | START [  1/1] 007bbfb7__seed_0  →  GPU 0
+2026-09-03 21:12:22 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-03 21:12:22 | INFO     | START [  1/1] 007bbfb7__seed_1  →  GPU 0
+2026-09-03 21:12:22 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-03 21:12:23 | DEBUG    | PROG  007bbfb7__seed_0  step    0/5  (  0.0%)
+2026-09-03 21:12:23 | DEBUG    | PROG  007bbfb7__seed_1  step    0/5  (  0.0%)
+2026-09-03 21:15:08 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 2019, in <module>
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1299, in run_split
+    _, phase2_solutions, phase2_loggers, t_p2 = parallelize_runs(
+                                                ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 775, in parallelize_runs
+    time.sleep(1)
+KeyboardInterrupt

@@ -44,8 +44,7 @@ def probe_solutions(solutions_file, split, iteration_num, task_nums=None):
 
         # Build up the solution scores up to the specified iteration
         for iter_idx in range(min(iteration_num + 1, len(solution_contribution_logs[task_num]))):
-            for i in range(2):
-                hashed, score = solution_contribution_logs[task_num][iter_idx][i]
+            for hashed, score in solution_contribution_logs[task_num][iter_idx]:
                 hashed = int(hashed) >> 16
                 original_score = torch.tensor(solution_scores.get(hashed, default=-10000))
                 score = torch.tensor(score)

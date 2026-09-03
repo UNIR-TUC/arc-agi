@@ -1,0 +1,125 @@
+{
+  "label": "eje_b_gate_candidate_resume1",
+  "timestamp": "2026-09-03 23:40:44",
+  "command": [
+    "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python",
+    "-u",
+    "parallel_train.py",
+    "--split",
+    "training",
+    "--task-ids",
+    "025d127b,05269061,06df4c85,08ed6ac7,0962bcdd,0b148d64,0ca9ddb6,0dfd9992,178fcbfb,1bfc4729,1c786137",
+    "--iterations",
+    "2000",
+    "--seeds",
+    "0,1,2,3",
+    "--max-workers",
+    "6",
+    "--postprocess-stride",
+    "4",
+    "--host-mem-per-worker-gb",
+    "9",
+    "--host-mem-reserve-gb",
+    "12",
+    "--cache-min-free-gb",
+    "50",
+    "--inductor-cache-dir",
+    "/mnt/supercompressarc-cache/.inductor_cache",
+    "--state-dir",
+    ".profile/eje_b_gate_candidate_artifacts/state",
+    "--resume",
+    "--no-tui",
+    "--eje-b",
+    "--accel-preset",
+    "compile",
+    "--output-dir",
+    ".profile/eje_b_gate_candidate_resume1_artifacts"
+  ],
+  "return_code": -15,
+  "wall_time_s": 5.0,
+  "n_cores": 24,
+  "sample_interval_s": 1.0,
+  "n_samples": 5,
+  "cpu": {
+    "mean_pct": 15.2,
+    "median_pct": 16.4,
+    "p95_pct": 16.7,
+    "max_pct": 18.9,
+    "saturation_threshold_pct": 90.0,
+    "saturation_fraction": 0.0
+  },
+  "concurrency": {
+    "mean_workers": 0.2,
+    "max_workers": 1,
+    "workers_completed": 0,
+    "mean_helper_procs": 1.4,
+    "max_helper_procs": 3
+  },
+  "throughput": {
+    "workers_completed": 0,
+    "wall_time_s": 5.0,
+    "workers_per_hour": 0.0,
+    "mean_worker_lifetime_s": null
+  },
+  "memory": {
+    "tree_rss_max_mb": 3060.6,
+    "host_mem_used_max_pct": 10.9
+  },
+  "gpu": {
+    "vendor": "sysfs(amdgpu)",
+    "util_mean_pct": 11.0,
+    "util_max_pct": 11.0,
+    "mem_max_mb": 1469.1,
+    "mem_busy_mean_pct": 3.0,
+    "power_mean_w": 33.0,
+    "power_max_w": 33.0,
+    "energy_wh": 0.0
+  },
+  "efficiency": {
+    "planned_train_steps": null,
+    "steps_per_s_aggregate": null,
+    "phase1_s": null,
+    "phase2_s": null,
+    "steps_per_s_phase2": null,
+    "energy_wh_per_worker": null,
+    "energy_wh_per_1k_steps": null
+  },
+  "accuracy": {
+    "n_solved": null,
+    "n_tasks": null,
+    "min_n_steps": null,
+    "solved_fraction": null
+  },
+  "accel_preset": "compile",
+  "artifact_dir": "/home/asier/repos/arc-agi/src/SuperCompressARC/.profile/eje_b_gate_candidate_resume1_artifacts",
+  "run_metadata": [],
+  "workers": [
+    {
+      "pid": 242809,
+      "name": "python",
+      "task_worker": false,
+      "lifetime_s": 3.0,
+      "mean_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "peak_rss_mb": 12.6
+    },
+    {
+      "pid": 242810,
+      "name": "python",
+      "task_worker": false,
+      "lifetime_s": 3.0,
+      "mean_cpu_pct": 16.0,
+      "peak_cpu_pct": 48.0,
+      "peak_rss_mb": 930.7
+    },
+    {
+      "pid": 242859,
+      "name": "python",
+      "task_worker": true,
+      "lifetime_s": 2.0,
+      "mean_cpu_pct": 50.0,
+      "peak_cpu_pct": 100.0,
+      "peak_rss_mb": 1108.4
+    }
+  ]
+}

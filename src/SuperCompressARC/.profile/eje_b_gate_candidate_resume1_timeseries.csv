@@ -1,0 +1,6 @@
+t_rel,sys_cpu_pct,percore_max_pct,percore_min_pct,n_workers,n_helper_procs,tree_cpu_pct,tree_rss_mb,host_mem_used_pct,gpu_util_pct,gpu_mem_mb,gpu_mem_busy_pct,gpu_power_w
+0.0,16.7,100.0,0.0,0,0,0.0,8.1,9.1,11.0,1469.1,3.0,33.0
+1.0,18.9,65.7,8.1,0,0,274.5,909.3,9.6,,,,
+2.0,16.1,60.6,8.1,0,2,37.1,1883.8,10.2,,,,
+3.0,16.4,87.0,8.1,0,3,48.0,2788.0,10.7,,,,
+4.0,7.7,94.0,0.0,1,2,100.0,3060.6,10.9,,,,
