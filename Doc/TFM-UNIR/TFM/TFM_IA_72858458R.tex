@@ -1651,11 +1651,6 @@ fundamenta en los principios de \textit{CompressARC} \cite{liao2025arcagiwithout
 un equilibrio entre la expresividad del modelo y la eficiencia computacional, evitando el pre-entrenamiento masivo en favor de una optimización centrada en 
 el tiempo de inferencia (\textit{Test-Time Training}). 
 
-% Partiendo de esta base, se ha desarrollado una evolución de dicha arquitectura con el objetivo de mejorar la capacidad de síntesis de programas y la resolución de transformaciones 
-% complejas en el \textit{benchmark} ARC-AGI-1. Esta propuesta se centra en refinamientos específicos dentro del espacio latente y en el uso optimizado de sistemas 
-% multitemporales (\textit{multitensors}), buscando una arquitectura que no solo sea compacta en parámetros, sino también más robusta ante la diversidad de tareas planteadas. 
-% En las siguientes secciones se detallan los componentes, capas y el proceso iterativo que conforman el núcleo de esta solución.
-
 Un Autocodificador es un modelo de aprendizaje profundo que aprende a generar variables latentes que representen
 características ocultas de los datos, para posteriormente, decodificarlas y reconstruir los datos de entrada. Estos modelos
 son especialmente útiles para tareas de reducción de dimensionalidad, compresión de datos y generación de nuevas muestras a partir de las características aprendidas.
@@ -1708,10 +1703,33 @@ El flujo completo de entrenamiento en tiempo de inferencia de manera simple podr
 	\item Se actualizan los parámetros del modelo mediante retropropagación.
 \end{enumerate}
 
-El autor del modelo \citeauthor{liao2025arcagiwithoutpretraining} muestra una seria de métricas del laboratorio de pruebas realizadas en 
-exhaustivos documentos explicativos. El entrenamiento del modelo para todas las tareas se realizan de manera secuencial, es decir, se realiza
+El sistema está basado en el principio de Mínima Longitud de Descripción (MDL). Si el modelo logra describir los ejemplos de entrenamiento de una
+tarea con un código más corto que el código más corto ue el código trivial de enumerar píxeles, entonces significa que ha descubierto la estructura
+de la tarea y esa estructura debería extrapolar al ejemplo de pruebas. Entre dos explicaciones que describen correctamente los datos conocidos, 
+se prefiere la que necesita menos información para expresarse.
+
+\subsection{Pruebas iniciales}
+
+El autor del modelo \citeauthor{liao2025arcagiwithoutpretraining} \citeyear{liao2025arcagiwithoutpretraining} muestra una seria de métricas del laboratorio de pruebas realizadas en 
+exhaustivos documentos explicativos. El entrenamiento del modelo, para todas las tareas se realizan de manera secuencial, es decir, se realiza
 el entrenamiento de una tarea, se compara el resultado y continua con el siguiente. Este procedimiento se realiza al completo en ambos 
-conjuntos de datos de entrenamiento y evaluación.
+conjuntos de datos de entrenamiento y evaluación. El autor reporta que el tiempo total de ejecución de todas las tareas de entrenamiento es 
+de 130 horas realizando 2000 iteraciones por tarea. El proceso de ejecución de las tareas de evaluación es un poco más, 138 horas.
+
+De manera experimental también incluye una opción de lanzar diversos procesos en paralelo, lo que puede reducir 
+el tiempo total de ejecución. En las pruebas iniciales, se uso ambas técnicas para probar si realmente existe una mejora
+significativa con un subconjunto pequeño de tareas. Ambas pruebas se realizaron y tardaron alrededor de 17,3 horas, con lo cual,
+el uso de ejecuciones en paralelo tal y como está diseñado el proceso de entrenamiento no proporciona una mejora significativa en términos de tiempo de ejecución.
+
+Al usar el entrenamiento en paralelo también se pudo observar un uso muy intensivo de la CPU, por lo tanto, las sospechas iniciales
+apuntaban a que podría ocurrir alguna limitación de los procesos relacionados entre la CPU y GPU.
+
+Por otro lado, \citeauthor{liao2025arcagiwithoutpretraining} \citeyear{liao2025arcagiwithoutpretraining} expresó que en sus pruebas realizadas, 
+se usó una NVIDIA RTX 4070, una GPU
+a nivel computacional teórico inferior a la utilizada para este trabajo, la RX 9070 XT. Esto induce a pensar que no está habiendo ningún
+aprovechamiento computacional debido a algún problema en el proceso de entrenamiento. Esta circunstancia ocurre tanto en entrenamiento
+sencuencial como en el entrenamiento en paralelo y por lo tanto, no parece haber relación con el posible uso de la CPU, más bien es de 
+diseño.
 
 \subsection{Codificador Multitensor}
 
@@ -1813,11 +1831,103 @@ $X$ e $Y$ las dimensiones espaciales. El último eje corresponde siempre a los c
 A estos tensores se le añade una dimensión adicional denominada canal o más correctamente espacio latente. Cada posible valor de las hojas contendrán un vector de 4
 valores que representará este espacio. Para recorrer todas las posibilidades de los diferentes tensores, en el que haya datos
 representados, se hará uso de una máscara binaria de 5 dimensiones. Posteriormente se representará todo el estado latente mediante un
-vector denominado \(z\).
+tensor denominado \(z\).
 
-\subsubsection{Arquitectura de decodificación}
+Las tareas de ARC-AGI mezclan información de naturalezas muy distintas. Tratar todo en un único tensor obligaría a la red a redescubrir que estos 
+ejes son cualitativamente distintos. En cambio, un Multitensor mantiene 18 tensores distintos y permite que cada uno se procese localmente y se comunique con
+los demás de forma controlada.
 
-\subsubsection{Ejemplo de entrenamiento al detalle}
+\subsubsection{Direcciones}
+
+El eje de direcciones del Multitensor tiene 8 dimensiones fijas. Estas direcciones cubren un grupo diédrico con el conjunto de simetrías
+de un cuadrado, es decir, todas las formas de moverlo. Las formas de moverlo más habituales es mediante rotaciones o reflexiones, de manera
+que vuelve a ocupar exactamente la misma posición. Ña operación del grupo es componer simetrías, es decir, aplicar una tras otra. Está formada
+por 8 elementos, correspondientes a las 4 rotaciones y 4 reflexiones posibles de un cuadrado. Básicamente describe todas las maneras de mover 
+un cuadrado sin cambiar su apariencia geométrica.
+
+\subsection{Arquitectura de decodificación}
+
+El objetivo de la capa de decodificación es decodificar el espacio latente \(z\). Este proceso se realiza mediante un método interno que
+se encarga de decodificar de manera independiente cada una de los 18 tensores del Multitensor. Utiliza una tabla de parámetros ajustables
+con la forma de la vista correspondiente, indicando la dirección que debe desviarse los valores latentes respecto al ruido inicial genérico.
+Durante todo el proceso de entrenamiento se crean valores aleatorios basados en una distribución normal estándar. Mantener una parte
+de ruido evita que el espacio latente se convierta en una tabla de memoria sin coste.
+
+También se hace uso de divergencia de Kullback-Leibler,
+una medida que compara distribuciones de probabilidad y cuantifica cuanta información adicional hace falta para describir la distribución 
+real a partir de la aproximación. En el modelo el tensor latente \(z\) funciona como un código interno de la tarea ARC. 
+Ese código debe contener la información necesaria para reconstruir los ejemplos y descubrir la regla.
+
+El proceso de decodificación consta de 4 bloques idénticos que se ejecutan de manera secuencial, como una especie de bucle. Este bloque
+está formado por una serie de operaciones:
+
+\begin{itemize}
+	\item \textbf{Comunicación ascendente del Multitensor (\texttt{share\_up}).} Esta capa permite que las representaciones más compactas
+	transmitan información a las que contienen un mayor número de ejes. Para cada tensor receptor, se seleccionan todas las hojas cuyos ejes
+	activos forman un subconjunto de los suyos. Después de proyectar sus canales a un espacio intermedio, las hojas seleccionadas se expanden
+	para hacer compatibles sus dimensiones y se suman. El resultado se normaliza, se proyecta de nuevo al número de canales original y se añade
+	mediante una conexión residual al estado de entrada. De este modo, una regularidad expresada únicamente por color o dirección puede incorporarse
+	a una representación más específica que también distinga ejemplos y posiciones espaciales.
+
+	\item \textbf{Selección multi-eje (\texttt{softmax}).} La operación \textit{softmax} transforma las puntuaciones internas en distribuciones
+	relativas sobre todos los subconjuntos no vacíos de los ejes informativos presentes, es decir, color, dirección, filas y columnas. El eje de
+	ejemplos y el eje de canales quedan excluidos de esta operación. Los resultados obtenidos para las distintas combinaciones de ejes se concatenan,
+	se proyectan al espacio de canales del tensor y se añaden de forma residual. Su propósito es permitir que la red destaque colores, orientaciones
+	o posiciones relevantes mediante comparaciones relativas, en lugar de depender únicamente de la magnitud absoluta de cada activación. Aunque la
+	llamada a esta capa solicita una pre-normalización, en la versión analizada el valor normalizado queda sobrescrito antes de la proyección de entrada,
+	por lo que dicha pre-normalización no modifica efectivamente el cálculo.
+
+	\item \textbf{Máximo acumulado direccional (\texttt{cummax}).} Esta capa propaga a cada posición el mayor valor encontrado anteriormente a
+	lo largo de una dirección. Se aplica exclusivamente a las hojas espaciales \texttt{11111} y \texttt{10111}, que contienen los ejes de ejemplos,
+	direcciones, filas y columnas, con o sin el eje de color. Las cuatro orientaciones cardinales se procesan mediante máximos acumulados directos,
+	mientras que las cuatro diagonales utilizan un escaneo asociativo en pasos de tamaño creciente. Las máscaras de la tarea impiden que el relleno
+	de las cuadrículas intervenga en el cálculo. La rama transformada se normaliza, se proyecta y se suma de forma residual. Esta operación aporta un
+	sesgo inductivo útil para extender señales, reconocer límites y determinar si una característica ya ha aparecido durante un recorrido espacial.
+
+	\item \textbf{Desplazamiento direccional (\texttt{shift}).} Esta operación desplaza la información una celda en cada una de las ocho
+	orientaciones y completa con ceros las posiciones que quedan fuera de la cuadrícula. Al igual que \texttt{cummax}, solo actúa sobre las hojas
+	\texttt{11111} y \texttt{10111} y utiliza las máscaras para respetar la región válida de cada ejemplo. Tras el desplazamiento, la rama se
+	normaliza, se proyecta al espacio original y se incorpora mediante una conexión residual. Su función es poner a disposición de cada píxel la
+	información de sus vecinos inmediatos, lo que permite comparar celdas adyacentes y representar movimientos locales. La repetición de esta operación
+	en los cuatro bloques posibilita además la composición de desplazamientos de mayor alcance.
+
+	\item \textbf{Comunicación entre direcciones (\texttt{direction\_share}).} Las operaciones anteriores producen información asociada a ocho
+	orientaciones diferentes. Esta capa permite que cada una reciba contribuciones de las otras siete y de sí misma. Se aplica a todas las hojas que
+	contienen el eje de dirección, incluso cuando no incluyen coordenadas espaciales. Primero normaliza el estado de entrada y, para cada par de
+	direcciones, aplica una transformación afín aprendida. Cada contribución se pondera según su separación angular mediante los coeficientes fijos
+	\(1\), \(0{,}2\), \(0{,}4\), \(0{,}2\), \(1\), \(0{,}2\), \(0{,}4\) y \(0{,}2\). Las direcciones iguales u opuestas reciben el mayor peso,
+	las ortogonales un peso intermedio y las restantes un peso menor. Las contribuciones se acumulan directamente sobre el estado original, formando
+	una conexión residual. El propósito de la capa es combinar hipótesis orientadas y facilitar reglas relacionadas con rotaciones y reflexiones sin
+	tratar cada dirección como un caso completamente independiente.
+
+	\item \textbf{Transformación no lineal (\texttt{nonlinear}).} Una sucesión formada únicamente por proyecciones lineales no podría representar
+	transformaciones complejas. Para evitar esta limitación, la capa proyecta primero cada hoja a un espacio intermedio de 16 canales, aplica la función
+	\(\operatorname{SiLU}(x)=x\,\sigma(x)\), vuelve a proyectar el resultado al número de canales original y lo suma al estado de entrada. La función
+	SiLU conserva una respuesta gradual para valores negativos y amplifica de forma suave las señales positivas. Esto permite crear interacciones no
+	lineales entre las características descubiertas por las capas espaciales y de comunicación. Esta operación comparte con \texttt{softmax} la
+	salvedad de que la pre-normalización solicitada queda anulada por la implementación actual del envoltorio residual.
+
+	\item \textbf{Comunicación descendente del Multitensor (\texttt{share\_down}).} Esta capa realiza el recorrido complementario a
+	\texttt{share\_up}. Cada hoja receptora reúne información procedente de todas las hojas que contienen sus mismos ejes y otros ejes adicionales.
+	Las dimensiones que no existen en el receptor se reducen mediante promedios. Cuando se agregan filas o columnas y la estructura de tamaños de la
+	tarea lo permite, estos promedios se ponderan con las máscaras para excluir el relleno. Las contribuciones reducidas se suman, se normalizan, se
+	proyectan y se incorporan al estado mediante una conexión residual. Así, los patrones descubiertos en representaciones espaciales detalladas pueden
+	convertirse en resúmenes por ejemplo, color o dirección y quedar disponibles para el siguiente bloque.
+
+	\item \textbf{Normalización final (\texttt{normalize}).} Al terminar cada bloque, cada hoja se centra y se reescala de forma independiente.
+	Para cada canal se calcula la media sobre todos los demás ejes, se resta esa media y se divide el resultado por su magnitud cuadrática media,
+	incluyendo una pequeña constante que evita divisiones por cero. A diferencia de las siete transformaciones anteriores, esta operación no añade
+	una rama residual ni introduce parámetros entrenables. Su finalidad es mantener una escala numérica estable, impedir que las sucesivas sumas
+	residuales hagan crecer descontroladamente las activaciones y preparar un estado comparable para la siguiente repetición del bloque.
+\end{itemize}
+
+\subsubsection{Contantes}
+
+
+
+%\subsection{Función de error}
+
+\subsection{Ejemplo de entrenamiento al detalle}
 
 \subsection{Limitaciones}
 
