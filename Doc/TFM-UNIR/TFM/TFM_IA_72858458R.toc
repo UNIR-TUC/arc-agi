@@ -61,16 +61,24 @@
 \contentsline {subsection}{\numberline {5.1.2}Codificador Multitensor}{65}{subsection.5.1.2}%
 \contentsline {subsubsection}{Direcciones}{67}{subsubsection*.12}%
 \contentsline {subsection}{\numberline {5.1.3}Arquitectura de decodificación}{67}{subsection.5.1.3}%
-\contentsline {subsubsection}{Contantes}{70}{subsubsection*.13}%
-\contentsline {subsection}{\numberline {5.1.4}Ejemplo de entrenamiento al detalle}{70}{subsection.5.1.4}%
-\contentsline {subsection}{\numberline {5.1.5}Limitaciones}{70}{subsection.5.1.5}%
-\contentsline {section}{\numberline {5.2}Ejes de mejora}{70}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Eje H: Reducción de saturación de procesos en paralelo}{70}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{70}{subsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del conjuntos de tensores}{70}{subsection.5.2.3}%
-\contentsline {chapter}{\numberline {6}Resultados}{71}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Planificación}{72}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Estudio económico}{73}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{74}{chapter.9}%
-\contentsline {section}{Referencias}{74}{section*.14}%
-\contentsline {chapter}{\numberline {A}Apéndices}{76}{appendix.Alph1}%
+\contentsline {subsubsection}{Comunicación ascendente del Multitensor}{69}{subsubsection*.13}%
+\contentsline {subsubsection}{Selección multi-eje}{70}{subsubsection*.14}%
+\contentsline {subsubsection}{Máximo acumulado direccional}{71}{subsubsection*.15}%
+\contentsline {subsubsection}{Desplazamiento direccional}{72}{subsubsection*.16}%
+\contentsline {subsubsection}{Comunicación entre direcciones}{73}{subsubsection*.17}%
+\contentsline {subsubsection}{Transformación no lineal}{74}{subsubsection*.18}%
+\contentsline {subsubsection}{Comunicación descendente del Multitensor}{75}{subsubsection*.19}%
+\contentsline {subsubsection}{Normalización final}{75}{subsubsection*.20}%
+\contentsline {subsubsection}{Contantes}{77}{subsubsection*.21}%
+\contentsline {subsection}{\numberline {5.1.4}Ejemplo de entrenamiento al detalle}{77}{subsection.5.1.4}%
+\contentsline {subsection}{\numberline {5.1.5}Limitaciones}{77}{subsection.5.1.5}%
+\contentsline {section}{\numberline {5.2}Ejes de mejora}{77}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Eje H: Reducción de saturación de procesos en paralelo}{77}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{77}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del conjuntos de tensores}{77}{subsection.5.2.3}%
+\contentsline {chapter}{\numberline {6}Resultados}{78}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Planificación}{79}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Estudio económico}{80}{chapter.8}%
+\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{81}{chapter.9}%
+\contentsline {section}{Referencias}{81}{section*.22}%
+\contentsline {chapter}{\numberline {A}Apéndices}{83}{appendix.Alph1}%

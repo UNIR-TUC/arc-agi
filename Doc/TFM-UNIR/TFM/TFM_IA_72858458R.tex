@@ -710,18 +710,18 @@ sirven para el entrenamiento del modelo y la adquisición de habilidades.
 Los archivos están en formato JSON. Cada archivo contiene un diccionario con dos claves: ``train'' y ``test''. El valor de cada clave es una lista de pares de ``arrays''.
 Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''. Los ``arrays'' son matrices bidimensionales de números enteros que representan los estados iniciales y finales de una tarea.
 
-En las siguientes matrices se puede ver una matriz de input $X$ y una matriz de output $Y$:
+En la Ecuación \eqref{eq:arc-matrices-entrada-salida} se muestran una matriz de entrada $X$ y su correspondiente matriz de salida $Y$:
 
-\[
+\begin{equation}\label{eq:arc-matrices-entrada-salida}
 X=
-\begin{bmatrix}
+\begin{pmatrix}
 0&7&7\\
 7&7&7\\
 0&7&7
-\end{bmatrix},
+\end{pmatrix},
 \qquad
 Y=
-\begin{bmatrix}
+\begin{pmatrix}
 0&0&0&0&7&7&0&7&7\\
 0&0&0&7&7&7&7&7&7\\
 0&0&0&0&7&7&0&7&7\\
@@ -731,8 +731,8 @@ Y=
 0&0&0&0&7&7&0&7&7\\
 0&0&0&7&7&7&7&7&7\\
 0&0&0&0&7&7&0&7&7
-\end{bmatrix}
-\]
+\end{pmatrix}
+\end{equation}
 
 \subsection{ARC-AGI-2}
 
@@ -1862,64 +1862,403 @@ El proceso de decodificación consta de 4 bloques idénticos que se ejecutan de 
 está formado por una serie de operaciones:
 
 \begin{itemize}
-	\item \textbf{Comunicación ascendente del Multitensor (\texttt{share\_up}).} Esta capa permite que las representaciones más compactas
-	transmitan información a las que contienen un mayor número de ejes. Para cada tensor receptor, se seleccionan todas las hojas cuyos ejes
-	activos forman un subconjunto de los suyos. Después de proyectar sus canales a un espacio intermedio, las hojas seleccionadas se expanden
-	para hacer compatibles sus dimensiones y se suman. El resultado se normaliza, se proyecta de nuevo al número de canales original y se añade
-	mediante una conexión residual al estado de entrada. De este modo, una regularidad expresada únicamente por color o dirección puede incorporarse
-	a una representación más específica que también distinga ejemplos y posiciones espaciales.
-
-	\item \textbf{Selección multi-eje (\texttt{softmax}).} La operación \textit{softmax} transforma las puntuaciones internas en distribuciones
-	relativas sobre todos los subconjuntos no vacíos de los ejes informativos presentes, es decir, color, dirección, filas y columnas. El eje de
-	ejemplos y el eje de canales quedan excluidos de esta operación. Los resultados obtenidos para las distintas combinaciones de ejes se concatenan,
-	se proyectan al espacio de canales del tensor y se añaden de forma residual. Su propósito es permitir que la red destaque colores, orientaciones
-	o posiciones relevantes mediante comparaciones relativas, en lugar de depender únicamente de la magnitud absoluta de cada activación. Aunque la
-	llamada a esta capa solicita una pre-normalización, en la versión analizada el valor normalizado queda sobrescrito antes de la proyección de entrada,
-	por lo que dicha pre-normalización no modifica efectivamente el cálculo.
-
-	\item \textbf{Máximo acumulado direccional (\texttt{cummax}).} Esta capa propaga a cada posición el mayor valor encontrado anteriormente a
-	lo largo de una dirección. Se aplica exclusivamente a las hojas espaciales \texttt{11111} y \texttt{10111}, que contienen los ejes de ejemplos,
-	direcciones, filas y columnas, con o sin el eje de color. Las cuatro orientaciones cardinales se procesan mediante máximos acumulados directos,
-	mientras que las cuatro diagonales utilizan un escaneo asociativo en pasos de tamaño creciente. Las máscaras de la tarea impiden que el relleno
-	de las cuadrículas intervenga en el cálculo. La rama transformada se normaliza, se proyecta y se suma de forma residual. Esta operación aporta un
-	sesgo inductivo útil para extender señales, reconocer límites y determinar si una característica ya ha aparecido durante un recorrido espacial.
-
-	\item \textbf{Desplazamiento direccional (\texttt{shift}).} Esta operación desplaza la información una celda en cada una de las ocho
-	orientaciones y completa con ceros las posiciones que quedan fuera de la cuadrícula. Al igual que \texttt{cummax}, solo actúa sobre las hojas
-	\texttt{11111} y \texttt{10111} y utiliza las máscaras para respetar la región válida de cada ejemplo. Tras el desplazamiento, la rama se
-	normaliza, se proyecta al espacio original y se incorpora mediante una conexión residual. Su función es poner a disposición de cada píxel la
-	información de sus vecinos inmediatos, lo que permite comparar celdas adyacentes y representar movimientos locales. La repetición de esta operación
-	en los cuatro bloques posibilita además la composición de desplazamientos de mayor alcance.
-
-	\item \textbf{Comunicación entre direcciones (\texttt{direction\_share}).} Las operaciones anteriores producen información asociada a ocho
-	orientaciones diferentes. Esta capa permite que cada una reciba contribuciones de las otras siete y de sí misma. Se aplica a todas las hojas que
-	contienen el eje de dirección, incluso cuando no incluyen coordenadas espaciales. Primero normaliza el estado de entrada y, para cada par de
-	direcciones, aplica una transformación afín aprendida. Cada contribución se pondera según su separación angular mediante los coeficientes fijos
-	\(1\), \(0{,}2\), \(0{,}4\), \(0{,}2\), \(1\), \(0{,}2\), \(0{,}4\) y \(0{,}2\). Las direcciones iguales u opuestas reciben el mayor peso,
-	las ortogonales un peso intermedio y las restantes un peso menor. Las contribuciones se acumulan directamente sobre el estado original, formando
-	una conexión residual. El propósito de la capa es combinar hipótesis orientadas y facilitar reglas relacionadas con rotaciones y reflexiones sin
-	tratar cada dirección como un caso completamente independiente.
-
-	\item \textbf{Transformación no lineal (\texttt{nonlinear}).} Una sucesión formada únicamente por proyecciones lineales no podría representar
-	transformaciones complejas. Para evitar esta limitación, la capa proyecta primero cada hoja a un espacio intermedio de 16 canales, aplica la función
-	\(\operatorname{SiLU}(x)=x\,\sigma(x)\), vuelve a proyectar el resultado al número de canales original y lo suma al estado de entrada. La función
-	SiLU conserva una respuesta gradual para valores negativos y amplifica de forma suave las señales positivas. Esto permite crear interacciones no
-	lineales entre las características descubiertas por las capas espaciales y de comunicación. Esta operación comparte con \texttt{softmax} la
-	salvedad de que la pre-normalización solicitada queda anulada por la implementación actual del envoltorio residual.
-
-	\item \textbf{Comunicación descendente del Multitensor (\texttt{share\_down}).} Esta capa realiza el recorrido complementario a
-	\texttt{share\_up}. Cada hoja receptora reúne información procedente de todas las hojas que contienen sus mismos ejes y otros ejes adicionales.
-	Las dimensiones que no existen en el receptor se reducen mediante promedios. Cuando se agregan filas o columnas y la estructura de tamaños de la
-	tarea lo permite, estos promedios se ponderan con las máscaras para excluir el relleno. Las contribuciones reducidas se suman, se normalizan, se
-	proyectan y se incorporan al estado mediante una conexión residual. Así, los patrones descubiertos en representaciones espaciales detalladas pueden
-	convertirse en resúmenes por ejemplo, color o dirección y quedar disponibles para el siguiente bloque.
-
-	\item \textbf{Normalización final (\texttt{normalize}).} Al terminar cada bloque, cada hoja se centra y se reescala de forma independiente.
-	Para cada canal se calcula la media sobre todos los demás ejes, se resta esa media y se divide el resultado por su magnitud cuadrática media,
-	incluyendo una pequeña constante que evita divisiones por cero. A diferencia de las siete transformaciones anteriores, esta operación no añade
-	una rama residual ni introduce parámetros entrenables. Su finalidad es mantener una escala numérica estable, impedir que las sucesivas sumas
-	residuales hagan crecer descontroladamente las activaciones y preparar un estado comparable para la siguiente repetición del bloque.
+	\item \textbf{Comunicación ascendente:} difunde información desde las hojas compactas hacia representaciones con más ejes.
+	\item \textbf{Selección multi-eje:} obtiene distribuciones relativas sobre colores, direcciones y posiciones mediante \textit{softmax}.
+	\item \textbf{Máximo acumulado direccional:} propaga a cada posición el mayor valor observado durante un recorrido espacial.
+	\item \textbf{Desplazamiento direccional:} traslada características entre píxeles vecinos en las ocho orientaciones disponibles.
+	\item \textbf{Comunicación entre direcciones:} combina las representaciones asociadas a orientaciones distintas.
+	\item \textbf{Transformación no lineal:} aplica la función SiLU para componer relaciones que no pueden expresarse linealmente.
+	\item \textbf{Comunicación descendente:} resume representaciones detalladas en hojas con menos ejes.
+	\item \textbf{Normalización final:} estabiliza la escala del estado antes de comenzar el bloque siguiente.
 \end{itemize}
+
+Para describir matemáticamente estas operaciones, se denota por \(h_s\) el estado de la hoja del Multitensor cuya máscara
+dimensional es \(s\). Las matrices \(P_s\) y \(Q_s\) representan, respectivamente, las proyecciones lineales aprendidas de entrada
+y de retorno al flujo residual. Ambas actúan únicamente sobre el último eje, correspondiente a los canales. La función
+\(\mathcal{N}\) representa la normalización propia del modelo. La relación \(r\preceq s\) indica que todos los ejes activos de
+\(r\) también están presentes en \(s\). Con esta notación, la estructura general de una transformación residual se expresa en la
+Ecuación \eqref{eq:decoder-transformacion-residual}:
+
+\begin{equation}\label{eq:decoder-transformacion-residual}
+h_s^{+}=h_s+Q_s\,\Phi_s(P_s h_s),
+\end{equation}
+
+donde \(\Phi_s\) es la operación característica de la capa. En las capas de comunicación intervienen varias hojas y esta expresión
+se amplía mediante sumas. Los pesos de \(P_s\) y \(Q_s\) se aprenden para cada tarea, por lo que no existe un valor numérico universal
+que pueda emplearse en los ejemplos. Para que los cálculos sean reproducibles, los ejemplos siguientes parten de la activación ya
+proyectada, consideran válidas todas las celdas y aíslan la operación característica. Cuando se muestra una suma residual, la
+proyección de retorno se considera identidad sobre los valores representados. Esta simplificación es únicamente pedagógica; las
+ecuaciones anteriores y las de cada apartado conservan el flujo completo de la implementación.
+
+\subsubsection{Comunicación ascendente del Multitensor}
+
+La primera operación del bloque corresponde a \texttt{share\_up}. Su objetivo es trasladar regularidades expresadas en hojas
+compactas hacia hojas más específicas. Por ejemplo, una señal que depende solo del color puede resultar relevante para una
+representación que, además del color, distingue cada ejemplo y cada posición de la cuadrícula. Sin esta comunicación, las hojas del
+Multitensor evolucionarían como representaciones independientes y la información descubierta en una de ellas no podría utilizarse en
+las demás.
+
+Para cada hoja receptora \(s\), la capa selecciona todas las hojas \(r\) que cumplen \(r\preceq s\). Primero proyecta sus canales
+mediante \(P_r\). Después, el operador \(\mathcal{B}_{r\rightarrow s}\) inserta los ejes ausentes y expande los valores hasta hacerlos
+compatibles con la forma de \(s\). Las contribuciones se suman, se normalizan, se proyectan al número de canales original y se añaden
+al estado receptor, tal como se muestra en la Ecuación \eqref{eq:share-up-operacion}:
+
+\begin{equation}\label{eq:share-up-operacion}
+\begin{aligned}
+u_s^{\uparrow}
+    &=\sum_{r\preceq s}\mathcal{B}_{r\rightarrow s}(P_r h_r),\\
+h_s^{+}
+    &=h_s+Q_s\mathcal{N}\!\left(u_s^{\uparrow}\right).
+\end{aligned}
+\end{equation}
+
+\textbf{Ejemplo simplificado.} Supóngase una hoja por color \(h_C\) y otra por color y posición \(h_{CX}\). Las filas representan
+dos colores y las columnas, dos posiciones. Si las demás contribuciones son nulas, la hoja por color se replica sobre el eje espacial,
+como se detalla en la Ecuación \eqref{eq:share-up-ejemplo}:
+
+\begin{equation}\label{eq:share-up-ejemplo}
+\begin{aligned}
+h_C&=\begin{pmatrix}2\\3\end{pmatrix},
+&
+h_{CX}&=\begin{pmatrix}1&0\\0&1\end{pmatrix},\\[2mm]
+\mathcal{B}_{C\rightarrow CX}(h_C)
+	&=\begin{pmatrix}2&2\\3&3\end{pmatrix},
+&
+u_{CX}^{\uparrow}
+    &=h_{CX}+\mathcal{B}_{C\rightarrow CX}(h_C)
+	  =\begin{pmatrix}3&2\\3&4\end{pmatrix}.
+\end{aligned}
+\end{equation}
+
+El valor asociado a cada color queda disponible en todas sus posiciones. En la capa real, esta suma todavía atraviesa la normalización
+y la proyección de retorno antes de incorporarse mediante la conexión residual.
+
+\subsubsection{Selección multi-eje}
+
+La segunda operación corresponde a \texttt{softmax}. Su función es convertir puntuaciones internas en comparaciones relativas. En
+lugar de normalizar siempre sobre un único eje, la capa considera todos los subconjuntos no vacíos de los ejes informativos presentes
+en la hoja. Estos ejes pueden ser el color, la dirección, las filas y las columnas; los ejemplos y los canales nunca forman parte de
+la normalización. Si una hoja contiene \(k\) ejes elegibles, se calculan \(2^k-1\) distribuciones diferentes y se concatenan sobre el
+eje de canales antes de aplicar \(Q_s\).
+
+Sea \(A_s\) el conjunto de ejes elegibles de la hoja \(s\) y sea \(J\) uno de sus subconjuntos no vacíos. Para cada canal interno
+\(q\), los índices pertenecientes a los ejes que no están en \(J\) permanecen fijos. La operación se define mediante la Ecuación
+\eqref{eq:softmax-multieje-operacion}:
+
+\begin{equation}\label{eq:softmax-multieje-operacion}
+\begin{aligned}
+m_{J,\mathbf{i}_{\bar J},q}
+    &=\max_{\mathbf{j}_J}
+      u_s(\mathbf{j}_J,\mathbf{i}_{\bar J},q),\\
+p_J(\mathbf{i},q)
+    &=\frac{\exp\!\left(u_s(\mathbf{i},q)-m_{J,\mathbf{i}_{\bar J},q}\right)}
+      {\displaystyle\sum_{\mathbf{j}_J}
+       \exp\!\left(u_s(\mathbf{j}_J,\mathbf{i}_{\bar J},q)
+       -m_{J,\mathbf{i}_{\bar J},q}\right)},\\
+\Phi_s^{\mathrm{sm}}(u_s)
+    &=\underset{\varnothing\neq J\subseteq A_s}{\operatorname{concat}}p_J(u_s),\\
+h_s^{+}
+    &=h_s+Q_s\Phi_s^{\mathrm{sm}}(P_s h_s).
+\end{aligned}
+\end{equation}
+
+La resta del máximo no cambia las probabilidades, pero evita desbordamientos al calcular la exponencial.
+
+\textbf{Ejemplo simplificado.} Considérese una activación proyectada con dos colores por filas y dos posiciones por columnas. Si se
+elige únicamente el subconjunto formado por el eje de color, cada columna se normaliza por separado, como se observa en la Ecuación
+\eqref{eq:softmax-multieje-ejemplo}:
+
+\begin{equation}\label{eq:softmax-multieje-ejemplo}
+U=\begin{pmatrix}1&0\\0&2\end{pmatrix}
+\quad\Longrightarrow\quad
+\operatorname{softmax}_{C}(U)
+=\begin{pmatrix}
+0{,}731&0{,}119\\
+0{,}269&0{,}881
+\end{pmatrix}.
+\end{equation}
+
+En la primera posición domina el primer color, mientras que en la segunda domina el segundo. Esta matriz es solo una de las
+distribuciones generadas; la implementación calcula también las correspondientes a los demás subconjuntos de ejes. Aunque la llamada
+a la capa solicita una pre-normalización, el envoltorio residual de la versión analizada sobrescribe inmediatamente ese valor con la
+proyección de \(h_s\), por lo que la pre-normalización no interviene efectivamente en este cálculo.
+
+\subsubsection{Máximo acumulado direccional}
+
+La operación \texttt{cummax} proporciona un mecanismo de propagación espacial de largo alcance. Para cada posición conserva el mayor
+valor encontrado desde el inicio del recorrido hasta la celda actual. El sentido del recorrido depende de la orientación y de la paridad
+del canal proyectado, ya que la implementación divide los canales en dos mitades intercaladas que se procesan en sentidos opuestos. Esto
+permite representar condiciones como que una señal ya ha
+aparecido en una fila, que una línea debe prolongarse desde un punto o que se ha alcanzado un límite durante una exploración. La capa
+solo modifica las hojas \texttt{11111} y \texttt{10111}, que contienen ejemplos, direcciones, filas y columnas, con o sin color. En las
+demás hojas se comporta como la identidad.
+
+Sea \(j\preceq_{d,p} i\) la relación que indica que \(j\) precede a \(i\) para la orientación \(d\) y la paridad de canal
+\(p\in\{0,1\}\), y sea \(m_j\) la máscara que determina si la posición es válida. El máximo acumulado y su reescalado al intervalo
+\([-1,1]\) se expresan en la Ecuación \eqref{eq:cummax-operacion}:
+
+\begin{equation}\label{eq:cummax-operacion}
+\begin{aligned}
+c_i^{(d,p)}&=\max\{u_j: j\preceq_{d,p} i,\;m_j=1\},\\
+\widehat{c}_i^{(d,p)}&=2\,\frac{c_i^{(d,p)}-a_{d,p}}{b_{d,p}-a_{d,p}}-1,\\
+h_s^{+}&=h_s+Q_s\mathcal{N}\!\left(\widehat{c}^{(d,p)}\right),
+\end{aligned}
+\end{equation}
+
+mediante la notación simplificada de una sección direccional y una paridad de canal. Los valores \(a_{d,p}\) y \(b_{d,p}\) son,
+respectivamente, el mínimo y el máximo válidos del recorrido. El código añade pequeñas constantes al
+denominador y a los extremos para asegurar la estabilidad numérica. En las direcciones cardinales se usa un máximo acumulado directo;
+en las diagonales se realiza un escaneo asociativo con desplazamientos de tamaño \(1,2,4,\ldots\).
+
+\textbf{Ejemplo simplificado.} Para una paridad de canal cuyo recorrido avanza de izquierda a derecha, el tercer valor deja de ser
+\(1\) porque antes se ha observado un \(2\). Tomando \(a=0\) y \(b=3\), se obtiene la transformación de la Ecuación
+\eqref{eq:cummax-ejemplo}:
+
+\begin{equation}\label{eq:cummax-ejemplo}
+\begin{aligned}
+U&=\begin{pmatrix}0&2&1&3\end{pmatrix},\\
+\operatorname{cummax}(U)
+ &=\begin{pmatrix}0&2&2&3\end{pmatrix},\\
+\widehat{U}
+ &=\begin{pmatrix}-1&\tfrac{1}{3}&\tfrac{1}{3}&1\end{pmatrix}.
+\end{aligned}
+\end{equation}
+
+La señal de valor \(2\) permanece activa hasta que aparece un valor mayor. Después, la rama se normaliza, se proyecta y se suma al
+estado anterior.
+
+\subsubsection{Desplazamiento direccional}
+
+La capa \texttt{shift} introduce comunicación local entre celdas vecinas. Cada sección del eje de dirección se divide en canales pares
+e impares, que se desplazan una posición en sentidos opuestos. Las cuatro orientaciones cardinales modifican una sola coordenada y las
+cuatro diagonales modifican simultáneamente fila y columna. Los valores que salen de la cuadrícula se descartan y las nuevas posiciones
+se rellenan con cero. Como \texttt{cummax}, esta capa solo actúa sobre las hojas \texttt{11111} y \texttt{10111} y utiliza las máscaras
+para anular los valores de origen que pertenecen al relleno.
+
+Para una orientación \(d\) y una paridad de canal \(p\), sea
+\(\Delta_{d,p}=(\Delta_{i,d,p},\Delta_{j,d,p})\) el desplazamiento correspondiente. La transformación se expresa en la Ecuación
+\eqref{eq:shift-operacion}:
+
+\begin{equation}\label{eq:shift-operacion}
+\begin{aligned}
+i'&=i-\Delta_{i,d,p},
+&j'&=j-\Delta_{j,d,p},\\[1mm]
+[S_{d,p}(U)]_{i,j,q}
+&=\mathbb{1}_{\Omega}(i',j')\,m_{i',j'}\,U_{i',j',q},
+\end{aligned}
+\end{equation}
+
+donde \(\Omega\) es el dominio de la cuadrícula y \(\mathbb{1}_{\Omega}(i',j')\) vale uno cuando la posición de origen pertenece
+a dicho dominio y cero en caso contrario. Esta función indicadora representa el relleno con ceros aplicado en los límites.
+
+Si \(S(U)\) representa la colección de los desplazamientos conservados por dirección y paridad de canal, la capa completa queda
+recogida en la Ecuación \eqref{eq:shift-residual}:
+
+\begin{equation}\label{eq:shift-residual}
+h_s^{+}=h_s+Q_s\mathcal{N}\!\left(S(P_s h_s)\right).
+\end{equation}
+
+\textbf{Ejemplo simplificado.} Para una de las dos paridades de canal, al desplazar una columna hacia la derecha una activación situada
+en el centro de una cuadrícula \(3\times3\), se obtiene el resultado de la Ecuación \eqref{eq:shift-ejemplo}:
+
+\begin{equation}\label{eq:shift-ejemplo}
+\begin{pmatrix}
+0&0&0\\
+0&1&0\\
+0&0&0
+\end{pmatrix}
+\xrightarrow{\;\Delta=(0,1)\;}
+\begin{pmatrix}
+0&0&0\\
+0&0&1\\
+0&0&0
+\end{pmatrix}.
+\end{equation}
+
+La salida no se suma a las otras secciones direccionales en este punto. Cada orientación conserva su propia sección y sus dos paridades
+de canal representan sentidos opuestos. Las capas posteriores aprenden cómo combinar esas vistas. La repetición de \texttt{shift} en
+cuatro bloques permite componer desplazamientos que abarcan más de una celda.
+
+\subsubsection{Comunicación entre direcciones}
+
+Después de procesar cada orientación por separado, \texttt{direction\_share} intercambia información entre las ocho direcciones. La
+capa se aplica a todas las hojas que contienen el eje direccional, incluso si no contienen filas o columnas. A diferencia del
+envoltorio residual genérico, esta función implementa directamente una pre-normalización efectiva y acumula cada contribución sobre
+el estado original.
+
+Sea \(z_s=\mathcal{N}(h_s)\) y sea \(A_{s,d_1,d_2}\) el mapa lineal aprendido que lleva información desde la dirección \(d_2\) hasta
+la dirección receptora \(d_1\). Los coeficientes \(c\) no se aprenden, sino que dependen de la separación angular, según la Ecuación
+\eqref{eq:direction-share-operacion}:
+
+\begin{equation}\label{eq:direction-share-operacion}
+\begin{aligned}
+z_s&=\mathcal{N}(h_s),\\
+h_{s,d_1}^{+}
+ &=h_{s,d_1}
+   +\sum_{d_2=0}^{7}
+    c_{(d_2-d_1)\bmod 8}\,
+    A_{s,d_1,d_2}z_{s,d_2},\\
+(c_0,c_1,\ldots,c_7)
+ &=\left(1,0{,}2,0{,}4,0{,}2,1,0{,}2,0{,}4,0{,}2\right).
+\end{aligned}
+\end{equation}
+
+Las direcciones iguales u opuestas reciben peso \(1\), las ortogonales peso \(0{,}4\) y las separadas por un número impar de octavos
+de vuelta peso \(0{,}2\). Los mapas \(A_{s,d_1,d_2}\), en cambio, sí se optimizan durante el entrenamiento.
+
+\textbf{Ejemplo simplificado.} Considérese una posición local de un canal perteneciente al tensor ya normalizado, mapas lineales
+identidad y la dirección \(d_1=0\) como receptora. Los valores de las restantes posiciones del tensor, que no se muestran, son los que
+completan los estadísticos globales de la normalización. Si en la posición observada solo las direcciones \(0\), \(2\) y \(4\)
+contienen información, se obtiene el cálculo de la Ecuación \eqref{eq:direction-share-ejemplo}:
+
+\begin{equation}\label{eq:direction-share-ejemplo}
+\begin{aligned}
+z_s&=\begin{pmatrix}1&0&2&0&3&0&0&0\end{pmatrix},
+& h_{s,0}&=1,\\
+h_{s,0}^{+}
+ &=1+1\cdot1+0{,}4\cdot2+1\cdot3
+ =5{,}8.
+\end{aligned}
+\end{equation}
+
+El resultado reúne en una sola orientación evidencia procedente de la propia dirección, de una dirección ortogonal y de la dirección
+opuesta, respetando la geometría impuesta por los coeficientes.
+
+\subsubsection{Transformación no lineal}
+
+Las proyecciones y sumas anteriores son operaciones lineales por partes. Si todo el bloque estuviera formado únicamente por ellas,
+varias capas consecutivas seguirían teniendo una capacidad expresiva limitada. La función \texttt{nonlinear} proyecta cada hoja a un
+espacio intermedio de 16 canales, aplica SiLU elemento a elemento, devuelve el resultado al número de canales original y lo añade al
+estado de entrada.
+
+La función sigmoide \(\sigma\) actúa como una compuerta suave sobre cada activación y se incorpora al flujo residual mediante la
+Ecuación \eqref{eq:silu-operacion}:
+
+\begin{equation}\label{eq:silu-operacion}
+\begin{aligned}
+\operatorname{SiLU}(u)
+    &=u\,\sigma(u)=\frac{u}{1+e^{-u}},\\
+h_s^{+}
+    &=h_s+Q_s\operatorname{SiLU}(P_s h_s).
+\end{aligned}
+\end{equation}
+
+Los valores positivos grandes se conservan casi por completo, los negativos se atenúan y el cero permanece en cero. La transición es
+continua y diferenciable, lo que facilita la optimización por gradiente.
+
+\textbf{Ejemplo simplificado.} Para reproducir la identidad efectiva alrededor de SiLU, puede imaginarse que \(P_s\) coloca cada
+valor en el primer canal de los 16 disponibles y que \(Q_s\) recupera ese mismo canal. La operación central y su suma residual se
+muestran en la Ecuación \eqref{eq:silu-ejemplo}:
+
+\begin{equation}\label{eq:silu-ejemplo}
+\begin{aligned}
+H&=\begin{pmatrix}-2&0\\1&2\end{pmatrix},\\[1mm]
+\operatorname{SiLU}(H)
+ &\simeq\begin{pmatrix}
+-0{,}238&0\\
+0{,}731&1{,}762
+\end{pmatrix},\\[1mm]
+H^{+}=H+\operatorname{SiLU}(H)
+ &\simeq\begin{pmatrix}
+-2{,}238&0\\
+1{,}731&3{,}762
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+
+La salida muestra que SiLU modifica la intensidad sin convertir la activación en una decisión binaria. Como ocurre en
+\texttt{softmax}, la pre-normalización solicitada en la llamada queda anulada por la sobrescritura existente en el envoltorio residual
+de esta versión.
+
+\subsubsection{Comunicación descendente del Multitensor}
+
+La función \texttt{share\_down} completa el intercambio iniciado por \texttt{share\_up}. En este caso, una hoja compacta recibe
+información de las hojas que contienen sus mismos ejes y otros adicionales. Las dimensiones ausentes en el receptor se eliminan mediante
+promedios. Para determinados ejes espaciales, cuando la relación entre los tamaños de entrada y salida lo permite, el promedio se
+pondera con las máscaras para excluir las celdas de relleno.
+
+Sea \(\mathcal{R}_{t\rightarrow s}\) el operador que reduce los ejes presentes en una hoja superior \(t\) pero ausentes en la hoja
+receptora \(s\). La comunicación descendente se formula en la Ecuación \eqref{eq:share-down-operacion}:
+
+\begin{equation}\label{eq:share-down-operacion}
+\begin{aligned}
+u_s^{\downarrow}
+    &=\sum_{t:\,s\preceq t}
+      \mathcal{R}_{t\rightarrow s}(P_t h_t),\\
+h_s^{+}
+    &=h_s+Q_s\mathcal{N}\!\left(u_s^{\downarrow}\right).
+\end{aligned}
+\end{equation}
+
+\textbf{Ejemplo simplificado.} En una hoja \(CX\), las filas representan dos colores y las columnas dos posiciones. Para obtener una
+contribución destinada a la hoja \(C\), se promedia el eje espacial como se muestra en la Ecuación
+\eqref{eq:share-down-ejemplo}:
+
+\begin{equation}\label{eq:share-down-ejemplo}
+h_{CX}=\begin{pmatrix}1&3\\2&4\end{pmatrix}
+\quad\Longrightarrow\quad
+\mathcal{R}_{CX\rightarrow C}(h_{CX})
+=\begin{pmatrix}
+\frac{1+3}{2}\\[1mm]
+\frac{2+4}{2}
+\end{pmatrix}
+=\begin{pmatrix}2\\3\end{pmatrix}.
+\end{equation}
+
+De este modo, un patrón distribuido por la cuadrícula se convierte en un resumen por color. En la implementación completa se suman
+las reducciones de todas las hojas compatibles, se normaliza el resultado y se incorpora mediante la proyección residual.
+
+\subsubsection{Normalización final}
+
+Cada bloque termina con \texttt{normalize}. Esta función se aplica de forma independiente a cada hoja y a cada canal, pero calcula sus
+estadísticos sobre todos los demás ejes de la hoja. Primero resta la media y después divide por la raíz de la media cuadrática de los
+valores centrados. No introduce parámetros entrenables de escala o sesgo y, a diferencia de las siete operaciones anteriores, no forma
+una rama residual.
+
+Si \(I_k\) es el conjunto de \(N\) posiciones pertenecientes al canal \(k\), la operación se define en la Ecuación
+\eqref{eq:normalizacion-operacion}:
+
+\begin{equation}\label{eq:normalizacion-operacion}
+\begin{aligned}
+\mu_k&=\frac{1}{N}\sum_{i\in I_k}h_{i,k},\\
+\mathcal{N}(h)_{i,k}
+ &=\frac{h_{i,k}-\mu_k}
+ {\sqrt{\displaystyle\varepsilon+
+ \frac{1}{N}\sum_{j\in I_k}(h_{j,k}-\mu_k)^2}},
+ &\varepsilon&=10^{-8}.
+\end{aligned}
+\end{equation}
+
+\textbf{Ejemplo simplificado.} Para una hoja con un único canal y cuatro posiciones se toman los estadísticos de la Ecuación
+\eqref{eq:normalizacion-estadisticos-ejemplo}:
+
+\begin{equation}\label{eq:normalizacion-estadisticos-ejemplo}
+H=\begin{pmatrix}1&2\\3&4\end{pmatrix},
+\qquad
+\mu=2{,}5,
+\qquad
+\frac{1}{4}\sum_{i=1}^{4}(H_i-\mu)^2=1{,}25.
+\end{equation}
+
+Al sustituir estos valores se obtiene el resultado de la Ecuación \eqref{eq:normalizacion-resultado-ejemplo}:
+
+\begin{equation}\label{eq:normalizacion-resultado-ejemplo}
+\mathcal{N}(H)
+=\frac{H-2{,}5}{\sqrt{1{,}25+10^{-8}}}
+\simeq
+\begin{pmatrix}
+-1{,}342&-0{,}447\\
+0{,}447&1{,}342
+\end{pmatrix}.
+\end{equation}
+
+La matriz resultante tiene media nula y una magnitud cuadrática media próxima a uno. Esto impide que las sumas residuales de los cuatro
+bloques aumenten progresivamente la escala de las activaciones y proporciona al bloque siguiente una entrada numéricamente estable.
+
+En conjunto, \texttt{share\_up} y \texttt{share\_down} conectan distintos niveles de detalle; \texttt{softmax} introduce selección
+relativa; \texttt{cummax} y \texttt{shift} realizan propagación espacial; \texttt{direction\_share} integra orientaciones; SiLU
+aporta capacidad no lineal; y \texttt{normalize} mantiene estable el flujo. La repetición de esta secuencia durante cuatro bloques
+permite componer estas operaciones elementales para aproximar transformaciones más complejas de las tareas ARC-AGI.
 
 \subsubsection{Contantes}
 
