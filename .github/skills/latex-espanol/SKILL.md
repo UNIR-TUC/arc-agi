@@ -79,6 +79,7 @@ argument-hint: 'Seccion, objetivo o tarea de redaccion en LaTeX'
 - Parrafos con una idea dominante y transiciones claras.
 - Ningun marcador pendiente sin explicar.
 - Todas las palabras que sean en inglés deben ir en cursiva salvo nombres propios, siglas o comandos LaTeX.
+- Evitar user '\texttt{}' para resaltar palabras en inglés; usar cursiva en su lugar. Si representa una variable usar representacion estilo matematica.
 
 ## Comprobacion Final
 - El texto responde exactamente a la seccion pedida.

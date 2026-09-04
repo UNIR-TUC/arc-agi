@@ -1671,7 +1671,7 @@ la entrada original. Este proceso permite que el modelo capture la incertidumbre
 El espacio latente es un conjunto de variables latentes. Estas variables latentes son características ocultas de los datos, representaciones
 que no son directamente observables en los datos de entrada, pero que capturan información relevante para la generación y reconstrucción de los mismos.
 
-\textit{CompressARC} es un sistema basado en autocodificadores varicionales, hasta cierto punto. Este sistema es mucho más profundo y complejo y contiene
+\textit{CompressARC} es un sistema basado en autocodificadores varicionales, hasta cierto punto. Este sistema es mucho más profundo, complejo y contiene
 un sistema de estructuras con diversas variaciones. Las tareas de ARC-AGI son complejas y variadas. Cada tarea puede contener
 diversos ejemplos, colores, tamaños y patrones diferentes. Todas estas variaciones en los datos deben ser capturados y representados en variables
 latentes. Este proceso es mucho más complejo a simple vista y requiere de un diseño sofisticado. Para poder realizar este cometido,
@@ -1706,7 +1706,39 @@ El flujo completo de entrenamiento en tiempo de inferencia de manera simple podr
 El sistema está basado en el principio de Mínima Longitud de Descripción (MDL). Si el modelo logra describir los ejemplos de entrenamiento de una
 tarea con un código más corto que el código más corto ue el código trivial de enumerar píxeles, entonces significa que ha descubierto la estructura
 de la tarea y esa estructura debería extrapolar al ejemplo de pruebas. Entre dos explicaciones que describen correctamente los datos conocidos, 
-se prefiere la que necesita menos información para expresarse.
+se prefiere la que necesita menos información para expresarse. Formalmente, para un conjunto
+de datos $D$ y un modelo $M$, esta longitud puede expresarse como:
+
+\begin{equation}
+	L(D,M) = L(M) + L(D\mid M),
+	\label{eq:mdl-general}
+\end{equation}
+
+donde $L(M)$ representa la información necesaria para describir el modelo y
+$L(D\mid M)$ representa la información adicional necesaria para describir los datos una vez conocido dicho modelo. En el caso de
+\textit{CompressARC}, esta descomposición se implementa mediante una aproximación diferenciable de la pérdida del VAE, que combina el coste de
+codificar las variables latentes y el coste de reconstruir los las cuadrículas observadas:
+
+\begin{equation}
+	\mathcal{L}_{\mathrm{MDL}} =
+	D_{\mathrm{KL}}\left(q(z)\,\middle\|\,\mathcal{N}(0,I)\right)
+	+ 10 \cdot H\left(\mathrm{logits},\text{cuadrículas observadas}\right),
+	\label{eq:mdl-compressarc}
+\end{equation}
+
+El primer término mide la información específica que debe transportar la distribución latente $q(z)$ con respecto a la distribución previa normal
+estándar, mientras que el segundo penaliza los errores de reconstrucción. El factor $10$ es un coeficiente empírico que equilibra ambos términos.
+Esta expresión es una aproximación diferenciable del principio MDL, restringida a las variables y operaciones de esta arquitectura, por lo que no
+constituye una medida exacta de la longitud mínima de todos los programas capaces de resolver una tarea. Por tanto, una explicación que comprime
+los ejemplos conocidos con menor coste tiene más posibilidades de capturar la estructura de la tarea y extrapolarla al ejemplo de prueba. En esta
+formulación, los píxeles observados incluyen las entradas de prueba, pero no sus salidas, que permanecen ocultas.
+
+
+
+En cada tarea se realiza un bucle de entrenamiento completo. Esto lo convierte en un sistema esencialmente transductivo. Se realiza
+una optimización específica por tarea en vez de un entrenamiento global. No es un modelo inductivo convencional entrenado globalmente para
+una función reutilizable entre tareas. Por decir alguna definición, \textit{CompressARC} es un modelo transductivo por tarea,
+con aprendizaje durante la inferencia y con sesgos inductivos arquitectónicos derivados de características específicas.
 
 \subsection{Pruebas iniciales}
 
@@ -1755,71 +1787,71 @@ $X$ e $Y$ las dimensiones espaciales. El último eje corresponde siempre a los c
 \renewcommand{\arraystretch}{0.9}
 \begin{tabular}{|c|c|p{9.2cm}|}
 	\hline
-	Máscara (\texttt{ECDXY}) & Estado & \multicolumn{1}{c|}{Dimensiones generales o motivo} \\
+	Máscara (\(\mathrm{ECDXY}\)) & Estado & \multicolumn{1}{c|}{Dimensiones generales o motivo} \\
 	\hline
-	\texttt{00000} & Inválido & No contiene ningún eje informativo. \\
+	\(00000\) & Inválido & No contiene ningún eje informativo. \\
 	\hline
-	\texttt{00001} & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\(00001\) & Inválido & El eje $Y$ requiere el eje $E$. \\
 	\hline
-	\texttt{00010} & Inválido & El eje $X$ requiere el eje $E$. \\
+	\(00010\) & Inválido & El eje $X$ requiere el eje $E$. \\
 	\hline
-	\texttt{00011} & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\(00011\) & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
 	\hline
-	\texttt{00100} & Válido & $[D,\mathrm{canal}]$ \\
+	\(00100\) & Válido & $[D,\mathrm{canal}]$ \\
 	\hline
-	\texttt{00101} & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\(00101\) & Inválido & El eje $Y$ requiere el eje $E$. \\
 	\hline
-	\texttt{00110} & Inválido & El eje $X$ requiere el eje $E$. \\
+	\(00110\) & Inválido & El eje $X$ requiere el eje $E$. \\
 	\hline
-	\texttt{00111} & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\(00111\) & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
 	\hline
-	\texttt{01000} & Válido & $[C,\mathrm{canal}]$ \\
+	\(01000\) & Válido & $[C,\mathrm{canal}]$ \\
 	\hline
-	\texttt{01001} & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\(01001\) & Inválido & El eje $Y$ requiere el eje $E$. \\
 	\hline
-	\texttt{01010} & Inválido & El eje $X$ requiere el eje $E$. \\
+	\(01010\) & Inválido & El eje $X$ requiere el eje $E$. \\
 	\hline
-	\texttt{01011} & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\(01011\) & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
 	\hline
-	\texttt{01100} & Válido & $[C,D,\mathrm{canal}]$ \\
+	\(01100\) & Válido & $[C,D,\mathrm{canal}]$ \\
 	\hline
-	\texttt{01101} & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\(01101\) & Inválido & El eje $Y$ requiere el eje $E$. \\
 	\hline
-	\texttt{01110} & Inválido & El eje $X$ requiere el eje $E$. \\
+	\(01110\) & Inválido & El eje $X$ requiere el eje $E$. \\
 	\hline
-	\texttt{01111} & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\(01111\) & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
 	\hline
-	\texttt{10000} & Inválido & Sólo contiene $E$; falta al menos uno de los ejes $C$, $D$, $X$ o $Y$. \\
+	\(10000\) & Inválido & Sólo contiene $E$; falta al menos uno de los ejes $C$, $D$, $X$ o $Y$. \\
 	\hline
-	\texttt{10001} & Válido & $[E,Y,\mathrm{canal}]$ \\
+	\(10001\) & Válido & $[E,Y,\mathrm{canal}]$ \\
 	\hline
-	\texttt{10010} & Válido & $[E,X,\mathrm{canal}]$ \\
+	\(10010\) & Válido & $[E,X,\mathrm{canal}]$ \\
 	\hline
-	\texttt{10011} & Válido & $[E,X,Y,\mathrm{canal}]$ \\
+	\(10011\) & Válido & $[E,X,Y,\mathrm{canal}]$ \\
 	\hline
-	\texttt{10100} & Válido & $[E,D,\mathrm{canal}]$ \\
+	\(10100\) & Válido & $[E,D,\mathrm{canal}]$ \\
 	\hline
-	\texttt{10101} & Válido & $[E,D,Y,\mathrm{canal}]$ \\
+	\(10101\) & Válido & $[E,D,Y,\mathrm{canal}]$ \\
 	\hline
-	\texttt{10110} & Válido & $[E,D,X,\mathrm{canal}]$ \\
+	\(10110\) & Válido & $[E,D,X,\mathrm{canal}]$ \\
 	\hline
-	\texttt{10111} & Válido & $[E,D,X,Y,\mathrm{canal}]$ \\
+	\(10111\) & Válido & $[E,D,X,Y,\mathrm{canal}]$ \\
 	\hline
-	\texttt{11000} & Válido & $[E,C,\mathrm{canal}]$ \\
+	\(11000\) & Válido & $[E,C,\mathrm{canal}]$ \\
 	\hline
-	\texttt{11001} & Válido & $[E,C,Y,\mathrm{canal}]$ \\
+	\(11001\) & Válido & $[E,C,Y,\mathrm{canal}]$ \\
 	\hline
-	\texttt{11010} & Válido & $[E,C,X,\mathrm{canal}]$ \\
+	\(11010\) & Válido & $[E,C,X,\mathrm{canal}]$ \\
 	\hline
-	\texttt{11011} & Válido & $[E,C,X,Y,\mathrm{canal}]$ \\
+	\(11011\) & Válido & $[E,C,X,Y,\mathrm{canal}]$ \\
 	\hline
-	\texttt{11100} & Válido & $[E,C,D,\mathrm{canal}]$ \\
+	\(11100\) & Válido & $[E,C,D,\mathrm{canal}]$ \\
 	\hline
-	\texttt{11101} & Válido & $[E,C,D,Y,\mathrm{canal}]$ \\
+	\(11101\) & Válido & $[E,C,D,Y,\mathrm{canal}]$ \\
 	\hline
-	\texttt{11110} & Válido & $[E,C,D,X,\mathrm{canal}]$ \\
+	\(11110\) & Válido & $[E,C,D,X,\mathrm{canal}]$ \\
 	\hline
-	\texttt{11111} & Válido & $[E,C,D,X,Y,\mathrm{canal}]$ \\
+	\(11111\) & Válido & $[E,C,D,X,Y,\mathrm{canal}]$ \\
 	\hline
 \end{tabular}
 \caption{Combinaciones dimensionales del sistema Multitensor.}
@@ -1841,7 +1873,7 @@ los demás de forma controlada.
 
 El eje de direcciones del Multitensor tiene 8 dimensiones fijas. Estas direcciones cubren un grupo diédrico con el conjunto de simetrías
 de un cuadrado, es decir, todas las formas de moverlo. Las formas de moverlo más habituales es mediante rotaciones o reflexiones, de manera
-que vuelve a ocupar exactamente la misma posición. Ña operación del grupo es componer simetrías, es decir, aplicar una tras otra. Está formada
+que vuelve a ocupar exactamente la misma posición. La operación del grupo es componer simetrías, es decir, aplicar una tras otra. Está formada
 por 8 elementos, correspondientes a las 4 rotaciones y 4 reflexiones posibles de un cuadrado. Básicamente describe todas las maneras de mover 
 un cuadrado sin cambiar su apariencia geométrica.
 
@@ -1892,7 +1924,7 @@ ecuaciones anteriores y las de cada apartado conservan el flujo completo de la i
 
 \subsubsection{Comunicación ascendente del Multitensor}
 
-La primera operación del bloque corresponde a \texttt{share\_up}. Su objetivo es trasladar regularidades expresadas en hojas
+La primera operación del bloque corresponde a \textit{share up}. Su objetivo es trasladar regularidades expresadas en hojas
 compactas hacia hojas más específicas. Por ejemplo, una señal que depende solo del color puede resultar relevante para una
 representación que, además del color, distingue cada ejemplo y cada posición de la cuadrícula. Sin esta comunicación, las hojas del
 Multitensor evolucionarían como representaciones independientes y la información descubierta en una de ellas no podría utilizarse en
@@ -1912,7 +1944,7 @@ h_s^{+}
 \end{aligned}
 \end{equation}
 
-\textbf{Ejemplo simplificado.} Supóngase una hoja por color \(h_C\) y otra por color y posición \(h_{CX}\). Las filas representan
+\textbf{Ejemplo simplificado.} Suponiendo una hoja por color \(h_C\) y otra por color y posición \(h_{CX}\). Las filas representan
 dos colores y las columnas, dos posiciones. Si las demás contribuciones son nulas, la hoja por color se replica sobre el eje espacial,
 como se detalla en la Ecuación \eqref{eq:share-up-ejemplo}:
 
@@ -1935,7 +1967,7 @@ y la proyección de retorno antes de incorporarse mediante la conexión residual
 
 \subsubsection{Selección multi-eje}
 
-La segunda operación corresponde a \texttt{softmax}. Su función es convertir puntuaciones internas en comparaciones relativas. En
+La segunda operación corresponde a \textit{softmax}. Su función es convertir puntuaciones internas en comparaciones relativas. En
 lugar de normalizar siempre sobre un único eje, la capa considera todos los subconjuntos no vacíos de los ejes informativos presentes
 en la hoja. Estos ejes pueden ser el color, la dirección, las filas y las columnas; los ejemplos y los canales nunca forman parte de
 la normalización. Si una hoja contiene \(k\) ejes elegibles, se calculan \(2^k-1\) distribuciones diferentes y se concatenan sobre el
@@ -1985,12 +2017,12 @@ proyección de \(h_s\), por lo que la pre-normalización no interviene efectivam
 
 \subsubsection{Máximo acumulado direccional}
 
-La operación \texttt{cummax} proporciona un mecanismo de propagación espacial de largo alcance. Para cada posición conserva el mayor
+La operación \textit{cummax} proporciona un mecanismo de propagación espacial de largo alcance. Para cada posición conserva el mayor
 valor encontrado desde el inicio del recorrido hasta la celda actual. El sentido del recorrido depende de la orientación y de la paridad
 del canal proyectado, ya que la implementación divide los canales en dos mitades intercaladas que se procesan en sentidos opuestos. Esto
 permite representar condiciones como que una señal ya ha
 aparecido en una fila, que una línea debe prolongarse desde un punto o que se ha alcanzado un límite durante una exploración. La capa
-solo modifica las hojas \texttt{11111} y \texttt{10111}, que contienen ejemplos, direcciones, filas y columnas, con o sin color. En las
+solo modifica las hojas \(11111\) y \(10111\), que contienen ejemplos, direcciones, filas y columnas, con o sin color. En las
 demás hojas se comporta como la identidad.
 
 Sea \(j\preceq_{d,p} i\) la relación que indica que \(j\) precede a \(i\) para la orientación \(d\) y la paridad de canal
@@ -2029,10 +2061,10 @@ estado anterior.
 
 \subsubsection{Desplazamiento direccional}
 
-La capa \texttt{shift} introduce comunicación local entre celdas vecinas. Cada sección del eje de dirección se divide en canales pares
+La capa \textit{shift} introduce comunicación local entre celdas vecinas. Cada sección del eje de dirección se divide en canales pares
 e impares, que se desplazan una posición en sentidos opuestos. Las cuatro orientaciones cardinales modifican una sola coordenada y las
 cuatro diagonales modifican simultáneamente fila y columna. Los valores que salen de la cuadrícula se descartan y las nuevas posiciones
-se rellenan con cero. Como \texttt{cummax}, esta capa solo actúa sobre las hojas \texttt{11111} y \texttt{10111} y utiliza las máscaras
+se rellenan con cero. Como \textit{cummax}, esta capa solo actúa sobre las hojas \(11111\) y \(10111\) y utiliza las máscaras
 para anular los valores de origen que pertenecen al relleno.
 
 Para una orientación \(d\) y una paridad de canal \(p\), sea
@@ -2076,12 +2108,12 @@ en el centro de una cuadrícula \(3\times3\), se obtiene el resultado de la Ecua
 \end{equation}
 
 La salida no se suma a las otras secciones direccionales en este punto. Cada orientación conserva su propia sección y sus dos paridades
-de canal representan sentidos opuestos. Las capas posteriores aprenden cómo combinar esas vistas. La repetición de \texttt{shift} en
+de canal representan sentidos opuestos. Las capas posteriores aprenden cómo combinar esas vistas. La repetición de \textit{shift} en
 cuatro bloques permite componer desplazamientos que abarcan más de una celda.
 
 \subsubsection{Comunicación entre direcciones}
 
-Después de procesar cada orientación por separado, \texttt{direction\_share} intercambia información entre las ocho direcciones. La
+Después de procesar cada orientación por separado, \textit{direction\_share} intercambia información entre las ocho direcciones. La
 capa se aplica a todas las hojas que contienen el eje direccional, incluso si no contienen filas o columnas. A diferencia del
 envoltorio residual genérico, esta función implementa directamente una pre-normalización efectiva y acumula cada contribución sobre
 el estado original.
@@ -2127,7 +2159,7 @@ opuesta, respetando la geometría impuesta por los coeficientes.
 \subsubsection{Transformación no lineal}
 
 Las proyecciones y sumas anteriores son operaciones lineales por partes. Si todo el bloque estuviera formado únicamente por ellas,
-varias capas consecutivas seguirían teniendo una capacidad expresiva limitada. La función \texttt{nonlinear} proyecta cada hoja a un
+varias capas consecutivas seguirían teniendo una capacidad expresiva limitada. La función \textit{nonlinear} proyecta cada hoja a un
 espacio intermedio de 16 canales, aplica SiLU elemento a elemento, devuelve el resultado al número de canales original y lo añade al
 estado de entrada.
 
@@ -2167,18 +2199,18 @@ H^{+}=H+\operatorname{SiLU}(H)
 \end{equation}
 
 La salida muestra que SiLU modifica la intensidad sin convertir la activación en una decisión binaria. Como ocurre en
-\texttt{softmax}, la pre-normalización solicitada en la llamada queda anulada por la sobrescritura existente en el envoltorio residual
+\textit{softmax}, la pre-normalización solicitada en la llamada queda anulada por la sobrescritura existente en el envoltorio residual
 de esta versión.
 
 \subsubsection{Comunicación descendente del Multitensor}
 
-La función \texttt{share\_down} completa el intercambio iniciado por \texttt{share\_up}. En este caso, una hoja compacta recibe
+La función \textit{share\_down} completa el intercambio iniciado por \textit{share\_up}. En este caso, una hoja compacta recibe
 información de las hojas que contienen sus mismos ejes y otros adicionales. Las dimensiones ausentes en el receptor se eliminan mediante
 promedios. Para determinados ejes espaciales, cuando la relación entre los tamaños de entrada y salida lo permite, el promedio se
 pondera con las máscaras para excluir las celdas de relleno.
 
 Sea \(\mathcal{R}_{t\rightarrow s}\) el operador que reduce los ejes presentes en una hoja superior \(t\) pero ausentes en la hoja
-receptora \(s\). La comunicación descendente se formula en la Ecuación \eqref{eq:share-down-operacion}:
+receptora \(s\). La comunicación descendente se formula en la Ecuación \eqref{eq:share-down-operacion} (\textit{share\_down}):
 
 \begin{equation}\label{eq:share-down-operacion}
 \begin{aligned}
@@ -2210,7 +2242,7 @@ las reducciones de todas las hojas compatibles, se normaliza el resultado y se i
 
 \subsubsection{Normalización final}
 
-Cada bloque termina con \texttt{normalize}. Esta función se aplica de forma independiente a cada hoja y a cada canal, pero calcula sus
+Cada bloque termina con \textit{normalize}. Esta función se aplica de forma independiente a cada hoja y a cada canal, pero calcula sus
 estadísticos sobre todos los demás ejes de la hoja. Primero resta la media y después divide por la raíz de la media cuadrática de los
 valores centrados. No introduce parámetros entrenables de escala o sesgo y, a diferencia de las siete operaciones anteriores, no forma
 una rama residual.
@@ -2255,20 +2287,30 @@ Al sustituir estos valores se obtiene el resultado de la Ecuación \eqref{eq:nor
 La matriz resultante tiene media nula y una magnitud cuadrática media próxima a uno. Esto impide que las sumas residuales de los cuatro
 bloques aumenten progresivamente la escala de las activaciones y proporciona al bloque siguiente una entrada numéricamente estable.
 
-En conjunto, \texttt{share\_up} y \texttt{share\_down} conectan distintos niveles de detalle; \texttt{softmax} introduce selección
-relativa; \texttt{cummax} y \texttt{shift} realizan propagación espacial; \texttt{direction\_share} integra orientaciones; SiLU
-aporta capacidad no lineal; y \texttt{normalize} mantiene estable el flujo. La repetición de esta secuencia durante cuatro bloques
+En conjunto, \textit{share\_up} y \textit{share\_down} conectan distintos niveles de detalle. \textit{softmax} introduce selección
+\textit{cummax} y \textit{shift} realizan propagación espacial; \textit{direction\_share} integra orientaciones. SiLU
+aporta capacidad no lineal y \textit{normalize} mantiene estable el flujo. La repetición de esta secuencia durante cuatro bloques
 permite componer estas operaciones elementales para aproximar transformaciones más complejas de las tareas ARC-AGI.
 
 \subsubsection{Contantes}
 
-
-
 %\subsection{Función de error}
 
-\subsection{Ejemplo de entrenamiento al detalle}
+% \subsection{Ejemplo de entrenamiento al detalle}
 
 \subsection{Limitaciones}
+
+El autor \citeauthor{liao2025arcagiwithoutpretraining} \citeyear{liao2025arcagiwithoutpretraining} deja claro en su trabajo lo que el modelo sabe y
+no sabe hacer. Entre las habilidades del modelo se podría resumir en lo siguiente:
+
+\begin{itemize}
+	\item Completar patrones espaciales (extensión de líneas, propagación de colores).
+	\item Llenar regiones cerradas.
+	\item Detectar y completar simetrías como espejos, rotaciones y traslaciones.
+	\item Agrupar, reagrupar y reordenar objetos.
+	\item Aplicar transformaciones afines simples a regiones.
+	\item Identificar el objeto "distinto" en una colección uniforme.
+\end{itemize}
 
 \section{Ejes de mejora}
 
