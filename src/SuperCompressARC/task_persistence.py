@@ -75,7 +75,8 @@ def is_complete_logger(logger_data):
     )
 
 
-def save_task_partial(split, task_name, n_steps, solution, logger_data):
+def save_task_partial(split, task_name, n_steps, solution, logger_data,
+                      state_dir=None):
     """Atomically persist one complete Phase-2 task result.
 
     The function is intentionally strict: returning success without a durable
@@ -86,7 +87,7 @@ def save_task_partial(split, task_name, n_steps, solution, logger_data):
     if not is_complete_logger(logger_data):
         raise ValueError(f'cannot persist {task_name}: logger data is incomplete')
 
-    directory = partial_dir(split)
+    directory = partial_dir(split, state_dir)
     os.makedirs(directory, exist_ok=True)
     path = os.path.join(directory, f'{safe_task_name(task_name)}.json')
     tmp = path + '.tmp'
@@ -115,11 +116,11 @@ def save_task_partial(split, task_name, n_steps, solution, logger_data):
     return path
 
 
-def load_task_partials(split, task_names, n_steps):
+def load_task_partials(split, task_names, n_steps, state_dir=None):
     """Return complete matching solutions and loggers from an earlier run."""
     solutions = {}
     loggers = {}
-    directory = partial_dir(split)
+    directory = partial_dir(split, state_dir)
     if not os.path.isdir(directory):
         return solutions, loggers
 

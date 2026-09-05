@@ -5,6 +5,8 @@ import torch
 np.random.seed(0)
 torch.manual_seed(0)
 
+SEED_MERGE_POLICY = 'consensus_plus_seed_normalized_diversity_v2'
+
 class Logger:
     """
     This class contains functionalities relating to the recording of model outputs, postprocessing,
@@ -252,6 +254,53 @@ def _solution_to_lists(solution):
     return [[list(row) for row in example] for example in solution]
 
 
+def _finite_logsumexp(scores):
+    finite_scores = np.asarray([
+        score for score in scores if np.isfinite(score)
+    ], dtype=float)
+    if finite_scores.size == 0:
+        return -np.inf
+    max_score = float(np.max(finite_scores))
+    return float(
+        max_score + np.log(np.exp(finite_scores - max_score).sum())
+    )
+
+
+def _rank_merged_hashes(aggregate_scores, seed_scores):
+    finite_aggregate = {
+        hashed: score for hashed, score in aggregate_scores.items()
+        if np.isfinite(score)
+    }
+    if not finite_aggregate:
+        return []
+    consensus = sorted(
+        finite_aggregate,
+        key=lambda hashed: (-finite_aggregate[hashed], hashed),
+    )
+    first = consensus[0]
+
+    diversity_scores = {}
+    for scores in seed_scores.values():
+        normalizer = _finite_logsumexp(scores.values())
+        if not np.isfinite(normalizer):
+            continue
+        for hashed, score in scores.items():
+            if np.isfinite(score):
+                diversity_scores[hashed] = max(
+                    diversity_scores.get(hashed, -np.inf),
+                    score - normalizer,
+                )
+    alternatives = [hashed for hashed in diversity_scores if hashed != first]
+    second = (
+        min(
+            alternatives,
+            key=lambda hashed: (-diversity_scores[hashed], hashed),
+        )
+        if alternatives else (consensus[1] if len(consensus) > 1 else first)
+    )
+    return [first, second]
+
+
 def merge_seed_logger_data(seed_loggers):
     """Merge independent seed evidence into one deterministic logical logger."""
     if not seed_loggers:
@@ -268,36 +317,40 @@ def merge_seed_logger_data(seed_loggers):
     merged_contributions = []
     merged_picks = []
     running_scores = {}
+    seed_running_scores = {seed: {} for seed, _ in ordered}
     for train_step in range(lengths.pop()):
         step_contributions = []
-        for _, logger_data in ordered:
-            step_contributions.extend(
-                logger_data['solution_contributions_log'][train_step]
-            )
+        for seed, logger_data in ordered:
+            seed_contributions = logger_data[
+                'solution_contributions_log'
+            ][train_step]
+            step_contributions.extend(seed_contributions)
+            for hashed_solution, score in seed_contributions:
+                seed_running_scores[seed][hashed_solution] = float(np.logaddexp(
+                    seed_running_scores[seed].get(hashed_solution, -np.inf),
+                    score,
+                ))
         merged_contributions.append(step_contributions)
         for hashed_solution, score in step_contributions:
             running_scores[hashed_solution] = float(np.logaddexp(
                 running_scores.get(hashed_solution, -np.inf), score
             ))
-        ranked_hashes = [
-            hashed_solution
-            for hashed_solution, _ in sorted(
-                running_scores.items(),
-                key=lambda item: (-item[1], item[0]),
-            )
-            if running_scores[hashed_solution] > -np.inf
-        ]
+        ranked_hashes = _rank_merged_hashes(
+            running_scores, seed_running_scores
+        )
         if not ranked_hashes:
             merged_picks.append([hash(None), hash(None)])
-        elif len(ranked_hashes) == 1:
-            merged_picks.append([ranked_hashes[0], ranked_hashes[0]])
         else:
-            merged_picks.append(ranked_hashes[:2])
+            merged_picks.append(ranked_hashes)
 
     merged_by_solution = {}
     solution_by_hash = {}
     for seed, logger_data in ordered:
-        for candidate in logger_data.get('candidate_evidence', []):
+        seed_candidates = logger_data.get('candidate_evidence', [])
+        seed_normalizer = _finite_logsumexp(
+            float(candidate['score']) for candidate in seed_candidates
+        )
+        for candidate in seed_candidates:
             solution = _canonical_solution(candidate['solution'])
             hashed_solution = int(candidate['hash'])
             previous = solution_by_hash.get(hashed_solution)
@@ -315,12 +368,19 @@ def merge_seed_logger_data(seed_loggers):
                     'hash': hashed_solution,
                     'solution': solution,
                     'score': float(candidate['score']),
+                    'max_normalized_score': (
+                        float(candidate['score']) - seed_normalizer
+                    ),
                     'first_seen': first_seen,
                 }
             else:
                 record['score'] = float(np.logaddexp(
                     record['score'], candidate['score']
                 ))
+                record['max_normalized_score'] = max(
+                    record['max_normalized_score'],
+                    float(candidate['score']) - seed_normalizer,
+                )
                 record['first_seen'] = min(record['first_seen'], first_seen)
 
     ranked_candidates = sorted(
@@ -333,12 +393,26 @@ def merge_seed_logger_data(seed_loggers):
     )
     if not ranked_candidates:
         raise ValueError('seed loggers contain no candidate evidence')
-    if len(ranked_candidates) == 1:
-        ranked_candidates.append(ranked_candidates[0])
+    first_candidate = ranked_candidates[0]
+    diversity_candidates = [
+        candidate for candidate in ranked_candidates
+        if candidate['solution'] != first_candidate['solution']
+    ]
+    second_candidate = (
+        min(
+            diversity_candidates,
+            key=lambda candidate: (
+                -candidate['max_normalized_score'],
+                candidate['first_seen'],
+                candidate['hash'],
+            ),
+        )
+        if diversity_candidates else first_candidate
+    )
 
     attempts = []
-    first_solution = ranked_candidates[0]['solution']
-    second_solution = ranked_candidates[1]['solution']
+    first_solution = first_candidate['solution']
+    second_solution = second_candidate['solution']
     for example_num in range(len(first_solution)):
         attempts.append({
             'attempt_1': [list(row) for row in first_solution[example_num]],
@@ -349,9 +423,11 @@ def merge_seed_logger_data(seed_loggers):
         'hash': candidate['hash'],
         'solution': _solution_to_lists(candidate['solution']),
         'score': candidate['score'],
+        'max_normalized_score': candidate['max_normalized_score'],
         'first_seen': list(candidate['first_seen']),
     } for candidate in ranked_candidates]
     return attempts, {
+        'merge_policy': SEED_MERGE_POLICY,
         'solution_contributions_log': merged_contributions,
         'solution_picks_history': merged_picks,
         'candidate_evidence': merged_evidence,

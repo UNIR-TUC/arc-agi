@@ -749,6 +749,13 @@ def _eje_b_comparison_errors(before, after):
                 errors.append(f'{field} differs between runs')
     return errors
 
+
+def _uses_eje_b(summary):
+    return any(
+        run.get('accel', {}).get('eje_b')
+        for run in summary.get('run_metadata') or []
+    )
+
 def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.0):
     with open(before_path) as f:
         b = json.load(f)
@@ -801,9 +808,11 @@ def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.
             print(f'  INVALID EJE B COMPARISON: {error}')
         print('=' * 66 + '\n')
         return 4
+    eje_b_comparison = _uses_eje_b(a)
 
     print('\n  Throughput / speed (higher is better):')
-    line('wall_time_s', b['wall_time_s'], a['wall_time_s'], 'lower', ' s')
+    line('wall_time_s', b['wall_time_s'], a['wall_time_s'],
+         None if eje_b_comparison else 'lower', ' s')
     # Phase-2 throughput first: it isolates training speed from the Phase-1
     # measurement, which can dominate the wall clock and invert the verdict.
     line('steps_per_s_phase2',
@@ -815,14 +824,20 @@ def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.
          get(b, 'efficiency', 'steps_per_s_aggregate'),
          get(a, 'efficiency', 'steps_per_s_aggregate'), 'higher')
     line('workers_per_hour', b['throughput']['workers_per_hour'],
-         a['throughput']['workers_per_hour'], 'higher')
+         a['throughput']['workers_per_hour'],
+         None if eje_b_comparison else 'higher')
     line('mean_worker_lifetime_s', b['throughput']['mean_worker_lifetime_s'],
          a['throughput']['mean_worker_lifetime_s'], 'lower', ' s')
 
     print(f'\n  CPU pressure (must NOT get worse; ±{cpu_tolerance_pp} pp is noise):')
     cpu_ok = []
-    cpu_ok.append(line('cpu_mean_pct', b['cpu']['mean_pct'], a['cpu']['mean_pct'],
-                       'lower', ' %', tolerance=cpu_tolerance_pp))
+    mean_cpu_ok = line(
+        'cpu_mean_pct', b['cpu']['mean_pct'], a['cpu']['mean_pct'],
+        None if eje_b_comparison else 'lower', ' %',
+        tolerance=cpu_tolerance_pp,
+    )
+    if not eje_b_comparison:
+        cpu_ok.append(mean_cpu_ok)
     cpu_ok.append(line('cpu_saturation_fraction',
                        b['cpu']['saturation_fraction'], a['cpu']['saturation_fraction'],
                        'lower', '', pct=True))
@@ -844,7 +859,8 @@ def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.
     line('energy_wh_per_1k_steps', get(b, 'efficiency', 'energy_wh_per_1k_steps'),
          get(a, 'efficiency', 'energy_wh_per_1k_steps'), 'lower', ' Wh')
     line('energy_wh_per_worker', get(b, 'efficiency', 'energy_wh_per_worker'),
-         get(a, 'efficiency', 'energy_wh_per_worker'), 'lower', ' Wh')
+         get(a, 'efficiency', 'energy_wh_per_worker'),
+         None if eje_b_comparison else 'lower', ' Wh')
 
     print('\n  Accuracy (must NOT get worse):')
     b_solved = get(b, 'accuracy', 'solved_fraction')
@@ -882,7 +898,10 @@ def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.
         print('  ⚠  CPU pressure INCREASED — this change worsens the bottleneck.')
         print('=' * 66 + '\n')
         return 2
-    print('  ✓  CPU pressure did not get worse and pass@2 held up.')
+    if eje_b_comparison:
+        print('  ✓  CPU saturation did not get worse and pass@2 held up.')
+    else:
+        print('  ✓  CPU pressure did not get worse and pass@2 held up.')
     print('=' * 66 + '\n')
     return 0
 

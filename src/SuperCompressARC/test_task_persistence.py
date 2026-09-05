@@ -148,6 +148,25 @@ class TaskPersistenceTests(unittest.TestCase):
             ({}, {}),
         )
 
+    def test_legacy_partial_can_be_isolated_by_state_dir(self):
+        task_persistence.save_task_partial(
+            'training', '007bbfb7', 2000,
+            self.solution, self.logger_data, state_dir='isolated',
+        )
+
+        self.assertEqual(
+            task_persistence.load_task_partials(
+                'training', ['007bbfb7'], 2000, state_dir='isolated'
+            ),
+            ({'007bbfb7': self.solution}, {'007bbfb7': self.logger_data}),
+        )
+        self.assertEqual(
+            task_persistence.load_task_partials(
+                'training', ['007bbfb7'], 2000
+            ),
+            ({}, {}),
+        )
+
     def test_recovery_manifest_round_trip_is_iteration_scoped(self):
         failure = {
             'stage': 'training',

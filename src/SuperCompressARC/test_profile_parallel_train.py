@@ -46,6 +46,10 @@ class EjeBComparisonContractTests(unittest.TestCase):
             [],
         )
 
+    def test_eje_b_detection_uses_run_metadata(self):
+        self.assertTrue(profile_parallel_train._uses_eje_b(summary(True)))
+        self.assertFalse(profile_parallel_train._uses_eje_b(summary(False)))
+
     def test_metadata_prefers_steps_executed_in_resumed_attempt(self):
         with tempfile.TemporaryDirectory() as directory:
             path = os.path.join(directory, 'run_metadata_training.json')

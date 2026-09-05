@@ -101,6 +101,37 @@ class SeedMergeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'same number of steps'):
             solution_selection.merge_seed_logger_data({0: one_step, 1: two_steps})
 
+    def test_second_attempt_preserves_confident_single_seed_diversity(self):
+        consensus = (((1,),),)
+        runner_up = (((2,),),)
+        diverse = (((3,),),)
+        seeds = {
+            0: logger_data(
+                [[(hash(consensus), 5.0), (hash(runner_up), 4.0)]],
+                [candidate(consensus, 5.0), candidate(runner_up, 4.0)],
+            ),
+            1: logger_data(
+                [[(hash(consensus), 5.0), (hash(runner_up), 4.0)]],
+                [candidate(consensus, 5.0), candidate(runner_up, 4.0)],
+            ),
+            2: logger_data(
+                [[(hash(diverse), 3.0), (0, -np.inf)]],
+                [candidate(diverse, 3.0)],
+            ),
+        }
+
+        attempts, merged = solution_selection.merge_seed_logger_data(seeds)
+
+        self.assertEqual(attempts[0]['attempt_1'], [[1]])
+        self.assertEqual(attempts[0]['attempt_2'], [[3]])
+        self.assertEqual(
+            merged['merge_policy'], solution_selection.SEED_MERGE_POLICY
+        )
+        self.assertEqual(
+            merged['solution_picks_history'][-1],
+            [hash(consensus), hash(diverse)],
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

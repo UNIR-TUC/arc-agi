@@ -85,7 +85,7 @@ class SolveTaskFailureTests(unittest.TestCase):
             materialize_curves=mock.Mock(),
         )
 
-        def assert_not_published(*args):
+        def assert_not_published(*args, **kwargs):
             self.assertEqual(memory_dict, {})
             self.assertEqual(solutions_dict, {})
             self.assertEqual(loggers_dict, {})

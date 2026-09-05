@@ -2046,6 +2046,15 @@ Integración: una nueva capa entre `direction_share` y `nonlinear` que aplique `
 
 Este eje no añade primitivas nuevas: explota mejor las existentes mediante mejoras al flujo de entrenamiento. Las propuestas son **ortogonales** a las del eje A y deberían validarse primero porque son baratas y reducen la varianza de los experimentos posteriores.
 
+> **Estado de implementación (2026-09-05).** El eje B está integrado en
+> `AccelConfig` y sólo puede ejecutarse con el preset `compile` del eje D. El
+> gate de 11 tareas conservó 11/11; en un demo de 30 tareas, el control y la
+> fusión raw obtuvieron 11/30. Las cuatro trayectorias resolvieron 9, 9, 13 y 10
+> tareas, con una unión oracle de 14. Un replay target-only que reserva el segundo
+> intento para diversidad normalizada obtuvo 12/30 sin reentrenar. Esta política
+> se eligió post-hoc sobre el mismo demo y requiere validación held-out. Véanse diseño,
+> comandos y medidas en [EJE_B_IMPLEMENTACION.md](EJE_B_IMPLEMENTACION.md).
+
 #### 9.4.1 KL floor con free-bits scheduling
 
 **Problema atacado**: §8.2.4 (posterior collapse: 14 de 18 tensores caen a KL≈0 y no se recuperan).
@@ -2058,15 +2067,29 @@ $$
 
 Con umbral $\tau$. Mientras $\text{KL}_i < \tau$, su contribución es constante (gradiente nulo respecto a $\mu_i, \sigma_i$), lo que libera al modelo de la presión de comprimir ese tensor a 0. Una vez $\text{KL}_i > \tau$, vuelve a la pérdida estándar.
 
-Apéndice K.3 del paper Liao & Gu sugiere exactamente esto, con la mejora de **scheduling decreciente**: $\tau_t = \tau_0 \cdot (1 - t/T)$. En las iteraciones tempranas $\tau$ es alto (≈ 2 nats), forzando a todos los tensores a transportar información; al final $\tau \to 0$ y la pérdida converge a la original (preservando garantías MDL).
+El Apéndice K.3 del paper Liao & Gu sugiere explorar un floor que empiece alto
+y decaiga a cero, después de indicar que su floor fijo no consiguió recuperar
+tensores. La implementación usa $\tau_t = \tau_0 \cdot (1-t/(T-1))$ con
+$\tau_0=2$ nats como elección experimental propia. Por debajo de $\tau_t$ el
+floor elimina el gradiente compresivo, pero no fuerza por sí mismo a que el
+tensor transporte información. Al final $\tau_t=0$ y se recupera la pérdida
+original.
 
 **MDL accounting**: $\tau$ es un hiperparámetro escalar; añade 4 bytes a θ ⇒ irrelevante. La pérdida final converge a la original, así que el techo MDL no se ve afectado, sólo la trayectoria de optimización.
 
 **Coste sobre RX 9070 XT**: cero adicional. Sólo cambia la lógica de [train.py:106](../../train.py#L106) por un `max(τ_t, KL_i)` por tensor.
 
-**Impacto esperado**: el Apéndice K.3 del paper estima que rescatar 4–6 tensores más subiría el pass@2 promedio ~3–5 puntos. Combinado con multi-seed (§9.4.2), debería **eliminar la varianza** entre runs (actualmente alta — los autores reconocen "lucky runs").
+**Resultado medido**: en las 120 trayectorias del demo de 30 tareas hubo al
+menos una hoja bajo el floor en el 66,38 % de los pasos, con 6,139 hojas bajo
+umbral de media y 16 como máximo. Esto demuestra que el mecanismo intervino,
+pero el demo no permite atribuir por separado una mejora de pass@2 al floor.
 
-**Evidencia empírica y fundamento REC**: la §5.2.1 y la Figura 6 de este documento muestran un caso donde un tensor crítico (`[color, direction, channel]`) casi colapsa y se **rescata** alrededor de la iteración 200, momento a partir del cual aparecen las muestras correctas — evidencia directa de que el colapso es reversible y de que un floor lo estabilizaría. Además, la interpretación por **Relative Entropy Coding** (Apéndice B del paper) da fundamento al free-bits: como la KL de cada tensor son los **bits reales** de su semilla, forzar un mínimo $\tau$ equivale a reservar un presupuesto de información no-negativo, y al hacer $\tau \to 0$ la pérdida converge exactamente al MDL óptimo. El free-bits no es, por tanto, una heurística sino una modificación *principiada* de la trayectoria de optimización.
+**Evidencia empírica y fundamento REC**: la §5.2.1 y la Figura 6 muestran un
+caso donde un tensor crítico se recupera alrededor de la iteración 200. REC
+motiva interpretar la KL como coste esperado del código. Free-bits modifica la
+trayectoria de optimización de ese coste y converge a la pérdida original al
+final del schedule; sigue siendo una heurística de optimización cuya utilidad
+debe medirse, no una garantía de recuperación ni de optimalidad MDL.
 
 #### 9.4.2 	 multi-semilla en paralelo (free pass@N → pass@2)
 
@@ -2079,8 +2102,11 @@ Apéndice K.3 del paper Liao & Gu sugiere exactamente esto, con la mejora de **s
 - VRAM por instancia (puzzle típico): ~0,7 GB.
 - VRAM total: 16 GB − 4 GB reserva sistema = 12 GB útiles.
 - Con $N = 4$ semillas en paralelo por puzzle: 4 × 0,7 = 2,8 GB ⇒ caben **4 puzzles distintos en paralelo cada uno con 4 semillas** (12 GB usados de 12). Suma: 16 puzzles concurrentes, frente a 8–10 del baseline.
-- Wall-clock: igual al baseline (las semillas corren en paralelo, no en serie).
-- **Saldo**: pass@2 sube según $1 - (1 - p)^4 \cdot (1 + 3p)^{-1}$ aproximado. Si $p = 0,2$ (eval baseline), pass@2 sube a ~0,35 ⇒ **+15 puntos esperados**, en línea con HRM.
+- Wall-clock: no es igual al baseline cuando la GPU ya está saturada. En el
+  demo medido fue ×4,32 para ×4 pasos, con un 8,6 % menos throughput por paso.
+- **Saldo medido**: las seeds resolvieron 9, 9, 13 y 10 de 30 tareas. La unión
+  oracle fue 14/30, pero no constituye un pass@2 válido. La fusión raw obtuvo
+  11/30 y la política target-only de consenso + diversidad obtuvo 12/30 en replay.
 
 **Riesgo MDL**: estrictamente, $N$ semillas multiplican la longitud de descripción por $N$ (cada semilla es un código distinto). Pero el output reportado es un único par de soluciones, así que **a efectos del benchmark pass@2 esto es legítimo**; sólo viola la pureza MDL del experimento, no las reglas de ARC.
 
@@ -2102,9 +2128,16 @@ Variante easy-first: muestrear primero por área decreciente (los grids pequeño
 
 **Coste**: cero adicional sobre RX 9070 XT.
 
-**Impacto esperado**: literatura de curriculum learning (Bengio et al. 2009) reporta ganancias del 1–3 % en eficiencia muestral. En ARC, donde los demo pairs ya son pocos, el efecto debería ser modesto pero positivo (+1–2 puntos pass@2).
+**Resultado medido**: la desviación absoluta media de los pesos respecto a uno
+fue 0,4338 y el rango observado `[0.1041, 3.7515]`. El curriculum estuvo activo,
+pero este experimento conjunto no aísla su contribución causal al pass@2.
 
 #### 9.4.4 Selección pass@2 aprendida en lugar de constantes mágicas
+
+**Decisión de alcance**: no implementada. Entrenar este selector con ground
+truth de otras tareas cambiaría la promesa target-only del experimento. En su
+lugar, la fusión multi-semilla usa exclusivamente scores internos de las
+trayectorias.
 
 **Problema atacado**: §8.4.2 (las constantes −10, −10, −4 en [solution_selection.py:54-90](../../solution_selection.py#L54-L90) no tienen justificación).
 

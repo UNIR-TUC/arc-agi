@@ -1137,7 +1137,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     elif resume:
         arc_logger.info(f'Loading partial results for split {split}')
         resume_solutions, resume_loggers = load_task_partials(
-            split, original_task_names, n_steps,
+            split, original_task_names, n_steps, state_dir=state_dir,
         )
     else:
         resume_solutions, resume_loggers = {}, {}
@@ -1499,6 +1499,10 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             'optimizer_steps_this_attempt': trained_seed_jobs * n_steps,
             'seeds':               list(accel_cfg.seeds),
             'eje_b_fingerprint':   partial_fingerprint,
+            'seed_merge_policy':   (
+                solution_selection.SEED_MERGE_POLICY
+                if accel_cfg.eje_b else None
+            ),
             'seed_solved_task_ids': seed_solved_task_ids,
             'output_dir':          os.path.abspath(output_dir),
             'state_dir':           (

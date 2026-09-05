@@ -177,7 +177,7 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id,
             if partial_fingerprint is None:
                 task_persistence.save_task_partial(
                     partial_split, task_name, partial_n_steps,
-                    example_list, logger_data,
+                    example_list, logger_data, state_dir=state_dir,
                 )
             else:
                 task_persistence.save_seed_partial(
