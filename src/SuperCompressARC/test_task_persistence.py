@@ -194,6 +194,30 @@ class TaskPersistenceTests(unittest.TestCase):
             for name in os.listdir(task_persistence.partial_dir('training'))
         ))
 
+    def test_recovery_manifests_are_isolated_by_state_dir(self):
+        with mock.patch.object(task_persistence, '_fsync_directory'):
+            task_persistence.update_task_recovery(
+                'training', 'fcb5c309', 2000, 'retry_eager',
+                state_dir='eje_b',
+            )
+            task_persistence.update_task_recovery(
+                'training', 'fcb5c309', 2000, 'quarantined',
+                state_dir='eje_d',
+            )
+
+        self.assertEqual(
+            task_persistence.load_task_recovery(
+                'training', 2000, state_dir='eje_b',
+            )['fcb5c309']['state'],
+            'retry_eager',
+        )
+        self.assertEqual(
+            task_persistence.load_task_recovery(
+                'training', 2000, state_dir='eje_d',
+            )['fcb5c309']['state'],
+            'quarantined',
+        )
+
     def test_recovery_manifest_rejects_corruption_and_unknown_state(self):
         directory = task_persistence.partial_dir('training')
         os.makedirs(directory)

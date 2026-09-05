@@ -8,7 +8,8 @@
 #
 # Settings come from the Eje D campaign (Docs/Architecture/EJE_D_IMPLEMENTACION.md).
 # Override any of them from the environment, e.g.  MAX_WORKERS=8 ./run_training_full.sh
-# Task recovery controls: ACCEL_PRESET, RECOVER_TASK_FAILURES, EAGER_TASKS and
+# Task selection and recovery controls: TASK_IDS, OUTPUT_DIR, STATE_DIR,
+# ACCEL_PRESET, EJE_B, SEEDS, RECOVER_TASK_FAILURES, EAGER_TASKS and
 # RETRY_QUARANTINED_TASKS.
 #
 set -uo pipefail
@@ -26,6 +27,12 @@ cd "$SCRIPT_DIR"
 
 PYTHON_BIN="${PYTHON_BIN:-${SCRIPT_DIR}/arcagi/bin/python}"
 ITERATIONS="${ITERATIONS:-2000}"
+POSTPROCESS_STRIDE="${POSTPROCESS_STRIDE:-4}"
+OUTPUT_DIR="${OUTPUT_DIR:-.}"
+STATE_DIR="${STATE_DIR:-}"
+TASK_IDS="${TASK_IDS:-}"
+EJE_B="${EJE_B:-0}"
+SEEDS="${SEEDS:-}"
 
 # 6, not 10: the concurrency sweep showed the GPU saturates here. Going to 10
 # bought +3.9 % throughput — inside the +4-5 % that the Inductor cache gains on
@@ -46,6 +53,11 @@ ACCEL_PRESET="${ACCEL_PRESET:-compile}"
 RECOVER_TASK_FAILURES="${RECOVER_TASK_FAILURES:-1}"
 EAGER_TASKS="${EAGER_TASKS:-}"
 RETRY_QUARANTINED_TASKS="${RETRY_QUARANTINED_TASKS:-}"
+
+if [[ "$EJE_B" != "0" && "$EJE_B" != "1" ]]; then
+  echo "[run] ERROR: EJE_B must be 0 or 1" >&2
+  exit 2
+fi
 
 MAX_ATTEMPTS="${MAX_ATTEMPTS:-5}"
 RETRY_DELAY_S="${RETRY_DELAY_S:-30}"
@@ -148,6 +160,10 @@ if [[ "$RECOVER_TASK_FAILURES" != "0" && "$RECOVER_TASK_FAILURES" != "1" ]]; the
 fi
 
 mkdir -p run_logs
+if ! mkdir -p "$OUTPUT_DIR"; then
+  echo "[run] ERROR: could not create output directory: ${OUTPUT_DIR}" >&2
+  exit 1
+fi
 RUN_ID="${RUN_ID:-$(date +%Y%m%d_%H%M%S)_$$}"
 CAMPAIGN_ID="${CAMPAIGN_ID:-$RUN_ID}"
 RUN_STARTED_EPOCH="$(date +%s.%N)"
@@ -155,6 +171,7 @@ LOG="${RUN_LOG_PATH:-run_logs/${SPLIT}_${RUN_ID}.log}"
 ATTEMPTS_FILE="${ATTEMPTS_FILE:-run_logs/${SPLIT}_${RUN_ID}_attempts.jsonl}"
 SUMMARY_FILE="${SPLIT_SUMMARY_PATH:-run_logs/${SPLIT}_${RUN_ID}_summary.json}"
 LATEST_SUMMARY="${LATEST_SUMMARY_PATH:-run_summary_${SPLIT}.json}"
+METADATA_FILE="${METADATA_PATH:-${OUTPUT_DIR}/run_metadata_${SPLIT}.json}"
 FINAL_STATUS="failed"
 
 finalize_tracking() {
@@ -165,7 +182,7 @@ finalize_tracking() {
       --events "$ATTEMPTS_FILE" \
       --summary "$SUMMARY_FILE" \
       --latest-summary "$LATEST_SUMMARY" \
-      --metadata "run_metadata_${SPLIT}.json" \
+      --metadata "$METADATA_FILE" \
       --run-id "$RUN_ID" \
       --campaign-id "$CAMPAIGN_ID" \
       --split "$SPLIT" \
@@ -194,13 +211,18 @@ echo "[run] split=${SPLIT} iterations=${ITERATIONS} max_workers=${MAX_WORKERS}"
 echo "[run] run_id=${RUN_ID} campaign_id=${CAMPAIGN_ID}"
 echo "[run] python: ${PYTHON_BIN}"
 echo "[run] acceleration: ${ACCEL_PRESET}; task recovery=${RECOVER_TASK_FAILURES}"
+echo "[run] eje_b=${EJE_B}; seeds=${SEEDS:-default}; postprocess_stride=${POSTPROCESS_STRIDE}"
+echo "[run] output_dir=${OUTPUT_DIR}; state_dir=${STATE_DIR:-.partial}"
+if [[ -n "$TASK_IDS" ]]; then
+  echo "[run] task selection: explicit task IDs"
+fi
 if [[ -n "$EAGER_TASKS" ]]; then
   echo "[run] eager tasks: ${EAGER_TASKS}"
 fi
 echo "[run] host RAM: ${MEM_PER_WORKER_GB} GB/worker, ${MEM_RESERVE_GB} GB reserved"
 echo "[run] cache limits: warn=${CACHE_WARN_FREE_GB} GB min=${CACHE_MIN_FREE_GB} GB inodes=${CACHE_MIN_FREE_INODES}"
 echo "[run] log: ${LOG}"
-echo "[run] interrupt at any time — relaunching resumes from .partial/${SPLIT}/"
+echo "[run] interrupt at any time — relaunching resumes from ${STATE_DIR:-.partial}/${SPLIT}/"
 
 export TORCHINDUCTOR_CACHE_DIR="$INDUCTOR_CACHE_DIR"
 
@@ -237,7 +259,9 @@ while (( attempt <= MAX_ATTEMPTS )); do
   python_args=(
     --split "${SPLIT}"
     --iterations "${ITERATIONS}"
+    --postprocess-stride "${POSTPROCESS_STRIDE}"
     --accel-preset "${ACCEL_PRESET}"
+    --output-dir "${OUTPUT_DIR}"
     --max-workers "${MAX_WORKERS}"
     --host-mem-per-worker-gb "${MEM_PER_WORKER_GB}"
     --host-mem-reserve-gb "${MEM_RESERVE_GB}"
@@ -246,6 +270,18 @@ while (( attempt <= MAX_ATTEMPTS )); do
     --cache-min-free-gb "${CACHE_MIN_FREE_GB}"
     --resume
   )
+  if [[ -n "$STATE_DIR" ]]; then
+    python_args+=(--state-dir "$STATE_DIR")
+  fi
+  if [[ -n "$TASK_IDS" ]]; then
+    python_args+=(--task-ids "$TASK_IDS")
+  fi
+  if (( EJE_B )); then
+    python_args+=(--eje-b)
+  fi
+  if [[ -n "$SEEDS" ]]; then
+    python_args+=(--seeds "$SEEDS")
+  fi
   if (( RECOVER_TASK_FAILURES )); then
     python_args+=(--recover-task-failures)
   fi
@@ -274,7 +310,7 @@ while (( attempt <= MAX_ATTEMPTS )); do
   if (( rc == 0 )); then
     FINAL_STATUS="success"
     echo "[run] ${SPLIT} complete at $(date '+%F %T')"
-    echo "[run] results: submission_${SPLIT}.json  predictions_${SPLIT}.npz"
+    echo "[run] results: ${OUTPUT_DIR}/submission_${SPLIT}.json  ${OUTPUT_DIR}/predictions_${SPLIT}.npz"
     exit 0
   fi
 
@@ -299,5 +335,5 @@ while (( attempt <= MAX_ATTEMPTS )); do
 done
 
 echo "[run] ${SPLIT} still failing after ${MAX_ATTEMPTS} attempts — see ${LOG}" >&2
-echo "[run] partial results are preserved in .partial/${SPLIT}/" >&2
+echo "[run] partial results are preserved in ${STATE_DIR:-.partial}/${SPLIT}/" >&2
 exit 1

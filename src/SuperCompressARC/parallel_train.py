@@ -941,11 +941,13 @@ def _task_eager_config(accel_config):
 
 
 def _activate_quarantined_retries(split, n_steps, task_names,
-                                  recovery_entries, arc_logger=None):
+                                  recovery_entries, arc_logger=None,
+                                  state_dir=None):
     """Make an operator-requested eager retry durable across attempts."""
     for task_name in task_names:
         entry = task_persistence.update_task_recovery(
             split, task_name, n_steps, 'retry_eager',
+            state_dir=state_dir,
         )
         recovery_entries[task_name] = entry
     if task_names and arc_logger is not None:
@@ -955,7 +957,8 @@ def _activate_quarantined_retries(split, n_steps, task_names,
         )
 
 
-def _record_task_recovery_failure(split, n_steps, failure, enabled, arc_logger):
+def _record_task_recovery_failure(split, n_steps, failure, enabled, arc_logger,
+                                  state_dir=None):
     """Persist the next recovery state, returning whether it was handled."""
     if (
         not enabled
@@ -972,6 +975,7 @@ def _record_task_recovery_failure(split, n_steps, failure, enabled, arc_logger):
     task_persistence.update_task_recovery(
         split, failure.task_name, n_steps, state,
         failure.recovery_record(),
+        state_dir=state_dir,
     )
     if arc_logger is not None:
         if state == 'retry_eager':
@@ -1106,12 +1110,15 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         )
 
     n_tasks = len(original_task_names)
-    recovery_entries = task_persistence.load_task_recovery(split, n_steps)
+    recovery_entries = task_persistence.load_task_recovery(
+        split, n_steps, state_dir=state_dir,
+    )
     effective_eager_tasks, quarantined_tasks = _recovery_task_sets(
         original_task_names, recovery_entries, eager_tasks, retry_quarantined,
     )
     _activate_quarantined_retries(
         split, n_steps, retry_quarantined, recovery_entries, arc_logger,
+        state_dir=state_dir,
     )
     resume_job_solutions = {}
     resume_job_loggers = {}
@@ -1145,6 +1152,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     for task_name in resolved_quarantines:
         task_persistence.update_task_recovery(
             split, task_name, n_steps, 'recovered_eager',
+            state_dir=state_dir,
         )
     quarantined_tasks -= resolved_quarantines
     runnable_task_names = [
@@ -1338,6 +1346,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             else:
                 _record_task_recovery_failure(
                     split, n_steps, failure, recover_task_failures, arc_logger,
+                    state_dir=state_dir,
                 )
             raise
     else:
@@ -1388,6 +1397,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         if recovery_entries.get(task_name, {}).get('state') != 'recovered_eager':
             task_persistence.update_task_recovery(
                 split, task_name, n_steps, 'recovered_eager',
+                state_dir=state_dir,
             )
 
     fallback_quarantined = {
@@ -1512,7 +1522,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             'degraded':           bool(fallback_quarantined),
             'recovery': {
                 'enabled': recover_task_failures,
-                'manifest': task_persistence.recovery_path(split),
+                'manifest': task_persistence.recovery_path(split, state_dir),
                 'explicit_eager_tasks': sorted(eager_tasks),
                 'effective_eager_tasks': sorted(effective_eager_tasks),
                 'recovered_eager_tasks': sorted(recovered_eager_tasks),

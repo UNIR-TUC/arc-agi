@@ -175,6 +175,7 @@ class SchedulerFailureTests(unittest.TestCase):
 
         update.assert_called_once_with(
             'training', 'fcb5c309', 2000, 'retry_eager',
+            state_dir=None,
         )
         self.assertEqual(recovery_entries['fcb5c309'], persisted)
 

@@ -30,8 +30,8 @@ def partial_dir(split, state_dir=None):
     return os.path.join(state_dir or '.partial', split)
 
 
-def recovery_path(split):
-    return os.path.join(partial_dir(split), '.task_recovery.json')
+def recovery_path(split, state_dir=None):
+    return os.path.join(partial_dir(split, state_dir), '.task_recovery.json')
 
 
 def _utc_timestamp():
@@ -232,9 +232,9 @@ def _empty_recovery_manifest():
     }
 
 
-def load_task_recovery_manifest(split):
+def load_task_recovery_manifest(split, state_dir=None):
     """Load and validate durable task recovery state for one split."""
-    path = recovery_path(split)
+    path = recovery_path(split, state_dir)
     try:
         with open(path, encoding='utf-8') as handle:
             payload = json.load(handle)
@@ -269,13 +269,14 @@ def load_task_recovery_manifest(split):
     return payload
 
 
-def load_task_recovery(split, n_steps):
+def load_task_recovery(split, n_steps, state_dir=None):
     """Return recovery entries scoped to the requested iteration count."""
-    manifest = load_task_recovery_manifest(split)
+    manifest = load_task_recovery_manifest(split, state_dir)
     return dict(manifest['iterations'].get(str(n_steps), {}))
 
 
-def update_task_recovery(split, task_name, n_steps, state, failure=None):
+def update_task_recovery(split, task_name, n_steps, state, failure=None,
+                         state_dir=None):
     """Atomically transition one task's recovery state."""
     safe_task_name(task_name)
     if state not in _RECOVERY_STATES:
@@ -285,7 +286,7 @@ def update_task_recovery(split, task_name, n_steps, state, failure=None):
     if failure is not None and not isinstance(failure, dict):
         raise ValueError('failure must be a dictionary or None')
 
-    manifest = load_task_recovery_manifest(split)
+    manifest = load_task_recovery_manifest(split, state_dir)
     task_entries = manifest['iterations'].setdefault(str(n_steps), {})
     previous = task_entries.get(task_name, {})
     failures = list(previous.get('failures', []))
@@ -297,5 +298,5 @@ def update_task_recovery(split, task_name, n_steps, state, failure=None):
         'updated_at': _utc_timestamp(),
         'failures': failures,
     }
-    _atomic_write_json(recovery_path(split), manifest)
+    _atomic_write_json(recovery_path(split, state_dir), manifest)
     return dict(task_entries[task_name])
