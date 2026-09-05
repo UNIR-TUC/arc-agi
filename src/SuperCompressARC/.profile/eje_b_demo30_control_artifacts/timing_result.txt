@@ -1,0 +1,3 @@
+Splits run   : training
+Total solved : 11/30
+Total time   : 10092.3s

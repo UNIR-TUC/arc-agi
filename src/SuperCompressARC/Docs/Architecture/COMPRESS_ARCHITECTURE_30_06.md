@@ -2051,7 +2051,8 @@ Este eje no añade primitivas nuevas: explota mejor las existentes mediante mejo
 > gate de 11 tareas conservó 11/11; en un demo de 30 tareas, el control y la
 > fusión raw obtuvieron 11/30. Las cuatro trayectorias resolvieron 9, 9, 13 y 10
 > tareas, con una unión oracle de 14. Un replay target-only que reserva el segundo
-> intento para diversidad normalizada obtuvo 12/30 sin reentrenar. Esta política
+> intento para diversidad normalizada obtuvo 12/30 y se materializó desde los
+> 120 parciales sin repetir Phase 2. Esta política
 > se eligió post-hoc sobre el mismo demo y requiere validación held-out. Véanse diseño,
 > comandos y medidas en [EJE_B_IMPLEMENTACION.md](EJE_B_IMPLEMENTACION.md).
 

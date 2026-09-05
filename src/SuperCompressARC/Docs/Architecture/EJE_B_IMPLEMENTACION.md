@@ -115,11 +115,11 @@ El gate estricto se superó. La mejor seed resolvió todas las tareas y la fusi�
 
 ### Demo de 30 tareas
 
-| Métrica | Control D | D+B raw | D+B fusión v2 replay |
+| Métrica | Control D | D+B raw | D+B fusión v2 materializada |
 | --- | ---: | ---: | ---: |
 | pass@2 | 11/30 (36,7 %) | 11/30 (36,7 %) | **12/30 (40,0 %)** |
-| Pasos | 60.000 | 240.000 | replay, sin training |
-| Wall-clock | 10.093,8 s | 43.630,0 s | n/a |
+| Pasos | 60.000 | 240.000 | 0 nuevos; 120 jobs reanudados |
+| Wall-clock | 10.093,8 s | 43.630,0 s | 221,6 s de replay |
 | Phase 2 throughput | 6,04 steps/s | 5,52 steps/s | n/a |
 | Energía | 290,507 Wh | 1.191,626 Wh | n/a |
 | Wh/1k pasos | 4,8418 | 4,9651 | n/a |
@@ -130,7 +130,11 @@ El gate estricto se superó. La mejor seed resolvió todas las tareas y la fusi�
 
 Resultados por seed: 9/30, 9/30, 13/30 y 10/30. La unión oracle de las cuatro seeds contiene 14 tareas, pero no es una métrica válida porque usa ground truth para elegir.
 
-La fusión raw resolvió exactamente las mismas 11 tareas que el control. El replay target-only de la política v2 conserva esas 11 y recupera `11852cab`, cuya solución correcta era top-2 de la seed 2 pero rango 3 tras la suma raw.
+La fusión raw resolvió exactamente las mismas 11 tareas que el control. La
+política v2 se materializó ejecutando `--resume` sobre los 120 parciales: cargó
+120 jobs, dejó cero pendientes y Phase 2 duró 0,0 s. La submission final conserva
+esas 11 tareas y recupera `11852cab`, cuya solución correcta era top-2 de la seed
+2 pero rango 3 tras la suma raw.
 
 La política v2 se eligió después de inspeccionar el ground truth de este mismo
 demo. Aunque su ejecución sólo usa scores internos, **12/30 es un resultado
@@ -142,7 +146,7 @@ pre-registrarse y probarse en tareas distintas antes de atribuirle mejora real.
 ## Veredicto
 
 - **Robustez:** aprobada. El gate 11/11 se mantiene y las trayectorias son diversas.
-- **Mejora exploratoria post-hoc:** +1 tarea mediante replay de la política
+- **Mejora exploratoria post-hoc:** +1 tarea en los artefactos v2 mediante la política
   target-only v2, de 36,7 % a 40,0 %; no es estadísticamente concluyente.
 - **Coste:** alto. Cuatro seeds multiplicaron wall-clock por 4,32 y energía total por 4,10. El throughput por paso cayó 8,6 % y Wh/1k pasos empeoró 2,5 %.
 - **Cuello de botella:** no se trasladó a CPU; la saturación siguió en 0 % y la GPU permaneció al 99,5 %.
@@ -155,3 +159,6 @@ pre-registrarse y probarse en tareas distintas antes de atribuirle mejora real.
 - Metadata candidato: `.profile/eje_b_demo30_candidate_artifacts/run_metadata_training.json`
 - Predicciones candidato: `.profile/eje_b_demo30_candidate_artifacts/predictions_training.npz`
 - Parciales reanudables: `.profile/eje_b_demo30_candidate_artifacts/state/`
+- Submission v2: `.profile/eje_b_demo30_candidate_v2_artifacts/submission_training.json`
+- Predicciones v2: `.profile/eje_b_demo30_candidate_v2_artifacts/predictions_training.npz`
+- Metadata v2: `.profile/eje_b_demo30_candidate_v2_artifacts/run_metadata_training.json`
