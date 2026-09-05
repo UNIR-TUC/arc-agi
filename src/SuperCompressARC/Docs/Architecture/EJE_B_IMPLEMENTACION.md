@@ -162,3 +162,151 @@ pre-registrarse y probarse en tareas distintas antes de atribuirle mejora real.
 - Submission v2: `.profile/eje_b_demo30_candidate_v2_artifacts/submission_training.json`
 - Predicciones v2: `.profile/eje_b_demo30_candidate_v2_artifacts/predictions_training.npz`
 - Metadata v2: `.profile/eje_b_demo30_candidate_v2_artifacts/run_metadata_training.json`
+
+## Explicaion
+
+**Respuesta corta**
+
+Sí. En la ejecución original del demo:
+
+$$
+30\ \text{tareas} \times 4\ \text{seeds} \times 2000\ \text{pasos}
+= 240\,000\ \text{pasos}
+$$
+
+Cada combinación `(tarea, seed)` entrenó un modelo nuevo e independiente. La ejecución posterior de 221,6 s no reentrenó: cargó los 120 resultados guardados y recalculó la fusión v2.
+
+**Flujo Completo**
+
+1. `--demo 30` selecciona las primeras 30 tareas del split.
+2. `--seeds 0,1,2,3` genera cuatro jobs por tarea en `parallel_train.py:403-421`.
+3. Se crean 120 identificadores, por ejemplo:
+   - `007bbfb7__seed_0`
+   - `007bbfb7__seed_1`
+   - …
+   - `1caeab9d__seed_3`
+4. El scheduler ejecuta hasta seis simultáneamente, según VRAM y RAM. No se ejecutan los 120 a la vez.
+5. Cada job nace en un proceso separado mediante `multiprocessing.Process` en `parallel_train.py:710-755`.
+6. Dentro del proceso se fijan Python, NumPy, Torch y GPU al valor de la seed en `solve_task.py:57-76`.
+7. Después se crean desde cero:
+   - Un nuevo `Task`.
+   - Un nuevo `ARCCompressor`.
+   - Nuevos pesos aleatorios.
+   - Un nuevo optimizador Adam.
+   - Un nuevo logger y una EMA nueva.
+8. El modelo ejecuta sus propios 2000 pasos en `solve_task.py:88-116`.
+
+No se comparten pesos, gradientes, momentos de Adam, KL, curriculum ni logits entre seeds.
+
+La seed 0 de una tarea tampoco transfiere nada a la seed 0 de otra tarea. “Seed 0” solo identifica una secuencia pseudoaleatoria; no es un modelo que vaya aprendiendo las 30 tareas.
+
+**Excepción: Phase 1**
+
+Phase 1 solo ejecuta dos pasos por tarea para medir memoria:
+
+$$
+30 \times 2 = 60\ \text{pasos}
+$$
+
+No repite esta medición para las cuatro seeds porque la forma del modelo es la misma. La independencia completa ocurre en Phase 2.
+
+En la materialización v2 se leyeron los 120 parciales existentes. Por eso la metadata muestra `resumed_seed_jobs=120`, `trained_seed_jobs=0` y Phase 2 de 0 segundos.
+
+**Cambios En El Entrenamiento**
+
+Free-bits actúa por cada una de las 18 hojas KL:
+
+$$
+L_{KL,t}=\sum_i\max(KL_i,\tau_t)
+$$
+
+$\tau_t$ baja linealmente de 2 a 0. Si una hoja tiene $KL_i=0{,}5$ y $\tau_t=2$, aporta 2 a la pérdida, pero su gradiente compresivo es cero. Esto no la obliga a aprender; simplemente deja de empujarla hacia cero. Está implementado en [train.py](train.py#L22-L39).
+
+El curriculum calcula qué demostraciones fueron históricamente más difíciles. Les asigna más peso gradualmente:
+
+$$
+w_i=n_{\text{train}}\operatorname{softmax}(\beta_t d_i)
+$$
+
+Los pesos tienen media 1. La dificultad usa una EMA detached de la pérdida por píxel. La entrada de test mantiene peso 1 y la salida oculta nunca participa en la pérdida. Véase [train.py](train.py#L41-L69) y [train.py](train.py#L211-L267).
+
+**Scoring Por Seed**
+
+Cada cuatro pasos se obtienen dos candidatos:
+
+- Predicción actual.
+- EMA de logits y máscaras.
+
+Para cada candidato se calcula:
+
+$$
+u=\operatorname{mean}(\log\sum_c e^{l_c}-\max_c l_c)
+=-\operatorname{mean}(\log p_{\text{color elegido}})
+$$
+
+Después:
+
+$$
+s=-10u-10\,\mathbf{1}_{t<150}-4\,\mathbf{1}_{EMA}
+$$
+
+Una solución segura recibe un score menos negativo. Si la misma cuadrícula aparece repetidamente, sus scores se acumulan mediante:
+
+$$
+\operatorname{logaddexp}(s_1,s_2)
+=\log(e^{s_1}+e^{s_2})
+$$
+
+Esto premia frecuencia y confianza. Está en [solution_selection.py](solution_selection.py#L99-L168).
+
+**Fusión Entre Seeds**
+
+La fusión ocurre únicamente entre las cuatro ejecuciones de una misma tarea.
+
+`attempt_1` usa consenso: los scores acumulados de una misma cuadrícula se combinan con `logaddexp`. Si varias seeds producen la misma respuesta, recibe más evidencia.
+
+`attempt_2` busca diversidad. Primero normaliza dentro de cada seed:
+
+$$
+\tilde{s}_{k,c}
+=s_{k,c}-\operatorname{logsumexp}_{c'}(s_{k,c'})
+$$
+
+Después toma para cada candidato su mejor soporte relativo:
+
+$$
+D_c=\max_k\tilde{s}_{k,c}
+$$
+
+Se elige la mejor solución distinta de `attempt_1`. La implementación está en `solution_selection.py:268-429`.
+
+**¿Es Válido?**
+
+Sí, respecto a ARC: el sistema puede ejecutar varios modelos y entregar finalmente solo dos respuestas. Esto es ensembling, no pass@4. El ground truth no participa en la fusión; se consulta después para calcular métricas en `parallel_train.py:1320-1368`.
+
+Pero no es una probabilidad bayesiana rigurosa:
+
+- El score es heurístico, no un logaritmo de probabilidad perfectamente calibrado.
+- Las seeds usan los mismos ejemplos y arquitectura; son independientes en estado y RNG, pero no evidencia estadísticamente independiente.
+- Los pasos consecutivos están muy correlacionados.
+- `logaddexp` asume que los scores son comparables entre seeds.
+- La normalización del segundo intento reduce este problema, pero no lo elimina.
+
+Por tanto: **es una política de ranking válida y razonable, no una demostración probabilística**.
+
+También es benchmark-valid, pero menos puro desde MDL: se buscan cuatro programas en vez de uno y se consume aproximadamente cuatro veces más cómputo.
+
+**Qué Mostraron Las Pruebas**
+
+- Seeds individuales: 9/30, 9/30, 13/30 y 10/30.
+- Intersección de las cuatro: 7 tareas.
+- Unión oracle: 14 tareas.
+- Control: 11/30.
+- Fusión raw: 11/30.
+- Fusión v2: 12/30.
+
+No se obtienen las 14 porque el sistema no conoce cuál seed acertó y solo puede entregar dos candidatos. La política v2 recuperó `11852cab`, pero fue diseñada tras inspeccionar este demo. Aunque durante la ejecución no usa ground truth, el 12/30 es post-hoc.
+
+La validación científicamente correcta ahora es congelar esta política y probarla sin ajustes en un conjunto distinto. Solo entonces podremos afirmar que unificar scores mejora realmente la generalización.
+
+Created 3 todos

@@ -31,12 +31,12 @@ ITERATIONS="${ITERATIONS:-2000}"
 # bought +3.9 % throughput — inside the +4-5 % that the Inductor cache gains on
 # its own per repeat — while costing +77 % CPU and +30 % host RAM. At 10 workers
 # a 50-task run already peaked at 89.5 % of the 96 GB host.
-MAX_WORKERS="${MAX_WORKERS:-6}"
+MAX_WORKERS="${MAX_WORKERS:-8}"
 
 # 50 tasks at 10 workers used ~8.4 GB of real RAM each; the full split has larger
 # puzzles and schedules the biggest first, so budget 9 and keep 12 GB for Ubuntu.
-MEM_PER_WORKER_GB="${MEM_PER_WORKER_GB:-9}"
-MEM_RESERVE_GB="${MEM_RESERVE_GB:-12}"
+MEM_PER_WORKER_GB="${MEM_PER_WORKER_GB:-11}"
+MEM_RESERVE_GB="${MEM_RESERVE_GB:-14}"
 
 # A wedged worker would otherwise hold the whole campaign forever. Workers report
 # every 10 steps, so this is ~2 orders of magnitude above a healthy interval.
