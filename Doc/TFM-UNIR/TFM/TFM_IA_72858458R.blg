@@ -16,11 +16,12 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: bibliografia.bib
 Warning--entry type for "liao2025arcagiwithoutpretraining" isn't style-file defined
 --line 531 of file bibliografia.bib
+Warning--I didn't find a database entry for "Chollet2019"
 apacite.bst [2013/07/21 v6.03 APA bibliography style]
 Warning--`others' not consistent with 6th ed. of the APA Manual
 You've used 26 entries,
             6951 wiz_defined-function locations,
-            1401 strings with 15074 characters,
+            1403 strings with 15096 characters,
 and the built_in function-call counts, 48480 in all, are:
 = -- 6015
 > -- 415
@@ -59,4 +60,4 @@ warning$ -- 1
 while$ -- 237
 width$ -- 0
 write$ -- 803
-(There were 2 warnings)
+(There were 3 warnings)

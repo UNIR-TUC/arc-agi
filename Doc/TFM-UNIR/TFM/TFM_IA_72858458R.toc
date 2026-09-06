@@ -70,16 +70,24 @@
 \contentsline {subsubsection}{Comunicación descendente del Multitensor}{75}{subsubsection*.19}%
 \contentsline {subsubsection}{Normalización final}{76}{subsubsection*.20}%
 \contentsline {subsubsection}{Contantes}{77}{subsubsection*.21}%
-\contentsline {subsection}{\numberline {5.1.4}Función de error}{77}{subsection.5.1.4}%
-\contentsline {subsection}{\numberline {5.1.5}Ejemplo de entrenamiento al detalle}{77}{subsection.5.1.5}%
-\contentsline {subsection}{\numberline {5.1.6}Limitaciones}{77}{subsection.5.1.6}%
-\contentsline {section}{\numberline {5.2}Ejes de mejora}{77}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Eje H: Reducción de saturación de procesos en paralelo}{77}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{77}{subsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del conjuntos de tensores}{77}{subsection.5.2.3}%
-\contentsline {chapter}{\numberline {6}Resultados}{78}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Planificación}{79}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Estudio económico}{80}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{81}{chapter.9}%
-\contentsline {section}{Referencias}{81}{section*.22}%
-\contentsline {chapter}{\numberline {A}Apéndices}{83}{appendix.Alph1}%
+\contentsline {subsection}{\numberline {5.1.4}Limitaciones}{77}{subsection.5.1.4}%
+\contentsline {subsection}{\numberline {5.1.5}Núcleos de conocimiento}{79}{subsection.5.1.5}%
+\contentsline {subsubsection}{Objetualidad}{79}{subsubsection*.22}%
+\contentsline {subsubsection}{Orientación hacia objetivos}{80}{subsubsection*.23}%
+\contentsline {subsubsection}{Números y conteo}{81}{subsubsection*.24}%
+\contentsline {subsubsection}{Geometría elemental y topología}{81}{subsubsection*.25}%
+\contentsline {subsubsection}{Síntesis de los núcleos presentes}{82}{subsubsection*.26}%
+\contentsline {section}{\numberline {5.2}Ejes de mejora}{82}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Eje H: Reducción de saturación de procesos en paralelo}{83}{subsection.5.2.1}%
+\contentsline {subsubsection}{Eliminación de sincronizaciones necesarias}{84}{subsubsection*.27}%
+\contentsline {subsubsection}{Reducción de la frecuencia de postprocesamiento}{84}{subsubsection*.28}%
+\contentsline {subsubsection}{H1: Vectorización del cálculo de la pérdida}{84}{subsubsection*.29}%
+\contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{87}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del espacio latente}{87}{subsection.5.2.3}%
+\contentsline {subsubsection}{Herramienta de visualización de procesos}{87}{subsubsection*.30}%
+\contentsline {chapter}{\numberline {6}Resultados}{88}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Planificación}{89}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Estudio económico}{90}{chapter.8}%
+\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{91}{chapter.9}%
+\contentsline {section}{Referencias}{91}{section*.31}%
+\contentsline {chapter}{\numberline {A}Apéndices}{93}{appendix.Alph1}%

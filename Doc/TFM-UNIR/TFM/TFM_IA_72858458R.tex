@@ -2309,16 +2309,354 @@ no sabe hacer. Entre las habilidades del modelo se podría resumir en lo siguien
 	\item Detectar y completar simetrías como espejos, rotaciones y traslaciones.
 	\item Agrupar, reagrupar y reordenar objetos.
 	\item Aplicar transformaciones afines simples a regiones.
-	\item Identificar el objeto "distinto" en una colección uniforme.
+	\item Identificar el objeto distinto en una colección uniforme.
 \end{itemize}
+
+También existen numerosas limitaciones arquitectónicas y de capacidad del modelo que restringen su desempeño en tareas más complejas o abstractas:
+
+\begin{itemize}
+	\item Existen algunas ausencias claras de habilidades primitivas, como es la capacidad de contar. El modelo no es capaz de contar
+	regiones ni cuantos píxeles de un color en la cuadrícula. Esta habilidad simplemente no está presenta en una función dentro del modelo. Esta habilidad
+	podría ser implementada dentro de la capa del núcleo de descompresión.
+	\item Limitaciones que requieren recurrencia en el tiempo como simulaciones de pixeles que se mueven con reglas específicas como es es la tarea
+	2dd70a9a.
+	\item Ausencia de planificación a largo plazo, reglas con múltiples pasos secuenciales no se suelen descubrir.
+	\item Se ha experimenta aleatoriedad en la semilla. Distintas semillas son capaces de resolver o no ciertas tareas. Existen ciertos casos
+	en los que algunos tensores críticos pueden llegar recomponerse tras una caída en el error de manera abrupta.
+	\item Entrenar el conjunto total de tareas de ARC-AGI dura dura en torno a 300 horas, lo que equivale a 20 minutos por tarea.
+	\item El uso de la CPU mediante el entrenamiento en paralelo es demasiado alto. A pesar de poder ejecutar diversos modelos al mismo tiempo
+	gracias a la capacidad de la tarjeta gráfica, el alto uso de CPU produce una especia de "cuello de botella" que limita el rendimiento global.
+	Ya sea de forma secuencial o paralela, la velocidad de entrenamiento rara vez supera las 2 iteraciones por segundo.
+	\item Destacar que existen limitaciones estructurales de capas neuronales densas. La arquitectura está fijada como una constante en 4 capas
+	para todas las tareas. El objetivo es mantener la longitud de la descripción del modelo baja. La consecuencia de esto es pueden existir
+	tareas que requieren más de 4 capas o directamente que necesitan iterar más veces un mismo operador. Esto deja claro una evidente ausencia de recurrencia
+	y capacidad adaptativa profunda. Otros modelos como los modelos de razonamiento jerárquicos si presentan mecanismos de razonamiento iterativo
+	y adaptativo.
+	\item Limitaciones operacionales de replica de formas. Ciertas tareas que requieren traslación, rotación, reflexión y escalado de una forma completa
+	se quedas sin solución. Este es probablemente la mayor categoría de fallos que se pueden resolver con mejoras arquitectónicas.
+	\item En muchos casos ocurre un colapso del espacio latente. Generalmente suelen ser 4 tensores los que sostienen el aprendizaje dentro del
+	bucle iterativo. 14 de los 18 tensores nunca llegan a recuperarse de un colapso tras 200 iteraciones. Si alguno de los tensores colapsados es
+	requerido para codificar información crítica, la tarea se queda sin solución y no existe método de rescate. Fortaleces la robustez del
+	espacio latente parece ser fundamental.
+	\item Se ha observado que el código implementa un mecanismo de puntuación de los diversos candidatos mediante variables constantes.
+\end{itemize}
+
+\subsection{Núcleos de conocimiento}
+
+Según \citeA{Chollet2019}, la inteligencia no depende únicamente de la cantidad de experiencia disponible, sino también de los
+conocimientos previos que orientan la búsqueda de una solución. Estos conocimientos previos, o sesgos inductivos, permiten reducir el
+espacio de hipótesis que debe explorarse y hacen posible generalizar a partir de un número reducido de ejemplos. En el contexto de
+ARC-AGI, Chollet identifica cuatro sistemas de conocimiento fundamentales, relacionados con la objetualidad, la agencia, los números
+y la geometría elemental junto con la topología. No se trata de cuatro etapas de procesamiento independientes, sino de capacidades
+previas que condicionan la forma en que se representan los problemas y se interpretan las transformaciones.
+
+El análisis de CompressARC permite determinar hasta qué punto estos cuatro núcleos están presentes en su arquitectura. El modelo
+representa cada tarea mediante un sistema de tensores con cinco ejes, correspondientes a ejemplos, colores, direcciones, filas y
+columnas. Esta decisión incorpora de forma explícita algunas relaciones espaciales, pero no proporciona una representación completa
+de todos los conceptos que pueden aparecer en una tarea de ARC-AGI. Por tanto, el rendimiento del modelo no solo depende de la
+optimización de sus parámetros, sino también de que la transformación buscada pueda expresarse mediante los conocimientos previos
+que la arquitectura ya contiene.
+
+\subsubsection{Objetualidad}
+
+La objetualidad, denominada \textit{objectness} en el marco de Chollet, comprende la capacidad de percibir entidades como objetos
+cohesionados, persistentes y diferenciables del fondo. En muchas tareas de ARC-AGI la regla no se aplica a cada celda de manera
+aislada, sino a una figura completa. El tamaño, la forma, la posición, el color o la relación de una figura con otras entidades
+determinan la transformación que debe realizarse.
+
+CompressARC no incluye una representación explícita de objetos. Sus operaciones trabajan sobre tensores densos y sobre las
+combinaciones de ejes del sistema multitensor. La información sobre una figura puede mantenerse de forma implícita mediante los
+valores de sus celdas, las máscaras y las operaciones espaciales, pero el modelo no detecta componentes conexas como unidades
+independientes ni reserva un estado específico para sus propiedades. Tampoco existe un mecanismo dedicado para comparar dos objetos,
+seleccionar el de mayor tamaño o agruparlos según su forma.
+
+Esta carencia explica que algunas tareas de selección, agrupación o reordenación de objetos solo sean accesibles cuando la regla
+puede aproximarse mediante operaciones píxel a píxel y relaciones direccionales. Cuando la solución exige conservar la identidad de
+varias figuras y operar sobre cada una de ellas de manera independiente, la representación actual debe codificar esa información en
+activaciones distribuidas. El modelo posee, por tanto, una objetualidad implícita y débil, pero no un núcleo de conocimiento
+dedicado a la detección y manipulación de objetos.
+
+\subsubsection{Orientación hacia objetivos}
+
+El segundo núcleo describe la capacidad de representar entidades que actúan, persiguen
+objetivos y modifican su entorno. Aunque no todas las tareas de ARC-AGI requieren un agente explícito, este conocimiento resulta
+relevante cuando la solución depende de una secuencia de acciones, de una interacción entre entidades o de la distinción entre un
+estado inicial y un estado objetivo.
+
+En CompressARC no existe una representación de agentes, acciones ni objetivos intermedios. El modelo recibe los ejemplos de entrada
+y salida, transforma sus representaciones internas y optimiza directamente la correspondencia con la salida esperada. No mantiene
+un estado de planificación ni dispone de un mecanismo que evalúe qué acción debe ejecutarse a continuación. En consecuencia, las
+tareas que pueden resolverse como una transformación global de la cuadrícula son compatibles con el diseño actual, mientras que las
+que requieren simular una interacción o encadenar decisiones dependen de que dicha secuencia quede codificada indirectamente en las
+capas disponibles.
+
+La ausencia de este núcleo no constituye una limitación para todas las tareas de ARC-AGI, puesto que muchas de ellas son
+transformaciones estáticas. Sin embargo, reduce la capacidad del modelo para representar reglas con varios pasos consecutivos y
+contribuye a explicar la falta de planificación a largo plazo observada en los experimentos.
+
+\subsubsection{Números y conteo}
+
+El tercer núcleo corresponde al conocimiento de los números y a la capacidad de contar. En una tarea de ARC-AGI, contar no implica
+únicamente sumar valores, sino identificar unidades discretas, conservar su cardinalidad y comparar cantidades. Ejemplos de este tipo
+son determinar cuántos objetos aparecen, comparar el número de celdas de dos regiones o repetir una operación tantas veces como
+indique una cantidad observada.
+
+La arquitectura analizada no contiene una primitiva explícita de conteo ni una representación entera de las cantidades. Los colores
+se tratan como categorías y las activaciones internas son variables continuas. Las normalizaciones, las agregaciones y las
+proyecciones pueden producir magnitudes relacionadas con el número de celdas activas, pero esas magnitudes no tienen garantizada una
+interpretación discreta ni una correspondencia estable con los números naturales. Del mismo modo, una comparación de intensidades no
+equivale a una comparación exacta de cardinalidades.
+
+Esta limitación hace que las tareas basadas en conteo de píxeles, regiones u objetos queden fuera del sesgo inductivo principal del
+modelo. El sistema puede aprender una correlación aproximada cuando la cantidad está asociada a un patrón espacial sencillo, pero no
+dispone de un operador que garantice el resultado para tamaños, colores o configuraciones nuevas. La ausencia de este núcleo es,
+por ello, una restricción representacional y no únicamente un problema de entrenamiento.
+
+\subsubsection{Geometría elemental y topología}
+
+El cuarto núcleo es el que se encuentra más desarrollado en CompressARC. La arquitectura incorpora una cuadrícula bidimensional con
+ejes de filas y columnas, ocho orientaciones espaciales y operaciones que propagan información en esas direcciones. Las funciones
+\textit{shift} y \textit{cummax} permiten comunicar activaciones entre celdas vecinas y acumular señales a lo largo de recorridos,
+mientras que \textit{direction\_share} intercambia información entre orientaciones. Además, la parametrización compartida de las
+direcciones introduce una equivarianza asociada a las simetrías del cuadrado, es decir, al grupo $D_4$.
+
+Este conjunto de mecanismos proporciona un sesgo adecuado para transformaciones espaciales elementales, como prolongar líneas,
+propagar colores, reconocer relaciones de vecindad y tratar simetrías compatibles con rotaciones de 90 grados y reflexiones. La
+representación direccional también facilita que una misma operación se aplique de forma coherente en diferentes orientaciones, lo que
+reduce la cantidad de parámetros que debe aprender el modelo.
+
+La geometría incorporada, no obstante, es parcial. El grupo $D_4$ no cubre rotaciones de ángulo arbitrario, escalados ni
+transformaciones afines generales. Tampoco existe una primitiva específica para copiar, trasladar o replicar una figura completa
+conservando simultáneamente su estructura. Por otra parte, el componente topológico está poco desarrollado. El modelo no representa
+de forma explícita la conectividad, los agujeros, los contornos ni la relación de inclusión entre regiones. En consecuencia, puede
+capturar regularidades geométricas locales, pero tiene dificultades cuando la solución depende de una propiedad topológica o de una
+transformación global de un objeto.
+
+\subsubsection{Síntesis de los núcleos presentes}
+
+La comparación anterior muestra que CompressARC materializa con mayor claridad el conocimiento geométrico y direccional. El conteo carece de una
+operación propia. Esta distribución de capacidades es coherente con los resultados observados en las tareas experimentales. El modelo
+resuelve con mayor facilidad las transformaciones que pueden expresarse como propagaciones, simetrías o relaciones espaciales sobre
+una cuadrícula, pero encuentra dificultades cuando debe identificar objetos como entidades persistentes, contar elementos o ejecutar
+una secuencia de transformaciones.
+
+Desde esta perspectiva, el límite de rendimiento no se explica únicamente por el número de capas o por la duración del entrenamiento.
+También refleja el alcance del conjunto de conocimientos previos incorporado en el diseño. Aumentar la capacidad de cálculo puede
+mejorar la optimización dentro de este espacio, pero no garantiza que el modelo pueda resolver una tarea cuyo concepto central no
+esté representado. Por ello, los ejes de mejora deben considerar la incorporación de operaciones de copia y manipulación de objetos,
+primitivas de conteo y mecanismos de iteración adaptativa, manteniendo al mismo tiempo las ventajas de las representaciones
+direccionales y de la equivarianza espacial.
+
 
 \section{Ejes de mejora}
 
+Debido a las limitaciones observadas en los experimentos previos, se proponen los siguientes ejes de mejora para abordar los problemas identificados en el modelo:
+
+\begin{enumerate}
+\item \textbf{Eje H: Reducción de saturación de procesos en paralelo}. El objetivo es estabilizar los problemas de saturación de la CPU sobre todo 
+para el entrenamiento de tareas en paralelo. También se deben desarrollar herramientas para obtener métricas comparativas cuantitativas.
+\item \textbf{Eje D: Eficiencia computacional y aprovechamiento de recursos}. Acelerar el proceso de entrenamiento aprovechando la capacidad
+computacional medido en TFLOPs y VRAM.
+\item \textbf{Eje B: Mejora de robustez del espacio latente}. Tratar de contener el colapso del espacio latente para mejorar la robustez del espacio
+latente en el proceso de entrenamiento.
+\end{enumerate}
+
 \subsection{Eje H: Reducción de saturación de procesos en paralelo}
+
+Las primeras pruebas ejecutadas en el equipo mostraron una saturación de la CPU alrededor del 80\% con diversos procesos en paralelo. Esto
+indicaba una saturación entre la comunicación de la CPU y la GPU. Dado que la mayor parte de operaciones es realizada por la GPU, no tiene sentido
+tal problema de sincronización. El código tampoco requiere operaciones complejas relacionadas con la CPU.
+
+Para controlar, al menos, temporalmente este problema, se implemento un argumento opcional para limitar el número de hilos de procesamiento
+cada vez que se entrenaba en paralelo. El número de hilos de procesamiento prácticamente equivale al número de tareas de entrenamiento al mismo tiempo.
+
+El objetivo principal de este eje es la optimización del tiempo de ejecución. No se busca una mejora en el modelo
+ni que razone mejor, simplemente con los mismos procesos que cada tarea recurra menos sobrecarga de la CPU. La mayoría de 
+operaciones recaen en la GPU pero existen numerosas operaciones pequeñas que son realizadas por el procesador:
+
+\begin{itemize}
+	\item Llamadas a frecuentes.
+	\item Operaciones tensoriales reducidos.
+	\item Lanzamientos de kernels GPU
+	\item Bucles de procesamiento.
+	\item Conversiones de datos entre la CPU y la GPU. La CPU carga información constantemente en la GPU.
+	\item Cálculos de recolección de datos para el error.
+\end{itemize}
+
+El problema era que la CPU debía coordinar demasiadas operaciones pequeñas. Cada proceso consumía CPU 
+preparando operaciones, esperando resultados y comunicándose con la GPU. Una operación como 
+.cpu().numpy() es especialmente importante. Las operaciones del \textit{software} de bajo nivel como ROCm suelen ejecutarse de forma asíncrona, 
+Python deja operaciones en la cola de la GPU y continúa. Sin embargo, cuando el programa solicita los datos en CPU, la CPU debe esperar a que la GPU termine. 
+Esa espera se denomina sincronización GPU y CPU.
+
+\subsubsection{Eliminación de sincronizaciones necesarias}
+
+\subsubsection{Reducción de la frecuencia de postprocesamiento}
+
+\subsubsection{H1: Vectorización del cálculo de la pérdida}
+
+El cálculo del error de reconstrucción constituía otra fuente de sobrecarga para la CPU. Para cada ejemplo y para cada cuadrícula de
+entrada o salida, el modelo debe evaluar las posiciones posibles en las que puede situarse la cuadrícula objetivo dentro de la
+cuadrícula acolchada. La versión inicial recorría estas posiciones mediante bucles de Python y calculaba repetidamente sumas sobre las
+máscaras y pérdidas de clasificación para recortes espaciales pequeños. Aunque cada operación individual era sencilla, el número de
+llamadas al intérprete y de lanzamientos de 	extit{kernels} aumentaba con el número de posiciones candidatas.
+
+La primera parte de H1 vectoriza la probabilidad asociada a cada desplazamiento en una dimensión. Sea $m_i$ la máscara de una dimensión
+de longitud $n$ y sea $L$ la longitud de la ventana objetivo. Para un desplazamiento $o$, el código asigna una puntuación logarítmica no
+normalizada positiva a las posiciones cubiertas por la ventana y negativa a las posiciones que quedan fuera. Esta puntuación se define
+como:
+
+\begin{equation}
+\ell(o)=-\sum_{i=0}^{o-1}m_i
+				+\sum_{i=o}^{o+L-1}m_i
+				-\sum_{i=o+L}^{n-1}m_i,
+\qquad o\in\{0,\ldots,n-L\}.
+\label{eq:h1-perdida-offset}
+\end{equation}
+
+El cálculo directo de la Ecuación \eqref{eq:h1-perdida-offset} repite gran parte de las mismas sumas para desplazamientos consecutivos.
+Para eliminarlas se define la suma prefija de la máscara:
+
+\begin{equation}
+P(k)=\sum_{i=0}^{k-1}m_i,
+\qquad P(0)=0,
+\qquad T=P(n)=\sum_{i=0}^{n-1}m_i.
+\label{eq:h1-suma-prefija}
+\end{equation}
+
+Con esta definición, las tres regiones de la cuadrícula se expresan mediante dos accesos a $P$ y el total $T$:
+
+\begin{equation}
+\begin{aligned}
+\sum_{i=0}^{o-1}m_i&=P(o),\\
+\sum_{i=o}^{o+L-1}m_i&=P(o+L)-P(o),\\
+\sum_{i=o+L}^{n-1}m_i&=T-P(o+L).
+\end{aligned}
+\label{eq:h1-regiones-prefijas}
+\end{equation}
+
+Al sustituir estas igualdades en la puntuación original se obtiene:
+
+\begin{equation}
+\begin{aligned}
+\ell(o)
+	&=-P(o)+\bigl(P(o+L)-P(o)\bigr)-\bigl(T-P(o+L)\bigr)\\
+	&=2P(o+L)-2P(o)-T.
+\end{aligned}
+\label{eq:h1-perdida-vectorizada}
+\end{equation}
+
+Por tanto, basta calcular una sola suma acumulada y realizar dos selecciones vectoriales. Si $N_L=n-L+1$ es el número de ventanas
+posibles, todas las puntuaciones se obtienen simultáneamente mediante:
+
+\begin{equation}
+\boldsymbol{\ell}_L
+ =\left(2P(o+L)-2P(o)-T\right)_{o=0}^{N_L-1}.
+\label{eq:h1-vector-offsets}
+\end{equation}
+
+La distribución sobre los desplazamientos se normaliza con la función \textit{logsumexp}, que evita calcular explícitamente
+exponenciales potencialmente inestables:
+
+\begin{equation}
+\begin{aligned}
+\log Z_L&=\log\left(\sum_{o=0}^{n-L}\exp\bigl(\ell(o)\bigr)\right)
+					=\operatorname{logsumexp}_{o}\bigl(\ell(o)\bigr),\\
+\log p(o\mid L,m)&=\ell(o)-\log Z_L.
+\end{aligned}
+\label{eq:h1-particion-desplazamiento}
+\end{equation}
+
+La segunda parte de H1 vectoriza la reconstrucción de los colores. Sean $a_{c,i,j}$ los 	extit{logits} del color $c$ en la posición
+$(i,j)$, y sea $G\in\{0,\ldots,C-1\}^{L_x\times L_y}$ la cuadrícula objetivo. Para unos desplazamientos $(x,y)$, la pérdida de
+clasificación del recorte es:
+
+\begin{equation}
+\operatorname{CE}_{x,y}
+ =-\sum_{i=0}^{L_x-1}\sum_{j=0}^{L_y-1}
+	 \log\left(
+	 \frac{\exp\bigl(a_{G_{i,j},x+i,y+j}\bigr)}
+	 {\displaystyle\sum_{c=0}^{C-1}\exp\bigl(a_{c,x+i,y+j}\bigr)}
+	 \right).
+\label{eq:h1-cross-entropy}
+\end{equation}
+
+En lugar de extraer cada recorte por separado, la operación \textit{unfold} organiza todos los recortes en un único tensor. En términos
+matemáticos, si $\mathcal{A}$ representa ese tensor, sus elementos son:
+
+\begin{equation}
+\mathcal{A}_{x,y,c,i,j}=a_{c,x+i,y+j},
+\qquad
+\begin{matrix}
+0\leq x<n_x-L_x+1,\\
+0\leq y<n_y-L_y+1.
+\end{matrix}
+\label{eq:h1-unfold}
+\end{equation}
+
+El tensor se reorganiza para que cada par $(x,y)$ sea un elemento de un mismo lote. De esta forma, la operación
+\texttt{cross\_entropy} recibe simultáneamente todos los recortes y produce una matriz de pérdidas
+$\left[\operatorname{CE}_{x,y}\right]$, en lugar de ejecutar una llamada independiente para cada par de desplazamientos. El
+contenido matemático de cada pérdida no cambia; únicamente se modifica la forma de evaluarlo en el dispositivo acelerador.
+
+Una vez calculadas las puntuaciones de posición y las pérdidas de color, la probabilidad de reconstruir la cuadrícula objetivo se obtiene
+marginalizando todos los desplazamientos posibles. Sean
+
+\begin{equation}
+\log Z_x=\operatorname{logsumexp}_{x}\bigl(\ell_x(x)\bigr),
+\qquad
+\log Z_y=\operatorname{logsumexp}_{y}\bigl(\ell_y(y)\bigr).
+\label{eq:h1-particiones-espaciales}
+\end{equation}
+
+Entonces, la log-probabilidad marginal de la reconstrucción es:
+
+\begin{equation}
+\log p(G\mid a,L_x,L_y)
+ =\operatorname{logsumexp}_{x,y}\left[
+		\ell_x(x)-\log Z_x
+	 +\ell_y(y)-\log Z_y
+	 -\operatorname{CE}_{x,y}
+	\right].
+\label{eq:h1-marginalizacion}
+\end{equation}
+
+El término de entropía cruzada aparece con signo negativo porque una pérdida mayor implica una probabilidad menor de reconstrucción. La
+Ecuación \eqref{eq:h1-marginalizacion} conserva la misma marginalización que el cálculo original, pero todos los candidatos espaciales
+se procesan como un lote. El error de reconstrucción de un paso de entrenamiento y la función objetivo completa quedan expresados como:
+
+\begin{equation}
+\begin{aligned}
+\mathrm{reconstruction\_error}
+	&=-\sum_{(e,d)\in\mathcal{V}}
+		\log p\bigl(G_{e,d}\mid a_{e,d},L_{x,e,d},L_{y,e,d}\bigr),\\
+\mathcal{L}
+	&=\mathrm{total\_KL}+10\,\mathrm{reconstruction\_error},
+\end{aligned}
+\label{eq:h1-objetivo-global}
+\end{equation}
+
+donde $\mathcal{V}$ contiene las cuadrículas observadas que intervienen en la reconstrucción. Cuando el tamaño de la salida no se conoce
+de antemano, se mantienen los bucles que recorren las longitudes posibles y se agregan sus términos mediante \textit{logsumexp}, con el
+factor de ponderación definido por el paso de entrenamiento. También permanecen los bucles externos sobre los ejemplos y sobre las
+cuadrículas de entrada y salida, porque cada una utiliza una máscara, un tamaño objetivo y unos \textit{logits} diferentes. La
+vectorización se aplica al nivel con mayor número de candidatos, es decir, a todos los desplazamientos de una dimensión y a todos los
+pares de desplazamientos espaciales.
+
+La transformación de la Ecuación \eqref{eq:h1-perdida-offset} a la Ecuación \eqref{eq:h1-perdida-vectorizada} es una identidad
+algebraica, por lo que H1 no introduce una aproximación del modelo ni modifica la función objetivo. Las únicas diferencias observables
+son las pequeñas variaciones de redondeo propias del orden de las operaciones en coma flotante. El número de pérdidas elementales que
+debe calcularse sigue dependiendo del número de recortes posibles, pero se reducen las llamadas pequeñas desde Python, los lanzamientos
+de \textit{kernels} y las sincronizaciones intermedias entre la CPU y la GPU.
+
+
+
 
 \subsection{Eje D: Eficiencia computacional y aprovechamiento de recursos}
 
-\subsection{Eje B: Mejora de robustez del conjuntos de tensores}
+\subsection{Eje B: Mejora de robustez del espacio latente}
+
+\subsubsection{Herramienta de visualización de procesos}
 
 
 % Conversación chatGPT https://chatgpt.com/share/6a260857-7178-83eb-89a4-2001dce06c2d
