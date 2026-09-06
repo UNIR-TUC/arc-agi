@@ -17,6 +17,7 @@
         "dimensionalidad",
         "ECDXY",
         "entrenables",
+        "equivarianza",
         "François",
         "GBFS",
         "GDDR",
@@ -46,11 +47,13 @@
         "Neurosimbólico",
         "numpy",
         "Numpy",
+        "objetualidad",
         "Orallo",
         "PFLOPs",
         "PRETRAINING",
         "pydantic",
         "Pydantic",
+        "Pytorch",
         "Radeon",
         "reescalado",
         "retropropagación",
@@ -81,6 +84,7 @@
         "Varicional",
         "varicionales",
         "Varicionales",
+        "vectoriza",
         "VIMRL"
     ]
 }

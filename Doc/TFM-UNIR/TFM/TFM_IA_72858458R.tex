@@ -1415,7 +1415,7 @@ junto con sus versiones y abreviaciones para su referencia en el resto del docum
 \FloatBarrier
 
 % TODO: Añadir herramientas de visualización y análisis de resultados.
-\section{Utilidades externas de ARC-AGI}
+% \section{Utilidades externas de ARC-AGI}
 
 
 % Utilizar las pautas de  https://arahim3.github.io/arc-agi-guide/ para realizar la introducción del texto.
@@ -1732,8 +1732,6 @@ Esta expresión es una aproximación diferenciable del principio MDL, restringid
 constituye una medida exacta de la longitud mínima de todos los programas capaces de resolver una tarea. Por tanto, una explicación que comprime
 los ejemplos conocidos con menor coste tiene más posibilidades de capturar la estructura de la tarea y extrapolarla al ejemplo de prueba. En esta
 formulación, los píxeles observados incluyen las entradas de prueba, pero no sus salidas, que permanecen ocultas.
-
-
 
 En cada tarea se realiza un bucle de entrenamiento completo. Esto lo convierte en un sistema esencialmente transductivo. Se realiza
 una optimización específica por tarea en vez de un entrenamiento global. No es un modelo inductivo convencional entrenado globalmente para
@@ -2359,18 +2357,18 @@ que la arquitectura ya contiene.
 
 \subsubsection{Objetualidad}
 
-La objetualidad, denominada \textit{objectness} en el marco de Chollet, comprende la capacidad de percibir entidades como objetos
+La objetualidad, denominada \textit{objectness} se comprende como la capacidad de percibir entidades como objetos
 cohesionados, persistentes y diferenciables del fondo. En muchas tareas de ARC-AGI la regla no se aplica a cada celda de manera
 aislada, sino a una figura completa. El tamaño, la forma, la posición, el color o la relación de una figura con otras entidades
 determinan la transformación que debe realizarse.
 
 CompressARC no incluye una representación explícita de objetos. Sus operaciones trabajan sobre tensores densos y sobre las
-combinaciones de ejes del sistema multitensor. La información sobre una figura puede mantenerse de forma implícita mediante los
+combinaciones de ejes del sistema Multitensor. La información sobre una figura puede mantenerse de forma implícita mediante los
 valores de sus celdas, las máscaras y las operaciones espaciales, pero el modelo no detecta componentes conexas como unidades
 independientes ni reserva un estado específico para sus propiedades. Tampoco existe un mecanismo dedicado para comparar dos objetos,
 seleccionar el de mayor tamaño o agruparlos según su forma.
 
-Esta carencia explica que algunas tareas de selección, agrupación o reordenación de objetos solo sean accesibles cuando la regla
+Esta carencia explica que algunas tareas de selección, agrupación o re-ordenación de objetos solo sean accesibles cuando la regla
 puede aproximarse mediante operaciones píxel a píxel y relaciones direccionales. Cuando la solución exige conservar la identidad de
 varias figuras y operar sobre cada una de ellas de manera independiente, la representación actual debe codificar esa información en
 activaciones distribuidas. El modelo posee, por tanto, una objetualidad implícita y débil, pero no un núcleo de conocimiento
@@ -2447,24 +2445,24 @@ esté representado. Por ello, los ejes de mejora deben considerar la incorporaci
 primitivas de conteo y mecanismos de iteración adaptativa, manteniendo al mismo tiempo las ventajas de las representaciones
 direccionales y de la equivarianza espacial.
 
-
 \section{Ejes de mejora}
 
 Debido a las limitaciones observadas en los experimentos previos, se proponen los siguientes ejes de mejora para abordar los problemas identificados en el modelo:
 
 \begin{enumerate}
-\item \textbf{Eje H: Reducción de saturación de procesos en paralelo}. El objetivo es estabilizar los problemas de saturación de la CPU sobre todo 
-para el entrenamiento de tareas en paralelo. También se deben desarrollar herramientas para obtener métricas comparativas cuantitativas.
-\item \textbf{Eje D: Eficiencia computacional y aprovechamiento de recursos}. Acelerar el proceso de entrenamiento aprovechando la capacidad
-computacional medido en TFLOPs y VRAM.
-\item \textbf{Eje B: Mejora de robustez del espacio latente}. Tratar de contener el colapso del espacio latente para mejorar la robustez del espacio
-latente en el proceso de entrenamiento.
+	\item \textbf{Eje H: Reducción de saturación de procesos en paralelo}. El objetivo es estabilizar los problemas de saturación de la CPU sobre todo 
+	para el entrenamiento de tareas en paralelo. También se deben desarrollar herramientas para obtener métricas comparativas cuantitativas.
+	\item \textbf{Eje D: Eficiencia computacional y aprovechamiento de recursos}. Acelerar el proceso de entrenamiento aprovechando la capacidad
+	computacional medido en TFLOPs y VRAM.
+	\item \textbf{Eje B: Mejora de robustez del espacio latente}. Tratar de contener el colapso del espacio latente para mejorar la robustez en el proceso de entrenamiento.
 \end{enumerate}
 
 \subsection{Eje H: Reducción de saturación de procesos en paralelo}
 
 Las primeras pruebas ejecutadas en el equipo mostraron una saturación de la CPU alrededor del 80\% con diversos procesos en paralelo. Esto
-indicaba una saturación entre la comunicación de la CPU y la GPU. Dado que la mayor parte de operaciones es realizada por la GPU, no tiene sentido
+indicaba una saturación entre la comunicación de la CPU y la GPU. Como consecuencia del alto uso intensivo, también provoca serios problemas
+de temperatura durante procesos prolongados. En muchas ocasiones, los diversos procesos en paralelo
+han provocado temperaturas por encima de 90°C, lo que representa un riesgo de supervivencia técnica del proyecto. Dado que la mayor parte de operaciones es realizada por la GPU, no tiene sentido
 tal problema de sincronización. El código tampoco requiere operaciones complejas relacionadas con la CPU.
 
 Para controlar, al menos, temporalmente este problema, se implemento un argumento opcional para limitar el número de hilos de procesamiento
@@ -2485,179 +2483,167 @@ operaciones recaen en la GPU pero existen numerosas operaciones pequeñas que so
 
 El problema era que la CPU debía coordinar demasiadas operaciones pequeñas. Cada proceso consumía CPU 
 preparando operaciones, esperando resultados y comunicándose con la GPU. Una operación como 
-.cpu().numpy() es especialmente importante. Las operaciones del \textit{software} de bajo nivel como ROCm suelen ejecutarse de forma asíncrona, 
+\(\text{.cpu().numpy()}\) es especialmente importante. Las operaciones del \textit{software} de bajo nivel como ROCm suelen ejecutarse de forma asíncrona, 
 Python deja operaciones en la cola de la GPU y continúa. Sin embargo, cuando el programa solicita los datos en CPU, la CPU debe esperar a que la GPU termine. 
 Esa espera se denomina sincronización GPU y CPU.
 
 \subsubsection{Eliminación de sincronizaciones necesarias}
 
-\subsubsection{Reducción de la frecuencia de postprocesamiento}
+Los entrenamientos de tareas requieren una gran cantidad de iteraciones para encontrar la solución. Este número de iteraciones oscilan entre 1500 y
+2000. En cada iteración se realiza diversas operaciones como el error acumulado, el error de reconstrucción y la pérdida total. Estos datos
+se estaban registrando mediante objetos en memoria. Aun que cada valor podría ser solamente un escalar, la operación obligaba el registro en 
+memoria por medio de la CPU. El problema radica en la cantidad de sincronizaciones necesarias en los diferentes componentes del sistema y el
+coste de detener el proceso y esperar a que finalicen las operaciones de la GPU pueden ser mucho mayor. Muchas de estas sincronizaciones
+se utilizaban para generar registros de análisis y visualización, lo cual no interesa cuando se trata de realizar trabajos en paralelo.
 
-\subsubsection{H1: Vectorización del cálculo de la pérdida}
+Se realizaron una serie de cambios para que de manera opcional todo tipo de estas operaciones de registro
+no se realizaran en procesos largos y en paralelo. No se fuerza la sincronización en cada iteración, ya no es necesario hacerlo. Toda esta transferencia de 
+datos se conservaría en la memoria de la GPU y posteriormente de manera opcional se transfiere a la CPU en caso de análisis o visualización.
 
-El cálculo del error de reconstrucción constituía otra fuente de sobrecarga para la CPU. Para cada ejemplo y para cada cuadrícula de
-entrada o salida, el modelo debe evaluar las posiciones posibles en las que puede situarse la cuadrícula objetivo dentro de la
-cuadrícula acolchada. La versión inicial recorría estas posiciones mediante bucles de Python y calculaba repetidamente sumas sobre las
-máscaras y pérdidas de clasificación para recortes espaciales pequeños. Aunque cada operación individual era sencilla, el número de
-llamadas al intérprete y de lanzamientos de 	extit{kernels} aumentaba con el número de posiciones candidatas.
+Se introdujo también un componente denominado \textit{profiler} que se encargaría de lanzar los procesos de manera independiente y realizar
+mediciones para posteriormente analizar y comparar métricas.
 
-La primera parte de H1 vectoriza la probabilidad asociada a cada desplazamiento en una dimensión. Sea $m_i$ la máscara de una dimensión
-de longitud $n$ y sea $L$ la longitud de la ventana objetivo. Para un desplazamiento $o$, el código asigna una puntuación logarítmica no
-normalizada positiva a las posiciones cubiertas por la ventana y negativa a las posiciones que quedan fuera. Esta puntuación se define
-como:
+\subsubsection{Reducción de la frecuencia de post-procesamiento}
 
-\begin{equation}
-\ell(o)=-\sum_{i=0}^{o-1}m_i
-				+\sum_{i=o}^{o+L-1}m_i
-				-\sum_{i=o+L}^{n-1}m_i,
-\qquad o\in\{0,\ldots,n-L\}.
-\label{eq:h1-perdida-offset}
-\end{equation}
+Durante el entrenamiento no es necesario generar curvas, gráficos ni análisis detallados en cada iteración. Por ello, el
+post-procesamiento se realiza con menor frecuencia y se concentra al finalizar el entrenamiento o en puntos concretos de supervisión.
+De este modo, la GPU se dedica principalmente al cálculo del modelo y se reducen las transferencias de datos y las esperas de la CPU.
 
-El cálculo directo de la Ecuación \eqref{eq:h1-perdida-offset} repite gran parte de las mismas sumas para desplazamientos consecutivos.
-Para eliminarlas se define la suma prefija de la máscara:
+Esta mejora no modifica la pérdida ni los parámetros aprendidos. Solo evita repetir tareas de registro y visualización que no son
+necesarias para cada paso, lo que disminuye el tiempo total de ejecución, especialmente cuando se entrenan varias tareas en paralelo.
+
+\subsubsection{Vectorización del cálculo de la pérdida}
+
+El cálculo del error de reconstrucción generaba muchas operaciones pequeñas en la CPU. Para cada ejemplo se probaban distintas
+posiciones de la cuadrícula objetivo y se calculaba una pérdida para cada recorte. H1 agrupa estas operaciones para procesarlas de
+forma vectorizada en la GPU.
+
+En primer lugar se calculan las puntuaciones de todas las posiciones posibles mediante una suma prefija de la máscara $m$. Si $P(k)$
+es la suma de los valores anteriores a la posición $k$, la puntuación de un desplazamiento $o$ puede escribirse como:
 
 \begin{equation}
 P(k)=\sum_{i=0}^{k-1}m_i,
-\qquad P(0)=0,
-\qquad T=P(n)=\sum_{i=0}^{n-1}m_i.
-\label{eq:h1-suma-prefija}
-\end{equation}
-
-Con esta definición, las tres regiones de la cuadrícula se expresan mediante dos accesos a $P$ y el total $T$:
-
-\begin{equation}
-\begin{aligned}
-\sum_{i=0}^{o-1}m_i&=P(o),\\
-\sum_{i=o}^{o+L-1}m_i&=P(o+L)-P(o),\\
-\sum_{i=o+L}^{n-1}m_i&=T-P(o+L).
-\end{aligned}
-\label{eq:h1-regiones-prefijas}
-\end{equation}
-
-Al sustituir estas igualdades en la puntuación original se obtiene:
-
-\begin{equation}
-\begin{aligned}
-\ell(o)
-	&=-P(o)+\bigl(P(o+L)-P(o)\bigr)-\bigl(T-P(o+L)\bigr)\\
-	&=2P(o+L)-2P(o)-T.
-\end{aligned}
+\qquad
+\ell(o)=2P(o+L)-2P(o)-P(n),
+\qquad 0\leq o\leq n-L.
 \label{eq:h1-perdida-vectorizada}
 \end{equation}
 
-Por tanto, basta calcular una sola suma acumulada y realizar dos selecciones vectoriales. Si $N_L=n-L+1$ es el número de ventanas
-posibles, todas las puntuaciones se obtienen simultáneamente mediante:
+Así, la suma de cada región de la máscara se obtiene reutilizando los valores de $P$, en lugar de repetirla para cada desplazamiento.
+Todas las puntuaciones se calculan a la vez y se convierten en probabilidades mediante \textit{logsumexp}:
 
 \begin{equation}
-\boldsymbol{\ell}_L
- =\left(2P(o+L)-2P(o)-T\right)_{o=0}^{N_L-1}.
-\label{eq:h1-vector-offsets}
-\end{equation}
-
-La distribución sobre los desplazamientos se normaliza con la función \textit{logsumexp}, que evita calcular explícitamente
-exponenciales potencialmente inestables:
-
-\begin{equation}
-\begin{aligned}
-\log Z_L&=\log\left(\sum_{o=0}^{n-L}\exp\bigl(\ell(o)\bigr)\right)
-					=\operatorname{logsumexp}_{o}\bigl(\ell(o)\bigr),\\
-\log p(o\mid L,m)&=\ell(o)-\log Z_L.
-\end{aligned}
+\log p(o\mid m,L)=\ell(o)-\operatorname{logsumexp}_{o'}\bigl(\ell(o')\bigr).
 \label{eq:h1-particion-desplazamiento}
 \end{equation}
 
-La segunda parte de H1 vectoriza la reconstrucción de los colores. Sean $a_{c,i,j}$ los 	extit{logits} del color $c$ en la posición
-$(i,j)$, y sea $G\in\{0,\ldots,C-1\}^{L_x\times L_y}$ la cuadrícula objetivo. Para unos desplazamientos $(x,y)$, la pérdida de
-clasificación del recorte es:
-
-\begin{equation}
-\operatorname{CE}_{x,y}
- =-\sum_{i=0}^{L_x-1}\sum_{j=0}^{L_y-1}
-	 \log\left(
-	 \frac{\exp\bigl(a_{G_{i,j},x+i,y+j}\bigr)}
-	 {\displaystyle\sum_{c=0}^{C-1}\exp\bigl(a_{c,x+i,y+j}\bigr)}
-	 \right).
-\label{eq:h1-cross-entropy}
-\end{equation}
-
-En lugar de extraer cada recorte por separado, la operación \textit{unfold} organiza todos los recortes en un único tensor. En términos
-matemáticos, si $\mathcal{A}$ representa ese tensor, sus elementos son:
+La segunda parte de H1 vectoriza la reconstrucción de los colores. La operación \textit{unfold} extrae todos los recortes posibles de
+los \textit{logits} y los organiza como un lote. Para cada posición $(x,y)$, el tensor resultante contiene los valores:
 
 \begin{equation}
 \mathcal{A}_{x,y,c,i,j}=a_{c,x+i,y+j},
 \qquad
-\begin{matrix}
-0\leq x<n_x-L_x+1,\\
-0\leq y<n_y-L_y+1.
-\end{matrix}
+\operatorname{CE}_{x,y}=\operatorname{CE}(\mathcal{A}_{x,y},G).
 \label{eq:h1-unfold}
 \end{equation}
 
-El tensor se reorganiza para que cada par $(x,y)$ sea un elemento de un mismo lote. De esta forma, la operación
-\texttt{cross\_entropy} recibe simultáneamente todos los recortes y produce una matriz de pérdidas
-$\left[\operatorname{CE}_{x,y}\right]$, en lugar de ejecutar una llamada independiente para cada par de desplazamientos. El
-contenido matemático de cada pérdida no cambia; únicamente se modifica la forma de evaluarlo en el dispositivo acelerador.
-
-Una vez calculadas las puntuaciones de posición y las pérdidas de color, la probabilidad de reconstruir la cuadrícula objetivo se obtiene
-marginalizando todos los desplazamientos posibles. Sean
+La entropía cruzada se calcula entonces para todos los recortes en una sola llamada. Una pérdida de clasificación mayor implica una menor
+probabilidad de reconstrucción. Por ello, la probabilidad final suma todos los desplazamientos posibles con \textit{logsumexp}:
 
 \begin{equation}
-\log Z_x=\operatorname{logsumexp}_{x}\bigl(\ell_x(x)\bigr),
-\qquad
-\log Z_y=\operatorname{logsumexp}_{y}\bigl(\ell_y(y)\bigr).
-\label{eq:h1-particiones-espaciales}
-\end{equation}
-
-Entonces, la log-probabilidad marginal de la reconstrucción es:
-
-\begin{equation}
-\log p(G\mid a,L_x,L_y)
- =\operatorname{logsumexp}_{x,y}\left[
-		\ell_x(x)-\log Z_x
-	 +\ell_y(y)-\log Z_y
-	 -\operatorname{CE}_{x,y}
-	\right].
+\log p(G\mid a,L_x,L_y)=\operatorname{logsumexp}_{x,y}\left[
+\log p(x)+\log p(y)-\operatorname{CE}_{x,y}\right].
 \label{eq:h1-marginalizacion}
 \end{equation}
 
-El término de entropía cruzada aparece con signo negativo porque una pérdida mayor implica una probabilidad menor de reconstrucción. La
-Ecuación \eqref{eq:h1-marginalizacion} conserva la misma marginalización que el cálculo original, pero todos los candidatos espaciales
-se procesan como un lote. El error de reconstrucción de un paso de entrenamiento y la función objetivo completa quedan expresados como:
+El objetivo de entrenamiento no cambia:
 
 \begin{equation}
-\begin{aligned}
-\mathrm{reconstruction\_error}
-	&=-\sum_{(e,d)\in\mathcal{V}}
-		\log p\bigl(G_{e,d}\mid a_{e,d},L_{x,e,d},L_{y,e,d}\bigr),\\
-\mathcal{L}
-	&=\mathrm{total\_KL}+10\,\mathrm{reconstruction\_error},
-\end{aligned}
+\mathcal{L}=\mathrm{total\_KL}+10\,\mathrm{reconstruction\_error}.
 \label{eq:h1-objetivo-global}
 \end{equation}
 
-donde $\mathcal{V}$ contiene las cuadrículas observadas que intervienen en la reconstrucción. Cuando el tamaño de la salida no se conoce
-de antemano, se mantienen los bucles que recorren las longitudes posibles y se agregan sus términos mediante \textit{logsumexp}, con el
-factor de ponderación definido por el paso de entrenamiento. También permanecen los bucles externos sobre los ejemplos y sobre las
-cuadrículas de entrada y salida, porque cada una utiliza una máscara, un tamaño objetivo y unos \textit{logits} diferentes. La
-vectorización se aplica al nivel con mayor número de candidatos, es decir, a todos los desplazamientos de una dimensión y a todos los
-pares de desplazamientos espaciales.
+Los bucles externos sobre ejemplos, cuadrículas y tamaños posibles se mantienen porque cada caso tiene máscaras y dimensiones
+diferentes. La vectorización se aplica a la parte con más candidatos, es decir, a los desplazamientos y a los recortes espaciales. De
+este modo se reducen las llamadas de Python, los lanzamientos de \textit{kernels} y las sincronizaciones entre CPU y GPU, sin cambiar
+la función de pérdida salvo por pequeñas diferencias de redondeo.
 
-La transformación de la Ecuación \eqref{eq:h1-perdida-offset} a la Ecuación \eqref{eq:h1-perdida-vectorizada} es una identidad
-algebraica, por lo que H1 no introduce una aproximación del modelo ni modifica la función objetivo. Las únicas diferencias observables
-son las pequeñas variaciones de redondeo propias del orden de las operaciones en coma flotante. El número de pérdidas elementales que
-debe calcularse sigue dependiendo del número de recortes posibles, pero se reducen las llamadas pequeñas desde Python, los lanzamientos
-de \textit{kernels} y las sincronizaciones intermedias entre la CPU y la GPU.
+Se realizaron una serie de pruebas con pequeños conjuntos de tareas de entrenamiento para comprobar realmente que existen mejoras cuantitativas.
 
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{4.5cm}|p{2.3cm}|p{2.3cm}|p{3.0cm}|}
+\hline
+\textbf{Métrica} & \textbf{Base} & \textbf{Optimizada} & \textbf{Variación} \\
+\hline
+Tiempo total de ejecución & 7929,4 s & 7140,2 s & $-10,0\%$ \\
+\hline
+Duración media por tarea & 7101,4 s & 6379,4 s & $-10,2\%$ \\
+\hline
+Uso medio de CPU & 84,8\% & 80,4\% & $-4,4$ p.p. \\
+\hline
+Tiempo con CPU $>90\%$ & 74,3\% & 65,0\% & $-9,3$ p.p. ($-12,5\%$ relativo) \\
+\hline
+Utilización media de GPU & 99,5\% & 99,6\% & $+0,1$ p.p. \\
+\hline
+Tareas resueltas & 5 de 12 (41,7\%) & 5 de 12 (41,7\%) & Sin variación \\
+\hline
+\end{tabular}
+\caption{Resultados comparativos de la línea base y la versión optimizada del Eje H en 12 tareas de entrenamiento en paralelo.}
+\label{tab:eje-h-resultados}
+\end{table}
 
+\FloatBarrier
 
+Las métricas se han calculado con únicamente las 12 tareas reales, sin incluir el proceso auxiliar de gestión. En conjunto, las optimizaciones
+redujeron el tiempo de ejecución y la saturación de la CPU, sin disminuir la utilización de la GPU ni la precisión observada en las tareas.
 
 \subsection{Eje D: Eficiencia computacional y aprovechamiento de recursos}
+
+El objetivo principal de este eje de mejoras es acelerar las operaciones realizadas en los procesos de entrenamiento. Principalmente se requiere
+optimizar los procesos en paralelo y reducir el tiempo de entrenamiento lo máximo posible. No se requiere modificar el núcleo principal del modelo.
+
+El modelo base realiza los entrenamiento con una precisión predeterminada de 32 bits de punto flotante (FP32). Se realizan pruebas utilizando
+punto flotante cerebral de 16 bits (BF16) para acelerar el entrenamiento sin reducir la capacidad del modelo. Tras probarlo, se pudo apreciar
+un impacto en el rendimiento considerablemente peor, descartando reducir la precisión de los datos de manera definitiva.
+
+La tarjeta gráfica Radeon RX 9070 XT dispone de cómputo aritmético suficiente como para poder realizar operaciones de entrenamiento
+a un mayor ritmo. Algo que se pudo detectar es que el trabajo realizado por la gráfica estaba por debajo de sus capacidades. Tras inspeccionar
+el código se pudo comprobar que una de las posibles causas es que la CPU estaba solicitando continuamente muchos \textit{kernels} pequeños y
+el tiempo de lanzar y coordinar tal número de micro-códigos podía ser mayor que el tiempo utilizado para realizar las operaciones.
+
+Para resolver este problema se diseña un nuevo componente denominado \textit{inductor} para mejorar la eficiencia de las operaciones mediante
+compilación de \textit{kernels}, construyendo una versión optimizada de las regiones que Pytorch puede analizar. Internamente el código de bajo
+nivel construye un grafo para conectar las diversas operaciones en lugar de ejecutar inmediatamente cada operación.
+
 
 \subsection{Eje B: Mejora de robustez del espacio latente}
 
 \subsubsection{Herramienta de visualización de procesos}
 
+\subsection{Problemas encontrados}
+
+Durante el desarrollo se han ido encontrado diversos problemas relacionados con la puesta en marcha del \textit{software} de entorno
+entre otros problemas:
+
+\begin{itemize}
+	\item A pesar de los grandes avances ROCm, todavía se encuentran errores de drivers en medio de procesos de entrenamiento. Esto era un problema
+	especialmente preocupante al inicio del desarrollo por que podía provocar que todo el conjunto de entrenamiento de las tareas que dura muchas
+	horas se pueda verse afectado. Se tuvieron que realizar protocolos y excepciones de código para controlar de forma aislada aquellos entrenamientos
+	que provocaban fallos en todo el sistema.
+	\item Se encontraron problemas del \textit{software} que controlaban diversos sistemas del equipo durante largas horas de entrenamiento. 
+	Los ventiladores del equipo podían quedarse sin funcionar en cualquier momento.
+	\item Problemas de falta de memoria gráfica durante el entrenamiento de diversas tareas en paralelo. Se tuvo que recurrir a una especia de fase
+	previa en la que la GPU carga los modelos en memoria, calcula el consumo y se guarda en un archivo temporal para que luego el programa
+	supiera de alguna manera el tamaño de reserva antes de cargarlo.
+	\item La compilación de \textit{kernels} también presentaba problemas en ciertas circunstancias. Los millones de archivos que se generan con
+	el tiempo aumentaban el espacio del disco. Se tuvo que recurrir al uso de un dispositivo de almacenamiento adicional para recoger los 842 GB
+	de documentos creados tras el entrenamiento de las 800 tareas (conjunto de entrenamiento y evaluación).
+	\item Además de optimizar el flujo de entrenamiento y el uso de la CPU, los problemas de temperatura continuaron. Se cambió el sistema de
+	refrigeración y se añadió un marco de contacto de CPU, además de aplicar un menor voltaje por medio de la BIOS.
+\end{itemize}
 
 % Conversación chatGPT https://chatgpt.com/share/6a260857-7178-83eb-89a4-2001dce06c2d
 % Coste actual por hora de 5070 TI https://cloud.vast.ai/?utm_source=getdeploying.com&utm_medium=paid&utm_content=nvidia-rtx-5070-ti
@@ -2673,6 +2659,10 @@ Pendiente de redactar.
 
 Pendiente de redactar.
 
+\chapter{Ética del proyecto}
+
+Pendiente de redactar.
+
 \chapter{Conclusiones y Trabajo Futuro}
 
 Pendiente de redactar.
@@ -2685,8 +2675,8 @@ Pendiente de redactar.
 \bibliographystyle{apacite}
 \bibliography{bibliografia}
 
-\appendix
-\chapter{Apéndices}
+%\appendix
+%\chapter{Apéndices}
 
 \end{document}
 

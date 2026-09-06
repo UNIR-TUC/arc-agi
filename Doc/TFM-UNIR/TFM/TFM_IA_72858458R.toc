@@ -53,41 +53,41 @@
 \contentsline {chapter}{\numberline {4}Infraestructura y herramientas}{50}{chapter.4}%
 \contentsline {section}{\numberline {4.1}Infraestructura de computación}{50}{section.4.1}%
 \contentsline {section}{\numberline {4.2}Entorno de desarrollo}{51}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Utilidades externas de ARC-AGI}{53}{section.4.3}%
-\contentsline {chapter}{\numberline {5}Desarrollo}{54}{chapter.5}%
-\contentsline {subsection}{\numberline {5.0.1}Análisis exploratorio de datos}{57}{subsection.5.0.1}%
-\contentsline {section}{\numberline {5.1}Sistema de referencia}{61}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Pruebas iniciales}{65}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Codificador Multitensor}{66}{subsection.5.1.2}%
-\contentsline {subsubsection}{Direcciones}{68}{subsubsection*.12}%
-\contentsline {subsection}{\numberline {5.1.3}Arquitectura de decodificación}{68}{subsection.5.1.3}%
-\contentsline {subsubsection}{Comunicación ascendente del Multitensor}{70}{subsubsection*.13}%
-\contentsline {subsubsection}{Selección multi-eje}{70}{subsubsection*.14}%
-\contentsline {subsubsection}{Máximo acumulado direccional}{71}{subsubsection*.15}%
-\contentsline {subsubsection}{Desplazamiento direccional}{72}{subsubsection*.16}%
-\contentsline {subsubsection}{Comunicación entre direcciones}{73}{subsubsection*.17}%
-\contentsline {subsubsection}{Transformación no lineal}{74}{subsubsection*.18}%
-\contentsline {subsubsection}{Comunicación descendente del Multitensor}{75}{subsubsection*.19}%
-\contentsline {subsubsection}{Normalización final}{76}{subsubsection*.20}%
-\contentsline {subsubsection}{Contantes}{77}{subsubsection*.21}%
-\contentsline {subsection}{\numberline {5.1.4}Limitaciones}{77}{subsection.5.1.4}%
-\contentsline {subsection}{\numberline {5.1.5}Núcleos de conocimiento}{79}{subsection.5.1.5}%
-\contentsline {subsubsection}{Objetualidad}{79}{subsubsection*.22}%
-\contentsline {subsubsection}{Orientación hacia objetivos}{80}{subsubsection*.23}%
-\contentsline {subsubsection}{Números y conteo}{81}{subsubsection*.24}%
-\contentsline {subsubsection}{Geometría elemental y topología}{81}{subsubsection*.25}%
-\contentsline {subsubsection}{Síntesis de los núcleos presentes}{82}{subsubsection*.26}%
-\contentsline {section}{\numberline {5.2}Ejes de mejora}{82}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Eje H: Reducción de saturación de procesos en paralelo}{83}{subsection.5.2.1}%
-\contentsline {subsubsection}{Eliminación de sincronizaciones necesarias}{84}{subsubsection*.27}%
-\contentsline {subsubsection}{Reducción de la frecuencia de postprocesamiento}{84}{subsubsection*.28}%
-\contentsline {subsubsection}{H1: Vectorización del cálculo de la pérdida}{84}{subsubsection*.29}%
-\contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{87}{subsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del espacio latente}{87}{subsection.5.2.3}%
-\contentsline {subsubsection}{Herramienta de visualización de procesos}{87}{subsubsection*.30}%
+\contentsline {chapter}{\numberline {5}Desarrollo}{53}{chapter.5}%
+\contentsline {subsection}{\numberline {5.0.1}Análisis exploratorio de datos}{56}{subsection.5.0.1}%
+\contentsline {section}{\numberline {5.1}Sistema de referencia}{60}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Pruebas iniciales}{64}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Codificador Multitensor}{65}{subsection.5.1.2}%
+\contentsline {subsubsection}{Direcciones}{67}{subsubsection*.12}%
+\contentsline {subsection}{\numberline {5.1.3}Arquitectura de decodificación}{67}{subsection.5.1.3}%
+\contentsline {subsubsection}{Comunicación ascendente del Multitensor}{69}{subsubsection*.13}%
+\contentsline {subsubsection}{Selección multi-eje}{69}{subsubsection*.14}%
+\contentsline {subsubsection}{Máximo acumulado direccional}{70}{subsubsection*.15}%
+\contentsline {subsubsection}{Desplazamiento direccional}{71}{subsubsection*.16}%
+\contentsline {subsubsection}{Comunicación entre direcciones}{72}{subsubsection*.17}%
+\contentsline {subsubsection}{Transformación no lineal}{73}{subsubsection*.18}%
+\contentsline {subsubsection}{Comunicación descendente del Multitensor}{74}{subsubsection*.19}%
+\contentsline {subsubsection}{Normalización final}{75}{subsubsection*.20}%
+\contentsline {subsubsection}{Contantes}{76}{subsubsection*.21}%
+\contentsline {subsection}{\numberline {5.1.4}Limitaciones}{76}{subsection.5.1.4}%
+\contentsline {subsection}{\numberline {5.1.5}Núcleos de conocimiento}{78}{subsection.5.1.5}%
+\contentsline {subsubsection}{Objetualidad}{78}{subsubsection*.22}%
+\contentsline {subsubsection}{Orientación hacia objetivos}{79}{subsubsection*.23}%
+\contentsline {subsubsection}{Números y conteo}{80}{subsubsection*.24}%
+\contentsline {subsubsection}{Geometría elemental y topología}{80}{subsubsection*.25}%
+\contentsline {subsubsection}{Síntesis de los núcleos presentes}{81}{subsubsection*.26}%
+\contentsline {section}{\numberline {5.2}Ejes de mejora}{81}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Eje H: Reducción de saturación de procesos en paralelo}{82}{subsection.5.2.1}%
+\contentsline {subsubsection}{Eliminación de sincronizaciones necesarias}{83}{subsubsection*.27}%
+\contentsline {subsubsection}{Reducción de la frecuencia de post-procesamiento}{84}{subsubsection*.28}%
+\contentsline {subsubsection}{Vectorización del cálculo de la pérdida}{84}{subsubsection*.29}%
+\contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{86}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del espacio latente}{86}{subsection.5.2.3}%
+\contentsline {subsubsection}{Herramienta de visualización de procesos}{86}{subsubsection*.30}%
+\contentsline {subsection}{\numberline {5.2.4}Problemas encontrados}{86}{subsection.5.2.4}%
 \contentsline {chapter}{\numberline {6}Resultados}{88}{chapter.6}%
 \contentsline {chapter}{\numberline {7}Planificación}{89}{chapter.7}%
 \contentsline {chapter}{\numberline {8}Estudio económico}{90}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{91}{chapter.9}%
-\contentsline {section}{Referencias}{91}{section*.31}%
-\contentsline {chapter}{\numberline {A}Apéndices}{93}{appendix.Alph1}%
+\contentsline {chapter}{\numberline {9}Ética del proyecto}{91}{chapter.9}%
+\contentsline {chapter}{\numberline {10}Conclusiones y Trabajo Futuro}{92}{chapter.10}%
+\contentsline {section}{Referencias}{92}{section*.31}%
