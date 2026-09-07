@@ -2357,7 +2357,7 @@ que la arquitectura ya contiene.
 
 \subsubsection{Objetualidad}
 
-La objetualidad, denominada \textit{objectness} se comprende como la capacidad de percibir entidades como objetos
+La objetualidad  se comprende como la capacidad de percibir entidades como objetos
 cohesionados, persistentes y diferenciables del fondo. En muchas tareas de ARC-AGI la regla no se aplica a cada celda de manera
 aislada, sino a una figura completa. El tamaño, la forma, la posición, el color o la relación de una figura con otras entidades
 determinan la transformación que debe realizarse.
@@ -2368,7 +2368,7 @@ valores de sus celdas, las máscaras y las operaciones espaciales, pero el model
 independientes ni reserva un estado específico para sus propiedades. Tampoco existe un mecanismo dedicado para comparar dos objetos,
 seleccionar el de mayor tamaño o agruparlos según su forma.
 
-Esta carencia explica que algunas tareas de selección, agrupación o re-ordenación de objetos solo sean accesibles cuando la regla
+Esta carencia explica que algunas tareas de selección, la agrupación de objetos solo son accesibles cuando la regla
 puede aproximarse mediante operaciones píxel a píxel y relaciones direccionales. Cuando la solución exige conservar la identidad de
 varias figuras y operar sobre cada una de ellas de manera independiente, la representación actual debe codificar esa información en
 activaciones distribuidas. El modelo posee, por tanto, una objetualidad implícita y débil, pero no un núcleo de conocimiento
@@ -2614,7 +2614,7 @@ a un mayor ritmo. Algo que se pudo detectar es que el trabajo realizado por la g
 el código se pudo comprobar que una de las posibles causas es que la CPU estaba solicitando continuamente muchos \textit{kernels} pequeños y
 el tiempo de lanzar y coordinar tal número de micro-códigos podía ser mayor que el tiempo utilizado para realizar las operaciones.
 
-Para resolver este problema se diseña un nuevo componente denominado \textit{inductor} para mejorar la eficiencia de las operaciones mediante
+Para resolver este problema se diseña un nuevo componente denominado \textit{inductor}. Este componente mejora la eficiencia de las operaciones mediante
 compilación de \textit{kernels}, construyendo una versión optimizada de las regiones que Pytorch puede analizar. Internamente el código de bajo
 nivel construye un grafo para conectar las diversas operaciones en lugar de ejecutar inmediatamente cada operación.
 
@@ -2653,7 +2653,35 @@ Pendiente de redactar.
 
 \chapter{Planificación}
 
-Pendiente de redactar.
+El objetivo de planificación de un proyecto de software es proporcionar un marco de trabajo que permita gestionar una serie de estimaciones razonables. La planificación permite eliminar ciertos
+bloqueos de evolución ya que en ocasiones ciertas características dependen de otras. El proyecto se ha realizado enteramente en un proyecto de GitHub usando su sistema
+de control de versiones y paneles organizativos.
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.90\textwidth]{image/images/roadmap.png}
+	\caption[Ejemplo panel de tareas del proyecto]{Ejemplo panel de tareas del proyecto.}
+	\label{fig:fig1SECTION7}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
+
+Al inicio del proyecto se diseñó una planificación inicial mediante objetivos generales. La planificación consiste en dividir una serie de fases del proyecto dependiente en grupos de tareas. 
+Los grupos de tareas están asignados a \textit{sprints} de 14 días basados en Scrum.
+
+Se han definido varios bloques principales incrementales:
+
+\begin{itemize}
+	\item Bloque 1: Configuración del entorno de desarrollo y herramientas necesarias.
+	\item Bloque 2: Optimización y refinamiento de la arquitectura.
+	\item Bloque 3: Desarrollo e implementaciones.
+	\item Bloque 4: Documentación y entrega.
+\end{itemize}
+
+Las metodologías ágiles planifican las tareas en intervalos cortos de tiempo. En vez de fases horizontales en las que bloques de tareas dependen de otras, las tareas se dividen en fases 
+incrementales incorporando las características principales al inicio de desarrollo e ir incrementado la funcionalidad a lo largo del ciclo de desarrollo.
 
 \chapter{Estudio económico}
 
@@ -2661,7 +2689,26 @@ Pendiente de redactar.
 
 \chapter{Ética del proyecto}
 
-Pendiente de redactar.
+En diversas ocasiones, las decisiones que se toman en cualquier aspecto de la vida pueden implicar alguna consideración ética. Teniendo en cuenta el mercado y la evolución de las tecnologías 
+cada vez se puede considerar de mayor importancia plantear dimensiones éticas ante decisiones que se tomen.
+
+En este caso, el proyecto utiliza infraestructuras de computación local y esto conlleva diversas reflexiones éticas. Cada vez más entidades están dispuestas a delegar sus propios 
+servicios de computación a proveedores externos que ofrecen servicio de inteligencia artificial a un precio relativamente asequible. Por lo tanto, también se les está delegando la posibilidad de mantener 
+los servicios de computación sin importar cuestiones éticas en el ámbito medioambiental. Los servicios de computación en la nube indirectamente necesitan materias primas y suministro eléctrico 
+en un contexto en el que se debe de tener en cuenta la responsabilidad y el impacto que supone el gasto energético.
+
+Cuidar el medioambiente y proteger el impacto en el medioambiente es responsabilidad de cada ciudadano y, por lo tanto, en este proyecto se puede hacer un análisis ético de dos aspectos 
+fundamentales: como individuo y como profesional de la ingeniería del \textit{software}.
+
+Desde una dimensión deontológica se debe impulsar el deber de cada individuo de informarse ante las consecuencias del impacto ambiental en el caso de convertirse en un abonado de un 
+proveedor de servicios de cualquier tecnología de inteligencia artificial. Se debe conocer en qué condiciones y cuáles son los principios que defiende la entidad ante un problema que afecta a todos los ciudadanos. 
+Todo ciudadano tiene derecho a disfrutar y a beneficiarse del mundo globalizado, pero se debe tener en cuenta que las generaciones posteriores también tienen el mismo derecho y por lo tanto 
+se debe salvaguardar el planeta lo más sano posible.
+
+Como profesional de la ingeniería del \textit{software} se debe impulsar el uso de tecnologías apoyen la eficiencia energética y el uso de infraestructuras propia, evitando depender excesivamente de servicios 
+externos. El uso de infraestructura propia permite mayor control y libertad al ciudadano sin tener que depender de ciertas compañías.
+
+Se debe apoyar verdaderamente tecnologías que promuevan una verdadera generalización de la inteligencia sin ``comprarla'' mediante computación y datos masivos, a costa del impacto medioambiental mencionado.
 
 \chapter{Conclusiones y Trabajo Futuro}
 
