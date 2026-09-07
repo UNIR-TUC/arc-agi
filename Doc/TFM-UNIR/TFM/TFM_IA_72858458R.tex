@@ -112,7 +112,7 @@ concentrarse exclusivamente en descubrir transformaciones algorítmicas robustas
 
 La viabilidad de este enfoque está respaldada por investigaciones muy recientes. Arquitecturas como el \textit{Hierarchical Reasoning Model} y el \textit{Tiny Recursive Model} han
 logrado superar el rendimiento de modelos masivos en ARC-AGI utilizando redes minúsculas de apenas 7 a 27 millones de parámetros, gracias a la aplicación de pasos de 
-computación recursiva en un espacio latente. Asimismo, enfoques revolucionarios como CompressARC han demostrado que es posible resolver un alto porcentaje de puzzles sin absolutamente ningún 
+computación recursiva en un espacio latente. Asimismo, enfoques revolucionarios como \textit{CompressARC} han demostrado que es posible resolver un alto porcentaje de puzzles sin absolutamente ningún 
 pre-entrenamiento, utilizando apenas 76.000 parámetros y minimizando la longitud de descripción puramente en el tiempo de inferencia \textit{(Test-Time Training)}.
 
 Dadas las restricciones de capacidad de cómputo disponibles para este proyecto, apostar por estos paradigmas (bucles de refinamiento, síntesis de programas y entrenamiento en tiempo de prueba) 
@@ -1092,6 +1092,9 @@ su único conjunto de datos son las matrices del problema exacto que se intenta 
 \itshape
 ``The ability to compress information is equivalent to intelligence.''
 \end{quote}
+\begin{center}
+\cite[p.~15]{ouellette2024towards}
+\end{center}
 
 El modelo es realmente compacto, de tan sólo 76 mil parámetros. Este sistema se rige por el principio de longitud de descripción mínima y la comprensión
 de información. La optimización se realiza mediante redes neuronales en lugar de algoritmos de búsqueda ciegos. Las redes neuronales pueden restringir
@@ -1111,10 +1114,6 @@ para transformaciones geométricas como medias, expansiones de tensores, funcion
 
 El modelo logra generalizar y resolver el 20\% de las tareas de ARC-AGI-1. Lograr este resultado con apenas 76 mil parámetros y una GPU RTX 4070 con una precisión 
 FP16 de 116,6 TFLOPs es realmente sorprendente.
-
-\begin{center}
-\cite[p.~15]{ouellette2024towards}
-\end{center}
 
 % 2410.06405v2_ARC_With_Vision_Transformers
 % REVISAR!!
@@ -1236,7 +1235,7 @@ reutilizables.
 
 En ese contexto, el cambio más relevante observado en 2025 no fue simplemente el escalado de parámetros, sino la consolidación de los bucles de refinamiento en
 tiempo de inferencia. Los enfoques más competitivos ya no se limitan a producir una respuesta directa, sino que encadenan ciclos de generación, verificación y
-corrección. Modelos como TRM y propuestas como CompressARC muestran que este principio puede ofrecer resultados competitivos incluso con redes muy pequeñas o
+corrección. Modelos como TRM y propuestas como \textit{CompressARC} muestran que este principio puede ofrecer resultados competitivos incluso con redes muy pequeñas o
 sin pre-entrenamiento masivo, siempre que el sistema disponga de mecanismos para revisar de manera iterativa su hipótesis interna. La eficiencia computacional
 no reside en el tamaño bruto del modelo, sino en la calidad del proceso de refinamiento que es capaz de ejecutar durante la inferencia.
 
@@ -1270,7 +1269,7 @@ representación es más fiel a la realidad que el tamaño del modelo, ya que un 
     \vspace{0.5cm}
     \caption[Comparativa del coste por tarea entre modelos]{Comparativa del coste por tarea entre modelos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
     \label{fig:fig20SECTION1}
-    {\footnotesize Fuente: Elaboración propia}
+    {\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI. }
     \vspace*{\fill}
 \end{figure}
 \clearpage
@@ -1460,21 +1459,22 @@ no se debe comprar con datos ni con cómputo masivo. Este trabajo se construye a
 Dejando al margen los grandes modelos de lenguaje y los modelos de frontera, se han estudiado diferentes enfoques de modelos compactos y eficientes. 
 La figura \ref{fig:fig1SECTION5} muestra una comparativa del coste por tarea entre diferentes modelos compactos, donde el tamaño de los círculos representa la capacidad computacional en TFLOPs FP16 usada en cada modelo.
 Esta representación es más fiel a la realidad que el propio tamaño del modelo, ya que un modelo pequeño puede requerir una gran capacidad de cómputo para su entrenamiento y ajuste fino.
+Los datos obtenidos son datos oficiales de la página web oficial de ARC-AGI.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.85\textwidth]{../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light.png}
 	\caption[Comparativa del coste por tarea entre modelos compactos]{Comparativa del coste por tarea entre modelos compactos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
 	\label{fig:fig1SECTION5}
-	{\footnotesize Fuente: Elaboración propia}
+	{\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.}
 \end{figure}
 
 \FloatBarrier
 
 Algunas soluciones como los modelos TRM requieren de una capacidad de cómputo muy elevada y no que no está al alcance de cualquier investigador. Por otra parte, este enfoque también se encuentra en el filo
 del espíritu de ARC-AGI, ya que es necesario realizar pre-entrenamientos sin ningún límite de capacidad de computación para posteriormente realizar ajustes finos e inferencia
-en la las GPUs obligadas por los órganos de ARC-PRIZE. La diferencia de la capacidad de cómputo usada para el modelo TRM en comparación al modelo de CompressARC es de 7.916 PFLOPs frente a 116,6 TFLOPs, 
-lo que supone una diferencia de más de 67 veces. En cuestión de eficiencia computacional es realmente destacable el modelo de CompressARC.
+en la las GPUs obligadas por los órganos de ARC-PRIZE. La diferencia de la capacidad de cómputo usada para el modelo TRM en comparación al modelo de \textit{CompressARC} es de 7.916 PFLOPs frente a 116,6 TFLOPs, 
+lo que supone una diferencia de más de 67 veces. En cuestión de eficiencia computacional es realmente destacable el modelo de \textit{CompressARC}.
 
 En la siguiente imagen \ref{fig:fig2SECTION5} se puede observar también la comparativa de diferentes modelos compactos desde la perspectiva de coste por tarea, otra comparativa
 que busca un punto de vista desde la eficiencia.
@@ -1485,7 +1485,7 @@ que busca un punto de vista desde la eficiencia.
 	\includegraphics[width=0.85\textwidth]{../../../src/arc_agi_data_scraper/images/cost_models_cost_light.png}
 	\caption[Comparativa del coste por tarea modelos compactos]{Comparativa del coste por tarea entre modelos compactos.}
 	\label{fig:fig2SECTION5}
-	{\footnotesize Fuente: Elaboración propia}
+	{\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.}
 \end{figure}
 
 \FloatBarrier
@@ -1499,12 +1499,14 @@ que busca un punto de vista desde la eficiencia.
 %         \centering
 %         \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{../../../src/arc_agi_data_scraper/images/tflops_models_cost_light.png}
 % 		\caption[Comparativa del coste por tarea \$ entre diferentes soluciones]{Comparativa del coste por tarea \$ entre diferentes soluciones. El tamaño de los círculos
-% 		representan el tamaño en parámetros de cada modelo.}
+% 		representan el tamaño en parámetros de cada modelo. Datos obtenidos de la página web oficial de ARC-AGI.}
 % 		\label{fig:fig1SECTION5}
 %     \end{figure}
 % \end{landscape}
 % \clearpage
 % }
+
+% \FloatBarrier
 
 % \begin{figure}[h]
 % \centering
@@ -1527,7 +1529,7 @@ que busca un punto de vista desde la eficiencia.
 %     \vspace{0.5cm}
 %     \caption[Comparativa del coste por tarea entre modelos compactos]{Comparativa del coste por tarea entre modelos compactos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
 %     \label{fig:fig1SECTION5}
-%     {\footnotesize Fuente: Elaboración propia}
+%     {\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.}
 %     \vspace*{\fill}
 % \end{figure}
 % \clearpage
@@ -2348,7 +2350,7 @@ ARC-AGI, Chollet identifica cuatro sistemas de conocimiento fundamentales, relac
 y la geometría elemental junto con la topología. No se trata de cuatro etapas de procesamiento independientes, sino de capacidades
 previas que condicionan la forma en que se representan los problemas y se interpretan las transformaciones.
 
-El análisis de CompressARC permite determinar hasta qué punto estos cuatro núcleos están presentes en su arquitectura. El modelo
+El análisis de \textit{CompressARC} permite determinar hasta qué punto estos cuatro núcleos están presentes en su arquitectura. El modelo
 representa cada tarea mediante un sistema de tensores con cinco ejes, correspondientes a ejemplos, colores, direcciones, filas y
 columnas. Esta decisión incorpora de forma explícita algunas relaciones espaciales, pero no proporciona una representación completa
 de todos los conceptos que pueden aparecer en una tarea de ARC-AGI. Por tanto, el rendimiento del modelo no solo depende de la
@@ -2362,7 +2364,7 @@ cohesionados, persistentes y diferenciables del fondo. En muchas tareas de ARC-A
 aislada, sino a una figura completa. El tamaño, la forma, la posición, el color o la relación de una figura con otras entidades
 determinan la transformación que debe realizarse.
 
-CompressARC no incluye una representación explícita de objetos. Sus operaciones trabajan sobre tensores densos y sobre las
+\textit{CompressARC} no incluye una representación explícita de objetos. Sus operaciones trabajan sobre tensores densos y sobre las
 combinaciones de ejes del sistema Multitensor. La información sobre una figura puede mantenerse de forma implícita mediante los
 valores de sus celdas, las máscaras y las operaciones espaciales, pero el modelo no detecta componentes conexas como unidades
 independientes ni reserva un estado específico para sus propiedades. Tampoco existe un mecanismo dedicado para comparar dos objetos,
@@ -2381,7 +2383,7 @@ objetivos y modifican su entorno. Aunque no todas las tareas de ARC-AGI requiere
 relevante cuando la solución depende de una secuencia de acciones, de una interacción entre entidades o de la distinción entre un
 estado inicial y un estado objetivo.
 
-En CompressARC no existe una representación de agentes, acciones ni objetivos intermedios. El modelo recibe los ejemplos de entrada
+\textit{CompressARC} no existe una representación de agentes, acciones ni objetivos intermedios. El modelo recibe los ejemplos de entrada
 y salida, transforma sus representaciones internas y optimiza directamente la correspondencia con la salida esperada. No mantiene
 un estado de planificación ni dispone de un mecanismo que evalúe qué acción debe ejecutarse a continuación. En consecuencia, las
 tareas que pueden resolverse como una transformación global de la cuadrícula son compatibles con el diseño actual, mientras que las
@@ -2432,7 +2434,7 @@ transformación global de un objeto.
 
 \subsubsection{Síntesis de los núcleos presentes}
 
-La comparación anterior muestra que CompressARC materializa con mayor claridad el conocimiento geométrico y direccional. El conteo carece de una
+La comparación anterior muestra que \textit{CompressARC} materializa con mayor claridad el conocimiento geométrico y direccional. El conteo carece de una
 operación propia. Esta distribución de capacidades es coherente con los resultados observados en las tareas experimentales. El modelo
 resuelve con mayor facilidad las transformaciones que pueden expresarse como propagaciones, simetrías o relaciones espaciales sobre
 una cuadrícula, pero encuentra dificultades cuando debe identificar objetos como entidades persistentes, contar elementos o ejecutar
@@ -2616,9 +2618,60 @@ el tiempo de lanzar y coordinar tal número de micro-códigos podía ser mayor q
 
 Para resolver este problema se diseña un nuevo componente denominado \textit{inductor}. Este componente mejora la eficiencia de las operaciones mediante
 compilación de \textit{kernels}, construyendo una versión optimizada de las regiones que Pytorch puede analizar. Internamente el código de bajo
-nivel construye un grafo para conectar las diversas operaciones en lugar de ejecutar inmediatamente cada operación.
+nivel construye un grafo para conectar las diversas operaciones en lugar de ejecutar inmediatamente cada operación. Las diversas operaciones
+de las capas se agrupan en bloques más grandes, por ejemplo, combinando la normalización, activación y vuelta a la normalización en un solo bloque. 
+La mejora radica principalmente en reducir el número de llamadas y por lo tanto, menos solicitudes a la GPU.
 
+Utilizando este método, al principio del entrenamiento de la tarea existirá un tiempo de preparación donde todavía no se realize ninguna operación.
+Durante este tiempo de realiza la compilación y se cargan los \textit{kernels} en la memoria RAM de la CPU. Cuando la compilación ha terminado,
+se lanza el entrenamiento y las operaciones se ejecutan mucho más rápidas. En algunos momentos del entrenamiento en paralelo se ha conseguido
+una mejora significativa incrementando la iteración por segundo de hasta 4 veces. Para comprobar que esta técnica funciona, se debe medir
+el tiempo completo de ejecución, desde el tiempo de compilación hasta que ha terminado el entrenamiento.
 
+Tras realizar una serie de pruebas, se puedo comprobar una reducción significativa del tiempo de entrenamiento por tarea alrededor del 66,8\%. Esto
+sumado al entrenamiento en paralelo también se nota una mejora más considerable. Se manejan los tiempos de manera más eficiente por que
+se combina la compilación con el entrenamiento entre tareas. Esta optimización mantiene intacta la arquitectura y no añade parámetros. Tampoco
+es necesario cambiar el número de iteraciones.
+
+En la siguiente tabla se presentan los resultados comparativos entre la línea base y la optimización mediante compilación. Se
+debe tener en cuenta que en los resultados aparece una tarea resuelta adicionalmente. Esto es debido a la variabilidad
+de algunas tareas dependiendo de la semilla. No se considera una mejora del modelo. También requiere remarcar
+que esta comparativa se ha realizado con entrenamientos de 1500 iteraciones por tarea, mientras que, para hacer
+una comparativa justo respecto al modelo base, en los resultados finales se realizará la comparación con 2000
+iteraciones por tarea.
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{4.3cm}|p{2.3cm}|p{2.8cm}|p{2.2cm}|}
+\hline
+\textbf{Métrica} & \textbf{Línea base} &
+\begin{tabular}{c}\textbf{Compilación}\\\end{tabular} &
+\textbf{Variación} \\
+\hline
+Tiempo total (50 tareas) & 40 550,7 s (11,3 h) & 13 476,0 s (3,7 h) & $-66,8\%$ \\
+\hline
+Velocidad de entrenamiento en fase 2 (pasos/s) & 1,85 & 5,67 & $+206,5\%$ \\
+\hline
+Uso medio de CPU & 79,4\% & 61,2\% & $-22,9\%$ \\
+\hline
+Utilización media de GPU & 99,9\% & 98,8\% & $-1,1$ p.p. \\
+\hline
+Pico de VRAM & 15 768 MB & 9 417 MB & $-40,3\%$ \\
+\hline
+Pico de RAM del sistema & 21,9\% & 89,5\% & $+307\%$ \\
+\hline
+Energía por 1.000 pasos (Wh) & 14,08 & 5,08 & $-64,0\%$ \\
+\hline
+Tareas resueltas (\textit{pass@2}) & 18 de 50 (36\%) & 19 de 50 (38\%) & +1 tarea \\
+\hline
+\end{tabular}
+\caption{Resultados de la comparación final del Eje D sobre 50 tareas con 1500 iteraciones por tarea.}
+\label{tab:eje-d-resultados}
+\end{table}
+
+\FloatBarrier
 
 \subsection{Eje B: Mejora de robustez del espacio latente}
 
@@ -2650,7 +2703,38 @@ entre otros problemas:
 % Coste actual por hora de 5070 TI https://cloud.vast.ai/?utm_source=getdeploying.com&utm_medium=paid&utm_content=nvidia-rtx-5070-ti
 \chapter{Resultados}
 
-Pendiente de redactar.
+La Tabla \ref{tab:resultados-finales} presenta un resumen provisional de las métricas
+principales obtenidas con la configuración base y con los ejes de mejora H/B y D.
+En el momento de redactar esta sección todavía no se dispone de la ejecución final,
+por lo que los valores incluidos tienen carácter orientativo y deberán sustituirse
+por las mediciones definitivas.
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{4.5cm}|p{2.3cm}|p{2.8cm}|p{2.2cm}|}
+\hline
+\textbf{Métrica} & \textbf{Base} &
+\begin{tabular}{c}\textbf{Eje H / B}\end{tabular} &
+\begin{tabular}{c}\textbf{Eje D}\end{tabular} \\
+\hline
+Tiempo total de ejecución & 300 h & 270 h & 101 h \\
+\hline
+\textit{pass@2} Et. (entrenamiento) & 70 de 400 (17,5\%) & 74 de 400 (18,5\%) & 78 de 400 (19,5\%) \\
+\hline
+\textit{pass@2} Ev. (evaluación) & 17 de 400 (4,3\%) & 18 de 400 (4,5\%) & 20 de 400 (5,0\%) \\
+\hline
+Uso medio de CPU & 84,8\% & 80,4\% & 61,2\% \\
+\hline
+Coste por tarea (aproximación) & 0,35 EUR & 0,31 EUR & 0,12 EUR \\
+\hline
+\end{tabular}
+\caption{Resumen provisional de los resultados finales por eje de mejora. Los valores son orientativos y deberán sustituirse por las mediciones definitivas.}
+\label{tab:resultados-finales}
+\end{table}
+
+\FloatBarrier
 
 \chapter{Estudio económico}
 

@@ -82,11 +82,11 @@
 \contentsline {subsubsection}{Reducción de la frecuencia de post-procesamiento}{84}{subsubsection*.28}%
 \contentsline {subsubsection}{Vectorización del cálculo de la pérdida}{84}{subsubsection*.29}%
 \contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{86}{subsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del espacio latente}{86}{subsection.5.2.3}%
-\contentsline {subsubsection}{Herramienta de visualización de procesos}{86}{subsubsection*.30}%
-\contentsline {subsection}{\numberline {5.2.4}Problemas encontrados}{86}{subsection.5.2.4}%
-\contentsline {chapter}{\numberline {6}Resultados}{88}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Estudio económico}{89}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Ética del proyecto}{90}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{91}{chapter.9}%
-\contentsline {section}{Referencias}{91}{section*.31}%
+\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del espacio latente}{88}{subsection.5.2.3}%
+\contentsline {subsubsection}{Herramienta de visualización de procesos}{88}{subsubsection*.30}%
+\contentsline {subsection}{\numberline {5.2.4}Problemas encontrados}{88}{subsection.5.2.4}%
+\contentsline {chapter}{\numberline {6}Resultados}{89}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Estudio económico}{90}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Ética del proyecto}{91}{chapter.8}%
+\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{92}{chapter.9}%
+\contentsline {section}{Referencias}{92}{section*.31}%
