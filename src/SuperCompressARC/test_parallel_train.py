@@ -365,6 +365,73 @@ class SchedulerFailureTests(unittest.TestCase):
         self.assertEqual(update.call_args_list[0].args[3], 'retry_eager')
         self.assertEqual(update.call_args_list[1].args[3], 'quarantined')
 
+    def test_eje_b_failure_is_recorded_for_eager_recovery(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            previous_cwd = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                os.makedirs('dataset')
+                with open(
+                    'dataset/arc-agi_training_challenges.json', 'w',
+                    encoding='utf-8',
+                ) as handle:
+                    json.dump({'fcb5c309': {'test': [{'input': [[1]]}]}}, handle)
+
+                logger = SimpleNamespace(
+                    info=mock.Mock(),
+                    warning=mock.Mock(),
+                    log_run_start=mock.Mock(),
+                    log_phase=mock.Mock(),
+                )
+                failure = parallel_train.WorkerFailure(
+                    'compiled failed', task_name='fcb5c309', gpu_id=0,
+                    exit_code=-6, last_step=10, stage='training',
+                    compile_mode='default', recoverable_task=True,
+                    seed=0, job_id='fcb5c309__seed_0',
+                )
+                config = parallel_train.accel.AccelConfig(
+                    compile_mode='default', eje_b=True,
+                    seeds=(0, 1, 2, 3), kl_free_bits_initial=2.0,
+                    curriculum=True,
+                )
+                with (
+                    mock.patch.object(
+                        parallel_train.task_persistence,
+                        'load_task_recovery', return_value={},
+                    ),
+                    mock.patch.object(
+                        parallel_train, 'load_memory_cache',
+                        return_value={'fcb5c309': 100},
+                    ),
+                    mock.patch.object(
+                        parallel_train.torch.cuda, 'mem_get_info',
+                        return_value=(2 * 1024**3, 2 * 1024**3),
+                    ),
+                    mock.patch.object(
+                        parallel_train, 'parallelize_runs',
+                        side_effect=failure,
+                    ),
+                    mock.patch.object(
+                        parallel_train.task_persistence,
+                        'update_task_recovery',
+                    ) as update,
+                ):
+                    with self.assertRaisesRegex(
+                        parallel_train.WorkerFailure, 'compiled failed',
+                    ):
+                        parallel_train.run_split(
+                            'training', 1, 1, logger, None,
+                            accel_cfg=config, n_steps=2000,
+                            recover_task_failures=True,
+                            state_dir='state',
+                        )
+            finally:
+                os.chdir(previous_cwd)
+
+        self.assertEqual(update.call_args.args[:4], (
+            'training', 'fcb5c309', 2000, 'retry_eager',
+        ))
+
     def test_non_task_failure_is_not_recorded_for_recovery(self):
         failure = parallel_train.WorkerFailure(
             'persist failed', task_name='fcb5c309', stage='persistence',
@@ -392,6 +459,29 @@ class SchedulerFailureTests(unittest.TestCase):
         self.assertEqual(selected['compile_mode'], 'off')
         self.assertEqual(untouched['compile_mode'], 'default')
         self.assertEqual(selected['matmul_precision'], 'high')
+
+    def test_eje_b_task_eager_override_preserves_algorithm_settings(self):
+        default = parallel_train.accel.AccelConfig(
+            compile_mode='default',
+            eje_b=True,
+            seeds=(0, 1, 2, 3),
+            kl_free_bits_initial=2.0,
+            curriculum=True,
+        )
+        eager = parallel_train._task_eager_config(default.to_dict())
+        selected = parallel_train._effective_task_accel_config(
+            'fcb5c309', default.to_dict(), {'fcb5c309': eager},
+        )
+        untouched = parallel_train._effective_task_accel_config(
+            '007bbfb7', default.to_dict(), {'fcb5c309': eager},
+        )
+
+        self.assertEqual(selected['compile_mode'], 'off')
+        self.assertTrue(selected['_eje_b_eager_override'])
+        self.assertEqual(selected['seeds'], (0, 1, 2, 3))
+        self.assertEqual(selected['kl_free_bits_initial'], 2.0)
+        self.assertTrue(selected['curriculum'])
+        self.assertEqual(untouched['compile_mode'], 'default')
 
     def test_seed_jobs_preserve_usage_and_skip_only_completed_jobs(self):
         job_ids, usages, specs = parallel_train._expand_seed_jobs(

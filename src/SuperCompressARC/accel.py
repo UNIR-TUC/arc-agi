@@ -50,7 +50,7 @@ import hashlib
 import json
 import os
 import warnings
-from dataclasses import dataclass, asdict, fields
+from dataclasses import dataclass, asdict, field, fields
 from typing import Optional
 
 import torch
@@ -112,6 +112,7 @@ class AccelConfig:
     curriculum: bool = False
     curriculum_beta_max: float = 1.0
     curriculum_ema_decay: float = 0.9
+    _eje_b_eager_override: bool = field(default=False, repr=False)
 
     def __post_init__(self):
         self.seeds = tuple(self.seeds)
@@ -146,7 +147,11 @@ class AccelConfig:
         )
         if b_options_enabled and not self.eje_b:
             raise ValueError('Eje B options require eje_b=True')
-        if self.eje_b and self.compile_mode != 'default':
+        if self._eje_b_eager_override and not self.eje_b:
+            raise ValueError('Eje B eager override requires eje_b=True')
+        if self.eje_b and self.compile_mode != 'default' and not (
+            self._eje_b_eager_override and self.compile_mode == 'off'
+        ):
             raise ValueError(
                 "Eje B requires the Eje D 'compile' preset "
                 "(compile_mode='default')"
@@ -212,7 +217,10 @@ class AccelConfig:
         return min(train_step, n_steps - 1) / (n_steps - 1)
 
     def to_dict(self):
-        return asdict(self)
+        values = asdict(self)
+        if not self._eje_b_eager_override:
+            values.pop('_eje_b_eager_override', None)
+        return values
 
     @classmethod
     def from_dict(cls, data):

@@ -284,6 +284,12 @@ Dataclass serializable (debe cruzar la frontera de `multiprocessing.spawn` como 
 > una recompilación completa. Se mantiene en los presets para no invalidar la caché
 > ya poblada.
 
+Eje B usa `compile_mode='default'` por defecto y la CLI sigue exigiendo el preset
+`compile`. La recuperación puede crear una configuración interna eager por tarea,
+marcada como `_eje_b_eager_override`; esa marca se serializa solo para el worker
+afectado, no forma parte del `algorithm_fingerprint()` y no cambia seeds, free-bits,
+curriculum ni la política de merge.
+
 Métodos relevantes:
 
 - `is_enabled()` — `True` si algo se desvía del baseline. Permite **afirmar** que una
@@ -2087,6 +2093,12 @@ reinicializa un contexto HIP corrompido. La frontera segura de recuperación es 
 La recuperación mantiene el principio de §2: no cambia `arc_compressor.py`, `layers.py`,
 `train.py` ni la pérdida. Actúa en la capa de aceleración, el scheduler y la persistencia.
 
+En Eje B, el fallback se aplica a los cuatro seed jobs pendientes de la tarea nombrada.
+Las otras tareas siguen compiladas y una tarea no cuarentenada solo se puede fusionar
+cuando sus cuatro seeds tienen resultados completos. La configuración eager es una
+decisión de ejecución por tarea: no cambia la huella algorítmica ni obliga a repetir la
+medición eager de Fase 1.
+
 | Estado / evento                         | Acción                                                                 |
 | --------------------------------------- | ---------------------------------------------------------------------- |
 | Fallo ordinario de `torch.compile`      | `_EagerFallback` continúa eager dentro del mismo worker                |
@@ -2129,9 +2141,10 @@ Para el incidente conocido, la forma recomendada de reanudar es:
 EAGER_TASKS=fcb5c309 ./run_training_full.sh
 ```
 
-El script mantiene `--accel-preset compile` para todas las demás tareas, carga los 97
-parciales válidos y reutiliza las 400 mediciones de Fase 1. Sólo `fcb5c309` evita
-TorchInductor. La recuperación automática está activa por defecto en los wrappers mediante
+El script mantiene `--accel-preset compile` para todas las demás tareas, carga los
+parciales de seed compatibles y reutiliza la caché existente de mediciones de Fase 1.
+Sólo `fcb5c309` evita TorchInductor, en sus cuatro seeds pendientes. La recuperación
+automática está activa por defecto en los wrappers mediante
 `RECOVER_TASK_FAILURES=1`.
 
 Si el intento eager también falla, el siguiente reintento omite `fcb5c309` y termina el

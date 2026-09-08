@@ -936,8 +936,12 @@ def _recovery_task_sets(task_names, recovery_entries, eager_tasks,
 
 
 def _task_eager_config(accel_config):
-    return {**accel.AccelConfig.from_dict(accel_config).to_dict(),
-            'compile_mode': 'off'}
+    config = accel.AccelConfig.from_dict(accel_config)
+    return {
+        **config.to_dict(),
+        'compile_mode': 'off',
+        '_eje_b_eager_override': config.eje_b,
+    }
 
 
 def _activate_quarantined_retries(split, n_steps, task_names,
@@ -1159,11 +1163,6 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         name for name in original_task_names if name not in quarantined_tasks
     ]
     if effective_eager_tasks:
-        if accel_cfg.eje_b:
-            raise ValueError(
-                'Eje B requires compile for every seed job; remove eager '
-                'recovery state before running this task set'
-            )
         arc_logger.info(
             'Task-specific eager mode: '
             + ', '.join(sorted(effective_eager_tasks))
@@ -1338,16 +1337,10 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
                 ),
             )
         except WorkerFailure as failure:
-            if accel_cfg.eje_b:
-                arc_logger.warning(
-                    f'{failure.job_id}: Eje B is compile-only; refusing '
-                    'compiled-to-eager recovery'
-                )
-            else:
-                _record_task_recovery_failure(
-                    split, n_steps, failure, recover_task_failures, arc_logger,
-                    state_dir=state_dir,
-                )
+            _record_task_recovery_failure(
+                split, n_steps, failure, recover_task_failures, arc_logger,
+                state_dir=state_dir,
+            )
             raise
     else:
         phase2_solutions, phase2_loggers, t_p2 = {}, {}, 0.0
