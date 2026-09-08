@@ -108,8 +108,7 @@ def get_accuracy(true_solution_hashes, fname='predictions.npz'):
         true_hash = true_solution_hashes[task_num] >> 16
         solution_scores = ValueSortedDict()
         for iteration_num in range(n_iterations):
-            for i in range(2):
-                hashed, score = solution_contribution_logs[task_num][iteration_num][i]
+            for hashed, score in solution_contribution_logs[task_num][iteration_num]:
                 hashed = int(hashed) >> 16
                 original_score = torch.tensor(solution_scores.get(hashed, default=-10000))
                 score = torch.tensor(score)

@@ -1,0 +1,122 @@
+2026-09-05 11:35:48 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1280.3 GB free, minimum 50.0 GB)
+2026-09-05 11:35:48 | WARNING  | DEMO MODE — running 30 of 400 tasks in the training split
+2026-09-05 11:35:48 | INFO     | Loading Eje B seed partials for split training
+2026-09-05 11:35:49 | INFO     | ========================================================================
+2026-09-05 11:35:49 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-05 11:35:49 | INFO     |   Tasks       : 30
+2026-09-05 11:35:49 | INFO     |   GPUs        : 1
+2026-09-05 11:35:49 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-05/arc_training_training_20260905_113548.log
+2026-09-05 11:35:49 | INFO     |   Results file: results_2026-09-05_11-35-48.txt
+2026-09-05 11:35:49 | INFO     | ========================================================================
+2026-09-05 11:35:49 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:35:49 | INFO     | Acceleration (Eje D): accel amp=off compile=default matmul=high threads=1 alloc=- eje-b=on seeds=0,1,2,3
+2026-09-05 11:35:49 | INFO     | ------------------------------------------------------------------------
+2026-09-05 11:35:49 | INFO     | PHASE: Phase 1 — Memory measurement  (2 iterations × 30 tasks)
+2026-09-05 11:35:49 | INFO     | ------------------------------------------------------------------------
+2026-09-05 11:35:50 | DEBUG    | START [  1/30] 007bbfb7  →  GPU 0
+2026-09-05 11:35:50 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:35:55 | DEBUG    | DONE  [  1/30] 007bbfb7     5.0s  peak=   768 MB  [not solved]
+2026-09-05 11:35:55 | DEBUG    | START [  2/30] 00d62c1b  →  GPU 0
+2026-09-05 11:35:55 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:00 | DEBUG    | DONE  [  2/30] 00d62c1b     5.0s  peak=  1024 MB  [not solved]
+2026-09-05 11:36:00 | DEBUG    | START [  3/30] 017c7c7b  →  GPU 0
+2026-09-05 11:36:00 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:04 | DEBUG    | DONE  [  3/30] 017c7c7b     4.0s  peak=   634 MB  [not solved]
+2026-09-05 11:36:04 | DEBUG    | START [  4/30] 025d127b  →  GPU 0
+2026-09-05 11:36:04 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:09 | DEBUG    | DONE  [  4/30] 025d127b     5.0s  peak=   746 MB  [not solved]
+2026-09-05 11:36:09 | DEBUG    | START [  5/30] 045e512c  →  GPU 0
+2026-09-05 11:36:09 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:14 | DEBUG    | DONE  [  5/30] 045e512c     5.0s  peak=  1450 MB  [not solved]
+2026-09-05 11:36:14 | DEBUG    | START [  6/30] 0520fde7  →  GPU 0
+2026-09-05 11:36:14 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:18 | DEBUG    | DONE  [  6/30] 0520fde7     4.0s  peak=   636 MB  [not solved]
+2026-09-05 11:36:18 | DEBUG    | START [  7/30] 05269061  →  GPU 0
+2026-09-05 11:36:18 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:23 | DEBUG    | DONE  [  7/30] 05269061     5.0s  peak=   684 MB  [not solved]
+2026-09-05 11:36:23 | DEBUG    | START [  8/30] 05f2a901  →  GPU 0
+2026-09-05 11:36:23 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:28 | DEBUG    | DONE  [  8/30] 05f2a901     5.0s  peak=   724 MB  [not solved]
+2026-09-05 11:36:28 | DEBUG    | START [  9/30] 06df4c85  →  GPU 0
+2026-09-05 11:36:28 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:33 | DEBUG    | DONE  [  9/30] 06df4c85     5.0s  peak=  1724 MB  [not solved]
+2026-09-05 11:36:33 | DEBUG    | START [ 10/30] 08ed6ac7  →  GPU 0
+2026-09-05 11:36:33 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:38 | DEBUG    | DONE  [ 10/30] 08ed6ac7     5.0s  peak=   714 MB  [not solved]
+2026-09-05 11:36:38 | DEBUG    | START [ 11/30] 09629e4f  →  GPU 0
+2026-09-05 11:36:38 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:43 | DEBUG    | DONE  [ 11/30] 09629e4f     5.0s  peak=   874 MB  [not solved]
+2026-09-05 11:36:43 | DEBUG    | START [ 12/30] 0962bcdd  →  GPU 0
+2026-09-05 11:36:43 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:48 | DEBUG    | DONE  [ 12/30] 0962bcdd     5.0s  peak=   794 MB  [not solved]
+2026-09-05 11:36:48 | DEBUG    | START [ 13/30] 0a938d79  →  GPU 0
+2026-09-05 11:36:48 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:53 | DEBUG    | DONE  [ 13/30] 0a938d79     5.0s  peak=  1716 MB  [not solved]
+2026-09-05 11:36:53 | DEBUG    | START [ 14/30] 0b148d64  →  GPU 0
+2026-09-05 11:36:53 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:36:58 | DEBUG    | DONE  [ 14/30] 0b148d64     5.0s  peak=  1212 MB  [not solved]
+2026-09-05 11:36:58 | DEBUG    | START [ 15/30] 0ca9ddb6  →  GPU 0
+2026-09-05 11:36:58 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:03 | DEBUG    | DONE  [ 15/30] 0ca9ddb6     5.0s  peak=   760 MB  [not solved]
+2026-09-05 11:37:03 | DEBUG    | START [ 16/30] 0d3d703e  →  GPU 0
+2026-09-05 11:37:03 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:07 | DEBUG    | DONE  [ 16/30] 0d3d703e     4.0s  peak=   642 MB  [not solved]
+2026-09-05 11:37:07 | DEBUG    | START [ 17/30] 0dfd9992  →  GPU 0
+2026-09-05 11:37:07 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:13 | DEBUG    | DONE  [ 17/30] 0dfd9992     6.0s  peak=  1652 MB  [not solved]
+2026-09-05 11:37:13 | DEBUG    | START [ 18/30] 0e206a2e  →  GPU 0
+2026-09-05 11:37:13 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:18 | DEBUG    | DONE  [ 18/30] 0e206a2e     5.0s  peak=  1386 MB  [not solved]
+2026-09-05 11:37:18 | DEBUG    | START [ 19/30] 10fcaaa3  →  GPU 0
+2026-09-05 11:37:18 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:23 | DEBUG    | DONE  [ 19/30] 10fcaaa3     5.0s  peak=   784 MB  [not solved]
+2026-09-05 11:37:23 | DEBUG    | START [ 20/30] 11852cab  →  GPU 0
+2026-09-05 11:37:23 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:28 | DEBUG    | DONE  [ 20/30] 11852cab     5.0s  peak=   764 MB  [not solved]
+2026-09-05 11:37:28 | DEBUG    | START [ 21/30] 1190e5a7  →  GPU 0
+2026-09-05 11:37:28 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:34 | DEBUG    | DONE  [ 21/30] 1190e5a7     6.0s  peak=  1658 MB  [not solved]
+2026-09-05 11:37:34 | DEBUG    | START [ 22/30] 137eaa0f  →  GPU 0
+2026-09-05 11:37:34 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:39 | DEBUG    | DONE  [ 22/30] 137eaa0f     5.0s  peak=   896 MB  [not solved]
+2026-09-05 11:37:39 | DEBUG    | START [ 23/30] 150deff5  →  GPU 0
+2026-09-05 11:37:39 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:44 | DEBUG    | DONE  [ 23/30] 150deff5     5.0s  peak=   720 MB  [not solved]
+2026-09-05 11:37:44 | DEBUG    | START [ 24/30] 178fcbfb  →  GPU 0
+2026-09-05 11:37:44 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:49 | DEBUG    | DONE  [ 24/30] 178fcbfb     5.0s  peak=   746 MB  [not solved]
+2026-09-05 11:37:49 | DEBUG    | START [ 25/30] 1a07d186  →  GPU 0
+2026-09-05 11:37:49 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:54 | DEBUG    | DONE  [ 25/30] 1a07d186     5.0s  peak=  1294 MB  [not solved]
+2026-09-05 11:37:54 | DEBUG    | START [ 26/30] 1b2d62fb  →  GPU 0
+2026-09-05 11:37:54 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:37:58 | DEBUG    | DONE  [ 26/30] 1b2d62fb     4.0s  peak=   664 MB  [not solved]
+2026-09-05 11:37:58 | DEBUG    | START [ 27/30] 1b60fb0c  →  GPU 0
+2026-09-05 11:37:58 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:38:03 | DEBUG    | DONE  [ 27/30] 1b60fb0c     5.0s  peak=   682 MB  [not solved]
+2026-09-05 11:38:03 | DEBUG    | START [ 28/30] 1bfc4729  →  GPU 0
+2026-09-05 11:38:03 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:38:08 | DEBUG    | DONE  [ 28/30] 1bfc4729     5.0s  peak=   748 MB  [not solved]
+2026-09-05 11:38:08 | DEBUG    | START [ 29/30] 1c786137  →  GPU 0
+2026-09-05 11:38:08 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:38:13 | DEBUG    | DONE  [ 29/30] 1c786137     5.0s  peak=  1644 MB  [not solved]
+2026-09-05 11:38:13 | DEBUG    | START [ 30/30] 1caeab9d  →  GPU 0
+2026-09-05 11:38:13 | DEBUG    |   GPU 0 | Used: 0.08/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-05 11:38:18 | DEBUG    | DONE  [ 30/30] 1caeab9d     5.0s  peak=   722 MB  [not solved]
+2026-09-05 11:38:19 | DEBUG    | parallelize_runs done in 150.5s
+2026-09-05 11:38:19 | INFO     | Phase 1 complete in 150.5s
+2026-09-05 11:38:19 | INFO     | Saved Phase 1 measurements to memory_cache_training.json
+2026-09-05 11:38:19 | INFO     | Compiled Phase 2: scaled eager Phase-1 measurements by 1.2x  (mean 1178 MB/task)
+2026-09-05 11:38:19 | INFO     | Phase 2 VRAM budget: GPU0=14.84 GB of 15.84 GB free
+2026-09-05 11:38:19 | INFO     | Eje B seed jobs: 120 resumed, 0 pending
+2026-09-05 11:38:19 | INFO     | ------------------------------------------------------------------------
+2026-09-05 11:38:19 | INFO     | PHASE: Phase 2 — Full training  (2000 iterations × 0 jobs)
+2026-09-05 11:38:19 | INFO     | ------------------------------------------------------------------------
+2026-09-05 11:39:29 | INFO     | Phase 2 complete in 0.0s
+2026-09-05 11:39:29 | INFO     | Saved .profile/eje_b_demo30_candidate_v2_artifacts/predictions_training.npz
+2026-09-05 11:39:29 | INFO     | Saved .profile/eje_b_demo30_candidate_v2_artifacts/submission_training.json
+2026-09-05 11:39:29 | INFO     | ========================================================================
+2026-09-05 11:39:29 | INFO     | RUN COMPLETE — 12/30 tasks solved (40.0%)  in 221.6s (0.06h)
+2026-09-05 11:39:29 | INFO     |   Predictions saved : .profile/eje_b_demo30_candidate_v2_artifacts/predictions_training.npz
+2026-09-05 11:39:29 | INFO     | ========================================================================
+2026-09-05 11:39:29 | INFO     | Saved .profile/eje_b_demo30_candidate_v2_artifacts/run_metadata_training.json

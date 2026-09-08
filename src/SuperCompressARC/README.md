@@ -33,6 +33,50 @@ Compiled runs use `/mnt/supercompressarc-cache/.inductor_cache` by default. Over
 with `--inductor-cache-dir`; an existing `TORCHINDUCTOR_CACHE_DIR` environment variable
 takes precedence over both.
 
+## Eje B: robust training with Eje D
+
+Eje B is integrated into `AccelConfig` and runs compiled by default. It also
+supports a controlled task-specific eager override: the override preserves the
+four seeds and all Eje B algorithm settings while disabling `torch.compile` only
+for the selected task. Run scripts through the project interpreter;
+`profile_parallel_train.py` is not a standalone executable, so
+`./profile_parallel_train.py` may return "Permission denied".
+
+```bash
+arcagi/bin/python profile_parallel_train.py \
+    --label eje_b_demo30 \
+    --accel-preset compile \
+    --eje-b \
+    --gpu-mode sysfs \
+    -- \
+    --split training \
+    --demo 30 \
+    --iterations 2000 \
+    --seeds 0,1,2,3 \
+    --max-workers 6 \
+    --postprocess-stride 4
+```
+
+Each seed job is saved independently beneath the profiler label's artifact
+directory. To resume, keep the same Eje B options and pass the same state path:
+
+```bash
+arcagi/bin/python profile_parallel_train.py \
+    --label eje_b_demo30_resume \
+    --accel-preset compile \
+    --eje-b \
+    -- \
+    --split training \
+    --demo 30 \
+    --iterations 2000 \
+    --seeds 0,1,2,3 \
+    --state-dir .profile/eje_b_demo30_artifacts/state \
+    --resume
+```
+
+See [Docs/Architecture/EJE_B_IMPLEMENTACION.md](Docs/Architecture/EJE_B_IMPLEMENTACION.md)
+for implementation details, measured cost, and validation results.
+
 The code creates `results/<task>/` and writes the plots, learned representations and a
 per-step timing CSV there. Use `--run-label` to keep multiple runs of the same preset
 separate.
@@ -112,6 +156,10 @@ after investigating its failure:
 ```bash
 RETRY_QUARANTINED_TASKS=fcb5c309 ./run_training_full.sh
 ```
+
+With Eje B, `EAGER_TASKS` applies to every pending seed job for the named task;
+the normal four-seed merge still requires all seeds. If eager execution also
+fails, the task is quarantined and the rest of the split continues.
 
 A quarantined task receives the solver's deterministic 2x2-zero initial guess
 only in the final artifacts. It is not saved as a completed partial, is excluded

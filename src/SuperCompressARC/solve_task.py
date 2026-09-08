@@ -5,6 +5,7 @@ import json
 import importlib
 import gc
 import multiprocessing
+import random
 import tqdm
 import traceback
 
@@ -29,7 +30,8 @@ A script that solves one puzzle, to be imported and used with parallel_train.py 
 def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id,
                memory_dict, solutions_dict, error_queue, loggers_dict=None,
                progress_dict=None, postprocess_stride=1, accel_config=None,
-               partial_split=None, partial_n_steps=None):
+               partial_split=None, partial_n_steps=None, seed=0, job_id=None,
+               partial_fingerprint=None, state_dir=None):
     """
     Solves a puzzle.
     Args:
@@ -58,6 +60,7 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id,
         partial_n_steps (int, optional): Iteration count stored with the partial.
     """
 
+    result_key = job_id or task_name
     last_step = -1
     failure_stage = 'setup'
     effective_compile_mode = 'unknown'
@@ -70,6 +73,10 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id,
 
         torch.set_default_device('cuda')
         torch.cuda.set_device(gpu_id)
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
         torch.cuda.reset_peak_memory_stats()  # Measure the memory used.
 
         # Get the task
@@ -85,25 +92,35 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id,
         accel.apply(model, accel_cfg)
         optimizer = torch.optim.Adam(model.weights_list, lr=0.01, betas=(0.5, 0.9))
         train_history_logger = solution_selection.Logger(task, postprocess_stride=postprocess_stride)
+        eje_b_state = train.EjeBTrainingState() if accel_cfg.curriculum else None
         train_history_logger.solution_most_frequent = tuple(((0, 0), (0, 0)) for example_num in range(task.n_test))
         train_history_logger.solution_second_most_frequent = tuple(((0, 0), (0, 0)) for example_num in range(task.n_test))
 
         # Training loop
         failure_stage = 'training'
         if progress_dict is not None:
-            progress_dict[task_name] = 0   # reached the loop: no longer "init"
+            progress_dict[result_key] = 0   # reached the loop: no longer "init"
         for train_step in range(n_train_iterations):
-            train.take_step(task, model, optimizer, train_step, train_history_logger)
+            train.take_step(
+                task,
+                model,
+                optimizer,
+                train_step,
+                train_history_logger,
+                accel_config=accel_cfg,
+                n_train_iterations=n_train_iterations,
+                eje_b_state=eje_b_state,
+            )
             last_step = train_step
             # Every 10 steps, not 100: the parent's stall watchdog needs finer
             # resolution than a slow task's 100-step interval.
             if progress_dict is not None and train_step % 10 == 0:
-                progress_dict[task_name] = train_step
+                progress_dict[result_key] = train_step
             if time.time() > time_limit:
                 break
 
         if progress_dict is not None:
-            progress_dict[task_name] = last_step + 1
+            progress_dict[result_key] = last_step + 1
 
         # Batch-convert accumulated GPU scalar tensors to floats in a single sync
         # (Eje H, H2) instead of one sync per training step.
@@ -128,6 +145,21 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id,
             logger_data = {
                 'solution_contributions_log': train_history_logger.solution_contributions_log,
                 'solution_picks_history':     train_history_logger.solution_picks_history,
+                'candidate_evidence':         train_history_logger.candidate_evidence(),
+                'eje_b_diagnostics': {
+                    'total_KL_raw': train_history_logger.total_KL_curve,
+                    'total_KL_effective': (
+                        train_history_logger.effective_total_KL_curve
+                    ),
+                    'kl_free_bits': train_history_logger.kl_free_bits_curve,
+                    'n_kl_below_floor': (
+                        train_history_logger.n_kl_below_floor_curve
+                    ),
+                    'curriculum_weights': (
+                        train_history_logger.curriculum_weights_curve
+                    ),
+                    'seed': seed,
+                },
             }
 
         # Measure actual GPU memory BEFORE cleanup: includes HIP/CUDA context +
@@ -142,10 +174,17 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id,
             failure_stage = 'persistence'
             if partial_n_steps is None:
                 raise ValueError('partial_n_steps is required with partial_split')
-            task_persistence.save_task_partial(
-                partial_split, task_name, partial_n_steps,
-                example_list, logger_data,
-            )
+            if partial_fingerprint is None:
+                task_persistence.save_task_partial(
+                    partial_split, task_name, partial_n_steps,
+                    example_list, logger_data, state_dir=state_dir,
+                )
+            else:
+                task_persistence.save_seed_partial(
+                    partial_split, task_name, partial_n_steps, seed,
+                    partial_fingerprint, example_list, logger_data,
+                    state_dir=state_dir,
+                )
 
         failure_stage = 'publish'
         del task
@@ -156,14 +195,16 @@ def solve_task(task_name, split, time_limit, n_train_iterations, gpu_id,
         gc.collect()
 
         # Store the result
-        memory_dict[task_name] = task_peak_memory
-        solutions_dict[task_name] = example_list
+        memory_dict[result_key] = task_peak_memory
+        solutions_dict[result_key] = example_list
         if loggers_dict is not None:
-            loggers_dict[task_name] = logger_data
+            loggers_dict[result_key] = logger_data
 
     except BaseException as exc:
         failure = {
             'task_name': task_name,
+            'job_id': result_key,
+            'seed': seed,
             'gpu_id': gpu_id,
             'pid': os.getpid(),
             'last_step': last_step,

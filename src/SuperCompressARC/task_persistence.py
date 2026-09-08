@@ -10,6 +10,7 @@ _LOGGER_FIELDS = (
     'solution_picks_history',
 )
 _RECOVERY_SCHEMA_VERSION = 1
+_SEED_PARTIAL_SCHEMA_VERSION = 1
 _RECOVERY_STATES = frozenset((
     'retry_eager',
     'quarantined',
@@ -25,12 +26,12 @@ def safe_task_name(task_name):
     return task_name
 
 
-def partial_dir(split):
-    return os.path.join('.partial', split)
+def partial_dir(split, state_dir=None):
+    return os.path.join(state_dir or '.partial', split)
 
 
-def recovery_path(split):
-    return os.path.join(partial_dir(split), '.task_recovery.json')
+def recovery_path(split, state_dir=None):
+    return os.path.join(partial_dir(split, state_dir), '.task_recovery.json')
 
 
 def _utc_timestamp():
@@ -74,7 +75,8 @@ def is_complete_logger(logger_data):
     )
 
 
-def save_task_partial(split, task_name, n_steps, solution, logger_data):
+def save_task_partial(split, task_name, n_steps, solution, logger_data,
+                      state_dir=None):
     """Atomically persist one complete Phase-2 task result.
 
     The function is intentionally strict: returning success without a durable
@@ -85,7 +87,7 @@ def save_task_partial(split, task_name, n_steps, solution, logger_data):
     if not is_complete_logger(logger_data):
         raise ValueError(f'cannot persist {task_name}: logger data is incomplete')
 
-    directory = partial_dir(split)
+    directory = partial_dir(split, state_dir)
     os.makedirs(directory, exist_ok=True)
     path = os.path.join(directory, f'{safe_task_name(task_name)}.json')
     tmp = path + '.tmp'
@@ -114,11 +116,11 @@ def save_task_partial(split, task_name, n_steps, solution, logger_data):
     return path
 
 
-def load_task_partials(split, task_names, n_steps):
+def load_task_partials(split, task_names, n_steps, state_dir=None):
     """Return complete matching solutions and loggers from an earlier run."""
     solutions = {}
     loggers = {}
-    directory = partial_dir(split)
+    directory = partial_dir(split, state_dir)
     if not os.path.isdir(directory):
         return solutions, loggers
 
@@ -146,6 +148,83 @@ def load_task_partials(split, task_names, n_steps):
     return solutions, loggers
 
 
+def seed_partial_path(split, task_name, seed, fingerprint, state_dir=None):
+    safe_task_name(task_name)
+    safe_task_name(fingerprint)
+    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+        raise ValueError('seed must be a non-negative integer')
+    return os.path.join(
+        partial_dir(split, state_dir),
+        'eje_b',
+        fingerprint,
+        task_name,
+        f'seed_{seed}.json',
+    )
+
+
+def save_seed_partial(split, task_name, n_steps, seed, fingerprint,
+                      solution, logger_data, state_dir=None):
+    """Atomically persist one complete Eje B seed job."""
+    if not isinstance(n_steps, int) or n_steps < 1:
+        raise ValueError('n_steps must be a positive integer')
+    if not solution:
+        raise ValueError(f'cannot persist {task_name} seed {seed}: solution is empty')
+    if not is_complete_logger(logger_data):
+        raise ValueError(
+            f'cannot persist {task_name} seed {seed}: logger data is incomplete'
+        )
+    path = seed_partial_path(
+        split, task_name, seed, fingerprint, state_dir
+    )
+    _atomic_write_json(path, {
+        'schema_version': _SEED_PARTIAL_SCHEMA_VERSION,
+        'fingerprint': fingerprint,
+        'task_name': task_name,
+        'seed': seed,
+        'n_steps': n_steps,
+        'solution': solution,
+        'logger': logger_data,
+    })
+    return path
+
+
+def load_seed_partials(split, task_names, n_steps, seeds, fingerprint,
+                       state_dir=None):
+    """Return matching Eje B results keyed by ``(task_name, seed)``."""
+    solutions = {}
+    loggers = {}
+    for task_name in task_names:
+        for seed in seeds:
+            try:
+                path = seed_partial_path(
+                    split, task_name, seed, fingerprint, state_dir
+                )
+                with open(path, encoding='utf-8') as handle:
+                    payload = json.load(handle)
+            except (FileNotFoundError, OSError, ValueError, TypeError,
+                    json.JSONDecodeError):
+                continue
+            if not isinstance(payload, dict):
+                continue
+            solution = payload.get('solution')
+            logger_data = payload.get('logger')
+            if (
+                payload.get('schema_version') != _SEED_PARTIAL_SCHEMA_VERSION
+                or payload.get('fingerprint') != fingerprint
+                or payload.get('task_name') != task_name
+                or payload.get('seed') != seed
+                or payload.get('n_steps') != n_steps
+                or not isinstance(solution, list)
+                or not solution
+                or not is_complete_logger(logger_data)
+            ):
+                continue
+            key = (task_name, seed)
+            solutions[key] = solution
+            loggers[key] = logger_data
+    return solutions, loggers
+
+
 def _empty_recovery_manifest():
     return {
         'schema_version': _RECOVERY_SCHEMA_VERSION,
@@ -153,9 +232,9 @@ def _empty_recovery_manifest():
     }
 
 
-def load_task_recovery_manifest(split):
+def load_task_recovery_manifest(split, state_dir=None):
     """Load and validate durable task recovery state for one split."""
-    path = recovery_path(split)
+    path = recovery_path(split, state_dir)
     try:
         with open(path, encoding='utf-8') as handle:
             payload = json.load(handle)
@@ -190,13 +269,14 @@ def load_task_recovery_manifest(split):
     return payload
 
 
-def load_task_recovery(split, n_steps):
+def load_task_recovery(split, n_steps, state_dir=None):
     """Return recovery entries scoped to the requested iteration count."""
-    manifest = load_task_recovery_manifest(split)
+    manifest = load_task_recovery_manifest(split, state_dir)
     return dict(manifest['iterations'].get(str(n_steps), {}))
 
 
-def update_task_recovery(split, task_name, n_steps, state, failure=None):
+def update_task_recovery(split, task_name, n_steps, state, failure=None,
+                         state_dir=None):
     """Atomically transition one task's recovery state."""
     safe_task_name(task_name)
     if state not in _RECOVERY_STATES:
@@ -206,7 +286,7 @@ def update_task_recovery(split, task_name, n_steps, state, failure=None):
     if failure is not None and not isinstance(failure, dict):
         raise ValueError('failure must be a dictionary or None')
 
-    manifest = load_task_recovery_manifest(split)
+    manifest = load_task_recovery_manifest(split, state_dir)
     task_entries = manifest['iterations'].setdefault(str(n_steps), {})
     previous = task_entries.get(task_name, {})
     failures = list(previous.get('failures', []))
@@ -218,5 +298,5 @@ def update_task_recovery(split, task_name, n_steps, state, failure=None):
         'updated_at': _utc_timestamp(),
         'failures': failures,
     }
-    _atomic_write_json(recovery_path(split), manifest)
+    _atomic_write_json(recovery_path(split, state_dir), manifest)
     return dict(task_entries[task_name])

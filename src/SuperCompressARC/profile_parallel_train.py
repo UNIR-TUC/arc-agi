@@ -263,7 +263,7 @@ def _sample_gpu_unified(source_type, payload):
 
 # ── Run metadata ingestion (written by parallel_train.py) ─────────────────
 
-def _collect_run_metadata(t0):
+def _collect_run_metadata(t0, metadata_dir='.'):
     """Read every run_metadata_{split}.json written by this run.
 
     parallel_train.py writes one file per split at the end of run_split(),
@@ -276,7 +276,8 @@ def _collect_run_metadata(t0):
             (planned steps, solved counts, accel config).
     """
     metadata = []
-    for path in sorted(glob.glob('run_metadata_*.json')):
+    for path in sorted(glob.glob(os.path.join(
+            metadata_dir, 'run_metadata_*.json'))):
         try:
             if os.path.getmtime(path) < t0 - 1:
                 continue
@@ -296,7 +297,11 @@ def _collect_run_metadata(t0):
     for m in metadata:
         steps = m.get('n_steps') or 0
         tasks = m.get('n_tasks') or 0
-        total_steps += steps * tasks
+        total_steps += (
+            m.get('optimizer_steps_this_attempt')
+            or m.get('total_optimizer_steps')
+            or steps * tasks
+        )
         n_tasks += tasks
         if steps:
             min_steps = steps if min_steps is None else min(min_steps, steps)
@@ -436,6 +441,17 @@ def run_and_profile(args, passthrough):
         'smi': f'smi({gpu_payload[0] if gpu_payload else "?"})',
     }.get(gpu_source_type, 'off')
 
+    artifact_dir = f'{prefix}_artifacts'
+    os.makedirs(artifact_dir, exist_ok=True)
+    if '--output-dir' not in passthrough:
+        passthrough = passthrough + ['--output-dir', artifact_dir]
+    if '--state-dir' not in passthrough:
+        passthrough = passthrough + [
+            '--state-dir', os.path.join(artifact_dir, 'state')
+        ]
+
+    output_index = passthrough.index('--output-dir')
+    metadata_dir = passthrough[output_index + 1]
     cmd = [sys.executable, '-u', 'parallel_train.py'] + passthrough
     print(f'[profiler] launching: {" ".join(cmd)}')
     print(f'[profiler] cores={n_cores}  gpu={gpu_label}  '
@@ -574,7 +590,7 @@ def run_and_profile(args, passthrough):
 
     # Metadata written by parallel_train.py: lets us report *training* throughput
     # (steps/s) and pass@2 accuracy, not just process counts.
-    run_metadata, run_derived = _collect_run_metadata(t0)
+    run_metadata, run_derived = _collect_run_metadata(t0, metadata_dir)
     planned_steps = run_derived['planned_train_steps']
     n_solved = run_derived['n_solved']
     n_meta_tasks = run_derived['n_tasks']
@@ -654,6 +670,7 @@ def run_and_profile(args, passthrough):
                                 if n_solved is not None and n_meta_tasks else None),
         },
         'accel_preset': args.accel_preset,
+        'artifact_dir': os.path.abspath(artifact_dir),
         'run_metadata': run_metadata,
         'workers': worker_records,
     }
@@ -711,6 +728,34 @@ def _print_summary(s, csv_path, json_path):
 
 # ── Before/after comparison ──────────────────────────────────────────────────
 
+def _eje_b_comparison_errors(before, after):
+    before_runs = before.get('run_metadata') or []
+    after_runs = after.get('run_metadata') or []
+    after_uses_eje_b = any(
+        run.get('accel', {}).get('eje_b') for run in after_runs
+    )
+    if not after_uses_eje_b:
+        return []
+    if len(before_runs) != len(after_runs):
+        return ['different number of split metadata records']
+
+    errors = []
+    for before_run, after_run in zip(before_runs, after_runs):
+        for label, run in (('before', before_run), ('after', after_run)):
+            if run.get('accel', {}).get('compile_mode') != 'default':
+                errors.append(f'{label} run is not compile=default')
+        for field in ('split', 'task_ids', 'n_steps', 'postprocess_stride'):
+            if before_run.get(field) != after_run.get(field):
+                errors.append(f'{field} differs between runs')
+    return errors
+
+
+def _uses_eje_b(summary):
+    return any(
+        run.get('accel', {}).get('eje_b')
+        for run in summary.get('run_metadata') or []
+    )
+
 def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.0):
     with open(before_path) as f:
         b = json.load(f)
@@ -757,8 +802,17 @@ def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.
           f'  ->  {get(a, "accel_preset", default="?")}')
     print('=' * 66)
 
+    contract_errors = _eje_b_comparison_errors(b, a)
+    if contract_errors:
+        for error in contract_errors:
+            print(f'  INVALID EJE B COMPARISON: {error}')
+        print('=' * 66 + '\n')
+        return 4
+    eje_b_comparison = _uses_eje_b(a)
+
     print('\n  Throughput / speed (higher is better):')
-    line('wall_time_s', b['wall_time_s'], a['wall_time_s'], 'lower', ' s')
+    line('wall_time_s', b['wall_time_s'], a['wall_time_s'],
+         None if eje_b_comparison else 'lower', ' s')
     # Phase-2 throughput first: it isolates training speed from the Phase-1
     # measurement, which can dominate the wall clock and invert the verdict.
     line('steps_per_s_phase2',
@@ -770,14 +824,20 @@ def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.
          get(b, 'efficiency', 'steps_per_s_aggregate'),
          get(a, 'efficiency', 'steps_per_s_aggregate'), 'higher')
     line('workers_per_hour', b['throughput']['workers_per_hour'],
-         a['throughput']['workers_per_hour'], 'higher')
+         a['throughput']['workers_per_hour'],
+         None if eje_b_comparison else 'higher')
     line('mean_worker_lifetime_s', b['throughput']['mean_worker_lifetime_s'],
          a['throughput']['mean_worker_lifetime_s'], 'lower', ' s')
 
     print(f'\n  CPU pressure (must NOT get worse; ±{cpu_tolerance_pp} pp is noise):')
     cpu_ok = []
-    cpu_ok.append(line('cpu_mean_pct', b['cpu']['mean_pct'], a['cpu']['mean_pct'],
-                       'lower', ' %', tolerance=cpu_tolerance_pp))
+    mean_cpu_ok = line(
+        'cpu_mean_pct', b['cpu']['mean_pct'], a['cpu']['mean_pct'],
+        None if eje_b_comparison else 'lower', ' %',
+        tolerance=cpu_tolerance_pp,
+    )
+    if not eje_b_comparison:
+        cpu_ok.append(mean_cpu_ok)
     cpu_ok.append(line('cpu_saturation_fraction',
                        b['cpu']['saturation_fraction'], a['cpu']['saturation_fraction'],
                        'lower', '', pct=True))
@@ -799,7 +859,8 @@ def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.
     line('energy_wh_per_1k_steps', get(b, 'efficiency', 'energy_wh_per_1k_steps'),
          get(a, 'efficiency', 'energy_wh_per_1k_steps'), 'lower', ' Wh')
     line('energy_wh_per_worker', get(b, 'efficiency', 'energy_wh_per_worker'),
-         get(a, 'efficiency', 'energy_wh_per_worker'), 'lower', ' Wh')
+         get(a, 'efficiency', 'energy_wh_per_worker'),
+         None if eje_b_comparison else 'lower', ' Wh')
 
     print('\n  Accuracy (must NOT get worse):')
     b_solved = get(b, 'accuracy', 'solved_fraction')
@@ -837,7 +898,10 @@ def compare(before_path, after_path, accuracy_tolerance=0.0, cpu_tolerance_pp=2.
         print('  ⚠  CPU pressure INCREASED — this change worsens the bottleneck.')
         print('=' * 66 + '\n')
         return 2
-    print('  ✓  CPU pressure did not get worse and pass@2 held up.')
+    if eje_b_comparison:
+        print('  ✓  CPU saturation did not get worse and pass@2 held up.')
+    else:
+        print('  ✓  CPU pressure did not get worse and pass@2 held up.')
     print('=' * 66 + '\n')
     return 0
 
@@ -874,6 +938,8 @@ def main():
                              'consistently. Use "baseline" for the reference run and '
                              '"bf16"/"compile"/"full" for the accelerated ones. Individual '
                              'flags can still be passed through after `--`.')
+    parser.add_argument('--eje-b', action='store_true',
+                        help='Run Eje B and force the required compile preset.')
     parser.add_argument('--accuracy-tolerance', type=float, default=0.0,
                         help='In --compare mode, how much pass@2 solved_fraction may drop '
                              'before the comparison is flagged as a regression (exit code 3). '
@@ -896,6 +962,13 @@ def main():
     passthrough = args.passthrough
     if passthrough and passthrough[0] == '--':
         passthrough = passthrough[1:]
+
+    if args.eje_b:
+        if args.accel_preset not in (None, 'compile'):
+            parser.error('--eje-b requires --accel-preset compile')
+        args.accel_preset = 'compile'
+        if '--eje-b' not in passthrough:
+            passthrough.append('--eje-b')
 
     # --accel-preset is a convenience wrapper over the parallel_train.py flag; an
     # explicit --accel-preset in the passthrough always wins.

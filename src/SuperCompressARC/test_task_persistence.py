@@ -96,6 +96,77 @@ class TaskPersistenceTests(unittest.TestCase):
         self.assertFalse(os.path.exists(path))
         self.assertFalse(os.path.exists(path + '.tmp'))
 
+    def test_seed_partial_round_trip_is_fingerprinted_and_isolated(self):
+        logger_data = {
+            **self.logger_data,
+            'candidate_evidence': [{'solution': [[[1]]], 'score': -1.0}],
+        }
+        path = task_persistence.save_seed_partial(
+            'training', '007bbfb7', 2000, 3, 'abc123',
+            self.solution, logger_data,
+        )
+
+        self.assertTrue(path.endswith(
+            '.partial/training/eje_b/abc123/007bbfb7/seed_3.json'
+        ))
+        self.assertEqual(
+            task_persistence.load_seed_partials(
+                'training', ['007bbfb7'], 2000, (0, 3), 'abc123'
+            ),
+            (
+                {('007bbfb7', 3): self.solution},
+                {('007bbfb7', 3): logger_data},
+            ),
+        )
+        self.assertEqual(
+            task_persistence.load_seed_partials(
+                'training', ['007bbfb7'], 2000, (3,), 'other'
+            ),
+            ({}, {}),
+        )
+
+    def test_seed_partial_rejects_wrong_payload_contract(self):
+        path = task_persistence.seed_partial_path(
+            'training', '007bbfb7', 1, 'abc123'
+        )
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w', encoding='utf-8') as handle:
+            json.dump({
+                'schema_version': 1,
+                'fingerprint': 'abc123',
+                'task_name': '007bbfb7',
+                'seed': 1,
+                'n_steps': 1000,
+                'solution': self.solution,
+                'logger': self.logger_data,
+            }, handle)
+
+        self.assertEqual(
+            task_persistence.load_seed_partials(
+                'training', ['007bbfb7'], 2000, (1,), 'abc123'
+            ),
+            ({}, {}),
+        )
+
+    def test_legacy_partial_can_be_isolated_by_state_dir(self):
+        task_persistence.save_task_partial(
+            'training', '007bbfb7', 2000,
+            self.solution, self.logger_data, state_dir='isolated',
+        )
+
+        self.assertEqual(
+            task_persistence.load_task_partials(
+                'training', ['007bbfb7'], 2000, state_dir='isolated'
+            ),
+            ({'007bbfb7': self.solution}, {'007bbfb7': self.logger_data}),
+        )
+        self.assertEqual(
+            task_persistence.load_task_partials(
+                'training', ['007bbfb7'], 2000
+            ),
+            ({}, {}),
+        )
+
     def test_recovery_manifest_round_trip_is_iteration_scoped(self):
         failure = {
             'stage': 'training',
@@ -122,6 +193,30 @@ class TaskPersistenceTests(unittest.TestCase):
             '.tmp.' in name
             for name in os.listdir(task_persistence.partial_dir('training'))
         ))
+
+    def test_recovery_manifests_are_isolated_by_state_dir(self):
+        with mock.patch.object(task_persistence, '_fsync_directory'):
+            task_persistence.update_task_recovery(
+                'training', 'fcb5c309', 2000, 'retry_eager',
+                state_dir='eje_b',
+            )
+            task_persistence.update_task_recovery(
+                'training', 'fcb5c309', 2000, 'quarantined',
+                state_dir='eje_d',
+            )
+
+        self.assertEqual(
+            task_persistence.load_task_recovery(
+                'training', 2000, state_dir='eje_b',
+            )['fcb5c309']['state'],
+            'retry_eager',
+        )
+        self.assertEqual(
+            task_persistence.load_task_recovery(
+                'training', 2000, state_dir='eje_d',
+            )['fcb5c309']['state'],
+            'quarantined',
+        )
 
     def test_recovery_manifest_rejects_corruption_and_unknown_state(self):
         directory = task_persistence.partial_dir('training')
