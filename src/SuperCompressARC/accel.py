@@ -18,8 +18,9 @@ Design constraints
    callable. `ARCCompressor` is a plain class (not `nn.Module`), so this works.
 2. **Everything is off by default.** An `AccelConfig()` with default values
    reproduces exactly today's behaviour (`is_enabled()` is False).
-3. **Never fail a task because of the accelerator.** Compilation problems fall
-   back to eager mode with a warning; an unsupported dtype falls back to FP32.
+3. **Recover safely from accelerator failures.** Ordinary compilation problems
+    fall back to eager mode. Fatal device errors are re-raised so the scheduler
+    can retry in a fresh process without issuing more work to a poisoned context.
 
 Why plain `torch.autocast` is numerically safe here
 ---------------------------------------------------
@@ -45,9 +46,11 @@ multitensor shapes are constant across all training steps. Unlike the
 shapes give a single compilation with no dynamic-shape guard overhead.
 """
 
+import hashlib
+import json
 import os
 import warnings
-from dataclasses import dataclass, asdict, fields
+from dataclasses import dataclass, asdict, field, fields
 from typing import Optional
 
 import torch
@@ -60,6 +63,8 @@ COMPILE_CHOICES = ('off', 'default', 'reduce-overhead', 'max-autotune')
 MATMUL_PRECISION_CHOICES = ('highest', 'high', 'medium')
 
 _AMP_DTYPES = {'bf16': torch.bfloat16, 'fp16': torch.float16}
+EJE_B_SCHEMA_VERSION = 1
+SOLUTION_SCORER_VERSION = 1
 
 
 @dataclass
@@ -101,6 +106,56 @@ class AccelConfig:
     inductor_cache_dir: Optional[str] = None
     compile_threads: int = 1
     memory_planning: bool = False
+    eje_b: bool = False
+    seeds: tuple = (0,)
+    kl_free_bits_initial: float = 0.0
+    curriculum: bool = False
+    curriculum_beta_max: float = 1.0
+    curriculum_ema_decay: float = 0.9
+    _eje_b_eager_override: bool = field(default=False, repr=False)
+
+    def __post_init__(self):
+        self.seeds = tuple(self.seeds)
+        if self.amp not in AMP_CHOICES:
+            raise ValueError(f'unknown AMP mode: {self.amp!r}')
+        if self.compile_mode not in COMPILE_CHOICES:
+            raise ValueError(f'unknown compile mode: {self.compile_mode!r}')
+        if self.matmul_precision not in MATMUL_PRECISION_CHOICES:
+            raise ValueError(
+                f'unknown matmul precision: {self.matmul_precision!r}'
+            )
+        if not self.seeds or any(
+            isinstance(seed, bool) or not isinstance(seed, int) or seed < 0
+            for seed in self.seeds
+        ):
+            raise ValueError('seeds must be a non-empty sequence of non-negative integers')
+        if len(set(self.seeds)) != len(self.seeds):
+            raise ValueError('seeds must not contain duplicates')
+        if self.kl_free_bits_initial < 0:
+            raise ValueError('kl_free_bits_initial must be non-negative')
+        if self.curriculum_beta_max < 0:
+            raise ValueError('curriculum_beta_max must be non-negative')
+        if not 0 <= self.curriculum_ema_decay < 1:
+            raise ValueError('curriculum_ema_decay must be in [0, 1)')
+
+        b_options_enabled = (
+            self.seeds != (0,)
+            or self.kl_free_bits_initial > 0
+            or self.curriculum
+            or self.curriculum_beta_max != 1.0
+            or self.curriculum_ema_decay != 0.9
+        )
+        if b_options_enabled and not self.eje_b:
+            raise ValueError('Eje B options require eje_b=True')
+        if self._eje_b_eager_override and not self.eje_b:
+            raise ValueError('Eje B eager override requires eje_b=True')
+        if self.eje_b and self.compile_mode != 'default' and not (
+            self._eje_b_eager_override and self.compile_mode == 'off'
+        ):
+            raise ValueError(
+                "Eje B requires the Eje D 'compile' preset "
+                "(compile_mode='default')"
+            )
 
     # ── Introspection ───────────────────────────────────────────────────
     def is_enabled(self):
@@ -113,8 +168,59 @@ class AccelConfig:
         """True if `apply()` would wrap or compile `model.forward`."""
         return self.amp != 'off' or self.compile_mode != 'off'
 
+    def kl_free_bits_at_step(self, train_step, n_steps):
+        """Return the per-leaf free-bits threshold for this training step."""
+        if not self.eje_b or self.kl_free_bits_initial == 0:
+            return 0.0
+        progress = self._schedule_progress(train_step, n_steps)
+        return self.kl_free_bits_initial * (1.0 - progress)
+
+    def curriculum_beta_at_step(self, train_step, n_steps):
+        """Return the hard-example curriculum strength for this training step."""
+        if not self.eje_b or not self.curriculum:
+            return 0.0
+        return self.curriculum_beta_max * self._schedule_progress(
+            train_step, n_steps
+        )
+
+    def algorithm_fingerprint(self, n_steps, postprocess_stride):
+        """Identify result-affecting settings while ignoring execution tuning."""
+        if n_steps < 1:
+            raise ValueError('n_steps must be positive')
+        if postprocess_stride < 1:
+            raise ValueError('postprocess_stride must be positive')
+        payload = {
+            'schema_version': EJE_B_SCHEMA_VERSION,
+            'solution_scorer_version': SOLUTION_SCORER_VERSION,
+            'n_steps': n_steps,
+            'postprocess_stride': postprocess_stride,
+            'eje_b': self.eje_b,
+            'seeds': list(self.seeds),
+            'kl_free_bits_initial': self.kl_free_bits_initial,
+            'curriculum': self.curriculum,
+            'curriculum_beta_max': self.curriculum_beta_max,
+            'curriculum_ema_decay': self.curriculum_ema_decay,
+        }
+        encoded = json.dumps(
+            payload, sort_keys=True, separators=(',', ':')
+        ).encode('ascii')
+        return hashlib.sha256(encoded).hexdigest()[:16]
+
+    @staticmethod
+    def _schedule_progress(train_step, n_steps):
+        if n_steps < 1:
+            raise ValueError('n_steps must be positive')
+        if train_step < 0:
+            raise ValueError('train_step must be non-negative')
+        if n_steps == 1:
+            return 1.0
+        return min(train_step, n_steps - 1) / (n_steps - 1)
+
     def to_dict(self):
-        return asdict(self)
+        values = asdict(self)
+        if not self._eje_b_eager_override:
+            values.pop('_eje_b_eager_override', None)
+        return values
 
     @classmethod
     def from_dict(cls, data):
@@ -137,7 +243,10 @@ class AccelConfig:
             return 'accel=off (baseline)'
         return (f'accel amp={self.amp} compile={self.compile_mode} '
                 f'matmul={self.matmul_precision} threads={self.threads_per_worker} '
-                f'alloc={self.alloc_conf or "-"}')
+            f'alloc={self.alloc_conf or "-"} '
+            f'eje-b={"on" if self.eje_b else "off"}'
+            + (f' seeds={",".join(map(str, self.seeds))}'
+               if self.eje_b else ''))
 
 
 # Convenience presets so A/B runs are labelled consistently.
@@ -212,9 +321,17 @@ def for_measurement(cfg):
     compiled run of the same split, removing a fixed cost from every A/B.
     """
     cfg = AccelConfig.from_dict(cfg)
-    if cfg.compile_mode == 'off':
-        return cfg
-    return AccelConfig.from_dict({**cfg.to_dict(), 'compile_mode': 'off'})
+    values = {
+        **cfg.to_dict(),
+        'compile_mode': 'off',
+        'eje_b': False,
+        'seeds': (0,),
+        'kl_free_bits_initial': 0.0,
+        'curriculum': False,
+        'curriculum_beta_max': 1.0,
+        'curriculum_ema_decay': 0.9,
+    }
+    return AccelConfig.from_dict(values)
 
 
 # ── Environment / process configuration ──────────────────────────────────────
@@ -344,26 +461,55 @@ def compile_report(cfg):
 
 # ── Forward-pass wrapping (the only contact point with the model) ────────────
 
+_FATAL_ACCELERATOR_ERROR_MARKERS = (
+    'illegal memory access',
+    'driver error: 700',
+    'hiperrorillegaladdress',
+    'device-side assert',
+    'device side assert',
+    'unspecified launch failure',
+)
+
+
+def _is_fatal_accelerator_error(exc):
+    """Return whether continuing to issue device work is unsafe."""
+    accelerator_error = getattr(torch, 'AcceleratorError', None)
+    if accelerator_error is not None and isinstance(exc, accelerator_error):
+        return True
+    message = str(exc).lower()
+    return any(marker in message for marker in _FATAL_ACCELERATOR_ERROR_MARKERS)
+
+
 class _EagerFallback:
-    """Call a compiled callable, permanently reverting to eager on first error.
+    """Call a compiled callable, reverting to eager on a non-fatal error.
 
     `torch.compile` is lazy: failures surface on the first call, not at
-    decoration time. A compilation problem must never kill a task, so the very
-    first exception switches this wrapper to the original eager callable for the
-    rest of the run.
+    decoration time. Fatal accelerator failures remain fatal for this wrapper;
+    only a fresh worker process may safely recover from them.
     """
 
     def __init__(self, compiled, eager):
         self._compiled = compiled
         self._eager = eager
         self._failed = False
+        self._fatal_error = None
 
     def __call__(self, *args, **kwargs):
+        if self._fatal_error is not None:
+            raise self._fatal_error
         if self._failed:
             return self._eager(*args, **kwargs)
         try:
             return self._compiled(*args, **kwargs)
         except Exception as exc:
+            if _is_fatal_accelerator_error(exc):
+                self._fatal_error = exc
+                warnings.warn(
+                    f'[accel] torch.compile hit a fatal accelerator error '
+                    f'({exc}); refusing eager fallback because the device '
+                    f'context may be corrupted.'
+                )
+                raise
             self._failed = True
             warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
                           f'falling back to eager for the rest of this task.')

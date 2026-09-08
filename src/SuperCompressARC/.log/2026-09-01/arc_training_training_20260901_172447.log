@@ -1,0 +1,141 @@
+2026-09-01 17:24:47 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1525.9 GB free, minimum 50.0 GB)
+2026-09-01 17:24:47 | INFO     | ========================================================================
+2026-09-01 17:24:47 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-01 17:24:47 | INFO     |   Tasks       : 400
+2026-09-01 17:24:47 | INFO     |   GPUs        : 1
+2026-09-01 17:24:47 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-01/arc_training_training_20260901_172447.log
+2026-09-01 17:24:47 | INFO     |   Results file: results_2026-09-01_17-24-47.txt
+2026-09-01 17:24:47 | INFO     | ========================================================================
+2026-09-01 17:24:47 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:24:47 | INFO     | Acceleration (Eje D): accel amp=off compile=default matmul=high threads=1 alloc=-
+2026-09-01 17:24:47 | INFO     | ------------------------------------------------------------------------
+2026-09-01 17:24:47 | INFO     | PHASE: Phase 1 — SKIPPED — loaded 400 task measurements from memory_cache_training.json
+2026-09-01 17:24:47 | INFO     | ------------------------------------------------------------------------
+2026-09-01 17:24:47 | INFO     | GPU fingerprint matches cached run. Delete memory_cache_training.json to force re-measurement.
+2026-09-01 17:24:47 | INFO     | Compiled Phase 2: scaled eager Phase-1 measurements by 1.2x  (mean 1098 MB/task)
+2026-09-01 17:24:47 | INFO     | Loading partial results for split training
+2026-09-01 17:24:47 | INFO     | Resume: 97/400 tasks already complete in .partial/training — Phase 2 will run the remaining 303
+2026-09-01 17:24:47 | INFO     | Phase 2 VRAM budget: GPU0=14.86 GB of 15.86 GB free
+2026-09-01 17:24:47 | INFO     | ------------------------------------------------------------------------
+2026-09-01 17:24:47 | INFO     | PHASE: Phase 2 — Full training  (2000 iterations × 303 tasks)
+2026-09-01 17:24:47 | INFO     | ------------------------------------------------------------------------
+2026-09-01 17:24:47 | INFO     | Host RAM: 90 GB free − 12 GB reserved = 78 GB for workers → cap 8 (at 9.0 GB/worker)
+2026-09-01 17:24:48 | INFO     | START [293/400] ba97ae07  →  GPU 0
+2026-09-01 17:24:48 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:24:48 | INFO     | START [340/400] d687bc17  →  GPU 0
+2026-09-01 17:24:48 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:24:48 | INFO     | START [  2/400] 00d62c1b  →  GPU 0
+2026-09-01 17:24:48 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:24:48 | INFO     | START [ 55/400] 272f95fa  →  GPU 0
+2026-09-01 17:24:48 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:24:48 | INFO     | START [396/400] fcb5c309  →  GPU 0
+2026-09-01 17:24:48 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:24:48 | INFO     | START [358/400] e21d9049  →  GPU 0
+2026-09-01 17:24:48 | DEBUG    |   GPU 0 | Used: 0.06/15.92 GB | Allocated: 0.0 MB | Reserved: 0.0 MB
+2026-09-01 17:24:49 | DEBUG    | PROG  ba97ae07  step    0/2000  (  0.0%)
+2026-09-01 17:24:49 | DEBUG    | PROG  d687bc17  step    0/2000  (  0.0%)
+2026-09-01 17:24:49 | DEBUG    | PROG  00d62c1b  step    0/2000  (  0.0%)
+2026-09-01 17:24:49 | DEBUG    | PROG  272f95fa  step    0/2000  (  0.0%)
+2026-09-01 17:24:49 | DEBUG    | PROG  fcb5c309  step    0/2000  (  0.0%)
+2026-09-01 17:24:49 | DEBUG    | PROG  e21d9049  step    0/2000  (  0.0%)
+2026-09-01 17:29:13 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 405, in parallelize_runs
+    raise WorkerFailure(
+WorkerFailure: Worker fcb5c309 on GPU 0 (pid 135287) failed after step 10:
+Traceback (most recent call last):
+  File "/mnt/supercompressarc-cache/.inductor_cache/tr/ctr5drb6elo4ccl5dmjsaugbax5bncgazkk32salzkdsdwkofylj.py", line 98359, in call
+    triton_per_fused__unsafe_view_prepare_softmax_online_135.run(buf4754, buf4755, buf4756, 8, 17, stream=raw_stream0)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/triton_heuristics.py", line 2410, in run
+    return fast(*args, stream=stream)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 5, in launcher
+RuntimeError: CUDA driver error: 700
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py", line 365, in __call__
+    return self._compiled(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1188, in compile_wrapper
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arc_compressor.py", line 94, in forward
+    def forward(self):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1468, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/aot_autograd.py", line 1283, in forward
+    return compiled_fn(full_args)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 1189, in runtime_wrapper
+    result = _codegen_runtime_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(runtime_wrapper_orchestration)", line 11, in _runtime_wrapper
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/utils.py", line 112, in g
+    return f(*args)
+           ^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/function.py", line 625, in apply
+    return super().apply(*args, **kwargs)  # type: ignore[misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3518, in forward
+    return CompiledFunction._fwd_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_forward)", line 2, in _compiled_forward
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/output_code.py", line 807, in __call__
+    return self.current_callable(inputs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/supercompressarc-cache/.inductor_cache/tr/ctr5drb6elo4ccl5dmjsaugbax5bncgazkk32salzkdsdwkofylj.py", line 81365, in call
+    with torch.cuda._DeviceGuard(0):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/cuda/__init__.py", line 696, in __exit__
+    self.idx = torch.cuda._maybe_exchange_device(self.prev_idx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/solve_task.py", line 92, in solve_task
+    train.take_step(task, model, optimizer, train_step, train_history_logger)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/train.py", line 55, in take_step
+    logits, x_mask, y_mask, KL_amounts, KL_names, = model.forward()
+                                                    ^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py", line 370, in __call__
+    return self._eager(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arc_compressor.py", line 114, in forward
+    x, KL_amounts, KL_names = layers.decode_latents(
+                              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 162, in decode_latents
+    x = decode_latents_(target_capacities, decode_weights, multiposteriors)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/multitensor_systems.py", line 207, in wrapper
+    iterate_and_assign(multitensor_system, result_data)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/multitensor_systems.py", line 200, in iterate_and_assign
+    output = fn(dims, *new_args, **new_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 157, in decode_latents_
+    z, KL = channel_layer(target_capacity, posterior)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 90, in channel_layer
+    min_capacity = torch.tensor(min_capacity)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.

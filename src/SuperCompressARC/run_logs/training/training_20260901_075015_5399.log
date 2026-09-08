@@ -1,0 +1,769 @@
+2026-09-01 07:50:17 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1528.3 GB free, minimum 50.0 GB)
+2026-09-01 07:50:17 | INFO     | ========================================================================
+2026-09-01 07:50:17 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-01 07:50:17 | INFO     |   Tasks       : 400
+2026-09-01 07:50:17 | INFO     |   GPUs        : 1
+2026-09-01 07:50:17 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-01/arc_training_training_20260901_075017.log
+2026-09-01 07:50:17 | INFO     |   Results file: results_2026-09-01_07-50-17.txt
+2026-09-01 07:50:17 | INFO     | ========================================================================
+W0901 09:01:32.203000 26164 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 12:26:37.644000 71469 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:368: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 90 v.s. 10
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 13:48:51.628000 89853 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 13:50:04.251000 90134 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:368: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 72 v.s. 8
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:368: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 72 v.s. 8
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 13:52:54.888000 90822 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 13:54:33.372000 91227 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:368: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 72 v.s. 8
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:368: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 72 v.s. 8
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 15:24:37.855000 109258 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:368: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 64 v.s. 8
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 15:28:28.047000 110053 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 15:28:28.049000 110053 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 16:03:32.654000 117303 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:368: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 60 v.s. 10
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 16:14:38.754000 119853 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 16:14:38.756000 119853 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:368: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 56 v.s. 8
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+terminate called after throwing an instance of 'c10::AcceleratorError'
+  what():  CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+Exception raised from SetDevice at /__w/pytorch/pytorch/c10/hip/HIPFunctions.cpp:334 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7dcc04176f9d in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x12cf9 (0x7dccaf87ccf9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10_hip.so)
+frame #2: c10::cuda::SetDevice(signed char, bool) + 0x51 (0x7dccaf8c1891 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10_hip.so)
+frame #3: <unknown function> + 0x1194c53 (0x7dcc78994c53 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #4: <unknown function> + 0x12c5bcd (0x7dcc78ac5bcd in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #5: <unknown function> + 0xc8893a (0x7dcc7848893a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #6: <unknown function> + 0x5a9048b (0x7dcc9e09048b in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #7: <unknown function> + 0x5465fe3 (0x7dcc9da65fe3 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #8: at::_ops::mm_out::call(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x162 (0x7dcc9b1a9b12 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #9: <unknown function> + 0x55d03e (0x7dccae15d03e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #10: <unknown function> + 0x2334a1 (0x5ce3c099b4a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #11: _PyObject_Call + 0xb5 (0x5ce3c09ae4a5 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #12: <unknown function> + 0x113688 (0x5ce3c087b688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #13: <unknown function> + 0x264b46 (0x5ce3c09ccb46 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #14: <unknown function> + 0x2d9196 (0x5ce3c0a41196 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #15: PyObject_CallMethod + 0xe2 (0x5ce3c0a4b572 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #16: <unknown function> + 0xdf9213 (0x7dccae9f9213 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #17: torch::handle_torch_function_no_python_arg_parser(c10::ArrayRef<_object*>, _object*, _object*, char const*, _object*, char const*, torch::TorchFunctionName) + 0x16 (0x7dccae9fb1d6 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #18: <unknown function> + 0xdfb7cb (0x7dccae9fb7cb in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #19: <unknown function> + 0x55ceed (0x7dccae15ceed in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #20: <unknown function> + 0x2334a1 (0x5ce3c099b4a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #21: _PyObject_MakeTpCall + 0x2eb (0x5ce3c09789ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #22: <unknown function> + 0x114a7e (0x5ce3c087ca7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #23: _PyObject_FastCallDictTstate + 0x1fa (0x5ce3c097c80a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #24: _PyObject_Call_Prepend + 0x69 (0x5ce3c09ab8d9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #25: <unknown function> + 0x321513 (0x5ce3c0a89513 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #26: _PyObject_MakeTpCall + 0x2eb (0x5ce3c09789ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #27: <unknown function> + 0x114a7e (0x5ce3c087ca7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #28: <unknown function> + 0x84bf23 (0x7dccae44bf23 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #29: <unknown function> + 0x2334a1 (0x5ce3c099b4a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #30: _PyObject_Call + 0xb5 (0x5ce3c09ae4a5 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #31: <unknown function> + 0x113688 (0x5ce3c087b688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #32: <unknown function> + 0x264b46 (0x5ce3c09ccb46 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #33: <unknown function> + 0x113688 (0x5ce3c087b688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #34: <unknown function> + 0x8c41b1 (0x7dccae4c41b1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #35: <unknown function> + 0x8c69cc (0x7dccae4c69cc in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #36: PyObject_Vectorcall + 0x4f (0x5ce3c098fdff in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #37: <unknown function> + 0x114a7e (0x5ce3c087ca7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #38: dynamo_eval_custom_code + 0x1ce (0x7dccae4c3fee in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #39: <unknown function> + 0x8c5c80 (0x7dccae4c5c80 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #40: <unknown function> + 0x8c6ab3 (0x7dccae4c6ab3 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #41: <unknown function> + 0x146985 (0x5ce3c08ae985 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #42: <unknown function> + 0x264be8 (0x5ce3c09ccbe8 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #43: <unknown function> + 0x113688 (0x5ce3c087b688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #44: _PyObject_FastCallDictTstate + 0x1fa (0x5ce3c097c80a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #45: _PyObject_Call_Prepend + 0x69 (0x5ce3c09ab8d9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #46: <unknown function> + 0x321513 (0x5ce3c0a89513 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #47: _PyObject_MakeTpCall + 0x2eb (0x5ce3c09789ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #48: <unknown function> + 0x114a7e (0x5ce3c087ca7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #49: PyEval_EvalCode + 0xae (0x5ce3c0a43cae in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #50: <unknown function> + 0x2ff45a (0x5ce3c0a6745a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #51: <unknown function> + 0x2faacb (0x5ce3c0a62acb in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #52: PyRun_StringFlags + 0x62 (0x5ce3c0a542c2 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #53: PyRun_SimpleStringFlags + 0x3c (0x5ce3c0a541dc in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #54: Py_RunMain + 0x452 (0x5ce3c0a72812 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #55: Py_BytesMain + 0x37 (0x5ce3c0a2e217 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #56: <unknown function> + 0x2a1ca (0x7dccef22a1ca in /lib/x86_64-linux-gnu/libc.so.6)
+frame #57: __libc_start_main + 0x8b (0x7dccef22a28b in /lib/x86_64-linux-gnu/libc.so.6)
+frame #58: <unknown function> + 0x2c6095 (0x5ce3c0a2e095 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+
+2026-09-01 17:24:16 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 425, in parallelize_runs
+    raise WorkerFailure(_format_worker_exit(
+WorkerFailure: Worker fcb5c309 on GPU 0 was terminated by signal 6 (SIGABRT) after step 0
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 425, in parallelize_runs
+    raise WorkerFailure(_format_worker_exit(
+WorkerFailure: Worker fcb5c309 on GPU 0 was terminated by signal 6 (SIGABRT) after step 0
+/home/asier/anaconda3/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[run] exit=1; Python and worker diagnostics are above
+[run] retrying in 30s — --resume skips every completed task
+2026-09-01 17:24:47 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1525.9 GB free, minimum 50.0 GB)
+2026-09-01 17:24:47 | INFO     | ========================================================================
+2026-09-01 17:24:47 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-01 17:24:47 | INFO     |   Tasks       : 400
+2026-09-01 17:24:47 | INFO     |   GPUs        : 1
+2026-09-01 17:24:47 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-01/arc_training_training_20260901_172447.log
+2026-09-01 17:24:47 | INFO     |   Results file: results_2026-09-01_17-24-47.txt
+2026-09-01 17:24:47 | INFO     | ========================================================================
+/home/asier/repos/arc-agi/src/SuperCompressARC/solution_selection.py:105: RuntimeWarning: invalid value encountered in logaddexp
+  self.solution_hashes_count[hashed_solution] = float(np.logaddexp(
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:368: UserWarning: [accel] torch.compile failed at runtime (CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+Process Process-6:
+Traceback (most recent call last):
+  File "/mnt/supercompressarc-cache/.inductor_cache/tr/ctr5drb6elo4ccl5dmjsaugbax5bncgazkk32salzkdsdwkofylj.py", line 98359, in call
+    triton_per_fused__unsafe_view_prepare_softmax_online_135.run(buf4754, buf4755, buf4756, 8, 17, stream=raw_stream0)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/triton_heuristics.py", line 2410, in run
+    return fast(*args, stream=stream)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 5, in launcher
+RuntimeError: CUDA driver error: 700
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py", line 365, in __call__
+    return self._compiled(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1188, in compile_wrapper
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arc_compressor.py", line 94, in forward
+    def forward(self):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1468, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/aot_autograd.py", line 1283, in forward
+    return compiled_fn(full_args)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 1189, in runtime_wrapper
+    result = _codegen_runtime_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(runtime_wrapper_orchestration)", line 11, in _runtime_wrapper
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/utils.py", line 112, in g
+    return f(*args)
+           ^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/function.py", line 625, in apply
+    return super().apply(*args, **kwargs)  # type: ignore[misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3518, in forward
+    return CompiledFunction._fwd_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_forward)", line 2, in _compiled_forward
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/output_code.py", line 807, in __call__
+    return self.current_callable(inputs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/supercompressarc-cache/.inductor_cache/tr/ctr5drb6elo4ccl5dmjsaugbax5bncgazkk32salzkdsdwkofylj.py", line 81365, in call
+    with torch.cuda._DeviceGuard(0):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/cuda/__init__.py", line 696, in __exit__
+    self.idx = torch.cuda._maybe_exchange_device(self.prev_idx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/asier/anaconda3/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/asier/anaconda3/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/solve_task.py", line 92, in solve_task
+    train.take_step(task, model, optimizer, train_step, train_history_logger)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/train.py", line 55, in take_step
+    logits, x_mask, y_mask, KL_amounts, KL_names, = model.forward()
+                                                    ^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py", line 370, in __call__
+    return self._eager(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arc_compressor.py", line 114, in forward
+    x, KL_amounts, KL_names = layers.decode_latents(
+                              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 162, in decode_latents
+    x = decode_latents_(target_capacities, decode_weights, multiposteriors)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/multitensor_systems.py", line 207, in wrapper
+    iterate_and_assign(multitensor_system, result_data)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/multitensor_systems.py", line 200, in iterate_and_assign
+    output = fn(dims, *new_args, **new_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 157, in decode_latents_
+    z, KL = channel_layer(target_capacity, posterior)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 90, in channel_layer
+    min_capacity = torch.tensor(min_capacity)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+2026-09-01 17:29:13 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 405, in parallelize_runs
+    raise WorkerFailure(
+WorkerFailure: Worker fcb5c309 on GPU 0 (pid 135287) failed after step 10:
+Traceback (most recent call last):
+  File "/mnt/supercompressarc-cache/.inductor_cache/tr/ctr5drb6elo4ccl5dmjsaugbax5bncgazkk32salzkdsdwkofylj.py", line 98359, in call
+    triton_per_fused__unsafe_view_prepare_softmax_online_135.run(buf4754, buf4755, buf4756, 8, 17, stream=raw_stream0)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/triton_heuristics.py", line 2410, in run
+    return fast(*args, stream=stream)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 5, in launcher
+RuntimeError: CUDA driver error: 700
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py", line 365, in __call__
+    return self._compiled(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1188, in compile_wrapper
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arc_compressor.py", line 94, in forward
+    def forward(self):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1468, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/aot_autograd.py", line 1283, in forward
+    return compiled_fn(full_args)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 1189, in runtime_wrapper
+    result = _codegen_runtime_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(runtime_wrapper_orchestration)", line 11, in _runtime_wrapper
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/utils.py", line 112, in g
+    return f(*args)
+           ^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/function.py", line 625, in apply
+    return super().apply(*args, **kwargs)  # type: ignore[misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3518, in forward
+    return CompiledFunction._fwd_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_forward)", line 2, in _compiled_forward
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/output_code.py", line 807, in __call__
+    return self.current_callable(inputs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/supercompressarc-cache/.inductor_cache/tr/ctr5drb6elo4ccl5dmjsaugbax5bncgazkk32salzkdsdwkofylj.py", line 81365, in call
+    with torch.cuda._DeviceGuard(0):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/cuda/__init__.py", line 696, in __exit__
+    self.idx = torch.cuda._maybe_exchange_device(self.prev_idx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/solve_task.py", line 92, in solve_task
+    train.take_step(task, model, optimizer, train_step, train_history_logger)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/train.py", line 55, in take_step
+    logits, x_mask, y_mask, KL_amounts, KL_names, = model.forward()
+                                                    ^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py", line 370, in __call__
+    return self._eager(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arc_compressor.py", line 114, in forward
+    x, KL_amounts, KL_names = layers.decode_latents(
+                              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 162, in decode_latents
+    x = decode_latents_(target_capacities, decode_weights, multiposteriors)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/multitensor_systems.py", line 207, in wrapper
+    iterate_and_assign(multitensor_system, result_data)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/multitensor_systems.py", line 200, in iterate_and_assign
+    output = fn(dims, *new_args, **new_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 157, in decode_latents_
+    z, KL = channel_layer(target_capacity, posterior)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 90, in channel_layer
+    min_capacity = torch.tensor(min_capacity)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 405, in parallelize_runs
+    raise WorkerFailure(
+WorkerFailure: Worker fcb5c309 on GPU 0 (pid 135287) failed after step 10:
+Traceback (most recent call last):
+  File "/mnt/supercompressarc-cache/.inductor_cache/tr/ctr5drb6elo4ccl5dmjsaugbax5bncgazkk32salzkdsdwkofylj.py", line 98359, in call
+    triton_per_fused__unsafe_view_prepare_softmax_online_135.run(buf4754, buf4755, buf4756, 8, 17, stream=raw_stream0)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/triton_heuristics.py", line 2410, in run
+    return fast(*args, stream=stream)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 5, in launcher
+RuntimeError: CUDA driver error: 700
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py", line 365, in __call__
+    return self._compiled(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1188, in compile_wrapper
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arc_compressor.py", line 94, in forward
+    def forward(self):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1468, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/aot_autograd.py", line 1283, in forward
+    return compiled_fn(full_args)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 1189, in runtime_wrapper
+    result = _codegen_runtime_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(runtime_wrapper_orchestration)", line 11, in _runtime_wrapper
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/utils.py", line 112, in g
+    return f(*args)
+           ^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/function.py", line 625, in apply
+    return super().apply(*args, **kwargs)  # type: ignore[misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3518, in forward
+    return CompiledFunction._fwd_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_forward)", line 2, in _compiled_forward
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/output_code.py", line 807, in __call__
+    return self.current_callable(inputs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/supercompressarc-cache/.inductor_cache/tr/ctr5drb6elo4ccl5dmjsaugbax5bncgazkk32salzkdsdwkofylj.py", line 81365, in call
+    with torch.cuda._DeviceGuard(0):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/cuda/__init__.py", line 696, in __exit__
+    self.idx = torch.cuda._maybe_exchange_device(self.prev_idx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/solve_task.py", line 92, in solve_task
+    train.take_step(task, model, optimizer, train_step, train_history_logger)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/train.py", line 55, in take_step
+    logits, x_mask, y_mask, KL_amounts, KL_names, = model.forward()
+                                                    ^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py", line 370, in __call__
+    return self._eager(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arc_compressor.py", line 114, in forward
+    x, KL_amounts, KL_names = layers.decode_latents(
+                              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 162, in decode_latents
+    x = decode_latents_(target_capacities, decode_weights, multiposteriors)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/multitensor_systems.py", line 207, in wrapper
+    iterate_and_assign(multitensor_system, result_data)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/multitensor_systems.py", line 200, in iterate_and_assign
+    output = fn(dims, *new_args, **new_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 157, in decode_latents_
+    z, KL = channel_layer(target_capacity, posterior)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/layers.py", line 90, in channel_layer
+    min_capacity = torch.tensor(min_capacity)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+/home/asier/anaconda3/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 5 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[run] exit=1; Python and worker diagnostics are above
+[run] retrying in 30s — --resume skips every completed task
+2026-09-01 17:29:45 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1525.9 GB free, minimum 50.0 GB)
+2026-09-01 17:29:45 | INFO     | ========================================================================
+2026-09-01 17:29:45 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-01 17:29:45 | INFO     |   Tasks       : 400
+2026-09-01 17:29:45 | INFO     |   GPUs        : 1
+2026-09-01 17:29:45 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-01/arc_training_training_20260901_172945.log
+2026-09-01 17:29:45 | INFO     |   Results file: results_2026-09-01_17-29-45.txt
+2026-09-01 17:29:45 | INFO     | ========================================================================
+terminate called after throwing an instance of 'c10::AcceleratorError'
+  what():  CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+Exception raised from SetDevice at /__w/pytorch/pytorch/c10/hip/HIPFunctions.cpp:334 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x71d20bb76f9d in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x12cf9 (0x71d2b727ccf9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10_hip.so)
+frame #2: c10::cuda::SetDevice(signed char, bool) + 0x51 (0x71d2b72c1891 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10_hip.so)
+frame #3: <unknown function> + 0x1194c53 (0x71d280394c53 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #4: <unknown function> + 0x12c5bcd (0x71d2804c5bcd in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #5: <unknown function> + 0xc8893a (0x71d27fe8893a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #6: <unknown function> + 0x5a9048b (0x71d2a5a9048b in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #7: <unknown function> + 0x5465fe3 (0x71d2a5465fe3 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #8: at::_ops::mm_out::call(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x162 (0x71d2a2ba9b12 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #9: <unknown function> + 0x55d03e (0x71d2b5b5d03e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #10: <unknown function> + 0x2334a1 (0x5884f88084a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #11: _PyObject_Call + 0xb5 (0x5884f881b4a5 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #12: <unknown function> + 0x113688 (0x5884f86e8688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #13: <unknown function> + 0x264b46 (0x5884f8839b46 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #14: <unknown function> + 0x2d9196 (0x5884f88ae196 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #15: PyObject_CallMethod + 0xe2 (0x5884f88b8572 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #16: <unknown function> + 0xdf9213 (0x71d2b63f9213 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #17: torch::handle_torch_function_no_python_arg_parser(c10::ArrayRef<_object*>, _object*, _object*, char const*, _object*, char const*, torch::TorchFunctionName) + 0x16 (0x71d2b63fb1d6 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #18: <unknown function> + 0xdfb7cb (0x71d2b63fb7cb in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #19: <unknown function> + 0x55ceed (0x71d2b5b5ceed in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #20: <unknown function> + 0x2334a1 (0x5884f88084a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #21: _PyObject_MakeTpCall + 0x2eb (0x5884f87e59ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #22: <unknown function> + 0x114a7e (0x5884f86e9a7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #23: _PyObject_FastCallDictTstate + 0x1fa (0x5884f87e980a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #24: _PyObject_Call_Prepend + 0x69 (0x5884f88188d9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #25: <unknown function> + 0x321513 (0x5884f88f6513 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #26: _PyObject_MakeTpCall + 0x2eb (0x5884f87e59ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #27: <unknown function> + 0x114a7e (0x5884f86e9a7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #28: <unknown function> + 0x84bf23 (0x71d2b5e4bf23 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #29: <unknown function> + 0x2334a1 (0x5884f88084a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #30: _PyObject_Call + 0xb5 (0x5884f881b4a5 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #31: <unknown function> + 0x113688 (0x5884f86e8688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #32: <unknown function> + 0x264b46 (0x5884f8839b46 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #33: <unknown function> + 0x113688 (0x5884f86e8688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #34: <unknown function> + 0x8c41b1 (0x71d2b5ec41b1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #35: <unknown function> + 0x8c69cc (0x71d2b5ec69cc in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #36: PyObject_Vectorcall + 0x4f (0x5884f87fcdff in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #37: <unknown function> + 0x114a7e (0x5884f86e9a7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #38: dynamo_eval_custom_code + 0x1ce (0x71d2b5ec3fee in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #39: <unknown function> + 0x8c5c80 (0x71d2b5ec5c80 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #40: <unknown function> + 0x8c6ab3 (0x71d2b5ec6ab3 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #41: <unknown function> + 0x146985 (0x5884f871b985 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #42: <unknown function> + 0x264be8 (0x5884f8839be8 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #43: <unknown function> + 0x113688 (0x5884f86e8688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #44: _PyObject_FastCallDictTstate + 0x1fa (0x5884f87e980a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #45: _PyObject_Call_Prepend + 0x69 (0x5884f88188d9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #46: <unknown function> + 0x321513 (0x5884f88f6513 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #47: _PyObject_MakeTpCall + 0x2eb (0x5884f87e59ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #48: <unknown function> + 0x114a7e (0x5884f86e9a7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #49: PyEval_EvalCode + 0xae (0x5884f88b0cae in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #50: <unknown function> + 0x2ff45a (0x5884f88d445a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #51: <unknown function> + 0x2faacb (0x5884f88cfacb in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #52: PyRun_StringFlags + 0x62 (0x5884f88c12c2 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #53: PyRun_SimpleStringFlags + 0x3c (0x5884f88c11dc in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #54: Py_RunMain + 0x452 (0x5884f88df812 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #55: Py_BytesMain + 0x37 (0x5884f889b217 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #56: <unknown function> + 0x2a1ca (0x71d2f6c2a1ca in /lib/x86_64-linux-gnu/libc.so.6)
+frame #57: __libc_start_main + 0x8b (0x71d2f6c2a28b in /lib/x86_64-linux-gnu/libc.so.6)
+frame #58: <unknown function> + 0x2c6095 (0x5884f889b095 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+
+2026-09-01 17:34:05 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 425, in parallelize_runs
+    raise WorkerFailure(_format_worker_exit(
+WorkerFailure: Worker fcb5c309 on GPU 0 was terminated by signal 6 (SIGABRT) after step 10
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 425, in parallelize_runs
+    raise WorkerFailure(_format_worker_exit(
+WorkerFailure: Worker fcb5c309 on GPU 0 was terminated by signal 6 (SIGABRT) after step 10
+/home/asier/anaconda3/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[run] exit=1; Python and worker diagnostics are above
+[run] retrying in 30s — --resume skips every completed task
+2026-09-01 17:34:37 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1525.9 GB free, minimum 50.0 GB)
+2026-09-01 17:34:37 | INFO     | ========================================================================
+2026-09-01 17:34:37 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-01 17:34:37 | INFO     |   Tasks       : 400
+2026-09-01 17:34:37 | INFO     |   GPUs        : 1
+2026-09-01 17:34:37 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-01/arc_training_training_20260901_173437.log
+2026-09-01 17:34:37 | INFO     |   Results file: results_2026-09-01_17-34-37.txt
+2026-09-01 17:34:37 | INFO     | ========================================================================
+terminate called after throwing an instance of 'c10::AcceleratorError'
+  what():  CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+Exception raised from SetDevice at /__w/pytorch/pytorch/c10/hip/HIPFunctions.cpp:334 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x76100c176f9d in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x12cf9 (0x7610b787ccf9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10_hip.so)
+frame #2: c10::cuda::SetDevice(signed char, bool) + 0x51 (0x7610b78c1891 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10_hip.so)
+frame #3: <unknown function> + 0x1194c53 (0x761080994c53 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #4: <unknown function> + 0x12c5bcd (0x761080ac5bcd in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #5: <unknown function> + 0xc8893a (0x76108048893a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #6: <unknown function> + 0x5a9048b (0x7610a609048b in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #7: <unknown function> + 0x5465fe3 (0x7610a5a65fe3 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #8: at::_ops::mm_out::call(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x162 (0x7610a31a9b12 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #9: <unknown function> + 0x55d03e (0x7610b615d03e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #10: <unknown function> + 0x2334a1 (0x5ef1231a64a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #11: _PyObject_Call + 0xb5 (0x5ef1231b94a5 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #12: <unknown function> + 0x113688 (0x5ef123086688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #13: <unknown function> + 0x264b46 (0x5ef1231d7b46 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #14: <unknown function> + 0x2d9196 (0x5ef12324c196 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #15: PyObject_CallMethod + 0xe2 (0x5ef123256572 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #16: <unknown function> + 0xdf9213 (0x7610b69f9213 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #17: torch::handle_torch_function_no_python_arg_parser(c10::ArrayRef<_object*>, _object*, _object*, char const*, _object*, char const*, torch::TorchFunctionName) + 0x16 (0x7610b69fb1d6 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #18: <unknown function> + 0xdfb7cb (0x7610b69fb7cb in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #19: <unknown function> + 0x55ceed (0x7610b615ceed in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #20: <unknown function> + 0x2334a1 (0x5ef1231a64a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #21: _PyObject_MakeTpCall + 0x2eb (0x5ef1231839ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #22: <unknown function> + 0x114a7e (0x5ef123087a7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #23: _PyObject_FastCallDictTstate + 0x1fa (0x5ef12318780a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #24: _PyObject_Call_Prepend + 0x69 (0x5ef1231b68d9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #25: <unknown function> + 0x321513 (0x5ef123294513 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #26: _PyObject_MakeTpCall + 0x2eb (0x5ef1231839ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #27: <unknown function> + 0x114a7e (0x5ef123087a7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #28: <unknown function> + 0x84bf23 (0x7610b644bf23 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #29: <unknown function> + 0x2334a1 (0x5ef1231a64a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #30: _PyObject_Call + 0xb5 (0x5ef1231b94a5 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #31: <unknown function> + 0x113688 (0x5ef123086688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #32: <unknown function> + 0x264b46 (0x5ef1231d7b46 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #33: <unknown function> + 0x113688 (0x5ef123086688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #34: <unknown function> + 0x8c41b1 (0x7610b64c41b1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #35: <unknown function> + 0x8c69cc (0x7610b64c69cc in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #36: PyObject_Vectorcall + 0x4f (0x5ef12319adff in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #37: <unknown function> + 0x114a7e (0x5ef123087a7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #38: dynamo_eval_custom_code + 0x1ce (0x7610b64c3fee in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #39: <unknown function> + 0x8c5c80 (0x7610b64c5c80 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #40: <unknown function> + 0x8c6ab3 (0x7610b64c6ab3 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #41: <unknown function> + 0x146985 (0x5ef1230b9985 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #42: <unknown function> + 0x264be8 (0x5ef1231d7be8 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #43: <unknown function> + 0x113688 (0x5ef123086688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #44: _PyObject_FastCallDictTstate + 0x1fa (0x5ef12318780a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #45: _PyObject_Call_Prepend + 0x69 (0x5ef1231b68d9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #46: <unknown function> + 0x321513 (0x5ef123294513 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #47: _PyObject_MakeTpCall + 0x2eb (0x5ef1231839ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #48: <unknown function> + 0x114a7e (0x5ef123087a7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #49: PyEval_EvalCode + 0xae (0x5ef12324ecae in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #50: <unknown function> + 0x2ff45a (0x5ef12327245a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #51: <unknown function> + 0x2faacb (0x5ef12326dacb in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #52: PyRun_StringFlags + 0x62 (0x5ef12325f2c2 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #53: PyRun_SimpleStringFlags + 0x3c (0x5ef12325f1dc in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #54: Py_RunMain + 0x452 (0x5ef12327d812 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #55: Py_BytesMain + 0x37 (0x5ef123239217 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #56: <unknown function> + 0x2a1ca (0x7610f722a1ca in /lib/x86_64-linux-gnu/libc.so.6)
+frame #57: __libc_start_main + 0x8b (0x7610f722a28b in /lib/x86_64-linux-gnu/libc.so.6)
+frame #58: <unknown function> + 0x2c6095 (0x5ef123239095 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+
+2026-09-01 17:38:58 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 425, in parallelize_runs
+    raise WorkerFailure(_format_worker_exit(
+WorkerFailure: Worker fcb5c309 on GPU 0 was terminated by signal 6 (SIGABRT) after step 10
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 425, in parallelize_runs
+    raise WorkerFailure(_format_worker_exit(
+WorkerFailure: Worker fcb5c309 on GPU 0 was terminated by signal 6 (SIGABRT) after step 10
+/home/asier/anaconda3/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[run] exit=1; Python and worker diagnostics are above
+[run] retrying in 30s — --resume skips every completed task
+2026-09-01 17:39:29 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1525.9 GB free, minimum 50.0 GB)
+2026-09-01 17:39:29 | INFO     | ========================================================================
+2026-09-01 17:39:29 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-01 17:39:29 | INFO     |   Tasks       : 400
+2026-09-01 17:39:29 | INFO     |   GPUs        : 1
+2026-09-01 17:39:29 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-01/arc_training_training_20260901_173929.log
+2026-09-01 17:39:29 | INFO     |   Results file: results_2026-09-01_17-39-29.txt
+2026-09-01 17:39:29 | INFO     | ========================================================================
+/home/asier/repos/arc-agi/src/SuperCompressARC/solution_selection.py:105: RuntimeWarning: invalid value encountered in logaddexp
+  self.solution_hashes_count[hashed_solution] = float(np.logaddexp(
+terminate called after throwing an instance of 'c10::AcceleratorError'
+  what():  CUDA error: an illegal memory access was encountered
+Search for `hipErrorIllegalAddress' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+Exception raised from SetDevice at /__w/pytorch/pytorch/c10/hip/HIPFunctions.cpp:334 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7f33b4576f9d in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x12cf9 (0x7f3427c93cf9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10_hip.so)
+frame #2: c10::cuda::SetDevice(signed char, bool) + 0x51 (0x7f3427cd8891 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libc10_hip.so)
+frame #3: <unknown function> + 0x1194c53 (0x7f3428f94c53 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #4: <unknown function> + 0x12c5bcd (0x7f34290c5bcd in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #5: <unknown function> + 0xc8893a (0x7f3428a8893a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_hip.so)
+frame #6: <unknown function> + 0x5a9048b (0x7f344e69048b in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #7: <unknown function> + 0x5465fe3 (0x7f344e065fe3 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #8: at::_ops::mm_out::call(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x162 (0x7f344b7a9b12 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #9: <unknown function> + 0x55d03e (0x7f345e75d03e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #10: <unknown function> + 0x2334a1 (0x618bc392c4a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #11: _PyObject_Call + 0xb5 (0x618bc393f4a5 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #12: <unknown function> + 0x113688 (0x618bc380c688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #13: <unknown function> + 0x264b46 (0x618bc395db46 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #14: <unknown function> + 0x2d9196 (0x618bc39d2196 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #15: PyObject_CallMethod + 0xe2 (0x618bc39dc572 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #16: <unknown function> + 0xdf9213 (0x7f345eff9213 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #17: torch::handle_torch_function_no_python_arg_parser(c10::ArrayRef<_object*>, _object*, _object*, char const*, _object*, char const*, torch::TorchFunctionName) + 0x16 (0x7f345effb1d6 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #18: <unknown function> + 0xdfb7cb (0x7f345effb7cb in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #19: <unknown function> + 0x55ceed (0x7f345e75ceed in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #20: <unknown function> + 0x2334a1 (0x618bc392c4a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #21: _PyObject_MakeTpCall + 0x2eb (0x618bc39099ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #22: <unknown function> + 0x114a7e (0x618bc380da7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #23: _PyObject_FastCallDictTstate + 0x1fa (0x618bc390d80a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #24: _PyObject_Call_Prepend + 0x69 (0x618bc393c8d9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #25: <unknown function> + 0x321513 (0x618bc3a1a513 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #26: _PyObject_MakeTpCall + 0x2eb (0x618bc39099ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #27: <unknown function> + 0x114a7e (0x618bc380da7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #28: <unknown function> + 0x84bf23 (0x7f345ea4bf23 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #29: <unknown function> + 0x2334a1 (0x618bc392c4a1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #30: _PyObject_Call + 0xb5 (0x618bc393f4a5 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #31: <unknown function> + 0x113688 (0x618bc380c688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #32: <unknown function> + 0x264b46 (0x618bc395db46 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #33: <unknown function> + 0x113688 (0x618bc380c688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #34: <unknown function> + 0x8c41b1 (0x7f345eac41b1 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #35: <unknown function> + 0x8c69cc (0x7f345eac69cc in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #36: PyObject_Vectorcall + 0x4f (0x618bc3920dff in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #37: <unknown function> + 0x114a7e (0x618bc380da7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #38: dynamo_eval_custom_code + 0x1ce (0x7f345eac3fee in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #39: <unknown function> + 0x8c5c80 (0x7f345eac5c80 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #40: <unknown function> + 0x8c6ab3 (0x7f345eac6ab3 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+frame #41: <unknown function> + 0x146985 (0x618bc383f985 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #42: <unknown function> + 0x264be8 (0x618bc395dbe8 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #43: <unknown function> + 0x113688 (0x618bc380c688 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #44: _PyObject_FastCallDictTstate + 0x1fa (0x618bc390d80a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #45: _PyObject_Call_Prepend + 0x69 (0x618bc393c8d9 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #46: <unknown function> + 0x321513 (0x618bc3a1a513 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #47: _PyObject_MakeTpCall + 0x2eb (0x618bc39099ab in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #48: <unknown function> + 0x114a7e (0x618bc380da7e in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #49: PyEval_EvalCode + 0xae (0x618bc39d4cae in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #50: <unknown function> + 0x2ff45a (0x618bc39f845a in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #51: <unknown function> + 0x2faacb (0x618bc39f3acb in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #52: PyRun_StringFlags + 0x62 (0x618bc39e52c2 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #53: PyRun_SimpleStringFlags + 0x3c (0x618bc39e51dc in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #54: Py_RunMain + 0x452 (0x618bc3a03812 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #55: Py_BytesMain + 0x37 (0x618bc39bf217 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+frame #56: <unknown function> + 0x2a1ca (0x7f349f82a1ca in /lib/x86_64-linux-gnu/libc.so.6)
+frame #57: __libc_start_main + 0x8b (0x7f349f82a28b in /lib/x86_64-linux-gnu/libc.so.6)
+frame #58: <unknown function> + 0x2c6095 (0x618bc39bf095 in /home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/bin/python)
+
+2026-09-01 17:44:00 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 425, in parallelize_runs
+    raise WorkerFailure(_format_worker_exit(
+WorkerFailure: Worker fcb5c309 on GPU 0 was terminated by signal 6 (SIGABRT) after step 10
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1357, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 874, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 425, in parallelize_runs
+    raise WorkerFailure(_format_worker_exit(
+WorkerFailure: Worker fcb5c309 on GPU 0 was terminated by signal 6 (SIGABRT) after step 10
+/home/asier/anaconda3/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+[run] exit=1; Python and worker diagnostics are above

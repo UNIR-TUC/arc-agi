@@ -33,6 +33,50 @@ Compiled runs use `/mnt/supercompressarc-cache/.inductor_cache` by default. Over
 with `--inductor-cache-dir`; an existing `TORCHINDUCTOR_CACHE_DIR` environment variable
 takes precedence over both.
 
+## Eje B: robust training with Eje D
+
+Eje B is integrated into `AccelConfig` and runs compiled by default. It also
+supports a controlled task-specific eager override: the override preserves the
+four seeds and all Eje B algorithm settings while disabling `torch.compile` only
+for the selected task. Run scripts through the project interpreter;
+`profile_parallel_train.py` is not a standalone executable, so
+`./profile_parallel_train.py` may return "Permission denied".
+
+```bash
+arcagi/bin/python profile_parallel_train.py \
+    --label eje_b_demo30 \
+    --accel-preset compile \
+    --eje-b \
+    --gpu-mode sysfs \
+    -- \
+    --split training \
+    --demo 30 \
+    --iterations 2000 \
+    --seeds 0,1,2,3 \
+    --max-workers 6 \
+    --postprocess-stride 4
+```
+
+Each seed job is saved independently beneath the profiler label's artifact
+directory. To resume, keep the same Eje B options and pass the same state path:
+
+```bash
+arcagi/bin/python profile_parallel_train.py \
+    --label eje_b_demo30_resume \
+    --accel-preset compile \
+    --eje-b \
+    -- \
+    --split training \
+    --demo 30 \
+    --iterations 2000 \
+    --seeds 0,1,2,3 \
+    --state-dir .profile/eje_b_demo30_artifacts/state \
+    --resume
+```
+
+See [Docs/Architecture/EJE_B_IMPLEMENTACION.md](Docs/Architecture/EJE_B_IMPLEMENTACION.md)
+for implementation details, measured cost, and validation results.
+
 The code creates `results/<task>/` and writes the plots, learned representations and a
 per-step timing CSV there. Use `--run-label` to keep multiple runs of the same preset
 separate.
@@ -62,6 +106,70 @@ python list_solved_puzzles.py results_for_the_blog_post/predictions_training.npz
 ```
 
 # Running All Tasks and Debugging Guide
+
+## Crash-resumable production runs
+
+Use the shell wrappers for unattended runs. They validate the dedicated
+TorchInductor cache, bound host-memory concurrency, persist every completed
+task under `.partial/<split>/`, and retry a failed Python attempt up to five
+times (the initial attempt plus four retries):
+
+```bash
+./run_training_full.sh
+./run_evaluation_full.sh
+./run_test_full.sh
+./run_all_full.sh
+```
+
+`run_all_full.sh` is the canonical three-split campaign. It runs training,
+evaluation and test in order and writes `campaign_summary.json` plus
+`timing_result.txt`. Individual wrappers write `run_summary_<split>.json`.
+These distinguish cumulative Python attempt time from total wall time, which
+also includes cache checks and retry waits.
+
+Completed tasks survive failures and are skipped by `--resume`; tasks still
+running when an attempt fails restart from iteration zero. Python tracebacks
+and worker-exit diagnoses are written to both `.log/YYYY-MM-DD/` and
+`run_logs/`. A process killed by `SIGKILL` cannot provide a Python traceback,
+so the runner records the signal and notes that an OS OOM kill is one possible
+cause.
+
+### Recovering a failing GPU task
+
+The production wrappers enable task recovery by default. If a compiled worker
+fails during training, the attempt stops so every GPU process is replaced, and
+the failed task is retried eagerly on the next `--resume` attempt. If that eager
+attempt also fails, the task is quarantined and later attempts finish the rest
+of the split. Recovery state is stored in
+`.partial/<split>/.task_recovery.json`; real completed task partials are never
+replaced by recovery records.
+
+To resume while forcing a known compile-unsafe task to eager mode:
+
+```bash
+EAGER_TASKS=fcb5c309 ./run_training_full.sh
+```
+
+Other tasks still use the `compile` preset. To retry a quarantined task later,
+after investigating its failure:
+
+```bash
+RETRY_QUARANTINED_TASKS=fcb5c309 ./run_training_full.sh
+```
+
+With Eje B, `EAGER_TASKS` applies to every pending seed job for the named task;
+the normal four-seed merge still requires all seeds. If eager execution also
+fails, the task is quarantined and the rest of the split continues.
+
+A quarantined task receives the solver's deterministic 2x2-zero initial guess
+only in the final artifacts. It is not saved as a completed partial, is excluded
+from solved counts, and is named under `recovery.quarantined_tasks` with
+`degraded: true` in `run_metadata_<split>.json` and the run summaries.
+
+For an emergency all-eager resume, use
+`ACCEL_PRESET=baseline ./run_training_full.sh`. Deleting
+`memory_cache_<split>.json` does not address a Triton illegal-memory-access:
+Phase 1 already runs eagerly and only measures scheduling memory.
 
 ## Running all tasks in one command
 

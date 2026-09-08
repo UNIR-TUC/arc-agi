@@ -215,3 +215,7 @@ __marimo__/
 **.inductor_cache
 results_*.txt
 **.partial/
+**.partial_eje_b/
+**.profile/
+**.log/
+**run_logs/

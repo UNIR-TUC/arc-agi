@@ -30,6 +30,10 @@ import json
 import shutil
 import argparse
 import multiprocessing
+import queue
+import signal
+import traceback
+from contextlib import contextmanager
 from dataclasses import dataclass, asdict
 from typing import Optional
 
@@ -52,6 +56,7 @@ import visualization
 import solve_task
 import arc_logging
 import accel
+import task_persistence
 
 # ── Global PyTorch settings (must run at import time for the main process) ──
 multiprocessing.set_start_method('spawn', force=True)
@@ -101,67 +106,9 @@ def _print_progress_line(task_names, tasks_started, tasks_finished, progress_dic
     sys.stdout.flush()
 
 
-# ── Crash-resumable per-task results ─────────────────────────────────────────
-
-def _safe_task_name(task_name):
-    """Reject anything that is not a plain ARC task id before it reaches a path."""
-    if not task_name or not all(ch.isalnum() or ch in '-_' for ch in task_name):
-        raise ValueError(f'unsafe task name for a file path: {task_name!r}')
-    return task_name
-
-
-def _partial_dir(split):
-    return os.path.join('.partial', split)
-
-
-def save_task_partial(split, task_name, n_steps, solution, logger_data,
-                      arc_logger=None):
-    """Persist one finished task so an interrupted split can be resumed.
-
-    A 400-task split takes tens of hours and its results otherwise live only in
-    the Manager dict, so any failure loses the whole run.
-    """
-    if not solution:
-        return
-    try:
-        arc_logger.info(f'Saving partial result for {task_name}')
-        directory = _partial_dir(split)
-        os.makedirs(directory, exist_ok=True)
-        path = os.path.join(directory, f'{_safe_task_name(task_name)}.json')
-        tmp = path + '.tmp'
-        with open(tmp, 'w') as f:
-            json.dump({'n_steps': n_steps,
-                       'solution': solution,
-                       'logger': logger_data}, f)
-        os.replace(tmp, path)
-    except Exception as exc:
-        if arc_logger is not None:
-            arc_logger.warning(f'Could not save partial result for {task_name}: {exc}')
-
-
-def load_task_partials(split, task_names, n_steps):
-    """Return (solutions, loggers) for tasks already completed at this n_steps."""
-    arc_logger.info(f'Loading partial results for split {split}')
-    solutions, loggers = {}, {}
-    directory = _partial_dir(split)
-    if not os.path.isdir(directory):
-        return solutions, loggers
-    for name in task_names:
-        try:
-            path = os.path.join(directory, f'{_safe_task_name(name)}.json')
-            if not os.path.exists(path):
-                continue
-            with open(path, 'r') as f:
-                payload = json.load(f)
-        except Exception:
-            continue
-        # A --demo 300-iteration partial must never satisfy a 1500-iteration run.
-        if payload.get('n_steps') != n_steps or not payload.get('solution'):
-            continue
-        solutions[name] = payload['solution']
-        if payload.get('logger'):
-            loggers[name] = payload['logger']
-    return solutions, loggers
+# Keep these local names for the existing run_split call sites and log messages.
+_partial_dir = task_persistence.partial_dir
+load_task_partials = task_persistence.load_task_partials
 
 
 # A worker needs a couple of minutes of Inductor work to reach its peak RSS, so
@@ -229,6 +176,176 @@ def _cache_free_gb(cache_dir):
     return shutil.disk_usage(cache_dir).free / 1024**3
 
 
+class WorkerFailure(RuntimeError):
+    """A task worker failed, so the current attempt must be resumed."""
+
+    def __init__(self, message, *, task_name=None, gpu_id=None, exit_code=None,
+                 last_step=None, stage=None, compile_mode=None,
+                 exception_type=None, recoverable_task=False, seed=0,
+                 job_id=None):
+        super().__init__(message)
+        self.task_name = task_name
+        self.gpu_id = gpu_id
+        self.exit_code = exit_code
+        self.last_step = last_step
+        self.stage = stage
+        self.compile_mode = compile_mode
+        self.exception_type = exception_type
+        self.recoverable_task = recoverable_task
+        self.seed = seed
+        self.job_id = job_id or task_name
+
+    def recovery_record(self):
+        return {
+            'timestamp': time.strftime('%Y-%m-%dT%H:%M:%S%z'),
+            'stage': self.stage,
+            'job_id': self.job_id,
+            'seed': self.seed,
+            'gpu_id': self.gpu_id,
+            'exit_code': self.exit_code,
+            'last_step': self.last_step,
+            'compile_mode': self.compile_mode,
+            'exception_type': self.exception_type,
+            'message': str(self)[-4000:],
+        }
+
+
+def _drain_worker_errors(error_queue):
+    records = []
+    while True:
+        try:
+            records.append(error_queue.get_nowait())
+        except queue.Empty:
+            return records
+
+
+def _step_location(step):
+    return f'after step {step}' if step is not None and step >= 0 else 'before training'
+
+
+def _format_reported_worker_error(record):
+    if not isinstance(record, dict):
+        return f'Worker reported an exception:\n{record}'
+    task_name = record.get('task_name', '<unknown>')
+    job_id = record.get('job_id', task_name)
+    gpu_id = record.get('gpu_id', '?')
+    pid = record.get('pid', '?')
+    location = _step_location(record.get('last_step'))
+    traceback_text = record.get('traceback') or '<no traceback reported>'
+    return (
+        f'Worker {job_id} on GPU {gpu_id} (pid {pid}) failed {location}:\n'
+        f'{traceback_text.rstrip()}'
+    )
+
+
+def _worker_failure_from_report(record):
+    message = _format_reported_worker_error(record)
+    if not isinstance(record, dict):
+        return WorkerFailure(message)
+    stage = record.get('stage')
+    return WorkerFailure(
+        message,
+        task_name=record.get('task_name'),
+        gpu_id=record.get('gpu_id'),
+        exit_code=record.get('exit_code', 1),
+        last_step=record.get('last_step'),
+        stage=stage,
+        compile_mode=record.get('compile_mode'),
+        exception_type=record.get('exception_type'),
+        recoverable_task=stage in ('training', 'postprocess'),
+        seed=record.get('seed', 0),
+        job_id=record.get('job_id'),
+    )
+
+
+def _format_worker_exit(task_name, gpu_id, exitcode, last_step):
+    location = _step_location(last_step)
+    if exitcode is None:
+        detail = 'ended without an exit code'
+    elif exitcode < 0:
+        signum = -exitcode
+        try:
+            signal_name = signal.Signals(signum).name
+        except ValueError:
+            signal_name = f'signal {signum}'
+        detail = f'was terminated by signal {signum} ({signal_name})'
+        if signum == signal.SIGKILL:
+            detail += (
+                '; no Python traceback is possible. This may indicate the OS '
+                'OOM killer or another external kill'
+            )
+    else:
+        detail = f'exited with code {exitcode} without reporting a traceback'
+    return f'Worker {task_name} on GPU {gpu_id} {detail} {location}'
+
+
+def _worker_failure_from_exit(task_name, gpu_id, exitcode, last_step,
+                              compile_mode=None, seed=0, job_id=None):
+    stage = 'training' if last_step is not None and last_step >= 0 else 'setup'
+    return WorkerFailure(
+        _format_worker_exit(job_id or task_name, gpu_id, exitcode, last_step),
+        task_name=task_name,
+        gpu_id=gpu_id,
+        exit_code=exitcode,
+        last_step=last_step,
+        stage=stage,
+        compile_mode=compile_mode,
+        recoverable_task=stage == 'training',
+        seed=seed,
+        job_id=job_id,
+    )
+
+
+def _validate_worker_outputs(task_name, memory_dict, solutions_dict,
+                             loggers_dict, require_logger):
+    missing = []
+    if task_name not in memory_dict:
+        missing.append('memory measurement')
+    if not solutions_dict.get(task_name):
+        missing.append('solution')
+    if require_logger and not task_persistence.is_complete_logger(
+        loggers_dict.get(task_name) if loggers_dict is not None else None
+    ):
+        missing.append('logger data')
+    if missing:
+        raise WorkerFailure(
+            f'Worker {task_name} exited successfully but did not publish: '
+            + ', '.join(missing)
+        )
+
+
+def _stop_process(process, timeout=30):
+    if process is None:
+        return
+    if process.is_alive():
+        process.terminate()
+        process.join(timeout=timeout)
+    if process.is_alive():
+        process.kill()
+        process.join(timeout=timeout)
+    else:
+        process.join(timeout=0)
+
+
+def _terminate_active_processes(processes):
+    for process in processes:
+        try:
+            _stop_process(process)
+        except Exception:
+            pass
+
+
+@contextmanager
+def _worker_process_guard(processes, arc_logger):
+    try:
+        yield
+    except BaseException:
+        _terminate_active_processes(processes)
+        if arc_logger is not None:
+            arc_logger.close_dashboard()
+        raise
+
+
 # ── Core scheduler ───────────────────────────────────────────────────────────
 
 @dataclass(frozen=True)
@@ -256,6 +373,7 @@ class ParallelRunOptions:
     verbose: bool = False
     postprocess_stride: int = 1
     accel_config: Optional[dict] = None
+    task_accel_configs: Optional[dict] = None
     partial_split: Optional[str] = None
     partial_n_steps: Optional[int] = None
     host_mem_per_worker_gb: float = 0.0
@@ -263,6 +381,72 @@ class ParallelRunOptions:
     stall_timeout_s: float = 1800.0
     cache_dir: Optional[str] = None
     cache_min_free_gb: float = 0.0
+    job_specs: Optional[dict] = None
+    partial_fingerprint: Optional[str] = None
+    state_dir: Optional[str] = None
+
+
+def _effective_task_accel_config(task_name, default_config, task_configs=None):
+    task_configs = task_configs or {}
+    selected = task_configs.get(task_name, default_config)
+    return accel.AccelConfig.from_dict(selected).to_dict()
+
+
+def _resolve_job(job_id, job_specs=None):
+    if not job_specs:
+        return job_id, 0
+    spec = job_specs.get(job_id)
+    if spec is None:
+        raise ValueError(f'missing job specification for {job_id!r}')
+    return spec['task_name'], int(spec['seed'])
+
+
+def _seed_job_id(task_name, seed):
+    return f'{task_name}__seed_{seed}'
+
+
+def _expand_seed_jobs(task_names, task_usages, seeds, completed_job_ids=()):
+    completed_job_ids = set(completed_job_ids)
+    job_ids = []
+    job_usages = []
+    job_specs = {}
+    for task_name, task_usage in zip(task_names, task_usages):
+        for seed in seeds:
+            job_id = _seed_job_id(task_name, seed)
+            job_specs[job_id] = {'task_name': task_name, 'seed': seed}
+            if job_id in completed_job_ids:
+                continue
+            job_ids.append(job_id)
+            job_usages.append(task_usage)
+    return job_ids, job_usages, job_specs
+
+
+def _merge_seed_results(task_names, seeds, job_solutions, job_loggers):
+    solutions = {}
+    loggers = {}
+    missing = []
+    for task_name in task_names:
+        seed_loggers = {}
+        for seed in seeds:
+            job_id = _seed_job_id(task_name, seed)
+            if not job_solutions.get(job_id) or not task_persistence.is_complete_logger(
+                job_loggers.get(job_id)
+            ):
+                missing.append(job_id)
+                continue
+            seed_loggers[seed] = job_loggers[job_id]
+        if len(seed_loggers) != len(seeds):
+            continue
+        solution, logger_data = solution_selection.merge_seed_logger_data(
+            seed_loggers
+        )
+        solutions[task_name] = solution
+        loggers[task_name] = logger_data
+    if missing:
+        raise WorkerFailure(
+            'Cannot merge incomplete Eje B seed jobs: ' + ', '.join(missing)
+        )
+    return solutions, loggers
 
 def parallelize_runs(
     gpu_quotas,
@@ -296,6 +480,11 @@ def parallelize_runs(
         loggers_data   (dict)            : logger data per task (empty if not collected).
         time_taken     (float)           : wall-clock seconds.
     """
+    if n_gpus < 1:
+        raise ValueError('parallel ARC training requires at least one GPU')
+    if n_cpus < 1:
+        raise ValueError('parallel ARC training requires at least one worker')
+
     options = options or ParallelRunOptions()
     collect_logger_data = options.collect_logger_data
     track_progress = options.track_progress
@@ -307,6 +496,7 @@ def parallelize_runs(
     verbose = options.verbose
     postprocess_stride = options.postprocess_stride
     accel_config = options.accel_config
+    task_accel_configs = options.task_accel_configs
     partial_split = options.partial_split
     partial_n_steps = options.partial_n_steps
     host_mem_per_worker_gb = options.host_mem_per_worker_gb
@@ -314,6 +504,9 @@ def parallelize_runs(
     stall_timeout_s = options.stall_timeout_s
     cache_dir = options.cache_dir
     cache_min_free_gb = options.cache_min_free_gb
+    job_specs = options.job_specs
+    partial_fingerprint = options.partial_fingerprint
+    state_dir = options.state_dir
 
     t = time.time()
     gpu_quotas = gpu_quotas[:]
@@ -325,6 +518,7 @@ def parallelize_runs(
     tasks_finished   = [False] * n_tasks
     processes        = [None]  * n_tasks
     process_gpu_ids  = [None]  * n_tasks
+    process_compile_modes = [None] * n_tasks
     task_start_times = [None]  * n_tasks
     task_last_pct    = {}   # task_name → last 10%-bucket logged
     task_last_step   = {}   # task_name → (step, when it last changed)
@@ -332,7 +526,9 @@ def parallelize_runs(
     mem_blocked      = False
     cache_blocked    = False
 
-    with multiprocessing.Manager() as manager:
+    with multiprocessing.Manager() as manager, _worker_process_guard(
+        processes, arc_logger,
+    ):
 
         # ── Shared inter-process structures ──────────────────────────────
         memory_dict    = manager.dict()
@@ -344,38 +540,53 @@ def parallelize_runs(
         # ── Main monitoring loop ──────────────────────────────────────────
         while not all(tasks_finished):
 
-            # Check for errors propagated from workers
-            if not error_queue.empty():
-                if arc_logger is not None:
-                    arc_logger.close_dashboard()
-                raise ValueError(error_queue.get())
+            reported_errors = _drain_worker_errors(error_queue)
+            if reported_errors:
+                raise _worker_failure_from_report(reported_errors[0])
 
             # ── Detect finished tasks ─────────────────────────────────
             for i in range(n_tasks):
                 if tasks_started[i] and not tasks_finished[i]:
-                    processes[i].join(timeout=0)
-                    if not processes[i].is_alive():
+                    process = processes[i]
+                    process.join(timeout=0)
+                    if not process.is_alive():
+                        reported_errors = _drain_worker_errors(error_queue)
+                        if reported_errors:
+                            raise _worker_failure_from_report(reported_errors[0])
+                        if process.exitcode != 0:
+                            task_name, seed = _resolve_job(
+                                task_names[i], job_specs
+                            )
+                            last_step = (
+                                int(_progress_dict.get(task_names[i], -1))
+                                if _progress_dict is not None else None
+                            )
+                            raise _worker_failure_from_exit(
+                                task_name, process_gpu_ids[i],
+                                process.exitcode, last_step,
+                                process_compile_modes[i],
+                                seed=seed,
+                                job_id=task_names[i],
+                            )
+                        _validate_worker_outputs(
+                            task_names[i], memory_dict, solutions_dict,
+                            _loggers_dict, collect_logger_data,
+                        )
                         tasks_finished[i] = True
                         gpu_quotas[process_gpu_ids[i]] += task_usages[i]
 
                         elapsed  = time.time() - task_start_times[i]
                         peak_mb  = memory_dict.get(task_names[i], 0) / 1024**2
-                        orig_idx = (task_original_idx.get(task_names[i], i)
+                        task_name, seed = _resolve_job(task_names[i], job_specs)
+                        orig_idx = (task_original_idx.get(task_name, i)
                                     if task_original_idx else i)
 
                         # Check whether this task was solved
                         solved_info = _check_solved(
-                            task_names[i], solutions_json, solutions_dict
+                            task_name,
+                            solutions_json,
+                            {task_name: solutions_dict[task_names[i]]},
                         )
-
-                        if partial_split is not None:
-                            save_task_partial(
-                                partial_split, task_names[i], partial_n_steps,
-                                solutions_dict.get(task_names[i]),
-                                (_loggers_dict.get(task_names[i])
-                                 if _loggers_dict is not None else None),
-                                arc_logger,
-                            )
 
                         if arc_logger is not None:
                             arc_logger.log_task_finished(
@@ -428,14 +639,14 @@ def parallelize_runs(
 
             # ── Stall watchdog ────────────────────────────────────────
             # A wedged worker spins on the GPU forever and takes the whole
-            # campaign with it (j_base_50, 2026-08-27). Kill it and move on;
-            # with no partial written, --resume retries it next time.
+            # campaign with it. Abort this attempt so the wrapper can resume it.
             if _progress_dict is not None and stall_timeout_s > 0:
                 now = time.time()
                 for i in range(n_tasks):
                     if not tasks_started[i] or tasks_finished[i]:
                         continue
                     name = task_names[i]
+                    task_name, seed = _resolve_job(name, job_specs)
                     step = int(_progress_dict.get(name, -1))
                     last = task_last_step.get(name)
                     if last is None or step != last[0]:
@@ -447,14 +658,23 @@ def parallelize_runs(
                     if arc_logger is not None:
                         arc_logger.warning(
                             f'{name} stalled {where} for '
-                            f'{stall_timeout_s:.0f}s — terminating it'
+                            f'{stall_timeout_s:.0f}s — aborting this attempt'
                         )
-                    processes[i].terminate()
-                    processes[i].join(timeout=30)
-                    if processes[i].is_alive():
-                        processes[i].kill()
-                    tasks_finished[i] = True
-                    gpu_quotas[process_gpu_ids[i]] += task_usages[i]
+                    _stop_process(processes[i])
+                    raise WorkerFailure(
+                        f'Worker {name} on GPU {process_gpu_ids[i]} stalled '
+                        f'{where} for {stall_timeout_s:.0f}s and was terminated; '
+                        f'the task will be retried from its last completed partial',
+                        task_name=task_name,
+                        gpu_id=process_gpu_ids[i],
+                        exit_code=None,
+                        last_step=step,
+                        stage='training',
+                        compile_mode=process_compile_modes[i],
+                        recoverable_task=True,
+                        seed=seed,
+                        job_id=name,
+                    )
 
             # ── Schedule new tasks ────────────────────────────────────
             # One launch per tick: ten workers racing into the HIP allocator in
@@ -514,14 +734,20 @@ def parallelize_runs(
                     gpu_quotas[gpu_id] -= task_usages[i]
                     task_start_times[i] = time.time()
 
-                    orig_idx = (task_original_idx.get(task_names[i], i)
+                    job_id = task_names[i]
+                    task_name, seed = _resolve_job(job_id, job_specs)
+                    orig_idx = (task_original_idx.get(task_name, i)
                                 if task_original_idx else i)
+                    task_accel_config = _effective_task_accel_config(
+                        task_name, accel_config, task_accel_configs,
+                    )
 
                     worker_args = (
-                        task_names[i], split, 1e20, n_iterations,
+                        task_name, split, 1e20, n_iterations,
                         gpu_id, memory_dict, solutions_dict, error_queue,
                         _loggers_dict, _progress_dict, postprocess_stride,
-                        accel_config,
+                        task_accel_config, partial_split, partial_n_steps,
+                        seed, job_id, partial_fingerprint, state_dir,
                     )
                     p = multiprocessing.Process(
                         target=solve_task.solve_task, args=worker_args
@@ -530,6 +756,7 @@ def parallelize_runs(
                     processes[i]       = p
                     tasks_started[i]   = True
                     process_gpu_ids[i] = gpu_id
+                    process_compile_modes[i] = task_accel_config['compile_mode']
                     recent_launches.append(time.time())
                     launched = True
 
@@ -552,11 +779,9 @@ def parallelize_runs(
             sys.stdout.write('\n')
             sys.stdout.flush()
 
-        # Final error scan
-        if not error_queue.empty():
-            if arc_logger is not None:
-                arc_logger.close_dashboard()
-            raise ValueError(error_queue.get())
+        reported_errors = _drain_worker_errors(error_queue)
+        if reported_errors:
+            raise _worker_failure_from_report(reported_errors[0])
 
         # ── Collect results before Manager shuts down ─────────────────
         memory_dict_out    = dict(memory_dict)
@@ -615,10 +840,20 @@ def load_memory_cache(split, n_gpus, required_task_names, accel_config=None):
 
 def save_memory_cache(split, n_gpus, memory_dict, accel_config=None):
     path = _cache_path(split)
+    fingerprint = _gpu_fingerprint(n_gpus, accel_config)
+    measurements = {}
+    try:
+        with open(path, 'r') as f:
+            existing = json.load(f)
+        if existing.get('fingerprint') == fingerprint:
+            measurements.update(existing.get('measurements', {}))
+    except (FileNotFoundError, OSError, ValueError, TypeError, json.JSONDecodeError):
+        pass
+    measurements.update({k: int(v) for k, v in memory_dict.items()})
     cache = {
-        'fingerprint':  _gpu_fingerprint(n_gpus, accel_config),
+        'fingerprint':  fingerprint,
         'created_at':   time.strftime('%Y-%m-%d %H:%M:%S'),
-        'measurements': {k: int(v) for k, v in memory_dict.items()},
+        'measurements': measurements,
     }
     with open(path, 'w') as f:
         json.dump(cache, f, indent=2)
@@ -626,9 +861,164 @@ def save_memory_cache(split, n_gpus, memory_dict, accel_config=None):
 
 # ── Per-split runner ─────────────────────────────────────────────────────────
 
+
+def _validate_recovery_task_ids(task_names, eager_tasks, retry_quarantined):
+    known = set(task_names)
+    unknown = (set(eager_tasks) | set(retry_quarantined)) - known
+    if unknown:
+        raise ValueError(
+            'unknown recovery task id(s): ' + ', '.join(sorted(unknown))
+        )
+
+
+def _parse_task_id_list(value):
+    if not value:
+        return set()
+    task_ids = set()
+    for raw_task_id in value.split(','):
+        task_id = raw_task_id.strip()
+        if not task_id:
+            continue
+        try:
+            task_ids.add(task_persistence.safe_task_name(task_id))
+        except ValueError as exc:
+            raise argparse.ArgumentTypeError(str(exc)) from exc
+    return task_ids
+
+
+def _parse_seed_list(value):
+    seeds = []
+    for item in value.split(','):
+        item = item.strip()
+        if not item:
+            continue
+        try:
+            seed = int(item)
+        except ValueError as exc:
+            raise argparse.ArgumentTypeError(
+                f'invalid seed {item!r}; expected comma-separated integers'
+            ) from exc
+        if seed < 0:
+            raise argparse.ArgumentTypeError('seeds must be non-negative')
+        seeds.append(seed)
+    if not seeds:
+        raise argparse.ArgumentTypeError('at least one seed is required')
+    if len(set(seeds)) != len(seeds):
+        raise argparse.ArgumentTypeError('seeds must not contain duplicates')
+    return tuple(seeds)
+
+
+def _recovery_task_sets(task_names, recovery_entries, eager_tasks,
+                        retry_quarantined):
+    """Resolve durable and operator-requested task recovery policy."""
+    _validate_recovery_task_ids(task_names, eager_tasks, retry_quarantined)
+    quarantined = {
+        name for name, entry in recovery_entries.items()
+        if name in task_names and entry.get('state') == 'quarantined'
+    }
+    invalid_retries = set(retry_quarantined) - quarantined
+    if invalid_retries:
+        raise ValueError(
+            'task id(s) are not quarantined: '
+            + ', '.join(sorted(invalid_retries))
+        )
+    automatic_eager = {
+        name for name, entry in recovery_entries.items()
+        if name in task_names
+        and entry.get('state') in ('retry_eager', 'recovered_eager')
+    }
+    effective_eager = (
+        set(eager_tasks) | automatic_eager | set(retry_quarantined)
+    )
+    skipped = quarantined - set(retry_quarantined)
+    effective_eager -= skipped
+    return effective_eager, skipped
+
+
+def _task_eager_config(accel_config):
+    config = accel.AccelConfig.from_dict(accel_config)
+    return {
+        **config.to_dict(),
+        'compile_mode': 'off',
+        '_eje_b_eager_override': config.eje_b,
+    }
+
+
+def _activate_quarantined_retries(split, n_steps, task_names,
+                                  recovery_entries, arc_logger=None,
+                                  state_dir=None):
+    """Make an operator-requested eager retry durable across attempts."""
+    for task_name in task_names:
+        entry = task_persistence.update_task_recovery(
+            split, task_name, n_steps, 'retry_eager',
+            state_dir=state_dir,
+        )
+        recovery_entries[task_name] = entry
+    if task_names and arc_logger is not None:
+        arc_logger.info(
+            'Reactivated quarantined tasks for eager retry: '
+            + ', '.join(sorted(task_names))
+        )
+
+
+def _record_task_recovery_failure(split, n_steps, failure, enabled, arc_logger,
+                                  state_dir=None):
+    """Persist the next recovery state, returning whether it was handled."""
+    if (
+        not enabled
+        or not isinstance(failure, WorkerFailure)
+        or not failure.recoverable_task
+        or not failure.task_name
+        or failure.compile_mode not in accel.COMPILE_CHOICES
+    ):
+        return False
+    state = (
+        'quarantined' if failure.compile_mode == 'off'
+        else 'retry_eager'
+    )
+    task_persistence.update_task_recovery(
+        split, failure.task_name, n_steps, state,
+        failure.recovery_record(),
+        state_dir=state_dir,
+    )
+    if arc_logger is not None:
+        if state == 'retry_eager':
+            action = 'will retry eagerly in a fresh attempt'
+        else:
+            action = 'quarantined after an eager failure'
+        arc_logger.warning(f'{failure.task_name}: {action}')
+    return True
+
+
+def _quarantined_fallback(n_test):
+    """Return the solver's deterministic initial guess for a skipped task."""
+    return [
+        {
+            'attempt_1': [[0, 0], [0, 0]],
+            'attempt_2': [[0, 0], [0, 0]],
+        }
+        for _ in range(n_test)
+    ]
+
+
+def _apply_quarantined_fallbacks(solutions, loggers, task_names,
+                                 task_test_counts):
+    for task_name in task_names:
+        solutions[task_name] = _quarantined_fallback(
+            task_test_counts[task_name]
+        )
+        loggers[task_name] = {
+            'solution_contributions_log': [],
+            'solution_picks_history': [],
+        }
+
+
 def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
               postprocess_stride=4, accel_cfg=None, n_steps=1500,
-              compile_memory_factor=1.2, resume=False, limits=None):
+              compile_memory_factor=1.2, resume=False, limits=None,
+              recover_task_failures=False, eager_tasks=None,
+              retry_quarantined=None, task_ids=None, output_dir='.',
+              state_dir=None):
     """
     Execute the full two-phase pipeline for one split and save all outputs.
 
@@ -647,6 +1037,10 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             earlier interrupted run at the same n_steps.
         limits (ResourceLimits|None): host-RAM caps, VRAM packing margin and the
             stall watchdog timeout.
+        recover_task_failures (bool): persist task-level compiled-to-eager and
+            eager-to-quarantine transitions before aborting a failed attempt.
+        eager_tasks (set[str]|None): task ids forced to use eager forward mode.
+        retry_quarantined (set[str]|None): quarantined task ids to retry eagerly.
 
     Returns:
         n_solved (int)         : tasks solved (always 0 for 'test').
@@ -655,9 +1049,15 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         predictions_file (str) : path to the saved .npz file.
     """
     split_start = time.time()
+    os.makedirs(output_dir, exist_ok=True)
     limits = limits or ResourceLimits()
+    eager_tasks = set(eager_tasks or ())
+    retry_quarantined = set(retry_quarantined or ())
     accel_cfg = accel.AccelConfig.from_dict(accel_cfg)
     accel_config = accel_cfg.to_dict()
+    partial_fingerprint = accel_cfg.algorithm_fingerprint(
+        n_steps, postprocess_stride
+    )
     # Phase 1 never compiles (Eje D): compiling to run 2 iterations cost ~1200 s
     # per task and was 92 % of a profiling run's wall time.
     measure_cfg = accel.for_measurement(accel_cfg)
@@ -687,7 +1087,23 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     with open(f'dataset/arc-agi_{split}_challenges.json', 'r') as f:
         problems = json.load(f)
     original_task_names = list(problems.keys())
+    task_test_counts = {
+        name: len(problem.get('test', ()))
+        for name, problem in problems.items()
+    }
     del problems
+
+    if task_ids is not None:
+        task_ids = set(task_ids)
+        unknown = task_ids - set(original_task_names)
+        if unknown:
+            raise ValueError(
+                'unknown task id(s) for split '
+                f'{split}: {", ".join(sorted(unknown))}'
+            )
+        original_task_names = [
+            name for name in original_task_names if name in task_ids
+        ]
 
     if demo_n is not None:
         n_total_in_split = len(original_task_names)
@@ -698,6 +1114,64 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         )
 
     n_tasks = len(original_task_names)
+    recovery_entries = task_persistence.load_task_recovery(
+        split, n_steps, state_dir=state_dir,
+    )
+    effective_eager_tasks, quarantined_tasks = _recovery_task_sets(
+        original_task_names, recovery_entries, eager_tasks, retry_quarantined,
+    )
+    _activate_quarantined_retries(
+        split, n_steps, retry_quarantined, recovery_entries, arc_logger,
+        state_dir=state_dir,
+    )
+    resume_job_solutions = {}
+    resume_job_loggers = {}
+    if resume and accel_cfg.eje_b:
+        arc_logger.info(f'Loading Eje B seed partials for split {split}')
+        seed_solutions, seed_loggers = task_persistence.load_seed_partials(
+            split,
+            original_task_names,
+            n_steps,
+            accel_cfg.seeds,
+            partial_fingerprint,
+            state_dir=state_dir,
+        )
+        resume_job_solutions = {
+            _seed_job_id(task_name, seed): solution
+            for (task_name, seed), solution in seed_solutions.items()
+        }
+        resume_job_loggers = {
+            _seed_job_id(task_name, seed): logger_data
+            for (task_name, seed), logger_data in seed_loggers.items()
+        }
+        resume_solutions, resume_loggers = {}, {}
+    elif resume:
+        arc_logger.info(f'Loading partial results for split {split}')
+        resume_solutions, resume_loggers = load_task_partials(
+            split, original_task_names, n_steps, state_dir=state_dir,
+        )
+    else:
+        resume_solutions, resume_loggers = {}, {}
+    resolved_quarantines = quarantined_tasks & set(resume_solutions)
+    for task_name in resolved_quarantines:
+        task_persistence.update_task_recovery(
+            split, task_name, n_steps, 'recovered_eager',
+            state_dir=state_dir,
+        )
+    quarantined_tasks -= resolved_quarantines
+    runnable_task_names = [
+        name for name in original_task_names if name not in quarantined_tasks
+    ]
+    if effective_eager_tasks:
+        arc_logger.info(
+            'Task-specific eager mode: '
+            + ', '.join(sorted(effective_eager_tasks))
+        )
+    if quarantined_tasks:
+        arc_logger.warning(
+            'Skipping quarantined tasks: '
+            + ', '.join(sorted(quarantined_tasks))
+        )
 
     arc_logger.log_run_start(n_tasks, n_gpus)
     arc_logger.info(f'Acceleration (Eje D): {accel_cfg.summary()}')
@@ -707,7 +1181,7 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     gpu_memory_quotas = [torch.cuda.mem_get_info(i)[0] for i in range(n_gpus)]
 
     cached_memory_dict = load_memory_cache(
-        split, n_gpus, original_task_names, measure_config
+        split, n_gpus, runnable_task_names, measure_config
     )
     if cached_memory_dict is not None:
         t_p1 = 0.0
@@ -722,17 +1196,18 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
         memory_dict = cached_memory_dict
     else:
         arc_logger.log_phase(
-            f'Phase 1 — Memory measurement  (2 iterations × {n_tasks} tasks)'
+            f'Phase 1 — Memory measurement  '
+            f'(2 iterations × {len(runnable_task_names)} tasks)'
         )
         gpu_task_quotas = [1] * n_gpus  # one task at a time → clean individual measurements
 
         memory_dict, _, _, t_p1 = parallelize_runs(
             gpu_task_quotas,
-            [1] * n_tasks,
+            [1] * len(runnable_task_names),
             2,
-            original_task_names,
+            runnable_task_names,
             split,
-            n_tasks, n_gpus, n_cpus,
+            len(runnable_task_names), n_gpus, n_cpus,
             ParallelRunOptions(
                 arc_logger=arc_logger,
                 n_original_tasks=n_tasks,
@@ -765,16 +1240,14 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     sorted_names      = [name for name, _ in sorted_tasks]
     sorted_mem_usages = [mem  for _, mem  in sorted_tasks]
 
-    # Skip tasks a previous interrupted run already finished at this n_steps.
-    resume_solutions, resume_loggers = (
-        load_task_partials(split, original_task_names, n_steps) if resume
-        else ({}, {})
-    )
-    if resume_solutions:
+    # Skip tasks a previous interrupted baseline run already finished at this
+    # n_steps. Eje B resumes individual seed jobs after expansion below.
+    if resume_solutions and not accel_cfg.eje_b:
+        remaining = n_tasks - len(resume_solutions) - len(quarantined_tasks)
         arc_logger.info(
             f'Resume: {len(resume_solutions)}/{n_tasks} tasks already complete in '
             f'{_partial_dir(split)} — Phase 2 will run the remaining '
-            f'{n_tasks - len(resume_solutions)}'
+            f'{remaining}'
         )
         pending = [(name, mem) for name, mem in zip(sorted_names, sorted_mem_usages)
                    if name not in resume_solutions]
@@ -800,62 +1273,184 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
                     for i in range(n_gpus))
     )
 
+    phase2_names = sorted_names
+    phase2_usages = sorted_mem_usages
+    job_specs = None
+    if accel_cfg.eje_b:
+        phase2_names, phase2_usages, job_specs = _expand_seed_jobs(
+            sorted_names,
+            sorted_mem_usages,
+            accel_cfg.seeds,
+            resume_job_solutions,
+        )
+        arc_logger.info(
+            f'Eje B seed jobs: {len(resume_job_solutions)} resumed, '
+            f'{len(phase2_names)} pending'
+        )
+
     arc_logger.log_phase(
-        f'Phase 2 — Full training  ({n_steps} iterations × {len(sorted_names)} tasks)'
+        f'Phase 2 — Full training  '
+        f'({n_steps} iterations × {len(phase2_names)} jobs)'
     )
 
-    if sorted_names:
-        _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
-            safe_gpu_memory_quotas,
-            sorted_mem_usages,
-            n_steps,
-            sorted_names,
-            split,
-            len(sorted_names), n_gpus, n_cpus,
-            ParallelRunOptions(
-                collect_logger_data=True,
-                track_progress=True,
-                arc_logger=arc_logger,
-                solutions_json=solutions_json,
-                task_original_idx=task_original_idx,
-                n_original_tasks=n_tasks,
-                quiet=False,
-                verbose=True,
-                postprocess_stride=postprocess_stride,
-                accel_config=accel_config,
-                partial_split=split,
-                partial_n_steps=n_steps,
-                host_mem_per_worker_gb=limits.host_mem_per_worker_gb,
-                host_mem_reserve_gb=limits.host_mem_reserve_gb,
-                stall_timeout_s=limits.stall_timeout_s,
-                cache_dir=cache_dir,
-                cache_min_free_gb=limits.cache_min_free_gb,
-            ),
+    if phase2_names:
+        eager_config = (
+            _task_eager_config(accel_config)
+            if effective_eager_tasks else None
         )
+        task_accel_configs = {
+            name: eager_config for name in effective_eager_tasks
+            if name in sorted_names and eager_config is not None
+        }
+        try:
+            _, phase2_solutions, phase2_loggers, t_p2 = parallelize_runs(
+                safe_gpu_memory_quotas,
+                phase2_usages,
+                n_steps,
+                phase2_names,
+                split,
+                len(phase2_names), n_gpus, n_cpus,
+                ParallelRunOptions(
+                    collect_logger_data=True,
+                    track_progress=True,
+                    arc_logger=arc_logger,
+                    solutions_json=(None if accel_cfg.eje_b else solutions_json),
+                    task_original_idx=task_original_idx,
+                    n_original_tasks=n_tasks,
+                    quiet=False,
+                    verbose=True,
+                    postprocess_stride=postprocess_stride,
+                    accel_config=accel_config,
+                    task_accel_configs=task_accel_configs,
+                    partial_split=split,
+                    partial_n_steps=n_steps,
+                    host_mem_per_worker_gb=limits.host_mem_per_worker_gb,
+                    host_mem_reserve_gb=limits.host_mem_reserve_gb,
+                    stall_timeout_s=limits.stall_timeout_s,
+                    cache_dir=cache_dir,
+                    cache_min_free_gb=limits.cache_min_free_gb,
+                    job_specs=job_specs,
+                    partial_fingerprint=(
+                        partial_fingerprint if accel_cfg.eje_b else None
+                    ),
+                    state_dir=state_dir,
+                ),
+            )
+        except WorkerFailure as failure:
+            _record_task_recovery_failure(
+                split, n_steps, failure, recover_task_failures, arc_logger,
+                state_dir=state_dir,
+            )
+            raise
     else:
-        solutions_dict, loggers_data, t_p2 = {}, {}, 0.0
-    solutions_dict = {**resume_solutions, **solutions_dict}
-    loggers_data   = {**resume_loggers,   **loggers_data}
+        phase2_solutions, phase2_loggers, t_p2 = {}, {}, 0.0
+
+    trained_seed_jobs = len(phase2_solutions)
+    seed_solved_task_ids = {}
+    if accel_cfg.eje_b:
+        all_job_solutions = {
+            **resume_job_solutions,
+            **phase2_solutions,
+        }
+        all_job_loggers = {
+            **resume_job_loggers,
+            **phase2_loggers,
+        }
+        solutions_dict, loggers_data = _merge_seed_results(
+            runnable_task_names,
+            accel_cfg.seeds,
+            all_job_solutions,
+            all_job_loggers,
+        )
+        if solutions_json is not None:
+            for seed in accel_cfg.seeds:
+                solved_ids = []
+                for task_name in runnable_task_names:
+                    job_id = _seed_job_id(task_name, seed)
+                    if _check_all_examples(
+                        all_job_solutions[job_id], solutions_json[task_name]
+                    ) is not None:
+                        solved_ids.append(task_name)
+                seed_solved_task_ids[str(seed)] = solved_ids
+        trained_this_attempt = len({
+            job_specs[job_id]['task_name']
+            for job_id in phase2_solutions
+        }) if job_specs else 0
+    else:
+        trained_this_attempt = len(phase2_solutions)
+        solutions_dict = {**resume_solutions, **phase2_solutions}
+        loggers_data = {**resume_loggers, **phase2_loggers}
     arc_logger.info(f'Phase 2 complete in {t_p2:.1f}s')
 
+    recovered_eager_tasks = {
+        name for name in effective_eager_tasks
+        if solutions_dict.get(name)
+    }
+    for task_name in recovered_eager_tasks:
+        if recovery_entries.get(task_name, {}).get('state') != 'recovered_eager':
+            task_persistence.update_task_recovery(
+                split, task_name, n_steps, 'recovered_eager',
+                state_dir=state_dir,
+            )
+
+    fallback_quarantined = {
+        name for name in quarantined_tasks if not solutions_dict.get(name)
+    }
+    _apply_quarantined_fallbacks(
+        solutions_dict, loggers_data, fallback_quarantined, task_test_counts,
+    )
+    if fallback_quarantined:
+        arc_logger.warning(
+            f'{n_tasks - len(fallback_quarantined)} tasks have real results; '
+            f'{len(fallback_quarantined)} quarantined task(s) use the '
+            f'deterministic 2x2-zero fallback: '
+            + ', '.join(sorted(fallback_quarantined))
+        )
+
+    missing_solutions = [
+        name for name in original_task_names if not solutions_dict.get(name)
+    ]
+    missing_loggers = [
+        name for name in original_task_names
+        if not task_persistence.is_complete_logger(loggers_data.get(name))
+    ]
+    if missing_solutions or missing_loggers:
+        details = []
+        if missing_solutions:
+            details.append(f'{len(missing_solutions)} missing solutions')
+        if missing_loggers:
+            details.append(f'{len(missing_loggers)} missing logger records')
+        raise WorkerFailure(
+            'Refusing to write incomplete split outputs: ' + ', '.join(details)
+        )
+    solutions_dict = {
+        name: solutions_dict[name] for name in original_task_names
+    }
+
     # ── Save predictions_{split}.npz in original JSON task order ─────
-    predictions_file = f'predictions_{split}.npz'
-    contrib_logs, picks_histories = [], []
+    predictions_file = os.path.join(output_dir, f'predictions_{split}.npz')
+    contrib_logs, picks_histories, eje_b_diagnostics = [], [], []
     missing = 0
     for name in original_task_names:
         if name in loggers_data:
             contrib_logs.append(loggers_data[name]['solution_contributions_log'])
             picks_histories.append(loggers_data[name]['solution_picks_history'])
+            eje_b_diagnostics.append(
+                loggers_data[name].get('seed_loggers')
+                or loggers_data[name].get('eje_b_diagnostics')
+            )
         else:
             arc_logger.warning(f'No logger data for task {name} — empty placeholder inserted')
             contrib_logs.append([])
             picks_histories.append([])
+            eje_b_diagnostics.append(None)
             missing += 1
 
     np.savez(
         predictions_file,
         solution_contribution_logs=np.array(contrib_logs,    dtype=object),
         solution_picks_histories  =np.array(picks_histories, dtype=object),
+        eje_b_diagnostics=np.array(eje_b_diagnostics, dtype=object),
     )
     arc_logger.info(
         f'Saved {predictions_file}'
@@ -863,18 +1458,15 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     )
 
     # ── Save submission_{split}.json (Kaggle format) ─────────────────
-    submission_file = f'submission_{split}.json'
+    submission_file = os.path.join(output_dir, f'submission_{split}.json')
     with open(submission_file, 'w') as f:
         json.dump(solutions_dict, f, indent=4)
     arc_logger.info(f'Saved {submission_file}')
 
     # ── Count solved tasks ────────────────────────────────────────────
-    n_solved = 0
-    if solutions_json is not None:
-        for task_name, pred in solutions_dict.items():
-            true_sol = solutions_json.get(task_name)
-            if true_sol and pred and _check_all_examples(pred, true_sol) is not None:
-                n_solved += 1
+    n_solved = _count_solved_tasks(
+        solutions_dict, solutions_json, fallback_quarantined,
+    )
 
     elapsed = time.time() - split_start
     arc_logger.log_run_summary(n_solved, n_tasks, elapsed, predictions_file)
@@ -884,12 +1476,13 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
     # Machine-readable description of *what* was run, consumed by
     # profile_parallel_train.py to report throughput-per-step, accuracy and the
     # exact acceleration configuration of each A/B run (Eje D).
-    metadata_file = f'run_metadata_{split}.json'
+    metadata_file = os.path.join(output_dir, f'run_metadata_{split}.json')
     with open(metadata_file, 'w') as f:
         json.dump({
             'split':              split,
             'timestamp':          time.strftime('%Y-%m-%d %H:%M:%S'),
             'n_tasks':            n_tasks,
+            'task_ids':           original_task_names,
             'n_steps':            n_steps,
             'n_solved':           n_solved if solutions_json is not None else None,
             'elapsed_s':          round(elapsed, 1),
@@ -901,6 +1494,36 @@ def run_split(split, n_gpus, n_cpus, arc_logger, solutions_json, demo_n=None,
             'phase1_s':           round(t_p1, 1),
             'phase2_s':           round(t_p2, 1),
             'resumed_tasks':      len(resume_solutions),
+            'trained_this_attempt': trained_this_attempt,
+            'trained_seed_jobs':   trained_seed_jobs,
+            'resumed_seed_jobs':   len(resume_job_solutions),
+            'total_seed_jobs':     n_tasks * len(accel_cfg.seeds),
+            'total_optimizer_steps': n_tasks * len(accel_cfg.seeds) * n_steps,
+            'optimizer_steps_this_attempt': trained_seed_jobs * n_steps,
+            'seeds':               list(accel_cfg.seeds),
+            'eje_b_fingerprint':   partial_fingerprint,
+            'seed_merge_policy':   (
+                solution_selection.SEED_MERGE_POLICY
+                if accel_cfg.eje_b else None
+            ),
+            'seed_solved_task_ids': seed_solved_task_ids,
+            'output_dir':          os.path.abspath(output_dir),
+            'state_dir':           (
+                os.path.abspath(state_dir) if state_dir else None
+            ),
+            'real_result_tasks':  n_tasks - len(fallback_quarantined),
+            'degraded':           bool(fallback_quarantined),
+            'recovery': {
+                'enabled': recover_task_failures,
+                'manifest': task_persistence.recovery_path(split, state_dir),
+                'explicit_eager_tasks': sorted(eager_tasks),
+                'effective_eager_tasks': sorted(effective_eager_tasks),
+                'recovered_eager_tasks': sorted(recovered_eager_tasks),
+                'quarantined_tasks': sorted(fallback_quarantined),
+                'fallback_strategy': (
+                    '2x2_zero_initial_guess' if fallback_quarantined else None
+                ),
+            },
             'limits':             asdict(limits),
             'inductor_cache': {
                 'path': cache_dir,
@@ -931,6 +1554,19 @@ def _check_solved(task_name, solutions_json, solutions_dict):
     if not pred:
         return None
     return _check_all_examples(pred, true_sol)
+
+
+def _count_solved_tasks(solutions_dict, solutions_json, excluded_tasks=()):
+    if solutions_json is None:
+        return 0
+    excluded_tasks = set(excluded_tasks)
+    return sum(
+        1 for task_name, pred in solutions_dict.items()
+        if task_name not in excluded_tasks
+        and solutions_json.get(task_name)
+        and pred
+        and _check_all_examples(pred, solutions_json[task_name]) is not None
+    )
 
 
 def _check_all_examples(pred, true_sol):
@@ -971,6 +1607,35 @@ if __name__ == '__main__':
         help=(
             'Smoke-test mode: run only the first N tasks per split.  '
             'Example: --demo 20 finishes in ~40 min instead of ~20 h.'
+        ),
+    )
+    parser.add_argument(
+        '--task-ids',
+        type=_parse_task_id_list,
+        default=None,
+        metavar='ID1,ID2,...',
+        help=(
+            'Run only these comma-separated task IDs, preserving dataset order. '
+            'Mutually exclusive with --demo; intended for reproducible '
+            'regression panels.'
+        ),
+    )
+    parser.add_argument(
+        '--output-dir',
+        default='.',
+        metavar='DIR',
+        help=(
+            'Directory for submission, predictions and run metadata. '
+            'Default: repository root.'
+        ),
+    )
+    parser.add_argument(
+        '--state-dir',
+        default=None,
+        metavar='DIR',
+        help=(
+            'Root directory for fingerprinted Eje B seed partials. Default: '
+            'the existing .partial directory.'
         ),
     )
     parser.add_argument(
@@ -1020,6 +1685,35 @@ if __name__ == '__main__':
             'interrupted run at the same --iterations. Results are always '
             'written there; this flag only controls whether they are consumed. '
             'Delete the directory to force a clean run.'
+        ),
+    )
+    parser.add_argument(
+        '--recover-task-failures',
+        action='store_true',
+        help=(
+            'Persist recoverable task failures across attempts. A compiled '
+            'task is retried eagerly in a fresh worker; an eager task that '
+            'also fails is quarantined so the remaining split can finish.'
+        ),
+    )
+    parser.add_argument(
+        '--eager-tasks',
+        type=_parse_task_id_list,
+        default=set(),
+        metavar='TASK_IDS',
+        help=(
+            'Comma-separated task ids that must run without torch.compile. '
+            'Other tasks retain the selected acceleration preset.'
+        ),
+    )
+    parser.add_argument(
+        '--retry-quarantined',
+        type=_parse_task_id_list,
+        default=set(),
+        metavar='TASK_IDS',
+        help=(
+            'Comma-separated quarantined task ids to retry eagerly. Use for '
+            'one deliberate recovery attempt after investigating the failure.'
         ),
     )
     parser.add_argument(
@@ -1207,7 +1901,75 @@ if __name__ == '__main__':
             'concurrent tasks instead of 10.'
         ),
     )
+    accel_group.add_argument(
+        '--eje-b',
+        action='store_true',
+        help=(
+            'Enable Eje B robustness: scheduled per-leaf free bits, '
+            'hard-example curriculum, and multi-seed evidence fusion. This is '
+            'only valid with --accel-preset compile.'
+        ),
+    )
+    accel_group.add_argument(
+        '--seeds',
+        type=_parse_seed_list,
+        default=None,
+        metavar='S0,S1,...',
+        help='Independent Eje B seeds. Default with --eje-b: 0,1,2,3.',
+    )
+    accel_group.add_argument(
+        '--kl-free-bits-initial',
+        type=float,
+        default=None,
+        metavar='NATS',
+        help=(
+            'Initial per-leaf free-bits threshold, decayed linearly to zero. '
+            'Default with --eje-b: 2.0.'
+        ),
+    )
+    accel_group.add_argument(
+        '--curriculum',
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help=(
+            'Enable hard-example demonstration weighting. Enabled by default '
+            'with --eje-b; use --no-curriculum for ablation.'
+        ),
+    )
+    accel_group.add_argument(
+        '--curriculum-beta-max',
+        type=float,
+        default=None,
+        metavar='BETA',
+        help='Final curriculum softmax strength. Default: 1.0.',
+    )
+    accel_group.add_argument(
+        '--curriculum-ema-decay',
+        type=float,
+        default=None,
+        metavar='DECAY',
+        help='EMA decay for historical per-example difficulty. Default: 0.9.',
+    )
     args = parser.parse_args()
+
+    if args.demo is not None and args.task_ids is not None:
+        parser.error('--demo and --task-ids are mutually exclusive')
+    if args.eje_b and args.accel_preset != 'compile':
+        parser.error('Eje B must run with --accel-preset compile')
+
+    seeds = args.seeds if args.seeds is not None else (
+        (0, 1, 2, 3) if args.eje_b else (0,)
+    )
+    kl_free_bits_initial = (
+        args.kl_free_bits_initial
+        if args.kl_free_bits_initial is not None
+        else (2.0 if args.eje_b else 0.0)
+    )
+    curriculum = (
+        args.curriculum
+        if args.curriculum is not None
+        else args.eje_b
+    )
 
     accel_cfg = accel.config_from_preset(
         args.accel_preset,
@@ -1219,6 +1981,12 @@ if __name__ == '__main__':
         inductor_cache_dir=args.inductor_cache_dir,
         compile_threads=args.compile_threads,
         memory_planning=args.memory_planning,
+        eje_b=args.eje_b,
+        seeds=seeds,
+        kl_free_bits_initial=kl_free_bits_initial,
+        curriculum=curriculum,
+        curriculum_beta_max=args.curriculum_beta_max,
+        curriculum_ema_decay=args.curriculum_ema_decay,
     )
     # Export the tuned environment before any worker is spawned, so children
     # inherit it (the allocator reads it at first allocation).
@@ -1235,6 +2003,17 @@ if __name__ == '__main__':
     splits_to_run = (
         ['training', 'evaluation', 'test'] if args.split == 'all'
         else [args.split]
+    )
+    split_task_ids = {}
+    for selected_split in splits_to_run:
+        with open(
+            f'dataset/arc-agi_{selected_split}_challenges.json', 'r'
+        ) as handle:
+            split_task_ids[selected_split] = set(json.load(handle))
+    _validate_recovery_task_ids(
+        set().union(*split_task_ids.values()),
+        args.eager_tasks,
+        args.retry_quarantined,
     )
 
     overall_start = time.time()
@@ -1280,9 +2059,20 @@ if __name__ == '__main__':
                 compile_memory_factor=args.compile_memory_factor,
                 resume=args.resume,
                 limits=limits,
+                recover_task_failures=args.recover_task_failures,
+                eager_tasks=args.eager_tasks & split_task_ids[split],
+                retry_quarantined=(
+                    args.retry_quarantined & split_task_ids[split]
+                ),
+                task_ids=(
+                    args.task_ids & split_task_ids[split]
+                    if args.task_ids is not None else None
+                ),
+                output_dir=args.output_dir,
+                state_dir=args.state_dir,
             )
         except BaseException:
-            arc_logger.close_dashboard()
+            arc_logger.log_run_failed(traceback.format_exc())
             raise
 
         total_solved += n_solved
@@ -1299,7 +2089,8 @@ if __name__ == '__main__':
         f'in {overall_elapsed:.1f}s ({overall_elapsed / 3600:.2f}h)'
     )
 
-    with open('timing_result.txt', 'w') as f:
+    os.makedirs(args.output_dir, exist_ok=True)
+    with open(os.path.join(args.output_dir, 'timing_result.txt'), 'w') as f:
         f.write(f'Splits run   : {", ".join(splits_to_run)}\n')
         f.write(f'Total solved : {total_solved}/{total_tasks}\n')
         f.write(f'Total time   : {overall_elapsed:.1f}s\n')

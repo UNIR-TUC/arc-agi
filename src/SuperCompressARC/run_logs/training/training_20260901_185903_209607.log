@@ -1,0 +1,932 @@
+2026-09-01 18:59:05 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1525.9 GB free, minimum 50.0 GB)
+2026-09-01 18:59:05 | INFO     | Loading partial results for split training
+2026-09-01 18:59:05 | INFO     | Task-specific eager mode: fcb5c309
+2026-09-01 18:59:05 | INFO     | ========================================================================
+2026-09-01 18:59:05 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-01 18:59:05 | INFO     |   Tasks       : 400
+2026-09-01 18:59:05 | INFO     |   GPUs        : 1
+2026-09-01 18:59:05 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-01/arc_training_training_20260901_185905.log
+2026-09-01 18:59:05 | INFO     |   Results file: results_2026-09-01_18-59-05.txt
+2026-09-01 18:59:05 | INFO     | ========================================================================
+W0901 19:32:34.880000 221805 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 19:59:18.955000 227313 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 19:59:19.641000 227276 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 20:01:00.773000 227694 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 20:01:49.605000 227920 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 20:01:49.607000 227920 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 20:05:44.736000 228644 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 20:08:37.667000 229312 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 80 v.s. 90
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 20:36:24.220000 234906 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 20:37:08.230000 235055 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 20:38:23.145000 235543 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 20:38:40.804000 235353 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 20:38:40.806000 235353 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 40 v.s. 8
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 20:41:13.813000 236114 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+Process Process-21:
+Traceback (most recent call last):
+  File "/home/asier/anaconda3/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/asier/anaconda3/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/solve_task.py", line 96, in solve_task
+    train.take_step(task, model, optimizer, train_step, train_history_logger)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/train.py", line 120, in take_step
+    loss.backward()
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 614, in backward
+    return handle_torch_function(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/overrides.py", line 1773, in handle_torch_function
+    result = mode.__torch_function__(public_api, types, args, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 623, in backward
+    torch.autograd.backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/__init__.py", line 395, in backward
+    _engine_run_backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/graph.py", line 979, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/function.py", line 333, in apply_boxed
+    return self._get_user_fn()(self, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3529, in backward
+    return CompiledFunction._bwd_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 16, in _compiled_backward
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 10, in impl_fn
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3585, in _backward_impl
+    compiled_bw = backward_compiler.get_or_compile(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 2901, in get_or_compile
+    self.compiled_bw = self.bw_compiler(
+                       ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/schemas.py", line 1502, in __call__
+    output_code = self.compiler_fn(gm, example_inputs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/backends/common.py", line 108, in _wrapped_bw_compiler
+    disable(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1468, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_utils_internal.py", line 96, in wrapper_function
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 3105, in bw_compiler
+    return compile_fx_backward(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 2748, in compile_fx_backward
+    return inner_compile(
+           ^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 861, in compile_fx_inner
+    compiled_graph = wrap_compiler_debug(
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/repro/after_aot.py", line 325, in debug_wrapper
+    inner_compiled_fn = compiler_fn(gm, example_inputs)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1132, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1109, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1929, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1677, in codegen_and_compile
+    compiled_module = graph.compile_to_module()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2985, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2995, in _compile_to_module
+    mod = self._compile_to_module_lines(wrapper_code)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 3071, in _compile_to_module_lines
+    mod = PyCodeCache.load_by_key_path(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/codecache.py", line 4742, in load_by_key_path
+    mod = _reload_python_module(key, path, set_sys_modules=set_sys_modules)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/compile_tasks.py", line 35, in _reload_python_module
+    exec(code, mod.__dict__, mod.__dict__)
+  File "/mnt/supercompressarc-cache/.inductor_cache/vf/cvfr6w7jg4vrz45gxwilpys3pdpzyamctlnirfzve5eadqmz5ro5.py", line 81682, in <module>
+    async_compile.wait(globals())
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 866, in wait
+    self._wait_futures(scope)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 908, in _wait_futures
+    raise RuntimeError(
+torch._inductor.exc.InductorError: RuntimeError: A compilation subprocess exited unexpectedly. This is likely due to a crash. To facilitate debugging, you can re-run with TORCHINDUCTOR_COMPILE_THREADS=1 to cause compilation to occur in the main process.
+2026-09-01 20:48:54 | WARNING  | dbc1a6ce: will retry eagerly in a fresh attempt
+2026-09-01 20:48:54 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1708, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1127, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 472, in parallelize_runs
+    raise _worker_failure_from_report(reported_errors[0])
+WorkerFailure: Worker dbc1a6ce on GPU 0 (pid 235353) failed before training:
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/solve_task.py", line 96, in solve_task
+    train.take_step(task, model, optimizer, train_step, train_history_logger)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/train.py", line 120, in take_step
+    loss.backward()
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 614, in backward
+    return handle_torch_function(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/overrides.py", line 1773, in handle_torch_function
+    result = mode.__torch_function__(public_api, types, args, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 623, in backward
+    torch.autograd.backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/__init__.py", line 395, in backward
+    _engine_run_backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/graph.py", line 979, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/function.py", line 333, in apply_boxed
+    return self._get_user_fn()(self, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3529, in backward
+    return CompiledFunction._bwd_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 16, in _compiled_backward
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 10, in impl_fn
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3585, in _backward_impl
+    compiled_bw = backward_compiler.get_or_compile(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 2901, in get_or_compile
+    self.compiled_bw = self.bw_compiler(
+                       ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/schemas.py", line 1502, in __call__
+    output_code = self.compiler_fn(gm, example_inputs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/backends/common.py", line 108, in _wrapped_bw_compiler
+    disable(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1468, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_utils_internal.py", line 96, in wrapper_function
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 3105, in bw_compiler
+    return compile_fx_backward(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 2748, in compile_fx_backward
+    return inner_compile(
+           ^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 861, in compile_fx_inner
+    compiled_graph = wrap_compiler_debug(
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/repro/after_aot.py", line 325, in debug_wrapper
+    inner_compiled_fn = compiler_fn(gm, example_inputs)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1132, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1109, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1929, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1677, in codegen_and_compile
+    compiled_module = graph.compile_to_module()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2985, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2995, in _compile_to_module
+    mod = self._compile_to_module_lines(wrapper_code)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 3071, in _compile_to_module_lines
+    mod = PyCodeCache.load_by_key_path(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/codecache.py", line 4742, in load_by_key_path
+    mod = _reload_python_module(key, path, set_sys_modules=set_sys_modules)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/compile_tasks.py", line 35, in _reload_python_module
+    exec(code, mod.__dict__, mod.__dict__)
+  File "/mnt/supercompressarc-cache/.inductor_cache/vf/cvfr6w7jg4vrz45gxwilpys3pdpzyamctlnirfzve5eadqmz5ro5.py", line 81682, in <module>
+    async_compile.wait(globals())
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 866, in wait
+    self._wait_futures(scope)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 908, in _wait_futures
+    raise RuntimeError(
+torch._inductor.exc.InductorError: RuntimeError: A compilation subprocess exited unexpectedly. This is likely due to a crash. To facilitate debugging, you can re-run with TORCHINDUCTOR_COMPILE_THREADS=1 to cause compilation to occur in the main process.
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1708, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1127, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 472, in parallelize_runs
+    raise _worker_failure_from_report(reported_errors[0])
+WorkerFailure: Worker dbc1a6ce on GPU 0 (pid 235353) failed before training:
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/solve_task.py", line 96, in solve_task
+    train.take_step(task, model, optimizer, train_step, train_history_logger)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/train.py", line 120, in take_step
+    loss.backward()
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 614, in backward
+    return handle_torch_function(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/overrides.py", line 1773, in handle_torch_function
+    result = mode.__torch_function__(public_api, types, args, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 623, in backward
+    torch.autograd.backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/__init__.py", line 395, in backward
+    _engine_run_backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/graph.py", line 979, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/function.py", line 333, in apply_boxed
+    return self._get_user_fn()(self, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3529, in backward
+    return CompiledFunction._bwd_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 16, in _compiled_backward
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 10, in impl_fn
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3585, in _backward_impl
+    compiled_bw = backward_compiler.get_or_compile(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 2901, in get_or_compile
+    self.compiled_bw = self.bw_compiler(
+                       ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/schemas.py", line 1502, in __call__
+    output_code = self.compiler_fn(gm, example_inputs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/backends/common.py", line 108, in _wrapped_bw_compiler
+    disable(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1468, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_utils_internal.py", line 96, in wrapper_function
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 3105, in bw_compiler
+    return compile_fx_backward(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 2748, in compile_fx_backward
+    return inner_compile(
+           ^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 861, in compile_fx_inner
+    compiled_graph = wrap_compiler_debug(
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/repro/after_aot.py", line 325, in debug_wrapper
+    inner_compiled_fn = compiler_fn(gm, example_inputs)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1132, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1109, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1929, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1677, in codegen_and_compile
+    compiled_module = graph.compile_to_module()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2985, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2995, in _compile_to_module
+    mod = self._compile_to_module_lines(wrapper_code)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 3071, in _compile_to_module_lines
+    mod = PyCodeCache.load_by_key_path(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/codecache.py", line 4742, in load_by_key_path
+    mod = _reload_python_module(key, path, set_sys_modules=set_sys_modules)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/compile_tasks.py", line 35, in _reload_python_module
+    exec(code, mod.__dict__, mod.__dict__)
+  File "/mnt/supercompressarc-cache/.inductor_cache/vf/cvfr6w7jg4vrz45gxwilpys3pdpzyamctlnirfzve5eadqmz5ro5.py", line 81682, in <module>
+    async_compile.wait(globals())
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 866, in wait
+    self._wait_futures(scope)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 908, in _wait_futures
+    raise RuntimeError(
+torch._inductor.exc.InductorError: RuntimeError: A compilation subprocess exited unexpectedly. This is likely due to a crash. To facilitate debugging, you can re-run with TORCHINDUCTOR_COMPILE_THREADS=1 to cause compilation to occur in the main process.
+[run] exit=1; Python and worker diagnostics are above
+[run] retrying in 30s — --resume skips every completed task
+/home/asier/anaconda3/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 5 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+2026-09-01 20:49:29 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1513.5 GB free, minimum 50.0 GB)
+2026-09-01 20:49:29 | INFO     | Loading partial results for split training
+2026-09-01 20:49:29 | INFO     | Task-specific eager mode: dbc1a6ce, fcb5c309
+2026-09-01 20:49:29 | INFO     | ========================================================================
+2026-09-01 20:49:29 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-01 20:49:29 | INFO     |   Tasks       : 400
+2026-09-01 20:49:29 | INFO     |   GPUs        : 1
+2026-09-01 20:49:29 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-01/arc_training_training_20260901_204929.log
+2026-09-01 20:49:29 | INFO     |   Results file: results_2026-09-01_20-49-29.txt
+2026-09-01 20:49:29 | INFO     | ========================================================================
+W0901 20:53:37.853000 238950 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 20:54:15.425000 238946 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 80 v.s. 90
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 40 v.s. 8
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 21:19:41.792000 244311 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 21:19:41.794000 244311 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 21:27:53.952000 246016 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 21:47:09.195000 255886 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 21:56:05.235000 259661 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 21:56:05.237000 259661 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 21:58:53.097000 260309 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 21:58:53.099000 260309 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 36 v.s. 6
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 22:01:53.728000 261106 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 22:02:25.724000 261238 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 22:02:25.726000 261238 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 22:17:05.183000 264338 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 22:30:14.121000 266914 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 64 v.s. 72
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 22:39:12.536000 268596 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 22:39:12.538000 268596 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 22:40:12.735000 268800 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 22:41:19.448000 269271 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 22:41:19.451000 269271 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 22:48:04.731000 271092 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:02:52.718000 275595 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:16:04.547000 280643 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:16:04.549000 280643 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:16:07.718000 280790 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:16:07.719000 280790 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:21:38.239000 281825 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:22:00.700000 282003 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:22:00.701000 282003 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 80 v.s. 60
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 64 v.s. 72
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0901 23:24:18.147000 282681 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:28:07.550000 283429 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:48:46.843000 287438 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:48:57.711000 287523 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:48:57.713000 287523 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:56:24.967000 289248 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0901 23:56:46.997000 289219 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 00:15:16.139000 293202 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 00:16:11.580000 293476 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 00:19:38.634000 294243 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 00:20:37.468000 294328 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 00:20:37.470000 294328 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 00:24:36.845000 295375 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 00:24:36.847000 295375 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 00:44:34.263000 299571 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 00:44:34.265000 299571 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 00:45:08.601000 299607 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 01:09:29.948000 304939 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 01:13:59.433000 305942 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 01:15:45.377000 306242 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 01:15:45.379000 306242 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 01:16:04.468000 306371 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 01:16:19.851000 306453 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 01:16:19.853000 306453 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 01:21:46.116000 307680 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 64 v.s. 56
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0902 01:29:57.476000 309323 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 01:29:57.478000 309323 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:03:35.678000 316342 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:03:35.679000 316342 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 24 v.s. 8
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0902 02:11:21.318000 317942 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:11:21.320000 317942 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:11:22.670000 318049 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:11:22.672000 318049 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:11:35.653000 318134 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:17:09.655000 319281 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:49:22.245000 327783 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:49:37.266000 327908 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:49:37.268000 327908 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:53:02.310000 328879 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 02:54:33.092000 329555 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 03:01:22.503000 331165 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 03:17:42.865000 334748 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 03:17:42.867000 334748 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 03:18:10.290000 334879 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 03:21:21.805000 335597 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 03:25:33.307000 336432 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 03:25:33.309000 336432 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 03:26:15.268000 336757 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 03:26:15.270000 336757 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 144 v.s. 36
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 64 v.s. 48
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0902 04:07:01.941000 345067 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 04:07:01.945000 345067 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 04:12:16.333000 346133 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 64 v.s. 40
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0902 04:26:49.822000 349283 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 04:26:49.824000 349283 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 04:56:42.959000 355400 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 05:07:27.342000 357589 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 05:10:48.010000 358400 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 05:10:48.012000 358400 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 05:10:48.092000 358320 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 05:12:21.490000 358572 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 05:12:36.168000 358849 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 05:20:09.178000 360570 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 05:35:17.493000 363686 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 05:41:09.869000 364965 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 06:01:06.777000 369249 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 06:01:06.779000 369249 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 06:03:52.858000 369789 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 64 v.s. 32
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0902 06:24:58.879000 374251 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 06:33:45.060000 376084 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 06:33:45.062000 376084 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 06:33:47.073000 376170 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 06:33:47.075000 376170 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 06:34:03.536000 376253 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 06:34:03.538000 376253 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 07:01:10.601000 382093 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 80 v.s. 30
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0902 07:06:59.768000 383532 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 07:27:09.473000 387732 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 07:27:09.475000 387732 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (AssertionError: 80 v.s. 30
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0902 07:28:02.345000 387929 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 07:28:02.347000 387929 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 07:29:14.039000 388171 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 07:38:44.965000 390151 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 07:38:44.967000 390151 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+/home/asier/repos/arc-agi/src/SuperCompressARC/accel.py:398: UserWarning: [accel] torch.compile failed at runtime (SubprocException: An exception occurred in a subprocess:
+
+Name=triton_per_fused__unsafe_view_add_cummax_max_min_mul_rsub_select_slice_sub_unsqueeze_372
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_worker/subproc_pool.py", line 479, in do_job
+    result = job()
+             ^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/compile_tasks.py", line 208, in _worker_compile_triton
+    kernel.precompile(warm_cache_only=True)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/triton_heuristics.py", line 721, in precompile
+    self._precompile_worker()
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/triton_heuristics.py", line 761, in _precompile_worker
+    compile_results.append(self._precompile_config(c))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/triton_heuristics.py", line 1361, in _precompile_config
+    binary = triton.compile(*compile_args, **compile_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/triton/compiler/compiler.py", line 327, in compile
+    next_module = compile_ir(module, metadata)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/triton/backends/amd/compiler.py", line 586, in <lambda>
+    stages["ttgir"] = lambda src, metadata: self.make_ttgir(src, metadata, options)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/triton/backends/amd/compiler.py", line 318, in make_ttgir
+    pm.run(mod, 'make_ttgir')
+RuntimeError: PassManager::run failed
+
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+); falling back to eager for the rest of this task.
+  warnings.warn(f'[accel] torch.compile failed at runtime ({exc}); '
+W0902 08:00:53.397000 394711 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:00:53.399000 394711 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:01:32.632000 394662 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:05:59.601000 395740 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:05:59.603000 395740 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:26:04.150000 399837 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:26:04.152000 399837 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:30:40.158000 400835 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:30:40.160000 400835 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:33:38.907000 401552 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:34:47.512000 401942 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:38:03.091000 403093 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:52:30.084000 407505 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:52:30.087000 407505 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 08:59:39.052000 409912 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:04:13.283000 411088 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:04:58.997000 411278 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:06:59.328000 411865 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:06:59.330000 411865 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:30:16.543000 416837 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:34:01.591000 417712 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:34:01.593000 417712 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:40:38.886000 419244 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:40:38.888000 419244 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:55:22.203000 422390 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 09:55:22.206000 422390 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:04:07.686000 424280 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:04:16.276000 424170 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:04:16.278000 424170 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:06:58.281000 424922 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:06:58.283000 424922 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:12:04.377000 426032 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:18:30.634000 428297 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:18:30.636000 428297 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:27:11.029000 430332 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:27:11.032000 430332 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:33:34.951000 431569 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:33:34.953000 431569 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:36:50.528000 432340 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:38:19.892000 432499 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:42:47.624000 433647 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:57:44.026000 436901 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:57:44.028000 436901 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:58:28.192000 436840 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 10:58:28.194000 436840 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:11:50.487000 439801 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:14:58.056000 440463 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:14:58.685000 440522 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:22:32.828000 442940 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:22:32.830000 442940 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:29:05.429000 445224 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:29:05.431000 445224 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:36:33.679000 446683 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:40:55.638000 447701 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:40:55.640000 447701 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 11:47:27.318000 449081 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 12:07:10.079000 454627 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 12:07:10.081000 454627 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 12:09:27.093000 455330 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 12:33:56.879000 460535 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 12:33:56.880000 460535 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 12:35:51.100000 460970 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 12:35:51.102000 460970 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 12:38:12.343000 461413 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 12:38:12.345000 461413 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 12:40:17.874000 462067 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 13:14:59.811000 470596 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 13:16:59.433000 471294 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 13:16:59.434000 471294 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 13:17:41.962000 471504 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 13:19:18.001000 471986 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 13:19:18.003000 471986 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 13:20:34.977000 472033 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 13:46:23.399000 477538 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:00:45.191000 481900 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:10:53.821000 484087 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:10:53.823000 484087 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:28:36.771000 487731 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:28:36.773000 487731 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:31:03.850000 488309 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:34:45.866000 489147 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:42:35.054000 490709 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:45:26.898000 491350 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:52:14.184000 492938 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 14:52:14.186000 492938 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 15:13:00.702000 498006 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 15:13:00.704000 498006 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 15:13:48.665000 498204 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 15:13:48.667000 498204 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 15:24:16.267000 500462 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 15:26:43.420000 501069 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 15:47:32.108000 505132 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 15:49:04.457000 505587 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 15:49:04.459000 505587 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:21:06.376000 513307 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:21:18.988000 513351 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:21:18.990000 513351 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:21:24.262000 513452 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:29:46.531000 515378 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:29:46.533000 515378 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:32:10.958000 515924 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:32:10.960000 515924 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:39:31.022000 517480 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:39:31.024000 517480 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:44:20.905000 518557 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 16:44:20.907000 518557 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+2026-09-02 16:56:15 | WARNING  | 4258a5f9: will retry eagerly in a fresh attempt
+2026-09-02 16:56:15 | ERROR    | RUN FAILED — completed task partials remain resumable
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1708, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1127, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 472, in parallelize_runs
+    raise _worker_failure_from_report(reported_errors[0])
+WorkerFailure: Worker 4258a5f9 on GPU 0 (pid 519174) failed before training:
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/solve_task.py", line 96, in solve_task
+    train.take_step(task, model, optimizer, train_step, train_history_logger)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/train.py", line 120, in take_step
+    loss.backward()
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 614, in backward
+    return handle_torch_function(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/overrides.py", line 1773, in handle_torch_function
+    result = mode.__torch_function__(public_api, types, args, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 623, in backward
+    torch.autograd.backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/__init__.py", line 395, in backward
+    _engine_run_backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/graph.py", line 979, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/function.py", line 333, in apply_boxed
+    return self._get_user_fn()(self, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3529, in backward
+    return CompiledFunction._bwd_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 16, in _compiled_backward
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 10, in impl_fn
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3585, in _backward_impl
+    compiled_bw = backward_compiler.get_or_compile(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 2901, in get_or_compile
+    self.compiled_bw = self.bw_compiler(
+                       ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/schemas.py", line 1502, in __call__
+    output_code = self.compiler_fn(gm, example_inputs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/backends/common.py", line 108, in _wrapped_bw_compiler
+    disable(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1468, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_utils_internal.py", line 96, in wrapper_function
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 3105, in bw_compiler
+    return compile_fx_backward(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 2748, in compile_fx_backward
+    return inner_compile(
+           ^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 861, in compile_fx_inner
+    compiled_graph = wrap_compiler_debug(
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/repro/after_aot.py", line 325, in debug_wrapper
+    inner_compiled_fn = compiler_fn(gm, example_inputs)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1132, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1109, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1929, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1677, in codegen_and_compile
+    compiled_module = graph.compile_to_module()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2985, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2995, in _compile_to_module
+    mod = self._compile_to_module_lines(wrapper_code)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 3071, in _compile_to_module_lines
+    mod = PyCodeCache.load_by_key_path(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/codecache.py", line 4742, in load_by_key_path
+    mod = _reload_python_module(key, path, set_sys_modules=set_sys_modules)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/compile_tasks.py", line 35, in _reload_python_module
+    exec(code, mod.__dict__, mod.__dict__)
+  File "/mnt/supercompressarc-cache/.inductor_cache/af/cafkhseldigtdptnjptao3lmejrdxuyslnozdhbezco7a25n762s.py", line 63669, in <module>
+    async_compile.wait(globals())
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 866, in wait
+    self._wait_futures(scope)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 908, in _wait_futures
+    raise RuntimeError(
+torch._inductor.exc.InductorError: RuntimeError: A compilation subprocess exited unexpectedly. This is likely due to a crash. To facilitate debugging, you can re-run with TORCHINDUCTOR_COMPILE_THREADS=1 to cause compilation to occur in the main process.
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1708, in <module>
+    n_solved, n_tasks, elapsed, pred_file = run_split(
+                                            ^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 1127, in run_split
+    _, solutions_dict, loggers_data, t_p2 = parallelize_runs(
+                                            ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/parallel_train.py", line 472, in parallelize_runs
+    raise _worker_failure_from_report(reported_errors[0])
+WorkerFailure: Worker 4258a5f9 on GPU 0 (pid 519174) failed before training:
+Traceback (most recent call last):
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/solve_task.py", line 96, in solve_task
+    train.take_step(task, model, optimizer, train_step, train_history_logger)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/train.py", line 120, in take_step
+    loss.backward()
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 614, in backward
+    return handle_torch_function(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/overrides.py", line 1773, in handle_torch_function
+    result = mode.__torch_function__(public_api, types, args, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/utils/_device.py", line 122, in __torch_function__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_tensor.py", line 623, in backward
+    torch.autograd.backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/__init__.py", line 395, in backward
+    _engine_run_backward(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/graph.py", line 979, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/autograd/function.py", line 333, in apply_boxed
+    return self._get_user_fn()(self, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3529, in backward
+    return CompiledFunction._bwd_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 16, in _compiled_backward
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/codegen.py:codegen(compiled_function_backward)", line 10, in impl_fn
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 3585, in _backward_impl
+    compiled_bw = backward_compiler.get_or_compile(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 2901, in get_or_compile
+    self.compiled_bw = self.bw_compiler(
+                       ^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/schemas.py", line 1502, in __call__
+    output_code = self.compiler_fn(gm, example_inputs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/backends/common.py", line 108, in _wrapped_bw_compiler
+    disable(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1468, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_utils_internal.py", line 96, in wrapper_function
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 3105, in bw_compiler
+    return compile_fx_backward(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 2748, in compile_fx_backward
+    return inner_compile(
+           ^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 861, in compile_fx_inner
+    compiled_graph = wrap_compiler_debug(
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_dynamo/repro/after_aot.py", line 325, in debug_wrapper
+    inner_compiled_fn = compiler_fn(gm, example_inputs)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1132, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1109, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1929, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1677, in codegen_and_compile
+    compiled_module = graph.compile_to_module()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2985, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2995, in _compile_to_module
+    mod = self._compile_to_module_lines(wrapper_code)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/graph.py", line 3071, in _compile_to_module_lines
+    mod = PyCodeCache.load_by_key_path(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/codecache.py", line 4742, in load_by_key_path
+    mod = _reload_python_module(key, path, set_sys_modules=set_sys_modules)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/runtime/compile_tasks.py", line 35, in _reload_python_module
+    exec(code, mod.__dict__, mod.__dict__)
+  File "/mnt/supercompressarc-cache/.inductor_cache/af/cafkhseldigtdptnjptao3lmejrdxuyslnozdhbezco7a25n762s.py", line 63669, in <module>
+    async_compile.wait(globals())
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 866, in wait
+    self._wait_futures(scope)
+  File "/home/asier/repos/arc-agi/src/SuperCompressARC/arcagi/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 908, in _wait_futures
+    raise RuntimeError(
+torch._inductor.exc.InductorError: RuntimeError: A compilation subprocess exited unexpectedly. This is likely due to a crash. To facilitate debugging, you can re-run with TORCHINDUCTOR_COMPILE_THREADS=1 to cause compilation to occur in the main process.
+[run] exit=1; Python and worker diagnostics are above
+[run] retrying in 30s — --resume skips every completed task
+/home/asier/anaconda3/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+2026-09-02 16:56:49 | INFO     | Inductor cache: /mnt/supercompressarc-cache/.inductor_cache (1317.7 GB free, minimum 50.0 GB)
+2026-09-02 16:56:49 | INFO     | Loading partial results for split training
+2026-09-02 16:56:50 | INFO     | Task-specific eager mode: 4258a5f9, dbc1a6ce, fcb5c309
+2026-09-02 16:56:50 | INFO     | ========================================================================
+2026-09-02 16:56:50 | INFO     | ARC-AGI Parallel Training  |  split=training
+2026-09-02 16:56:50 | INFO     |   Tasks       : 400
+2026-09-02 16:56:50 | INFO     |   GPUs        : 1
+2026-09-02 16:56:50 | INFO     |   Log file    : /home/asier/repos/arc-agi/src/SuperCompressARC/.log/2026-09-02/arc_training_training_20260902_165649.log
+2026-09-02 16:56:50 | INFO     |   Results file: results_2026-09-02_16-56-49.txt
+2026-09-02 16:56:50 | INFO     | ========================================================================
+W0902 17:00:33.692000 522403 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:00:33.694000 522403 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:28:05.742000 528017 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:28:05.744000 528017 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:28:47.828000 529574 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:28:47.830000 529574 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:44:21.520000 533505 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:44:21.522000 533505 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:44:32.114000 533663 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:44:32.116000 533663 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:54:07.805000 535949 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:54:07.807000 535949 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:55:43.346000 536261 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:57:00.963000 536679 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 17:57:00.965000 536679 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:10:26.446000 539637 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:12:20.856000 539942 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:12:20.858000 539942 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:18:32.499000 541374 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:20:51.838000 541779 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:20:51.840000 541779 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:23:08.498000 542428 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:24:16.465000 542600 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:24:16.467000 542600 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:43:30.594000 546748 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:43:30.596000 546748 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:48:55.141000 547938 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:48:55.143000 547938 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:50:35.450000 548530 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:51:44.844000 548743 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 18:51:44.846000 548743 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:01:54.492000 551033 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:01:54.494000 551033 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:07:59.860000 552357 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:07:59.862000 552357 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:15:40.870000 553947 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:15:57.056000 553893 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:17:19.769000 554441 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:18:00.430000 554541 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:23:18.502000 555710 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:28:38.448000 556998 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:50:56.567000 562216 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:50:56.568000 562216 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:56:13.151000 563579 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 19:56:13.153000 563579 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 20:08:28.684000 566217 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+W0902 20:08:28.686000 566217 arcagi/lib/python3.12/site-packages/torch/_inductor/utils.py:3096] [0/0] DeviceCopy in input program
+2026-09-02 20:26:41 | INFO     | ========================================================================
+2026-09-02 20:26:41 | INFO     | RUN COMPLETE — 140/400 tasks solved (35.0%)  in 12591.8s (3.50h)
+2026-09-02 20:26:41 | INFO     |   Predictions saved : predictions_training.npz
+2026-09-02 20:26:41 | INFO     | ========================================================================
+2026-09-02 20:26:41 | INFO     | Saved run_metadata_training.json

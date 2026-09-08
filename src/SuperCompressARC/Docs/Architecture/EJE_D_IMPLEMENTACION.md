@@ -31,11 +31,14 @@
 - [17. Campaña de confirmación (2026-08-27): bloques G–J](#17-campaña-de-confirmación-2026-08-27-bloques-gj)
 - [18. Ejecución final: scripts de producción](#18-ejecución-final-scripts-de-producción)
 - [19. Ejemplo individual compilado (`analyze_example.py`)](#19-ejemplo-individual-compilado-analyze_examplepy)
+- [20. Incidente del 2026-09-01: fallo fatal de `fcb5c309` con `torch.compile`](#20-incidente-del-2026-09-01-fallo-fatal-de-fcb5c309-con-torchcompile)
 
 > **Aviso de vigencia.** Las secciones 3 a 14 se escribieron tras la primera
 > campaña. La batería nocturna de §15 refuta dos de sus conclusiones — la
 > inflación de VRAM al compilar y el efecto de `memory_planning` — y confirma
 > las demás. §17 cierra el eje con datos a 50 tareas y §18 es el entregable.
+> §20 documenta el primer fallo fatal reproducible observado durante el split
+> completo y la recuperación temporal incorporada a los scripts de producción.
 > Se conservan sin renumerar, con notas de corrección en el punto exacto donde
 > el dato dejó de ser cierto.
 
@@ -281,6 +284,12 @@ Dataclass serializable (debe cruzar la frontera de `multiprocessing.spawn` como 
 > una recompilación completa. Se mantiene en los presets para no invalidar la caché
 > ya poblada.
 
+Eje B usa `compile_mode='default'` por defecto y la CLI sigue exigiendo el preset
+`compile`. La recuperación puede crear una configuración interna eager por tarea,
+marcada como `_eje_b_eager_override`; esa marca se serializa solo para el worker
+afectado, no forma parte del `algorithm_fingerprint()` y no cambia seeds, free-bits,
+curriculum ni la política de merge.
+
 Métodos relevantes:
 
 - `is_enabled()` — `True` si algo se desvía del baseline. Permite **afirmar** que una
@@ -372,9 +381,12 @@ model.forward = forward
 Dos mecanismos de seguridad:
 
 - **`_EagerFallback`**: `torch.compile` es perezoso — un fallo de compilación aparece en la
-  *primera llamada*, no al decorar. Esta clase captura la primera excepción, emite un
-  warning y **revierte a eager de forma permanente** para el resto de la tarea. Una tarea
-  nunca muere por culpa del acelerador.
+  *primera llamada*, no al decorar. Los fallos ordinarios de Dynamo/Inductor emiten un
+  warning y **revierten a eager de forma permanente** para el resto de la tarea. Los
+  errores fatales del acelerador (`illegal memory access`, error 700 del driver,
+  `device-side assert`, etc.) se vuelven a elevar **sin ejecutar eager**: el contexto
+  HIP/CUDA puede estar corrompido y sólo es seguro recuperarlo terminando el worker. El
+  planificador hace ese reintento en un proceso nuevo (§20).
 - **Degradación BF16**: si el dispositivo o la build no soportan BF16, se avisa y se corre
   en FP32.
 
@@ -883,8 +895,11 @@ TORCH_LOGS=recompiles python parallel_train.py --split training --demo 1 --compi
 ```
 
 Esperado: **1–2 compilaciones** en total gracias a `dynamic=False`; coste concentrado en el
-primer paso. Forzar un fallo (p. ej. `--compile max-autotune` sin Triton disponible) debe
-producir el warning de `_EagerFallback` y **completar la tarea igualmente**.
+primer paso. Forzar un fallo **no fatal** (p. ej. un grafo no soportado antes de lanzar
+trabajo en GPU) debe producir el warning de `_EagerFallback` y **completar la tarea
+igualmente**. Un acceso ilegal, un error 700 del driver o un `device-side assert` deben
+terminar el worker sin intentar eager; la recuperación se valida en un proceso nuevo
+mediante el flujo de §20, no provocando deliberadamente otro fallo del driver.
 
 Confirmar además en el log de cada worker la línea `[accel][<tarea>] compile times: ...`
 (§5.8), que dice si el gasto está en Dynamo o en Inductor.
@@ -958,7 +973,8 @@ Criterios de aceptación:
 | `reduce-overhead` devuelve buffers de cudagraph reutilizados | `accel._clone_wrap` copia las salidas (§15.9)                               | Bloque H debe confirmar que pass@2 se recupera                       |
 | Una ejecución de 400 tareas pierde todo si falla              | `.partial/{split}/` + `--resume` (§16.3)                                  | —                                                                   |
 | Caché de Fase 1 obsoleta tras cambiar de preset               | La config de medición forma parte del fingerprint                             | —                                                                   |
-| Fallo de compilación mata una tarea                           | `_EagerFallback` revierte a eager                                            | —                                                                   |
+| Fallo ordinario de compilación                                | `_EagerFallback` revierte a eager                                            | —                                                                   |
+| Fallo fatal de un kernel compilado (`illegal memory access`)  | Se eleva sin fallback, se reinicia el intento y la tarea se degrada a eager (§20) | Aislar la causa en PyTorch/Inductor/Triton-ROCm                    |
 | El`peak=` que se loguea en Fase 2 mide **toda la GPU** | — (no afecta al scheduler: la Fase 1 corre de una en una)                     | Añadir`max_memory_allocated()` al mensaje                         |
 
 ### 13.2 Fuera de alcance (deliberadamente)
@@ -1747,12 +1763,14 @@ por donde iba. Cualquier ajuste se sobrescribe por entorno sin editar nada:
 ```bash
 MAX_WORKERS=8 ./run_training_full.sh        # si el barrido de 6 se queda corto
 MEM_RESERVE_GB=20 ./run_evaluation_full.sh  # si la máquina tiene más cosas abiertas
+EAGER_TASKS=fcb5c309 ./run_training_full.sh # una tarea conocida corre eager
 ```
 
 Variables disponibles: `ITERATIONS`, `MAX_WORKERS`, `MEM_PER_WORKER_GB`,
 `MEM_RESERVE_GB`, `STALL_TIMEOUT_S`, `MAX_ATTEMPTS`, `CACHE_MOUNT`,
 `CACHE_EXPECTED_UUID`, `CACHE_EXPECTED_SERIAL`, `INDUCTOR_CACHE_DIR`, `CACHE_WARN_FREE_GB`,
-`CACHE_MIN_FREE_GB`, `CACHE_MIN_FREE_INODES`, `CACHE_PREFLIGHT_ONLY` y `PYTHON_BIN`.
+`CACHE_MIN_FREE_GB`, `CACHE_MIN_FREE_INODES`, `CACHE_PREFLIGHT_ONLY`, `ACCEL_PRESET`,
+`RECOVER_TASK_FAILURES`, `EAGER_TASKS`, `RETRY_QUARANTINED_TASKS` y `PYTHON_BIN`.
 El runner usa por defecto `arcagi/bin/python`, por lo que no depende de que el entorno
 virtual se haya activado en la shell.
 
@@ -1767,6 +1785,9 @@ virtual se haya activado en la shell.
 | `Holding back new tasks`                         | La reserva de RAM está frenando arranques (§16.5)              |
 | `Inductor cache filesystem has ...`              | El disco de caché cruzó el mínimo; no arrancan tareas nuevas  |
 | `<tarea> stalled ... terminating it`             | Watchdog; la tarea se reintentará en la siguiente pasada        |
+| `<tarea>: will retry eagerly in a fresh attempt` | Falló compilada; el siguiente intento la ejecutará sin compilar |
+| `Skipping quarantined tasks: ...`                | También falló eager; el resto del split continúa (§20)          |
+| `N tasks have real results; M ... fallback`      | Salida completa pero degradada; revisar los metadatos            |
 
 Al terminar quedan `submission_{split}.json` y `predictions_{split}.npz`, y
 `list_solved_puzzles.py` / `plot_accuracy.py` funcionan sobre ellos sin cambios.
@@ -1991,3 +2012,176 @@ Para comparar rendimiento deben usarse la misma tarea y al menos 300 pasos, porq
 primer paso compilado incluye el tracing. No se exige igualdad bit a bit: como documenta
 §13.3, `torch.compile` funcionaliza el RNG. Sí se exigen curvas finitas, artefactos
 completos y ausencia de regresión de pass@2 en una muestra representativa.
+
+---
+
+## 20. Incidente del 2026-09-01: fallo fatal de `fcb5c309` con `torch.compile`
+
+Esta sección documenta un incidente de producción, no una nueva conclusión sobre la
+matemática del modelo. Durante la ejecución completa del split `training`, la tarea
+`fcb5c309` provocó de forma repetida un acceso ilegal desde un kernel generado por
+TorchInductor/Triton. La solución aplicada es **temporal y operativa**: evita compilar esa
+tarea, reinicia el contexto de GPU entre intentos y permite terminar las demás. No corrige
+todavía la causa dentro de PyTorch/Inductor/Triton-ROCm.
+
+### 20.1 Síntoma y secuencia observada
+
+La campaña comenzó el 2026-09-01 a las 07:50. Cuando ya había **97 de 400 tareas**
+persistidas en `.partial/training/`, `fcb5c309` falló y agotó los cinco intentos del
+runner. Los cuatro reintentos de las 17:24, 17:29, 17:34 y 17:39 repitieron la misma
+tarea y el mismo último progreso conocido, sin avanzar el split:
+
+```text
+Worker fcb5c309 on GPU 0 was terminated by signal 6 (SIGABRT) after step 10
+```
+
+El log del primer reintento,
+`.log/2026-09-01/arc_training_training_20260901_172447.log`, y el log consolidado de la
+campaña conservaron el traceback completo. Allí el fallo quedó localizado en código
+generado dentro de la caché de Inductor:
+
+```text
+triton_per_fused__unsafe_view_prepare_softmax_online_135.run(..., 8, 17, ...)
+RuntimeError: CUDA driver error: 700
+torch.AcceleratorError: CUDA error: an illegal memory access was encountered
+```
+
+Aunque la build sea ROCm, PyTorch conserva nombres de API y mensajes `CUDA`; el propio
+traceback remite a `hipErrorIllegalAddress`. Al inspeccionar el fichero generado que cita
+el traceback se observa `prims.prepare_softmax_online` sobre vistas de forma
+`(4, 17, 2)`, por lo que el punto observado pertenece a la ruta compilada de softmax.
+**Eso no demuestra que exista un defecto en `layers.softmax` ni en las formas del
+modelo**: puede ser un error de codegen, un defecto del kernel Triton generado o un
+problema del backend ROCm. No se modificó el núcleo del modelo sin un reproductor mínimo
+que discrimine esas posibilidades.
+
+El texto «after step 10» tampoco identifica con precisión la instrucción que falló. El
+worker publica progreso cada diez pasos; el padre sólo puede informar del último valor
+recibido antes del `SIGABRT`.
+
+### 20.2 Por qué no era una medición de VRAM obsoleta
+
+La evidencia descarta un OOM ordinario como explicación principal:
+
+- `fcb5c309` completó la Fase 1 eager en unos 5 s y midió **1 020 MiB**.
+- Las seis tareas arrancadas en el intento sumaban exactamente **6,0 GiB** según la
+  caché de Fase 1, o **7,2 GiB** después del factor 1,2.
+- El presupuesto anunciado para Fase 2 era **14,86 GiB**.
+- Los logs no contienen `out of memory`; contienen error 700 y acceso ilegal.
+
+Forzar una nueva Fase 1 borrando `memory_cache_training.json` no prueba la ruta que falla:
+`accel.for_measurement()` desactiva siempre la compilación. Sólo repetiría una medición
+eager que la tarea ya superó y añadiría unos 30–35 minutos al reinicio.
+
+### 20.3 Por qué el fallback anterior no podía recuperarse
+
+Antes de este incidente, la versión anterior de `_EagerFallback` trataba cualquier
+excepción de `torch.compile` igual, sin discriminar entre fallos ordinarios y fatales:
+marcaba el callable compilado como fallido y ejecutaba inmediatamente el `forward` eager.
+Esa política es correcta para un graph break o un operador no soportado que falla antes
+de lanzar trabajo en GPU, pero no después de un acceso ilegal.
+
+Tras `hipErrorIllegalAddress`, el contexto y la cola de comandos pueden quedar en estado
+de error. El intento eager posterior volvió a fallar en `layers.channel_layer` al crear un
+tensor, pero esa línea era sólo la siguiente llamada que sincronizó con el dispositivo,
+no necesariamente el origen del acceso ilegal. `torch.cuda.empty_cache()` tampoco
+reinicializa un contexto HIP corrompido. La frontera segura de recuperación es el
+**proceso**: terminar todos los workers del intento y crear otros nuevos.
+
+### 20.4 Solución temporal implementada
+
+La recuperación mantiene el principio de §2: no cambia `arc_compressor.py`, `layers.py`,
+`train.py` ni la pérdida. Actúa en la capa de aceleración, el scheduler y la persistencia.
+
+En Eje B, el fallback se aplica a los cuatro seed jobs pendientes de la tarea nombrada.
+Las otras tareas siguen compiladas y una tarea no cuarentenada solo se puede fusionar
+cuando sus cuatro seeds tienen resultados completos. La configuración eager es una
+decisión de ejecución por tarea: no cambia la huella algorítmica ni obliga a repetir la
+medición eager de Fase 1.
+
+| Estado / evento                         | Acción                                                                 |
+| --------------------------------------- | ---------------------------------------------------------------------- |
+| Fallo ordinario de `torch.compile`      | `_EagerFallback` continúa eager dentro del mismo worker                |
+| Error fatal del acelerador              | Se vuelve a elevar sin ejecutar eager en el contexto afectado          |
+| Tarea compilada falla durante training  | Se guarda `retry_eager` y se aborta el intento completo                 |
+| Siguiente intento                       | Esa tarea usa `compile_mode='off'`; las demás conservan `compile`       |
+| La misma tarea también falla eager      | Se guarda `quarantined`; el intento siguiente la omite                  |
+| La tarea eager termina y persiste       | Se guarda `recovered_eager` y su parcial real sustituye cualquier estado |
+
+Los errores de worker incluyen ahora `task_name`, etapa, GPU, código o señal de salida,
+último paso y modo de compilación. El padre persiste la transición, con escritura atómica
+y `fsync`, en:
+
+```text
+.partial/<split>/.task_recovery.json
+```
+
+El manifiesto está separado por número de iteraciones: un fallo a 2 000 pasos no
+cuarentena por accidente una campaña de 1 500. Los fallos de persistencia, almacenamiento
+o invariantes del scheduler siguen siendo fatales y **no** se convierten en cuarentenas.
+
+Si una tarea queda en cuarentena, los artefactos finales conservan las 400 claves mediante
+el mismo candidato inicial determinista que ya usaba el solver: dos rejillas 2x2 de ceros.
+Ese fallback:
+
+- no se escribe como `.partial/<split>/<tarea>.json`;
+- no cuenta como tarea resuelta aunque coincida por casualidad;
+- deja `degraded: true` y el identificador en `recovery.quarantined_tasks` dentro de
+  `run_metadata_<split>.json`;
+- se propaga a los resúmenes del split y de la campaña.
+
+Por tanto, código de salida 0 significa que la campaña produjo artefactos estructuralmente
+completos; el campo `degraded` distingue si todos proceden de entrenamiento real.
+
+### 20.5 Procedimiento para continuar esta campaña
+
+Para el incidente conocido, la forma recomendada de reanudar es:
+
+```bash
+EAGER_TASKS=fcb5c309 ./run_training_full.sh
+```
+
+El script mantiene `--accel-preset compile` para todas las demás tareas, carga los
+parciales de seed compatibles y reutiliza la caché existente de mediciones de Fase 1.
+Sólo `fcb5c309` evita TorchInductor, en sus cuatro seeds pendientes. La recuperación
+automática está activa por defecto en los wrappers mediante
+`RECOVER_TASK_FAILURES=1`.
+
+Si el intento eager también falla, el siguiente reintento omite `fcb5c309` y termina el
+resto del split con el fallback degradado descrito arriba. Para volver a probarla más
+adelante, después de actualizar PyTorch/ROCm o disponer de un reproductor seguro:
+
+```bash
+RETRY_QUARANTINED_TASKS=fcb5c309 ./run_training_full.sh
+```
+
+Ese permiso explícito sólo se envía en el primer intento del wrapper. Al activarse, el
+estado `retry_eager` queda persistido para que un fallo no relacionado de otra tarea no
+cancele la prueba. Si `fcb5c309` vuelve a fallar directamente, regresa a `quarantined`.
+
+Como contingencia más conservadora se puede reanudar todo el pendiente sin compilación:
+
+```bash
+ACCEL_PRESET=baseline ./run_training_full.sh
+```
+
+Esta última opción evita por completo Inductor, pero pierde la aceleración medida en §17
+para todas las tareas y no es la recomendada mientras el fallo siga aislado en una sola.
+
+### 20.6 Límites y criterio de cierre
+
+La mitigación se considera temporal porque evita el grafo compilado problemático en lugar
+de corregirlo. El incidente puede cerrarse como defecto resuelto sólo cuando una versión
+nueva del stack, o un cambio respaldado por un reproductor mínimo, complete `fcb5c309`
+compilada sin error 700 y sin regresión de pass@2. Hasta entonces:
+
+1. no se debe reejecutar deliberadamente el kernel compilado conocido en una campaña larga;
+2. no se debe borrar `.partial/training/`, porque contiene el trabajo ya terminado;
+3. no se debe borrar `memory_cache_training.json` como supuesto arreglo del acceso ilegal;
+4. hay que revisar `degraded` y `recovery.quarantined_tasks` antes de interpretar una
+   campaña como íntegramente entrenada.
+
+La implementación de recuperación quedó cubierta por 53 tests unitarios y de integración:
+clasificación fatal frente a fallback ordinario, manifiesto atómico, transición
+compiled→eager→quarantine, orden y completitud de artefactos, exclusión del recuento de
+aciertos y propagación de metadatos degradados.
