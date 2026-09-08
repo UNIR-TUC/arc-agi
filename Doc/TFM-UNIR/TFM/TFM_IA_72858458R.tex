@@ -61,16 +61,14 @@
 \listoftables
 
 \chapter{Resumen}
-{\bf Nota:} En este apartado se introducirá un breve resumen en español del trabajo realizado (extensión máxima: 150 palabras). Este resumen debe incluir el objetivo o propósito de la investigación, la metodología, los resultados y las conclusiones.
+Este trabajo diseña y optimiza \textit{SuperCompressARC}, un modelo compacto orientado a la síntesis de programas y a la resolución del \textit{benchmark} ARC-AGI-1, con prioridad en la eficiencia computacional frente al escalado de modelos de lenguaje. Se aplica una metodología empírico-analítica y cuantitativa, con desarrollo iterativo basado en prácticas ágiles y MLOps. La evaluación compara el modelo base con mejoras de \textit{hardware}, memoria y arquitectura, incluyendo entrenamiento específico por tarea, estabilización del espacio latente y varias semillas. En el conjunto de entrenamiento, la métrica \textit{pass@2} aumenta del 34,75\% al 44\%; en evaluación, del 20\% al 25,25\%. Además, el tiempo de ejecución de evaluación se reduce de 138 a 64,3 horas y el coste aproximado por tarea de 0,086 a 0,040 dólares. Se concluye que los modelos compactos son viables bajo restricciones de \textit{hardware}, aunque la profundidad fija y la generalización limitada siguen siendo retos.
 
-
-{\bf Palabras Clave:} Se deben incluir de 3 a 5 palabras claves en español
+{\bf Palabras clave:} ARC-AGI-1; modelos de lenguaje compactos; síntesis de programas; razonamiento abstracto; eficiencia computacional.
 
 \chapter{Abstract}
-{\bf Nota:} En este apartado se introducirá un breve resumen en español del trabajo realizado (extensión máxima: 150 palabras). Este resumen debe incluir el objetivo o propósito de la investigación, la metodología, los resultados y las conclusiones.
+This work designs and optimizes \textit{SuperCompressARC}, a compact model for program synthesis and solving the ARC-AGI-1 \textit{benchmark}, prioritizing computational efficiency over scaling language models. An empirical-analytical and quantitative methodology is applied, combining iterative development with agile and MLOps practices. The evaluation compares the baseline with hardware, memory, and architectural improvements, including task-specific training, latent-space stabilization, and multiple random seeds. On the training set, \textit{pass@2} improves from 34.75\% to 44\%; on evaluation, from 20\% to 25.25\%. Evaluation runtime also decreases from 138 to 64.3 hours, while the approximate cost per task falls from 0.086 to 0.040 dollars. The results indicate that compact models are viable under hardware constraints, although fixed reasoning depth and limited generalization remain challenges.
 
-
-{\bf Palabras Clave:} Se deben incluir de 3 a 5 palabras claves en inglés
+{\bf Keywords:} ARC-AGI-1; compact language models; program synthesis; abstract reasoning; computational efficiency.
 
 
 
@@ -2699,11 +2697,31 @@ de la semilla inicial. Esto lleva a algunos resultados inconsistentes. Sumado al
 para estabilizar el estacio latente distribuido en las 18 hojas del Multitensor. Cada una de estas hojas representa una combinación de diferentes dimensiones,
 como ejemplos, colores, direcciones, filas y columnas (pixeles).
 
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.90\textwidth]{image/images/SuperCompressARC-KL.png}
+	\caption[Ejemplos de colapso posterior. Tareas 6cdd2623, ecdecbb3, 2bee17df y 007bbfb7]{Ejemplos de colapso posterior. Tareas 6cdd2623, ecdecbb3, 2bee17df y 007bbfb7.}
+	\label{fig:fig10SECTION5}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
+
 Durante el entrenamiento, cada hoja aporta una cantidad de información mediante su divergencia de Kullback-Leibler. Sin embargo, se observó que muchas
 hojas reducían rápidamente su contribución. Alrededor de las iteraciones 200-300, muchas hojas colapsaban hasta valores próximos a 0. Este fenómeno
 se conoce como \textit{posterior collapse}, ya que es el propio espacio latente el que es incapaz de aportar información significativa al modelo.
 Cuando una hoja colapsa,deja de transportar información relevante sobre la tarea. Si la hoja afectada era necesaria para representar la regla del problema, 
 el modelo podía quedar atrapado en una solución incorrecta sin disponer de un mecanismo para recuperarla.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.90\textwidth]{image/images/SuperCompressARC-Arquitectura Multiseeds.png}
+	\caption[Arquitectura \textit{CompressARC} con ejes de mejora H/B/D.]{Arquitectura \textit{CompressARC} con ejes de mejora H/B/D.}
+	\label{fig:fig11SECTION5}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
 
 Además, el entrenamiento depende de la inicialización aleatoria de los pesos, de los posteriores latentes y de las muestras de ruido utilizadas por el
 decodificador. Por este motivo, dos ejecuciones de la misma tarea pueden seguir trayectorias diferentes y producir soluciones distintas. Existen casos en los que
@@ -2892,11 +2910,106 @@ entrenamiento conocidos.
 \subsubsection{Entrenamiento independiente mediante varias semillas}
 
 La tercera parte del Eje B aborda la variabilidad producida por la inicialización aleatoria. Para cada tarea se ejecutan cuatro modelos
-independientes, uno por cada semilla.
+independientes, uno por cada semilla. Cada combinación de tarea y semilla se considera un trabajo independiente. Por
+ejemplo, para una tarea llamada \texttt{007bbfb7} se crean los trabajos:
+
+\begin{itemize}
+	\item \texttt{007bbfb7\_seed0}
+	\item \texttt{007bbfb7\_seed1}
+	\item \texttt{007bbfb7\_seed2}
+	\item \texttt{007bbfb7\_seed3}
+\end{itemize}
+
+Cada proceso inicializa de forma independiente:
+
+\begin{itemize}
+    \item Generador aleatorio de Python.
+    \item Generador de NumPy.
+    \item Generador de PyTorch.
+    \item Generador aleatorio de la GPU.
+    \item Pesos del modelo.
+    \item Posteriores latentes.
+    \item Optimizador Adam.
+    \item Estado del currículo.
+    \item Registrador de candidatos.
+\end{itemize}
+
+No se comparten pesos, gradientes, momentos del optimizador, valores KL,
+historiales del currículo ni logits entre las semillas. La semilla no representa
+un modelo que aprenda entre tareas. Solo determina una trayectoria
+independiente para resolver una tarea concreta.
+
+Al principio del entrenamiento de un conjunto de tareas
+en paralelo, se realiza la fase 1, que mide la cantidad de memoria
+de VRAM requerida para cada tarea y se guarda en un archivo temporal.
+La medición inicial de memoria no se repite para cada semilla. La fase de
+medición ejecuta solamente dos pasos por tarea, porque las cuatro semillas
+utilizan la misma geometría y el mismo consumo aproximado de memoria. La fase
+de entrenamiento completa sí se expande en cuatro trabajos independientes por
+tarea.
+
+\subsubsection{Selección de candidatos dentro de cada semilla}
+
+Cada semilla conserva el selector original de \textit{CompressARC}. En cada
+paso se consideran dos candidatos:
+
+\begin{enumerate}
+    \item Predicción actual del modelo;
+    \item Predicción suavizada mediante una media móvil exponencial.
+\end{enumerate}
+
+El postprocesamiento completo se realiza cada cuatro pasos en las ejecuciones
+paralelas. El paso cero siempre se procesa para garantizar que exista un
+candidato inicial. Esta reducción de frecuencia pertenece al Eje H y busca
+disminuir sincronizaciones entre CPU y GPU sin cambiar el criterio matemático de selección.
+
+\subsubsection{Fusión de las soluciones obtenidas por las semillas}
+
+Cuando las cuatro semillas de una tarea han terminado, sus evidencias se
+combinan para construir las dos respuestas finales exigidas por ARC-AGI.
+
+Se utiliza un consenso entre semillas agregando puntuaciones a diferentes trayectoras.
+Por otro lado, se busca diversidad normalizando puntuaciones dentro de cada semilla. Si se utilizara 
+únicamente el consenso, una semilla que hubiera descubierto una solución correcta pero diferente
+podría quedar oculta por una solución repetida por las demás.
+
+La fusión no utiliza las soluciones reales de las tareas. Aunque se ejecuten cuatro modelos internos,
+el sistema continúa entregando únicamente dos respuestas por tarea y sigue siendo
+compatible con la métrica \textit{pass@2}. Esto es especialmente importante por que si no fuera así,
+las pruebas no serían representativas del rendimiento real del sistema.
+
+El conjunto de las soluciones correctas obtenidas por las cuatro semillas no
+puede utilizarse directamente como métrica. Esa operación sería una selección
+\textit{oracle}, porque necesitaría conocer de antemano cuál de las soluciones
+es correcta. El sistema real debe elegir solo dos candidatos utilizando sus
+puntuaciones internas.
+
+Se realizaron varios experimentos con reducidos conjuntos de tareas. Los experimentos evidenciaron
+que el modelo no había empeorado y consiguió incluso una ligera mejora aproximado del 4 \% de taras
+resueltas. Estas mejoras no garantizan que resuelva todas las tareas, al contrario, el modelo
+sigue careciendo de habilidades primitivas necesarias para resolver ciertas tareas.
+
+El Eje B mejora la robustez mediante una combinación de estabilización,
+adaptación y diversidad. El umbral de información libre protege temporalmente
+las hojas latentes. El uso de 4 semillas permite explorar trayectorias independientes y
+conservar dos soluciones complementarias mediante una fusión basada en consenso y diversidad.
 
 \subsubsection{Herramienta de visualización de procesos}
 
+Para facilitar la monitorización del progreso, comportamiento general del sistema e identificar tareas en entrenamiento,
+se ha implementado una interfaz sencilla que permite visualizar el estado de las tareas en entrenamiento y el comportamiento general del sistema.
+Esta interfaz permite realizar observaciones que son muy necesarias cuando se realizan ejecuciones de entrenamiento prolongadas.
 
+La interfaz proporciona información activa de entrenamiento, velocidad de iteraciones por segundo y algunas métricas adicionales.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.90\textwidth]{image/images/arc_agi_dashboard.png}
+	\caption[Panel de monitorización del progreso y comportamiento del sistema.]{Panel de monitorización del progreso y comportamiento del sistema.}
+	\label{fig:fig12SECTION5}
+\end{figure}
+
+\FloatBarrier
 
 \subsection{Problemas encontrados}
 
@@ -2924,20 +3037,19 @@ entre otros problemas:
 % Coste actual por hora de 5070 TI https://cloud.vast.ai/?utm_source=getdeploying.com&utm_medium=paid&utm_content=nvidia-rtx-5070-ti
 \chapter{Resultados}
 
-Los resultados de la ejecución base se ha obtenido de la documentación oficial del modelo \textit{CompressARC}. Estas métricas obtenidas
-por el autor original se han utilizado como referencia para comparar los resultados obtenidos en este proyecto.
+Los resultados de la ejecución base se han obtenido de la documentación oficial del modelo \textit{CompressARC}. Las métricas
+del autor original se han utilizado como referencia, para comparar los resultados obtenidos en este proyecto.
 
 Se ha realizado una ejecución completa de los datos entrenamiento y los datos de evaluación tras la implementación de cada eje de mejora. La comparativa
-se ajusta entre en modelo base, el eje de mejora H/B y el eje de mejora acumulado H/B/D. El eje de mejora H/B hace referencia a las optimizaciones 
+se ajusta entre el modelo base, el eje de mejora H/B y el eje de mejora acumulado H/B/D. El eje de mejora H/B hace referencia a las optimizaciones 
 relacionadas con el \textit{hardware} y la memoria, mientras que el eje de mejora D se centra en mejorar el modelo. El eje de mejora acumulado H/B/D 
 combina todas las optimizaciones anteriores.
 
-Las las implementaciones de mejora de optimización, el modelo no mejora en las métricas de evaluación pero es la implementación más 
+Las implementaciones H/B no mejoran en las métricas de evaluación, pero es la implementación más 
 eficiente en términos de uso de recursos y tiempo de ejecución.
 
 Por otro lado, el acumulado H/B/D permite mejorar tanto la eficiencia en el uso de recursos como las métricas de evaluación, 
 combinando las ventajas de las optimizaciones de \textit{hardware}, memoria y modelo.
-
 
 \begin{table}[h]
 \centering
@@ -2946,8 +3058,8 @@ combinando las ventajas de las optimizaciones de \textit{hardware}, memoria y mo
 \begin{tabular}{|p{4.5cm}|p{2.3cm}|p{2.8cm}|p{2.2cm}|}
 \hline
 \textbf{Métrica} & \textbf{Base} &
-\begin{tabular}{c}\textbf{Eje H / B}\end{tabular} &
-\begin{tabular}{c}\textbf{Eje H / B / D}\end{tabular} \\
+\begin{tabular}{c}\textbf{Eje H/B}\end{tabular} &
+\begin{tabular}{c}\textbf{Eje H/B/D}\end{tabular} \\
 \hline
 Tiempo total de ejecución (evaluación) & 138 h & 35,6 h & 64,3 h \\
 \hline
@@ -2966,6 +3078,19 @@ Coste por tarea (aproximación) & 0,086 \$ & 0,02225 \$ & 0,040 \$ \\
 
 \FloatBarrier
 
+Con los resultados obtenidos, el modelo renombrado \textit{SuperCompressARC} demuestra una ligera mejora en las áreas de coste por tarea y
+puntuación respecto a las métricas de evaluación. El modelo se acerca al modelo compacto HRM siendo computacionalmente exigente y más barato.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light_final.png}
+	\caption[Comparativa del coste por tarea modelos compactos]{Comparativa del modelo renombrado \textit{SuperCompressARC} respecto a otros modelos compactos.}
+	\label{fig:fig1SECTION6}
+	{\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.
+	Imagen completa: \url{https://github.com/UNIR-TUC/arc-agi/blob/main/src/arc_agi_data_scraper/images/compact_tflops_cost_light_final.png}}
+\end{figure}
+
+\FloatBarrier
 
 % \chapter{Estudio económico}
 
@@ -2996,7 +3121,51 @@ Se debe apoyar verdaderamente tecnologías que promuevan una verdadera generaliz
 
 \chapter{Conclusiones y Trabajo Futuro}
 
-Pendiente de redactar.
+La industria de la inteligencia artificial es un mercado cambiante y exigente. Es un mercado que exige innovaciones constantes
+en búsqueda de una inteligencia artificial general. En este contexto, es importante tener en cuenta la responsabilidad ética y
+medioambiental que conlleva el estudio y desarrollo de tecnologías y modelos.
+
+Este trabajo ha estudiado el diseño y la optimización de un modelo compacto
+orientado a la resolución del \textit{benchmark} ARC-AGI-1. El objetivo principal
+consistía en analizar hasta qué punto era posible mejorar el rendimiento de un
+sistema con una capacidad computacional limitada, priorizando el entrenamiento en tiempo
+de inferencia y la relación entre precisión y coste de ejecución.
+
+Los resultados obtenidos muestran que este objetivo se ha alcanzado parcialmente. Se
+ha logrado optimizar el modelo base y posteriormente mejorar ligeramente la capacidad de resolver
+tareas de ARC-AGI-1. Esto supone una mejora desde el 34,75\% hasta el 44\% en
+entrenamiento y desde el 20\% hasta el 25,25\% en evaluación. Por tanto, se
+observa que las estrategias de estabilización del espacio latente, la utilización
+de varias semillas y la selección de candidatos pueden mejorar la robustez de
+las predicciones.
+
+Los recientes avances también evidencian que los modelos compactos son todavía una 
+opción para la sociedad al margen de grandes compañías y granjas de computación.
+El uso de tecnología propia y modelos compactos permite tener libertad al ciudadano.
+Los avances tecnológicos no pueden estar ligados a quienes pueden comprar la inteligencia
+mediante computación infinita.
+
+No todos los objetivos específicos se han alcanzado completamente. El
+entrenamiento específico por tarea y la adaptación en tiempo de inferencia sí
+se han integrado en el flujo experimental. También se ha desarrollado una
+estrategia de diversidad basada en varias semillas y en la selección de
+candidatos. Sin embargo, el modelo continúa utilizando una profundidad fija y
+no dispone de un mecanismo plenamente adaptativo de \textit{early stopping}.
+Del mismo modo, los bucles de refinamiento implementados no constituyen todavía
+un sistema recursivo capaz de decidir dinámicamente la profundidad necesaria
+para cada tarea, como sí realizan modelos como HRM y TRM.
+
+En conjunto, el trabajo confirma que los modelos compactos pueden ofrecer una
+alternativa viable para investigar el razonamiento abstracto bajo restricciones
+de hardware. La reducción del tamaño o del tiempo de
+ejecución, por sí sola, no es suficiente para alcanzar una generalización
+robusta en ARC-AGI-1.
+
+Como continuación de este trabajo, se propone incorporar una profundidad de
+razonamiento adaptativa que permita detener el proceso cuando la predicción haya
+convergido o prolongarlo cuando la tarea requiera transformaciones adicionales.
+También sería conveniente introducir representaciones explícitas de objetos,
+operaciones de conteo y mecanismos de copia, traslación y replicación de formas.
 
 %\begin{thebibliography}{a}
 %\bibitem{etiqueta} \textsc{Autores},
