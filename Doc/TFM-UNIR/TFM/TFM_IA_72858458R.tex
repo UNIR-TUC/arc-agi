@@ -112,7 +112,7 @@ concentrarse exclusivamente en descubrir transformaciones algorítmicas robustas
 
 La viabilidad de este enfoque está respaldada por investigaciones muy recientes. Arquitecturas como el \textit{Hierarchical Reasoning Model} y el \textit{Tiny Recursive Model} han
 logrado superar el rendimiento de modelos masivos en ARC-AGI utilizando redes minúsculas de apenas 7 a 27 millones de parámetros, gracias a la aplicación de pasos de 
-computación recursiva en un espacio latente. Asimismo, enfoques revolucionarios como CompressARC han demostrado que es posible resolver un alto porcentaje de puzzles sin absolutamente ningún 
+computación recursiva en un espacio latente. Asimismo, enfoques revolucionarios como \textit{CompressARC} han demostrado que es posible resolver un alto porcentaje de puzzles sin absolutamente ningún 
 pre-entrenamiento, utilizando apenas 76.000 parámetros y minimizando la longitud de descripción puramente en el tiempo de inferencia \textit{(Test-Time Training)}.
 
 Dadas las restricciones de capacidad de cómputo disponibles para este proyecto, apostar por estos paradigmas (bucles de refinamiento, síntesis de programas y entrenamiento en tiempo de prueba) 
@@ -121,7 +121,7 @@ a gran escala.
 
 \section{Objetivos}
 
-El objetivo principal es diseñar y desarrollar un modelo compacto (SLM) que maximice la puntuación en la resolución del benchmark ARC-AGI-1, priorizando estrictamente la
+El objetivo principal es diseñar y desarrollar un modelo compacto (SLM) que maximice la puntuación en la resolución del \textit{benchmark} ARC-AGI-1, priorizando estrictamente la
 eficiencia computacional y el rendimiento por parámetro frente a los modelos de lenguaje a gran escala.
 
 En cuanto a objetivos particulares se enumeran los siguientes:
@@ -135,7 +135,7 @@ En cuanto a objetivos particulares se enumeran los siguientes:
 	alcanzado una solución convergente, optimizando drásticamente el consumo de memoria y tiempo de ejecución.
 	\item Implementar estrategias de consistencia y ensamblado \textit{top-k} que operen sobre diversas variantes o aumentos de los datos de entrada para seleccionar las predicciones más 
 	robustas.
-	\item Realizar una comparativa exhaustiva de eficiencia que evalúe cualitativamente la relación entre la precisión lograda en el benchmark y el coste computacional empleado, como el uso de VRAM,
+	\item Realizar una comparativa exhaustiva de eficiencia que evalúe cualitativamente la relación entre la precisión lograda en el \textit{benchmark} y el coste computacional empleado, como el uso de VRAM,
 	y precisión en FLOPs, validando la viabilidad de la inteligencia algorítmica en entornos de recursos restringidos.
 \end{itemize}
 
@@ -207,7 +207,7 @@ investigadores a demostrar que existe un sistema cognitivo único \cite{spelke20
 poco imprecisas, esta imprecisión crece de forma lineal a medida que aumenta el número representado.
 
 \begin{enumerate}
-\item \textbf{Sistema de representación de objetos inanimados:} Es la capacidad de percibir límites de objetos, la forma forma completo o parcial de objetos ocultos y percibir cuándo y hacia donde se moverán los objetos.
+\item \textbf{Sistema de representación de objetos inanimados:} Es la capacidad de percibir límites de objetos, la forma completo o parcial de objetos ocultos y percibir cuándo y hacia donde se moverán los objetos.
 \item \textbf{Sistema de representación de agentes y sus acciones:} Es la capacidad de percibir agentes animados, sus acciones y sus intenciones, incluso sin lenguaje.
 \item \textbf{Sistema de representación numérica:} Es la capacidad de representar cantidades numéricas, incluso sin lenguaje, y de realizar operaciones aritméticas básicas.
 \item \textbf{Sistema de representación geométrica del espacio:} Es la capacidad de representar el espacio y las relaciones espaciales entre objetos.
@@ -278,7 +278,7 @@ razonamiento más complejo o intensivo, el pensamiento inductivo es más adecuad
 
 Teóricamente, casi cualquier problema puede ser resuelto por fuerza bruta, pero en la la realidad el coste computacional y tiempo hace inabarcable este enfoque. El problema y el espacio
 son características fundamentales para determinar la estrategia de búsqueda y optimización más adecuada. En este sentido, existen diferentes algoritmos de búsqueda y optimización que se pueden aplicar
-en función de las características del problema y el espacio.
+en función de las características del problema.
 
 Tradicionalmente los algoritmos de búsqueda se han clasificado en dos grandes categorías, los algoritmos de búsqueda no informada y los algoritmos de búsqueda informada. Los
 algoritmos de búsqueda no informada, son aquellos algoritmos que no están guiados o simplemente están basados en fuerza bruta. No existe información sobre el dominio del
@@ -415,7 +415,7 @@ acciones desde el nuevo nodo hasta alcanzar un estado final. Estas simulaciones 
 dominio para obtener estimaciones más precisas.
 
 Actualmente existen variantes como Adaptive Branching MCTS (AB-MCTS) que introduce un mecanismo de ramificación adaptativa para mejorar la eficiencia en espacios 
-de búsqueda con alta ramificación, o Sakana AI, un sistema de inteligencia artificial que utiliza MCTS para resolver puzzles del benchmark ARC-AGI.
+de búsqueda con alta ramificación, o Sakana AI, un sistema de inteligencia artificial que utiliza MCTS para resolver puzzles del \textit{benchmark} ARC-AGI.
 
 \subsection{Síntesis de programas}
 
@@ -434,7 +434,7 @@ en cada paso \cite{swiechowski2023monte}, generando una explosión combinatoria 
 
 Por otro lado, las Redes Neuronales Profundas son excelentes reconociendo patrones e intuiciones de un solo vistazo,
 pero carecen de la capacidad algorítmica para planificar deliberadamente a largo plazo o corregir sus propios errores secuenciales. La Búsqueda Guiada por Redes
-Neuronales soluciona las carencias de ambos mundos inyectando la "intuición" del aprendizaje profundo dentro de la estructura lógica de los árboles de búsqueda. 
+Neuronales soluciona las carencias de ambos mundos inyectando la ``intuición'' del aprendizaje profundo dentro de la estructura lógica de los árboles de búsqueda. 
 Esto se materializó entrenando redes neuronales para que actuaran como entes evaluadores dentro de algoritmos como MCTS.
 
 En su versión clásica, MCTS depende de simulaciones masivas para estimar la calidad de cada rama. Sin embargo, en los enfoques híbridos modernos se incorporan redes neuronales que guían de forma explícita la exploración:
@@ -508,8 +508,8 @@ antemano, para conseguir la generalización el agente debe ser capaz de aprender
 \subsection{Espectro de la generalización}
 
 La generalización es un concepto que ha llegado de la mano del aprendizaje automático, desarrollado originalmente para caracterizar el buen rendimiento de un modelo estadístico en 
-datos de entrada que no forman parte de su conjunto de datos de entrenamiento. Este concepto ha seguido siendo parte de la conversación  y se puede definir como la "habilidad" de
-un modelo para gestionar una situación o varias situaciones (o tareas) que no se ha encontrado previamente. Nótese que el concepto de la frase "situación que no se ha encontrado previamente"
+datos de entrada que no forman parte de su conjunto de datos de entrenamiento. Este concepto ha seguido siendo parte de la conversación  y se puede definir como la ``habilidad'' de
+un modelo para gestionar una situación o varias situaciones (o tareas) que no se ha encontrado previamente. Nótese que el concepto de la frase ``situación que no se ha encontrado previamente''
 puede ser tremendamente ambigua y el autor \cite{chollet2019measure} propone un espectro de generalización para aclarar esta ambigüedad. En este espectro, se pueden encontrar diferentes tipos de generalización, 
 como la generalización sistémica (centrada en el sistema)  o generalización consciente-desarrollada (capacidad de manejar situaciones que ni el sistema ni su creador humano habían encontrado antes) que no se va a 
 profundizar en este artículo. Al contrario, se va a profundizar en la generalización de habilidades, que es más útil para cuantificar los grados de generalización.
@@ -537,9 +537,9 @@ aprendizaje profundo moderno. El autor \cite{chollet2019measure} hace referencia
 
 Existen dos perspectivas fundamentales sobre la mente humana, una que es una colección de habilidades que se han grabado en nuestro ADN en la evolución y y la otra que se trata de ver la
 mente como una página en blanco. El autor François Chollet, en el manifiesto ``On the Measure of Intelligence'' \cite{chollet2019measure}, sugiere que los humanos no nacen con una mente vacía que
-aprende cualquier conocimiento desde cero., pero tampoco son una colección de instintos. Se puede decir que nacemos con algunos conocimientos previos innatos \cite{spelke2007core}.
+aprende cualquier conocimiento desde cero, pero tampoco son una colección de instintos. Se puede decir que nacemos con algunos conocimientos previos innatos \cite{spelke2007core}.
 
-Para que un ``benchmark'' como ARC pueda ser una medida real de la inteligencia no puede depender de conocimientos adquiridos y las tareas deb ser resolubles utilizando únicamente los principios de los
+Para que un \textit{benchmark} como ARC pueda ser una medida real de la inteligencia no puede depender de conocimientos adquiridos y las tareas deb ser resolubles utilizando únicamente los principios de los
 núcleos de conocimiento. Cómo de eficiente puede ser un agente para usar usu conocimientos innatos en resolver problemas que no ha conocido antes.
 
 François Chollet define la inteligencia no como un programa estático, sino como un proceso de síntesis de programas. Para establecer esta definición, hay que detallar en una primera
@@ -584,7 +584,7 @@ este aspecto es el diseño para evitar trampas estadísticas que no requieran un
 
 El control de la experiencia debe ser fundamental. No se debe ``comprar'' el rendimiento de un \textit{benchmark} mediante un conjunto de datos de entrenamiento ilimitados. Si un sistema inteligente
 necesita de millones de datos de entrenamiento para generar programas de habilidad consistentes que un humando puede captar con apenas pocos ejemplos, significa que el sistema es ineficiente y no inteligente 
-aun que logre la misma puntuación. La cantidad de datos de entrenamiento sería estrictamente limitada. Por último, el \textit{benchmark} debe ser funcional de la misma forma para humanos y máquinas, de forma justa, asumiendo que
+Aunque logre la misma puntuación. La cantidad de datos de entrenamiento sería estrictamente limitada. Por último, el \textit{benchmark} debe ser funcional de la misma forma para humanos y máquinas, de forma justa, asumiendo que
 ambos agentes poseen los mismos núcleos de conocimiento y que requiere tiempo y tamaño del entrenamiento de un humano.
 
 \subsection{ARC-AGI-1}
@@ -603,14 +603,14 @@ ejemplos.
 \item Describir el conjunto completo de núcleos de conocimiento y comparación ``precisa'' con la inteligencia entre el ser humano y los agentes de inteligencia artificial.
 \end{itemize}
 
-En la imagen siguiente \ref{fig:fig6SECTION2} se muestra un ejemplo de una tarea de ARC-AGI-1. En esta tarea, el objetivo es completar un patrón de una area dada. La solución de esta tarea pasa por generar una cuadrícula
+En la imagen siguiente \ref{fig:fig6SECTION2} se muestra un ejemplo de una tarea de ARC-AGI-1. En esta tarea, el objetivo es completar un patrón de una área dada. La solución de esta tarea pasa por generar una cuadrícula
 de salida que corresponde con la entrada a su izquierda. Para resolver esta tarea, el agente debe ser capaz de identificar el patrón subyacente en la entrada y generar la salida correcta, demostrando así su capacidad para 
 generalizar a partir de los ejemplos proporcionados.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113847784.png}
-\caption[Tarea donde el objetivo es completar un patrón de una area dada]{Tarea donde el objetivo es completar un patrón de una area dada. Para solucionar esta tarea debe generar una cuadrícula de salida que corresponde con la entrada a su izquierda.}
+\caption[Tarea donde el objetivo es completar un patrón de una área dada]{Tarea donde el objetivo es completar un patrón de una área dada. Para solucionar esta tarea debe generar una cuadrícula de salida que corresponde con la entrada a su izquierda.}
 \label{fig:fig6SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
@@ -637,7 +637,7 @@ de la entrada en diferentes objetos basándose en valores o criterios de continu
 
 \FloatBarrier
 
-Generalmente, los objetos presentes en la cuadrícula de entrada persisten en la salida, a menudo trasformando algún transformación geométrica. A pesar del ruido visual o la inclusión
+Generalmente, los objetos presentes en la cuadrícula de entrada persisten en la salida, a menudo con transformación geométrica. A pesar del ruido visual o la inclusión
 provocada por otros objetos, muchos de los objetos persisten.
 
 \begin{figure}[h]
@@ -700,28 +700,28 @@ diversos objetos repetidamente también se incluyen en este núcleo de conocimie
 Los datos de ARC-AGI se pueden encontrar en el repositorio de GitHub \cite{githubGitHubFcholletARCAGI}. Los datos están contenidos en dos sub-directorios diferentes:
 
 \begin{itemize}
-\item \textbf{training}: Contiene 400 tareas de entrenamiento. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son 400 archivos. Todos los archivos de este directorio
-sirven para el entrenamiento del modelo y la adquisición de habilidades.
+\item \textbf{Training}: Contiene 400 tareas de entrenamiento. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son 400 archivos. Todos los archivos de este directorio
+Sirven para el entrenamiento del modelo y la adquisición de habilidades.
 	\subitem{\textbf{a.}} Pares ``train'': Típicamente suele tener tres o más pares de ``arrays''. Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
 	\subitem{\textbf{b.}} Pares ``test'': Típicamente suele tener un par de ``arrays''. El par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
-\item \textbf{evaluation}: Contiene 400 tareas de evaluación. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son otros 400 archivos.
+\item \textbf{Evaluation}: Contiene 400 tareas de evaluación. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son otros 400 archivos.
 \end{itemize}
 	
 Los archivos están en formato JSON. Cada archivo contiene un diccionario con dos claves: ``train'' y ``test''. El valor de cada clave es una lista de pares de ``arrays''.
 Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''. Los ``arrays'' son matrices bidimensionales de números enteros que representan los estados iniciales y finales de una tarea.
 
-En las siguientes matrices se puede ver una matriz de input $X$ y una matriz de output $Y$:
+En la Ecuación \eqref{eq:arc-matrices-entrada-salida} se muestran una matriz de entrada $X$ y su correspondiente matriz de salida $Y$:
 
-\[
+\begin{equation}\label{eq:arc-matrices-entrada-salida}
 X=
-\begin{bmatrix}
+\begin{pmatrix}
 0&7&7\\
 7&7&7\\
 0&7&7
-\end{bmatrix},
+\end{pmatrix},
 \qquad
 Y=
-\begin{bmatrix}
+\begin{pmatrix}
 0&0&0&0&7&7&0&7&7\\
 0&0&0&7&7&7&7&7&7\\
 0&0&0&0&7&7&0&7&7\\
@@ -731,8 +731,8 @@ Y=
 0&0&0&0&7&7&0&7&7\\
 0&0&0&7&7&7&7&7&7\\
 0&0&0&0&7&7&0&7&7
-\end{bmatrix}
-\]
+\end{pmatrix}
+\end{equation}
 
 \subsection{ARC-AGI-2}
 
@@ -746,7 +746,7 @@ destinadas a evaluar capacidades de razonamiento nuevas y más complejas:
 
 \begin{itemize}
 	\item \textbf{Interpretación simbólica:} tareas en las que los símbolos visuales deben interpretarse como portadores de un significado semántico
-más allá de su forma, por ejemplo, cuando una figura representa una acción.
+más allá de su forma. Por ejemplo, cuando una figura representa una acción.
 	\item \textbf{Razonamiento composicional:} tareas que requieren descubrir y aplicar simultáneamente múltiples reglas que interactúan entre sí.
 	\item \textbf{Aplicación contextual de reglas:} tareas en las que la regla correcta depende del contexto específico dentro de la cuadrícula,
 superando la simple identificación de patrones globales superficiales.
@@ -836,7 +836,7 @@ requiere técnicas de aprendizaje por refuerzo y modelado del mundo más que ing
 \subsection{Domain Specific Languages (DSLs) y síntesis de programas}\label{sec:DSL}
 
 En 2020 Johan Sokrates Wind publicó uno de los primero intentos basado en un Lenguaje de Dominio Específico o DSL. El uso de código estrictamente diseñado para resolver tareas específicas
-de ARC-AGI permitió alcanzar una puntuación de 20\% en el benchmark. La idea detrás de esto es codificar algoritmos de programación para crear un conjunto de programas primitivos
+de ARC-AGI permitió alcanzar una puntuación de 20\% en el \textit{benchmark}. La idea detrás de esto es codificar algoritmos de programación para crear un conjunto de programas primitivos
 capaces de modificar matrices bidimensionales.
 
 Los algoritmos realizan búsquedas exhaustivas sobre el espacio de programas posibles que se puede construir cambiando núcleos de conocimiento. Esta mecánica se puede considerar
@@ -1092,6 +1092,9 @@ su único conjunto de datos son las matrices del problema exacto que se intenta 
 \itshape
 ``The ability to compress information is equivalent to intelligence.''
 \end{quote}
+\begin{center}
+\cite[p.~15]{ouellette2024towards}
+\end{center}
 
 El modelo es realmente compacto, de tan sólo 76 mil parámetros. Este sistema se rige por el principio de longitud de descripción mínima y la comprensión
 de información. La optimización se realiza mediante redes neuronales en lugar de algoritmos de búsqueda ciegos. Las redes neuronales pueden restringir
@@ -1112,16 +1115,12 @@ para transformaciones geométricas como medias, expansiones de tensores, funcion
 El modelo logra generalizar y resolver el 20\% de las tareas de ARC-AGI-1. Lograr este resultado con apenas 76 mil parámetros y una GPU RTX 4070 con una precisión 
 FP16 de 116,6 TFLOPs es realmente sorprendente.
 
-\begin{center}
-\cite[p.~15]{ouellette2024towards}
-\end{center}
-
 % 2410.06405v2_ARC_With_Vision_Transformers
 % REVISAR!!
 \section{Modelos basados en Transformers compactos}
 
 \citeA{li2024tackling} estudian la viabilidad de aplicar un \textit{Vision Transformer} 
-compacto al benchmark ARC mediante entrenamiento supervisado específico por tarea con grandes volúmenes de ejemplos sintéticos. 
+compacto al \textit{benchmark} ARC mediante entrenamiento supervisado específico por tarea con grandes volúmenes de ejemplos sintéticos. 
 El hallazgo central es que un \textit{ViT} convencional sigue rindiendo de forma muy pobre incluso con abundantes datos, 
 lo que apunta a una limitación de representación más que a un simple problema de escala. Para corregir esta debilidad, el 
 trabajo propone \textit{ViTARC}, una arquitectura que sustituye la representación por parches por una codificación a nivel de píxel e 
@@ -1201,7 +1200,7 @@ La autora del trabajo ha realizado el pre-entrenamiento del modelo en un clúste
 
 \section{Estado actual con perspectiva de eficiencia computacional}
 
-Desde una perspectiva estrictamente computacional, el estado actual de ARC-AGI muestra un patrón muy claro. Cada nueva generación del benchmark ha introducido 
+Desde una perspectiva estrictamente computacional, el estado actual de ARC-AGI muestra un patrón muy claro. Cada nueva generación del \textit{benchmark} ha introducido 
 un precipicio de rendimiento que reduce de forma drástica la precisión de los sistemas previos. En términos agregados, el paso de ARC-AGI-1 a ARC-AGI-2 y 
 posteriormente a ARC-AGI-3 implica caídas del orden de 2.5 a 3 veces, lo que sugiere que buena parte de los avances recientes siguen dependiendo de regularidades
 explotables en una versión concreta del problema más que de una generalización robusta. Este comportamiento refuerza la idea de que el progreso en ARC no puede
@@ -1236,7 +1235,7 @@ reutilizables.
 
 En ese contexto, el cambio más relevante observado en 2025 no fue simplemente el escalado de parámetros, sino la consolidación de los bucles de refinamiento en
 tiempo de inferencia. Los enfoques más competitivos ya no se limitan a producir una respuesta directa, sino que encadenan ciclos de generación, verificación y
-corrección. Modelos como TRM y propuestas como CompressARC muestran que este principio puede ofrecer resultados competitivos incluso con redes muy pequeñas o
+corrección. Modelos como TRM y propuestas como \textit{CompressARC} muestran que este principio puede ofrecer resultados competitivos incluso con redes muy pequeñas o
 sin pre-entrenamiento masivo, siempre que el sistema disponga de mecanismos para revisar de manera iterativa su hipótesis interna. La eficiencia computacional
 no reside en el tamaño bruto del modelo, sino en la calidad del proceso de refinamiento que es capaz de ejecutar durante la inferencia.
 
@@ -1270,7 +1269,7 @@ representación es más fiel a la realidad que el tamaño del modelo, ya que un 
     \vspace{0.5cm}
     \caption[Comparativa del coste por tarea entre modelos]{Comparativa del coste por tarea entre modelos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
     \label{fig:fig20SECTION1}
-    {\footnotesize Fuente: Elaboración propia}
+    {\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI. }
     \vspace*{\fill}
 \end{figure}
 \clearpage
@@ -1283,7 +1282,7 @@ representación es más fiel a la realidad que el tamaño del modelo, ya que un 
 \section{Enfoque Científico y Método de Investigación}
 
 El presente trabajo se enmarca dentro del método científico empírico-analítico. Dado que el objetivo principal es evaluar la eficiencia y capacidad de un modelo de lenguaje compacto
-en la resolución del benchmark ARC-AGI-1, el enfoque adoptado es de carácter cuantitativo. La investigación sigue un proceso hipotético-deductivo articulado en etapas: planteamiento del problema ante los 
+en la resolución del \textit{benchmark} ARC-AGI-1, el enfoque adoptado es de carácter cuantitativo. La investigación sigue un proceso hipotético-deductivo articulado en etapas: planteamiento del problema ante los 
 límites de la hipótesis de escala en modelos LLM, formulación de la hipótesis basada en modelos compactos, diseño experimental, ejecución y análisis métrico de los resultados.
 
 Desde la perspectiva investigadora, se aplica un método empírico experimental. Este método es el más idóneo ya que permite establecer relaciones causales bajo condiciones de laboratorio estrictamente 
@@ -1414,8 +1413,26 @@ junto con sus versiones y abreviaciones para su referencia en el resto del docum
 
 \FloatBarrier
 
+\section{Herramientas externas}
+
+El desarrollo del proyecto se ha usando herramientas externas de control de código, y plataformas de colaboración de código y desarrollo
+Github Copilot. Adicionalmente, para potenciar la productividad se ha usado diversas herramientas como servidores MCP.
+
+Mencionar el uso de la herramienta Codebase Memory como \textit{indexer} de código para búsquedas e implementación de soluciones. La herramienta
+ayuda a agentes de inteligencia artificial a organizar y localizar el código de manera estructural en lugar de recorrer archivos constantemente.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{image/images/codebase_memory.png}
+	\caption[Representación semántica y relacional del uso de la herramienta Codebase Memory como \textit{indexer} de código.]{Representación semántica y relacional del uso de la herramienta Codebase Memory como \textit{indexer} de código.}
+	\label{fig:fig1SECTION4}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
+
 % TODO: Añadir herramientas de visualización y análisis de resultados.
-\section{Utilidades externas de ARC-AGI}
+% \section{Utilidades externas de ARC-AGI}
 
 
 % Utilizar las pautas de  https://arahim3.github.io/arc-agi-guide/ para realizar la introducción del texto.
@@ -1441,9 +1458,9 @@ La idea (también llamada programación inductiva) es escribir automáticamente 
 simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente, nada más. Este enfoque es inductivo,
 parte de una regla general y busca deducir la regla a partir de los ejemplos. El otro enfoque es transductivo, que es evitar generar un programa general e intentar
 predecir la salida directamente a partir de los ejemplos de entrada. Las soluciones Domain Specific Languages (DSLs) como se ha visto en la sección \ref{sec:DSL},
-el espacio de psobiles programas que se pueden generar es inmenso, computacionalmente costoso para CPU y poco práctico.
+el espacio de posibles programas que se pueden generar es inmenso, computacionalmente costoso para CPU y poco práctico.
 
-Resolver el benchmark ARC-AGI requiere de un enfoque meticuloso y una comprensión profunda de los principios subyacentes que rigen la inteligencia general. Es necesario establecer
+Resolver el \textit{benchmark} ARC-AGI requiere de un enfoque meticuloso y una comprensión profunda de los principios subyacentes que rigen la inteligencia general. Es necesario establecer
 una serie de desarrollos básicos previos:
 
 \begin{enumerate}
@@ -1455,37 +1472,37 @@ una serie de desarrollos básicos previos:
 \end{enumerate}
 
 Como se ha visto en la sección \ref{sec:arc}, el espíritu de ARC-AGI es encontrar soluciones que sean lo más eficientes posible, no solo en términos de precisión, sino también en términos de coste computacional. La inteligencia
-no se debe comprar con datos ni con cómputo masivo. Este trabajo se construye a partir de este espírito de la norma y se ha estudiado numerosos modelos y soluciones para tratar de buscar un enfoque de acuerdo con este principio.
+no se debe comprar con datos ni con cómputo masivo. Este trabajo se construye a partir de este espíritu de la norma y se ha estudiado numerosos modelos y soluciones para tratar de buscar un enfoque de acuerdo con este principio.
 
 Dejando al margen los grandes modelos de lenguaje y los modelos de frontera, se han estudiado diferentes enfoques de modelos compactos y eficientes. 
 La figura \ref{fig:fig1SECTION5} muestra una comparativa del coste por tarea entre diferentes modelos compactos, donde el tamaño de los círculos representa la capacidad computacional en TFLOPs FP16 usada en cada modelo.
-Esta representación es más fiel a la realidad que el porpio tamaño del modelo, ya que un modelo pequeño puede requerir una gran capacidad de cómputo para su entrenamiento y ajuste fino.
+Esta representación es más fiel a la realidad que el propio tamaño del modelo, ya que un modelo pequeño puede requerir una gran capacidad de cómputo para su entrenamiento y ajuste fino.
+Los datos obtenidos son datos oficiales de la página web oficial de ARC-AGI.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.85\textwidth]{../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light.png}
 	\caption[Comparativa del coste por tarea entre modelos compactos]{Comparativa del coste por tarea entre modelos compactos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
 	\label{fig:fig1SECTION5}
-	{\footnotesize Fuente: Elaboración propia}
+	{\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.}
 \end{figure}
 
 \FloatBarrier
 
 Algunas soluciones como los modelos TRM requieren de una capacidad de cómputo muy elevada y no que no está al alcance de cualquier investigador. Por otra parte, este enfoque también se encuentra en el filo
-del espírito de ARC-AGI, ya que es necesario realizar pre-entrenamientos sin ningún límite de capacidad de computación para posteriormente realizar ajustes finos e inferencia
-en la las GPUs obligadas por los órganos de ARC-PRIZE. La diferencia de la capacidad de cómputo usada para el modelo TRM en comparación al modelo de CompressARC es de 7.916 PFLOPs frente a 116,6 TFLOPs, 
-lo que supone una diferencia de más de 67 veces. En cuestión de eficiencia computacional es realmente destacable el modelo de CompressARC.
+del espíritu de ARC-AGI, ya que es necesario realizar pre-entrenamientos sin ningún límite de capacidad de computación para posteriormente realizar ajustes finos e inferencia
+en la las GPUs obligadas por los órganos de ARC-PRIZE. La diferencia de la capacidad de cómputo usada para el modelo TRM en comparación al modelo de \textit{CompressARC} es de 7.916 PFLOPs frente a 116,6 TFLOPs, 
+lo que supone una diferencia de más de 67 veces. En cuestión de eficiencia computacional es realmente destacable el modelo de \textit{CompressARC}.
 
 En la siguiente imagen \ref{fig:fig2SECTION5} se puede observar también la comparativa de diferentes modelos compactos desde la perspectiva de coste por tarea, otra comparativa
 que busca un punto de vista desde la eficiencia.
-
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.85\textwidth]{../../../src/arc_agi_data_scraper/images/cost_models_cost_light.png}
 	\caption[Comparativa del coste por tarea modelos compactos]{Comparativa del coste por tarea entre modelos compactos.}
 	\label{fig:fig2SECTION5}
-	{\footnotesize Fuente: Elaboración propia}
+	{\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.}
 \end{figure}
 
 \FloatBarrier
@@ -1499,12 +1516,14 @@ que busca un punto de vista desde la eficiencia.
 %         \centering
 %         \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{../../../src/arc_agi_data_scraper/images/tflops_models_cost_light.png}
 % 		\caption[Comparativa del coste por tarea \$ entre diferentes soluciones]{Comparativa del coste por tarea \$ entre diferentes soluciones. El tamaño de los círculos
-% 		representan el tamaño en parámetros de cada modelo.}
+% 		representan el tamaño en parámetros de cada modelo. Datos obtenidos de la página web oficial de ARC-AGI.}
 % 		\label{fig:fig1SECTION5}
 %     \end{figure}
 % \end{landscape}
 % \clearpage
 % }
+
+% \FloatBarrier
 
 % \begin{figure}[h]
 % \centering
@@ -1527,7 +1546,7 @@ que busca un punto de vista desde la eficiencia.
 %     \vspace{0.5cm}
 %     \caption[Comparativa del coste por tarea entre modelos compactos]{Comparativa del coste por tarea entre modelos compactos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
 %     \label{fig:fig1SECTION5}
-%     {\footnotesize Fuente: Elaboración propia}
+%     {\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.}
 %     \vspace*{\fill}
 % \end{figure}
 % \clearpage
@@ -1559,7 +1578,7 @@ secciones se analizará con detalle este enfoque y se presentará una variante p
 
 \subsection{Análisis exploratorio de datos}
 
-Los datos de entrada del benchmark ARC-AGI se presentan en forma de pares de matrices, donde cada par consiste en una matriz de entrada y su correspondiente matriz de salida.
+Los datos de entrada del \textit{benchmark} ARC-AGI se presentan en forma de pares de matrices, donde cada par consiste en una matriz de entrada y su correspondiente matriz de salida.
 El análisis exploratorio de datos (EDA) es un paso crucial para comprender la naturaleza de estos datos y para identificar patrones, tendencias y posibles anomalías que puedan influir en el diseño del modelo. Los
 datos típicamente se presentan en archivos de lenguaje de texto simple JSON, que contienen representaciones de las matrices en formato de listas anidadas. Cada matriz puede variar en tamaño y contenido,
 lo que introduce un nivel adicional de complejidad en el análisis.
@@ -1651,39 +1670,1115 @@ fundamenta en los principios de \textit{CompressARC} \cite{liao2025arcagiwithout
 un equilibrio entre la expresividad del modelo y la eficiencia computacional, evitando el pre-entrenamiento masivo en favor de una optimización centrada en 
 el tiempo de inferencia (\textit{Test-Time Training}). 
 
-% Partiendo de esta base, se ha desarrollado una evolución de dicha arquitectura con el objetivo de mejorar la capacidad de síntesis de programas y la resolución de transformaciones 
-% complejas en el \textit{benchmark} ARC-AGI-1. Esta propuesta se centra en refinamientos específicos dentro del espacio latente y en el uso optimizado de sistemas 
-% multitemporales (\textit{multitensors}), buscando una arquitectura que no solo sea compacta en parámetros, sino también más robusta ante la diversidad de tareas planteadas. 
-% En las siguientes secciones se detallan los componentes, capas y el proceso iterativo que conforman el núcleo de esta solución.
+Un Autocodificador es un modelo de aprendizaje profundo que aprende a generar variables latentes que representen
+características ocultas de los datos, para posteriormente, decodificarlas y reconstruir los datos de entrada. Estos modelos
+son especialmente útiles para tareas de reducción de dimensionalidad, compresión de datos y generación de nuevas muestras a partir de las características aprendidas.
+El problema de estos modelos es que aprenden los datos hasta el punto de memorizar en lugar de generalizar, 
+haciendo que sean especialmente buenas para clonar comportamientos concretos. Los autocodificadores en concreto
+son capaces de generar representaciones discretas, como puede ser un vector variables simple binario.
 
-\subsection{Multitensors}
+Los Autocodificadores Varicionales o VAE son un tipo de autocodificadores con ciertas particularidades. A diferencia de los
+autocodificadores tradicionales, codifican representaciones continuas y probabilísticas en un espacio latente. En vez de codificar
+un vector de valores determinísticos, típicamente se genera una media y una desviación estándar por cada variable latente.
+Este mecanismo tiene una ventaja, lo convierte en un modelo de aprendizaje profundo generativo capaz de reconstruir con
+precisión la entrada general exacta y además variaciones que se parecen a los datos originales.
 
-\subsubsection{Arquitectura de referencia}
+Profundizando más acerca de los Autocodificadores Varicionales, destacar que se compone típicamente de dos componentes principales;
+un codificador y un decodificador. Ambos componentes son redes neuronales densas, la diferencia es que el codificador codifica la entrada
+convirtiendo la salida en variables de medias y desviaciones estándar y el decodificador recoge estas variables para reconstruir 
+la entrada original. Este proceso permite que el modelo capture la incertidumbre inherente en los datos y genere nuevas muestras que sean coherentes con la distribución aprendida.
+El espacio latente es un conjunto de variables latentes. Estas variables latentes son características ocultas de los datos, representaciones
+que no son directamente observables en los datos de entrada, pero que capturan información relevante para la generación y reconstrucción de los mismos.
+
+\textit{CompressARC} es un sistema basado en autocodificadores varicionales, hasta cierto punto. Este sistema es mucho más profundo, complejo y contiene
+un sistema de estructuras con diversas variaciones. Las tareas de ARC-AGI son complejas y variadas. Cada tarea puede contener
+diversos ejemplos, colores, tamaños y patrones diferentes. Todas estas variaciones en los datos deben ser capturados y representados en variables
+latentes. Este proceso es mucho más complejo a simple vista y requiere de un diseño sofisticado. Para poder realizar este cometido,
+\textit{CompressARC} hace uso de un sistema denominado Multitensor, y posteriormente se descodifica mediante una compleja arquitectura 
+de redes neuronales densas.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.90\textwidth]{image/images/SuperCompressARC-Arquitectura Baseline_dia.png}
+	\caption[Arquitectura \textit{CompressARC}]{Arquitectura \textit{CompressARC}.}
+	\label{fig:fig9SECTION5}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
+
+El objetivo del modelo es el mismo que cualquier Autocodificador Varicional, codificar un espacio latente y posteriormente decodificarlo 
+para reconstruirlo mediante los denominados \textit{logits}. En los siguientes apartados se explicará con todos tipo de detalles
+el funcionamiento de cada sistema en detalle.
+
+El flujo completo de entrenamiento en tiempo de inferencia de manera simple podría ser el siguiente:
+\begin{enumerate}
+	\item Se recibe una tarea con sus ejemplos y se extraen las características relevantes: número de ejemplos, número de colores, direcciones, número de filas y número de columnas.
+	\item Se construye el Multitensor a partir de estas características, aplicando la máscara binaria para identificar los tensores válidos.
+	\item Cada tensor válido se recorre y se representa en el espacio latente mediante un vector de 4 dimensiones.
+	\item Se combina toda la información del espacio latente en un vector único denominado \(z\).
+	\item El vector \(z\) se pasa a través de la arquitectura de decodificación para reconstruir los \textit{logits}.
+	\item Se calcula la pérdida comparando los \textit{logits} reconstruidos con los datos originales.
+	\item Se actualizan los parámetros del modelo mediante retropropagación.
+\end{enumerate}
+
+El sistema está basado en el principio de Mínima Longitud de Descripción (MDL). Si el modelo logra describir los ejemplos de entrenamiento de una
+tarea con un código más corto que el código más corto ue el código trivial de enumerar píxeles, entonces significa que ha descubierto la estructura
+de la tarea y esa estructura debería extrapolar al ejemplo de pruebas. Entre dos explicaciones que describen correctamente los datos conocidos, 
+se prefiere la que necesita menos información para expresarse. Formalmente, para un conjunto
+de datos $D$ y un modelo $M$, esta longitud puede expresarse como:
+
+\begin{equation}
+	L(D,M) = L(M) + L(D\mid M),
+	\label{eq:mdl-general}
+\end{equation}
+
+donde $L(M)$ representa la información necesaria para describir el modelo y
+$L(D\mid M)$ representa la información adicional necesaria para describir los datos una vez conocido dicho modelo. En el caso de
+\textit{CompressARC}, esta descomposición se implementa mediante una aproximación diferenciable de la pérdida del VAE, que combina el coste de
+codificar las variables latentes y el coste de reconstruir los las cuadrículas observadas:
+
+\begin{equation}
+	\mathcal{L}_{\mathrm{MDL}} =
+	D_{\mathrm{KL}}\left(q(z)\,\middle\|\,\mathcal{N}(0,I)\right)
+	+ 10 \cdot H\left(\mathrm{logits},\text{cuadrículas observadas}\right),
+	\label{eq:mdl-compressarc}
+\end{equation}
+
+El primer término mide la información específica que debe transportar la distribución latente $q(z)$ con respecto a la distribución previa normal
+estándar, mientras que el segundo penaliza los errores de reconstrucción. El factor $10$ es un coeficiente empírico que equilibra ambos términos.
+Esta expresión es una aproximación diferenciable del principio MDL, restringida a las variables y operaciones de esta arquitectura, por lo que no
+constituye una medida exacta de la longitud mínima de todos los programas capaces de resolver una tarea. Por tanto, una explicación que comprime
+los ejemplos conocidos con menor coste tiene más posibilidades de capturar la estructura de la tarea y extrapolarla al ejemplo de prueba. En esta
+formulación, los píxeles observados incluyen las entradas de prueba, pero no sus salidas, que permanecen ocultas.
+
+En cada tarea se realiza un bucle de entrenamiento completo. Esto lo convierte en un sistema esencialmente transductivo. Se realiza
+una optimización específica por tarea en vez de un entrenamiento global. No es un modelo inductivo convencional entrenado globalmente para
+una función reutilizable entre tareas. Por decir alguna definición, \textit{CompressARC} es un modelo transductivo por tarea,
+con aprendizaje durante la inferencia y con sesgos inductivos arquitectónicos derivados de características específicas.
+
+\subsection{Pruebas iniciales}
+
+El autor del modelo \citeauthor{liao2025arcagiwithoutpretraining} \citeyear{liao2025arcagiwithoutpretraining} muestra una seria de métricas del laboratorio de pruebas realizadas en 
+exhaustivos documentos explicativos. El entrenamiento del modelo, para todas las tareas se realizan de manera secuencial, es decir, se realiza
+el entrenamiento de una tarea, se compara el resultado y continua con el siguiente. Este procedimiento se realiza al completo en ambos 
+conjuntos de datos de entrenamiento y evaluación. El autor reporta que el tiempo total de ejecución de todas las tareas de entrenamiento es 
+de 130 horas realizando 2000 iteraciones por tarea. El proceso de ejecución de las tareas de evaluación es un poco más, 138 horas.
+
+De manera experimental también incluye una opción de lanzar diversos procesos en paralelo, lo que puede reducir 
+el tiempo total de ejecución. En las pruebas iniciales, se uso ambas técnicas para probar si realmente existe una mejora
+significativa con un subconjunto pequeño de tareas. Ambas pruebas se realizaron y tardaron alrededor de 17,3 horas, con lo cual,
+el uso de ejecuciones en paralelo tal y como está diseñado el proceso de entrenamiento no proporciona una mejora significativa en términos de tiempo de ejecución.
+
+Al usar el entrenamiento en paralelo también se pudo observar un uso muy intensivo de la CPU, por lo tanto, las sospechas iniciales
+apuntaban a que podría ocurrir alguna limitación de los procesos relacionados entre la CPU y GPU.
+
+Por otro lado, \citeauthor{liao2025arcagiwithoutpretraining} \citeyear{liao2025arcagiwithoutpretraining} expresó que en sus pruebas realizadas, 
+se usó una NVIDIA RTX 4070, una GPU
+a nivel computacional teórico inferior a la utilizada para este trabajo, la RX 9070 XT. Esto induce a pensar que no está habiendo ningún
+aprovechamiento computacional debido a algún problema en el proceso de entrenamiento. Esta circunstancia ocurre tanto en entrenamiento
+sencuencial como en el entrenamiento en paralelo y por lo tanto, no parece haber relación con el posible uso de la CPU, más bien es de 
+diseño.
+
+\subsection{Codificador Multitensor}
+
+Las tareas de ARC-AGI típicamente contienen en los datos de entrenamiento entre 2 y 7 ejemplos. También puede contener entre 2 y 5 colores,
+además de cambios espaciales. En ARC-AGI, las tareas que presentan una variación en el tamaño de la matriz se puede ver reflejado
+en las salidas de los propios ejemplos. Si tomamos todas estas características en conjunto podemos tener una representación compleja
+de 5 dimensiones: [número de ejemplos, número de colores, direcciones, número de filas, número de columnas]. El sistema al principio
+almacena toda esta información de un vector de estas características. Debido a las grandes variaciones de las 800 tareas que
+representa ARC-AGI, se recurre a la creación de una estructura denominada Multitensor.
+
+El Multitensor es un conjunto de tensores, cada tensor guarda combinaciones dimensionales. No todas las combinaciones posibles pueden contener
+información relevante. Para aquellas combinaciones que no representan información relevante se le considera inválida. Una máscara binaria de
+5 dimensiones da como resultado 32 posibles combinaciones binarias. De estas 32 posibles combinaciones, se consideran
+sólo 18 como tensores válidos.
+
+En la tabla \ref{tab:multitensor-dimensions}, $E$ representa los ejemplos, $C$ los colores, $D$ las direcciones y
+$X$ e $Y$ las dimensiones espaciales. El último eje corresponde siempre a los canales de cada representación.
+
+\begin{table}[h]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{|c|c|p{9.2cm}|}
+	\hline
+	Máscara (\(\mathrm{ECDXY}\)) & Estado & \multicolumn{1}{c|}{Dimensiones generales o motivo} \\
+	\hline
+	\(00000\) & Inválido & No contiene ningún eje informativo. \\
+	\hline
+	\(00001\) & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\hline
+	\(00010\) & Inválido & El eje $X$ requiere el eje $E$. \\
+	\hline
+	\(00011\) & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\hline
+	\(00100\) & Válido & $[D,\mathrm{canal}]$ \\
+	\hline
+	\(00101\) & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\hline
+	\(00110\) & Inválido & El eje $X$ requiere el eje $E$. \\
+	\hline
+	\(00111\) & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\hline
+	\(01000\) & Válido & $[C,\mathrm{canal}]$ \\
+	\hline
+	\(01001\) & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\hline
+	\(01010\) & Inválido & El eje $X$ requiere el eje $E$. \\
+	\hline
+	\(01011\) & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\hline
+	\(01100\) & Válido & $[C,D,\mathrm{canal}]$ \\
+	\hline
+	\(01101\) & Inválido & El eje $Y$ requiere el eje $E$. \\
+	\hline
+	\(01110\) & Inválido & El eje $X$ requiere el eje $E$. \\
+	\hline
+	\(01111\) & Inválido & Los ejes $X$ e $Y$ requieren el eje $E$. \\
+	\hline
+	\(10000\) & Inválido & Sólo contiene $E$; falta al menos uno de los ejes $C$, $D$, $X$ o $Y$. \\
+	\hline
+	\(10001\) & Válido & $[E,Y,\mathrm{canal}]$ \\
+	\hline
+	\(10010\) & Válido & $[E,X,\mathrm{canal}]$ \\
+	\hline
+	\(10011\) & Válido & $[E,X,Y,\mathrm{canal}]$ \\
+	\hline
+	\(10100\) & Válido & $[E,D,\mathrm{canal}]$ \\
+	\hline
+	\(10101\) & Válido & $[E,D,Y,\mathrm{canal}]$ \\
+	\hline
+	\(10110\) & Válido & $[E,D,X,\mathrm{canal}]$ \\
+	\hline
+	\(10111\) & Válido & $[E,D,X,Y,\mathrm{canal}]$ \\
+	\hline
+	\(11000\) & Válido & $[E,C,\mathrm{canal}]$ \\
+	\hline
+	\(11001\) & Válido & $[E,C,Y,\mathrm{canal}]$ \\
+	\hline
+	\(11010\) & Válido & $[E,C,X,\mathrm{canal}]$ \\
+	\hline
+	\(11011\) & Válido & $[E,C,X,Y,\mathrm{canal}]$ \\
+	\hline
+	\(11100\) & Válido & $[E,C,D,\mathrm{canal}]$ \\
+	\hline
+	\(11101\) & Válido & $[E,C,D,Y,\mathrm{canal}]$ \\
+	\hline
+	\(11110\) & Válido & $[E,C,D,X,\mathrm{canal}]$ \\
+	\hline
+	\(11111\) & Válido & $[E,C,D,X,Y,\mathrm{canal}]$ \\
+	\hline
+\end{tabular}
+\caption{Combinaciones dimensionales del sistema Multitensor.}
+\label{tab:multitensor-dimensions}
+\end{table}
+
+\FloatBarrier
+
+A estos tensores se le añade una dimensión adicional denominada canal o más correctamente espacio latente. Cada posible valor de las hojas contendrán un vector de 4
+valores que representará este espacio. Para recorrer todas las posibilidades de los diferentes tensores, en el que haya datos
+representados, se hará uso de una máscara binaria de 5 dimensiones. Posteriormente se representará todo el estado latente mediante un
+tensor denominado \(z\).
+
+Las tareas de ARC-AGI mezclan información de naturalezas muy distintas. Tratar todo en un único tensor obligaría a la red a redescubrir que estos 
+ejes son cualitativamente distintos. En cambio, un Multitensor mantiene 18 tensores distintos y permite que cada uno se procese localmente y se comunique con
+los demás de forma controlada.
+
+\subsubsection{Direcciones}
+
+El eje de direcciones del Multitensor tiene 8 dimensiones fijas. Estas direcciones cubren un grupo diédrico con el conjunto de simetrías
+de un cuadrado, es decir, todas las formas de moverlo. Las formas de moverlo más habituales es mediante rotaciones o reflexiones, de manera
+que vuelve a ocupar exactamente la misma posición. La operación del grupo es componer simetrías, es decir, aplicar una tras otra. Está formada
+por 8 elementos, correspondientes a las 4 rotaciones y 4 reflexiones posibles de un cuadrado. Básicamente describe todas las maneras de mover 
+un cuadrado sin cambiar su apariencia geométrica.
+
+\subsection{Arquitectura de decodificación}
+
+El objetivo de la capa de decodificación es decodificar el espacio latente \(z\). Este proceso se realiza mediante un método interno que
+se encarga de decodificar de manera independiente cada una de los 18 tensores del Multitensor. Utiliza una tabla de parámetros ajustables
+con la forma de la vista correspondiente, indicando la dirección que debe desviarse los valores latentes respecto al ruido inicial genérico.
+Durante todo el proceso de entrenamiento se crean valores aleatorios basados en una distribución normal estándar. Mantener una parte
+de ruido evita que el espacio latente se convierta en una tabla de memoria sin coste.
+
+También se hace uso de divergencia de Kullback-Leibler,
+una medida que compara distribuciones de probabilidad y cuantifica cuanta información adicional hace falta para describir la distribución 
+real a partir de la aproximación. En el modelo el tensor latente \(z\) funciona como un código interno de la tarea ARC. 
+Ese código debe contener la información necesaria para reconstruir los ejemplos y descubrir la regla.
+
+El proceso de decodificación consta de 4 bloques idénticos que se ejecutan de manera secuencial, como una especie de bucle. Este bloque
+está formado por una serie de operaciones:
+
+\begin{itemize}
+	\item \textbf{Comunicación ascendente:} difunde información desde las hojas compactas hacia representaciones con más ejes.
+	\item \textbf{Selección multi-eje:} obtiene distribuciones relativas sobre colores, direcciones y posiciones mediante \textit{softmax}.
+	\item \textbf{Máximo acumulado direccional:} propaga a cada posición el mayor valor observado durante un recorrido espacial.
+	\item \textbf{Desplazamiento direccional:} traslada características entre píxeles vecinos en las ocho orientaciones disponibles.
+	\item \textbf{Comunicación entre direcciones:} combina las representaciones asociadas a orientaciones distintas.
+	\item \textbf{Transformación no lineal:} aplica la función SiLU para componer relaciones que no pueden expresarse linealmente.
+	\item \textbf{Comunicación descendente:} resume representaciones detalladas en hojas con menos ejes.
+	\item \textbf{Normalización final:} estabiliza la escala del estado antes de comenzar el bloque siguiente.
+\end{itemize}
+
+Para describir matemáticamente estas operaciones, se denota por \(h_s\) el estado de la hoja del Multitensor cuya máscara
+dimensional es \(s\). Las matrices \(P_s\) y \(Q_s\) representan, respectivamente, las proyecciones lineales aprendidas de entrada
+y de retorno al flujo residual. Ambas actúan únicamente sobre el último eje, correspondiente a los canales. La función
+\(\mathcal{N}\) representa la normalización propia del modelo. La relación \(r\preceq s\) indica que todos los ejes activos de
+\(r\) también están presentes en \(s\). Con esta notación, la estructura general de una transformación residual se expresa en la
+Ecuación \eqref{eq:decoder-transformacion-residual}:
+
+\begin{equation}\label{eq:decoder-transformacion-residual}
+h_s^{+}=h_s+Q_s\,\Phi_s(P_s h_s),
+\end{equation}
+
+donde \(\Phi_s\) es la operación característica de la capa. En las capas de comunicación intervienen varias hojas y esta expresión
+se amplía mediante sumas. Los pesos de \(P_s\) y \(Q_s\) se aprenden para cada tarea, por lo que no existe un valor numérico universal
+que pueda emplearse en los ejemplos. Para que los cálculos sean reproducibles, los ejemplos siguientes parten de la activación ya
+proyectada, consideran válidas todas las celdas y aíslan la operación característica. Cuando se muestra una suma residual, la
+proyección de retorno se considera identidad sobre los valores representados. Esta simplificación es únicamente pedagógica; las
+ecuaciones anteriores y las de cada apartado conservan el flujo completo de la implementación.
+
+\subsubsection{Comunicación ascendente del Multitensor}
+
+La primera operación del bloque corresponde a \textit{share up}. Su objetivo es trasladar regularidades expresadas en hojas
+compactas hacia hojas más específicas. Por ejemplo, una señal que depende solo del color puede resultar relevante para una
+representación que, además del color, distingue cada ejemplo y cada posición de la cuadrícula. Sin esta comunicación, las hojas del
+Multitensor evolucionarían como representaciones independientes y la información descubierta en una de ellas no podría utilizarse en
+las demás.
+
+Para cada hoja receptora \(s\), la capa selecciona todas las hojas \(r\) que cumplen \(r\preceq s\). Primero proyecta sus canales
+mediante \(P_r\). Después, el operador \(\mathcal{B}_{r\rightarrow s}\) inserta los ejes ausentes y expande los valores hasta hacerlos
+compatibles con la forma de \(s\). Las contribuciones se suman, se normalizan, se proyectan al número de canales original y se añaden
+al estado receptor, tal como se muestra en la Ecuación \eqref{eq:share-up-operacion}:
+
+\begin{equation}\label{eq:share-up-operacion}
+\begin{aligned}
+u_s^{\uparrow}
+    &=\sum_{r\preceq s}\mathcal{B}_{r\rightarrow s}(P_r h_r),\\
+h_s^{+}
+    &=h_s+Q_s\mathcal{N}\!\left(u_s^{\uparrow}\right).
+\end{aligned}
+\end{equation}
+
+\textbf{Ejemplo simplificado.} Suponiendo una hoja por color \(h_C\) y otra por color y posición \(h_{CX}\). Las filas representan
+dos colores y las columnas, dos posiciones. Si las demás contribuciones son nulas, la hoja por color se replica sobre el eje espacial,
+como se detalla en la Ecuación \eqref{eq:share-up-ejemplo}:
+
+\begin{equation}\label{eq:share-up-ejemplo}
+\begin{aligned}
+h_C&=\begin{pmatrix}2\\3\end{pmatrix},
+&
+h_{CX}&=\begin{pmatrix}1&0\\0&1\end{pmatrix},\\[2mm]
+\mathcal{B}_{C\rightarrow CX}(h_C)
+	&=\begin{pmatrix}2&2\\3&3\end{pmatrix},
+&
+u_{CX}^{\uparrow}
+    &=h_{CX}+\mathcal{B}_{C\rightarrow CX}(h_C)
+	  =\begin{pmatrix}3&2\\3&4\end{pmatrix}.
+\end{aligned}
+\end{equation}
+
+El valor asociado a cada color queda disponible en todas sus posiciones. En la capa real, esta suma todavía atraviesa la normalización
+y la proyección de retorno antes de incorporarse mediante la conexión residual.
+
+\subsubsection{Selección multi-eje}
+
+La segunda operación corresponde a \textit{softmax}. Su función es convertir puntuaciones internas en comparaciones relativas. En
+lugar de normalizar siempre sobre un único eje, la capa considera todos los subconjuntos no vacíos de los ejes informativos presentes
+en la hoja. Estos ejes pueden ser el color, la dirección, las filas y las columnas; los ejemplos y los canales nunca forman parte de
+la normalización. Si una hoja contiene \(k\) ejes elegibles, se calculan \(2^k-1\) distribuciones diferentes y se concatenan sobre el
+eje de canales antes de aplicar \(Q_s\).
+
+Sea \(A_s\) el conjunto de ejes elegibles de la hoja \(s\) y sea \(J\) uno de sus subconjuntos no vacíos. Para cada canal interno
+\(q\), los índices pertenecientes a los ejes que no están en \(J\) permanecen fijos. La operación se define mediante la Ecuación
+\eqref{eq:softmax-multieje-operacion}:
+
+\begin{equation}\label{eq:softmax-multieje-operacion}
+\begin{aligned}
+m_{J,\mathbf{i}_{\bar J},q}
+    &=\max_{\mathbf{j}_J}
+      u_s(\mathbf{j}_J,\mathbf{i}_{\bar J},q),\\
+p_J(\mathbf{i},q)
+    &=\frac{\exp\!\left(u_s(\mathbf{i},q)-m_{J,\mathbf{i}_{\bar J},q}\right)}
+      {\displaystyle\sum_{\mathbf{j}_J}
+       \exp\!\left(u_s(\mathbf{j}_J,\mathbf{i}_{\bar J},q)
+       -m_{J,\mathbf{i}_{\bar J},q}\right)},\\
+\Phi_s^{\mathrm{sm}}(u_s)
+    &=\underset{\varnothing\neq J\subseteq A_s}{\operatorname{concat}}p_J(u_s),\\
+h_s^{+}
+    &=h_s+Q_s\Phi_s^{\mathrm{sm}}(P_s h_s).
+\end{aligned}
+\end{equation}
+
+La resta del máximo no cambia las probabilidades, pero evita desbordamientos al calcular la exponencial.
+
+\textbf{Ejemplo simplificado.} Considérese una activación proyectada con dos colores por filas y dos posiciones por columnas. Si se
+elige únicamente el subconjunto formado por el eje de color, cada columna se normaliza por separado, como se observa en la Ecuación
+\eqref{eq:softmax-multieje-ejemplo}:
+
+\begin{equation}\label{eq:softmax-multieje-ejemplo}
+U=\begin{pmatrix}1&0\\0&2\end{pmatrix}
+\quad\Longrightarrow\quad
+\operatorname{softmax}_{C}(U)
+=\begin{pmatrix}
+0{,}731&0{,}119\\
+0{,}269&0{,}881
+\end{pmatrix}.
+\end{equation}
+
+En la primera posición domina el primer color, mientras que en la segunda domina el segundo. Esta matriz es solo una de las
+distribuciones generadas; la implementación calcula también las correspondientes a los demás subconjuntos de ejes. Aunque la llamada
+a la capa solicita una pre-normalización, el envoltorio residual de la versión analizada sobrescribe inmediatamente ese valor con la
+proyección de \(h_s\), por lo que la pre-normalización no interviene efectivamente en este cálculo.
+
+\subsubsection{Máximo acumulado direccional}
+
+La operación \textit{cummax} proporciona un mecanismo de propagación espacial de largo alcance. Para cada posición conserva el mayor
+valor encontrado desde el inicio del recorrido hasta la celda actual. El sentido del recorrido depende de la orientación y de la paridad
+del canal proyectado, ya que la implementación divide los canales en dos mitades intercaladas que se procesan en sentidos opuestos. Esto
+permite representar condiciones como que una señal ya ha
+aparecido en una fila, que una línea debe prolongarse desde un punto o que se ha alcanzado un límite durante una exploración. La capa
+solo modifica las hojas \(11111\) y \(10111\), que contienen ejemplos, direcciones, filas y columnas, con o sin color. En las
+demás hojas se comporta como la identidad.
+
+Sea \(j\preceq_{d,p} i\) la relación que indica que \(j\) precede a \(i\) para la orientación \(d\) y la paridad de canal
+\(p\in\{0,1\}\), y sea \(m_j\) la máscara que determina si la posición es válida. El máximo acumulado y su reescalado al intervalo
+\([-1,1]\) se expresan en la Ecuación \eqref{eq:cummax-operacion}:
+
+\begin{equation}\label{eq:cummax-operacion}
+\begin{aligned}
+c_i^{(d,p)}&=\max\{u_j: j\preceq_{d,p} i,\;m_j=1\},\\
+\widehat{c}_i^{(d,p)}&=2\,\frac{c_i^{(d,p)}-a_{d,p}}{b_{d,p}-a_{d,p}}-1,\\
+h_s^{+}&=h_s+Q_s\mathcal{N}\!\left(\widehat{c}^{(d,p)}\right),
+\end{aligned}
+\end{equation}
+
+mediante la notación simplificada de una sección direccional y una paridad de canal. Los valores \(a_{d,p}\) y \(b_{d,p}\) son,
+respectivamente, el mínimo y el máximo válidos del recorrido. El código añade pequeñas constantes al
+denominador y a los extremos para asegurar la estabilidad numérica. En las direcciones cardinales se usa un máximo acumulado directo;
+en las diagonales se realiza un escaneo asociativo con desplazamientos de tamaño \(1,2,4,\ldots\).
+
+\textbf{Ejemplo simplificado.} Para una paridad de canal cuyo recorrido avanza de izquierda a derecha, el tercer valor deja de ser
+\(1\) porque antes se ha observado un \(2\). Tomando \(a=0\) y \(b=3\), se obtiene la transformación de la Ecuación
+\eqref{eq:cummax-ejemplo}:
+
+\begin{equation}\label{eq:cummax-ejemplo}
+\begin{aligned}
+U&=\begin{pmatrix}0&2&1&3\end{pmatrix},\\
+\operatorname{cummax}(U)
+ &=\begin{pmatrix}0&2&2&3\end{pmatrix},\\
+\widehat{U}
+ &=\begin{pmatrix}-1&\tfrac{1}{3}&\tfrac{1}{3}&1\end{pmatrix}.
+\end{aligned}
+\end{equation}
+
+La señal de valor \(2\) permanece activa hasta que aparece un valor mayor. Después, la rama se normaliza, se proyecta y se suma al
+estado anterior.
+
+\subsubsection{Desplazamiento direccional}
+
+La capa \textit{shift} introduce comunicación local entre celdas vecinas. Cada sección del eje de dirección se divide en canales pares
+e impares, que se desplazan una posición en sentidos opuestos. Las cuatro orientaciones cardinales modifican una sola coordenada y las
+cuatro diagonales modifican simultáneamente fila y columna. Los valores que salen de la cuadrícula se descartan y las nuevas posiciones
+se rellenan con cero. Como \textit{cummax}, esta capa solo actúa sobre las hojas \(11111\) y \(10111\) y utiliza las máscaras
+para anular los valores de origen que pertenecen al relleno.
+
+Para una orientación \(d\) y una paridad de canal \(p\), sea
+\(\Delta_{d,p}=(\Delta_{i,d,p},\Delta_{j,d,p})\) el desplazamiento correspondiente. La transformación se expresa en la Ecuación
+\eqref{eq:shift-operacion}:
+
+\begin{equation}\label{eq:shift-operacion}
+\begin{aligned}
+i'&=i-\Delta_{i,d,p},
+&j'&=j-\Delta_{j,d,p},\\[1mm]
+[S_{d,p}(U)]_{i,j,q}
+&=\mathbb{1}_{\Omega}(i',j')\,m_{i',j'}\,U_{i',j',q},
+\end{aligned}
+\end{equation}
+
+donde \(\Omega\) es el dominio de la cuadrícula y \(\mathbb{1}_{\Omega}(i',j')\) vale uno cuando la posición de origen pertenece
+a dicho dominio y cero en caso contrario. Esta función indicadora representa el relleno con ceros aplicado en los límites.
+
+Si \(S(U)\) representa la colección de los desplazamientos conservados por dirección y paridad de canal, la capa completa queda
+recogida en la Ecuación \eqref{eq:shift-residual}:
+
+\begin{equation}\label{eq:shift-residual}
+h_s^{+}=h_s+Q_s\mathcal{N}\!\left(S(P_s h_s)\right).
+\end{equation}
+
+\textbf{Ejemplo simplificado.} Para una de las dos paridades de canal, al desplazar una columna hacia la derecha una activación situada
+en el centro de una cuadrícula \(3\times3\), se obtiene el resultado de la Ecuación \eqref{eq:shift-ejemplo}:
+
+\begin{equation}\label{eq:shift-ejemplo}
+\begin{pmatrix}
+0&0&0\\
+0&1&0\\
+0&0&0
+\end{pmatrix}
+\xrightarrow{\;\Delta=(0,1)\;}
+\begin{pmatrix}
+0&0&0\\
+0&0&1\\
+0&0&0
+\end{pmatrix}.
+\end{equation}
+
+La salida no se suma a las otras secciones direccionales en este punto. Cada orientación conserva su propia sección y sus dos paridades
+de canal representan sentidos opuestos. Las capas posteriores aprenden cómo combinar esas vistas. La repetición de \textit{shift} en
+cuatro bloques permite componer desplazamientos que abarcan más de una celda.
+
+\subsubsection{Comunicación entre direcciones}
+
+Después de procesar cada orientación por separado, \textit{direction\_share} intercambia información entre las ocho direcciones. La
+capa se aplica a todas las hojas que contienen el eje direccional, incluso si no contienen filas o columnas. A diferencia del
+envoltorio residual genérico, esta función implementa directamente una pre-normalización efectiva y acumula cada contribución sobre
+el estado original.
+
+Sea \(z_s=\mathcal{N}(h_s)\) y sea \(A_{s,d_1,d_2}\) el mapa lineal aprendido que lleva información desde la dirección \(d_2\) hasta
+la dirección receptora \(d_1\). Los coeficientes \(c\) no se aprenden, sino que dependen de la separación angular, según la Ecuación
+\eqref{eq:direction-share-operacion}:
+
+\begin{equation}\label{eq:direction-share-operacion}
+\begin{aligned}
+z_s&=\mathcal{N}(h_s),\\
+h_{s,d_1}^{+}
+ &=h_{s,d_1}
+   +\sum_{d_2=0}^{7}
+    c_{(d_2-d_1)\bmod 8}\,
+    A_{s,d_1,d_2}z_{s,d_2},\\
+(c_0,c_1,\ldots,c_7)
+ &=\left(1,0{,}2,0{,}4,0{,}2,1,0{,}2,0{,}4,0{,}2\right).
+\end{aligned}
+\end{equation}
+
+Las direcciones iguales u opuestas reciben peso \(1\), las ortogonales peso \(0{,}4\) y las separadas por un número impar de octavos
+de vuelta peso \(0{,}2\). Los mapas \(A_{s,d_1,d_2}\), en cambio, sí se optimizan durante el entrenamiento.
+
+\textbf{Ejemplo simplificado.} Considérese una posición local de un canal perteneciente al tensor ya normalizado, mapas lineales
+identidad y la dirección \(d_1=0\) como receptora. Los valores de las restantes posiciones del tensor, que no se muestran, son los que
+completan los estadísticos globales de la normalización. Si en la posición observada solo las direcciones \(0\), \(2\) y \(4\)
+contienen información, se obtiene el cálculo de la Ecuación \eqref{eq:direction-share-ejemplo}:
+
+\begin{equation}\label{eq:direction-share-ejemplo}
+\begin{aligned}
+z_s&=\begin{pmatrix}1&0&2&0&3&0&0&0\end{pmatrix},
+& h_{s,0}&=1,\\
+h_{s,0}^{+}
+ &=1+1\cdot1+0{,}4\cdot2+1\cdot3
+ =5{,}8.
+\end{aligned}
+\end{equation}
+
+El resultado reúne en una sola orientación evidencia procedente de la propia dirección, de una dirección ortogonal y de la dirección
+opuesta, respetando la geometría impuesta por los coeficientes.
+
+\subsubsection{Transformación no lineal}
+
+Las proyecciones y sumas anteriores son operaciones lineales por partes. Si todo el bloque estuviera formado únicamente por ellas,
+varias capas consecutivas seguirían teniendo una capacidad expresiva limitada. La función \textit{nonlinear} proyecta cada hoja a un
+espacio intermedio de 16 canales, aplica SiLU elemento a elemento, devuelve el resultado al número de canales original y lo añade al
+estado de entrada.
+
+La función sigmoide \(\sigma\) actúa como una compuerta suave sobre cada activación y se incorpora al flujo residual mediante la
+Ecuación \eqref{eq:silu-operacion}:
+
+\begin{equation}\label{eq:silu-operacion}
+\begin{aligned}
+\operatorname{SiLU}(u)
+    &=u\,\sigma(u)=\frac{u}{1+e^{-u}},\\
+h_s^{+}
+    &=h_s+Q_s\operatorname{SiLU}(P_s h_s).
+\end{aligned}
+\end{equation}
+
+Los valores positivos grandes se conservan casi por completo, los negativos se atenúan y el cero permanece en cero. La transición es
+continua y diferenciable, lo que facilita la optimización por gradiente.
+
+\textbf{Ejemplo simplificado.} Para reproducir la identidad efectiva alrededor de SiLU, puede imaginarse que \(P_s\) coloca cada
+valor en el primer canal de los 16 disponibles y que \(Q_s\) recupera ese mismo canal. La operación central y su suma residual se
+muestran en la Ecuación \eqref{eq:silu-ejemplo}:
+
+\begin{equation}\label{eq:silu-ejemplo}
+\begin{aligned}
+H&=\begin{pmatrix}-2&0\\1&2\end{pmatrix},\\[1mm]
+\operatorname{SiLU}(H)
+ &\simeq\begin{pmatrix}
+-0{,}238&0\\
+0{,}731&1{,}762
+\end{pmatrix},\\[1mm]
+H^{+}=H+\operatorname{SiLU}(H)
+ &\simeq\begin{pmatrix}
+-2{,}238&0\\
+1{,}731&3{,}762
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+
+La salida muestra que SiLU modifica la intensidad sin convertir la activación en una decisión binaria. Como ocurre en
+\textit{softmax}, la pre-normalización solicitada en la llamada queda anulada por la sobrescritura existente en el envoltorio residual
+de esta versión.
+
+\subsubsection{Comunicación descendente del Multitensor}
+
+La función \textit{share\_down} completa el intercambio iniciado por \textit{share\_up}. En este caso, una hoja compacta recibe
+información de las hojas que contienen sus mismos ejes y otros adicionales. Las dimensiones ausentes en el receptor se eliminan mediante
+promedios. Para determinados ejes espaciales, cuando la relación entre los tamaños de entrada y salida lo permite, el promedio se
+pondera con las máscaras para excluir las celdas de relleno.
+
+Sea \(\mathcal{R}_{t\rightarrow s}\) el operador que reduce los ejes presentes en una hoja superior \(t\) pero ausentes en la hoja
+receptora \(s\). La comunicación descendente se formula en la Ecuación \eqref{eq:share-down-operacion} (\textit{share\_down}):
+
+\begin{equation}\label{eq:share-down-operacion}
+\begin{aligned}
+u_s^{\downarrow}
+    &=\sum_{t:\,s\preceq t}
+      \mathcal{R}_{t\rightarrow s}(P_t h_t),\\
+h_s^{+}
+    &=h_s+Q_s\mathcal{N}\!\left(u_s^{\downarrow}\right).
+\end{aligned}
+\end{equation}
+
+\textbf{Ejemplo simplificado.} En una hoja \(CX\), las filas representan dos colores y las columnas dos posiciones. Para obtener una
+contribución destinada a la hoja \(C\), se promedia el eje espacial como se muestra en la Ecuación
+\eqref{eq:share-down-ejemplo}:
+
+\begin{equation}\label{eq:share-down-ejemplo}
+h_{CX}=\begin{pmatrix}1&3\\2&4\end{pmatrix}
+\quad\Longrightarrow\quad
+\mathcal{R}_{CX\rightarrow C}(h_{CX})
+=\begin{pmatrix}
+\frac{1+3}{2}\\[1mm]
+\frac{2+4}{2}
+\end{pmatrix}
+=\begin{pmatrix}2\\3\end{pmatrix}.
+\end{equation}
+
+De este modo, un patrón distribuido por la cuadrícula se convierte en un resumen por color. En la implementación completa se suman
+las reducciones de todas las hojas compatibles, se normaliza el resultado y se incorpora mediante la proyección residual.
+
+\subsubsection{Normalización final}
+
+Cada bloque termina con \textit{normalize}. Esta función se aplica de forma independiente a cada hoja y a cada canal, pero calcula sus
+estadísticos sobre todos los demás ejes de la hoja. Primero resta la media y después divide por la raíz de la media cuadrática de los
+valores centrados. No introduce parámetros entrenables de escala o sesgo y, a diferencia de las siete operaciones anteriores, no forma
+una rama residual.
+
+Si \(I_k\) es el conjunto de \(N\) posiciones pertenecientes al canal \(k\), la operación se define en la Ecuación
+\eqref{eq:normalizacion-operacion}:
+
+\begin{equation}\label{eq:normalizacion-operacion}
+\begin{aligned}
+\mu_k&=\frac{1}{N}\sum_{i\in I_k}h_{i,k},\\
+\mathcal{N}(h)_{i,k}
+ &=\frac{h_{i,k}-\mu_k}
+ {\sqrt{\displaystyle\varepsilon+
+ \frac{1}{N}\sum_{j\in I_k}(h_{j,k}-\mu_k)^2}},
+ &\varepsilon&=10^{-8}.
+\end{aligned}
+\end{equation}
+
+\textbf{Ejemplo simplificado.} Para una hoja con un único canal y cuatro posiciones se toman los estadísticos de la Ecuación
+\eqref{eq:normalizacion-estadisticos-ejemplo}:
+
+\begin{equation}\label{eq:normalizacion-estadisticos-ejemplo}
+H=\begin{pmatrix}1&2\\3&4\end{pmatrix},
+\qquad
+\mu=2{,}5,
+\qquad
+\frac{1}{4}\sum_{i=1}^{4}(H_i-\mu)^2=1{,}25.
+\end{equation}
+
+Al sustituir estos valores se obtiene el resultado de la Ecuación \eqref{eq:normalizacion-resultado-ejemplo}:
+
+\begin{equation}\label{eq:normalizacion-resultado-ejemplo}
+\mathcal{N}(H)
+=\frac{H-2{,}5}{\sqrt{1{,}25+10^{-8}}}
+\simeq
+\begin{pmatrix}
+-1{,}342&-0{,}447\\
+0{,}447&1{,}342
+\end{pmatrix}.
+\end{equation}
+
+La matriz resultante tiene media nula y una magnitud cuadrática media próxima a uno. Esto impide que las sumas residuales de los cuatro
+bloques aumenten progresivamente la escala de las activaciones y proporciona al bloque siguiente una entrada numéricamente estable.
+
+En conjunto, \textit{share\_up} y \textit{share\_down} conectan distintos niveles de detalle. \textit{softmax} introduce selección
+\textit{cummax} y \textit{shift} realizan propagación espacial; \textit{direction\_share} integra orientaciones. SiLU
+aporta capacidad no lineal y \textit{normalize} mantiene estable el flujo. La repetición de esta secuencia durante cuatro bloques
+permite componer estas operaciones elementales para aproximar transformaciones más complejas de las tareas ARC-AGI.
+
+\subsubsection{Contantes}
+
+%\subsection{Función de error}
+
+% \subsection{Ejemplo de entrenamiento al detalle}
 
 \subsection{Limitaciones}
 
+El autor \citeauthor{liao2025arcagiwithoutpretraining} \citeyear{liao2025arcagiwithoutpretraining} deja claro en su trabajo lo que el modelo sabe y
+no sabe hacer. Entre las habilidades del modelo se podría resumir en lo siguiente:
+
+\begin{itemize}
+	\item Completar patrones espaciales (extensión de líneas, propagación de colores).
+	\item Llenar regiones cerradas.
+	\item Detectar y completar simetrías como espejos, rotaciones y traslaciones.
+	\item Agrupar, reagrupar y reordenar objetos.
+	\item Aplicar transformaciones afines simples a regiones.
+	\item Identificar el objeto distinto en una colección uniforme.
+\end{itemize}
+
+También existen numerosas limitaciones arquitectónicas y de capacidad del modelo que restringen su desempeño en tareas más complejas o abstractas:
+
+\begin{itemize}
+	\item Existen algunas ausencias claras de habilidades primitivas, como es la capacidad de contar. El modelo no es capaz de contar
+	regiones ni cuantos píxeles de un color en la cuadrícula. Esta habilidad simplemente no está presenta en una función dentro del modelo. Esta habilidad
+	podría ser implementada dentro de la capa del núcleo de descompresión.
+	\item Limitaciones que requieren recurrencia en el tiempo como simulaciones de pixeles que se mueven con reglas específicas como es es la tarea
+	2dd70a9a.
+	\item Ausencia de planificación a largo plazo, reglas con múltiples pasos secuenciales no se suelen descubrir.
+	\item Se ha experimenta aleatoriedad en la semilla. Distintas semillas son capaces de resolver o no ciertas tareas. Existen ciertos casos
+	en los que algunos tensores críticos pueden llegar recomponerse tras una caída en el error de manera abrupta.
+	\item Entrenar el conjunto total de tareas de ARC-AGI dura dura en torno a 300 horas, lo que equivale a 20 minutos por tarea.
+	\item El uso de la CPU mediante el entrenamiento en paralelo es demasiado alto. A pesar de poder ejecutar diversos modelos al mismo tiempo
+	gracias a la capacidad de la tarjeta gráfica, el alto uso de CPU produce una especia de "cuello de botella" que limita el rendimiento global.
+	Ya sea de forma secuencial o paralela, la velocidad de entrenamiento rara vez supera las 2 iteraciones por segundo.
+	\item Destacar que existen limitaciones estructurales de capas neuronales densas. La arquitectura está fijada como una constante en 4 capas
+	para todas las tareas. El objetivo es mantener la longitud de la descripción del modelo baja. La consecuencia de esto es pueden existir
+	tareas que requieren más de 4 capas o directamente que necesitan iterar más veces un mismo operador. Esto deja claro una evidente ausencia de recurrencia
+	y capacidad adaptativa profunda. Otros modelos como los modelos de razonamiento jerárquicos si presentan mecanismos de razonamiento iterativo
+	y adaptativo.
+	\item Limitaciones operacionales de replica de formas. Ciertas tareas que requieren traslación, rotación, reflexión y escalado de una forma completa
+	se quedas sin solución. Este es probablemente la mayor categoría de fallos que se pueden resolver con mejoras arquitectónicas.
+	\item En muchos casos ocurre un colapso del espacio latente. Generalmente suelen ser 4 tensores los que sostienen el aprendizaje dentro del
+	bucle iterativo. 14 de los 18 tensores nunca llegan a recuperarse de un colapso tras 200 iteraciones. Si alguno de los tensores colapsados es
+	requerido para codificar información crítica, la tarea se queda sin solución y no existe método de rescate. Fortaleces la robustez del
+	espacio latente parece ser fundamental.
+	\item Se ha observado que el código implementa un mecanismo de puntuación de los diversos candidatos mediante variables constantes.
+\end{itemize}
+
+\subsection{Núcleos de conocimiento}
+
+Según \citeA{chollet2019measure}, la inteligencia no depende únicamente de la cantidad de experiencia disponible, sino también de los
+conocimientos previos que orientan la búsqueda de una solución. Estos conocimientos previos, o sesgos inductivos, permiten reducir el
+espacio de hipótesis que debe explorarse y hacen posible generalizar a partir de un número reducido de ejemplos. En el contexto de
+ARC-AGI, Chollet identifica cuatro sistemas de conocimiento fundamentales, relacionados con la objetualidad, la agencia, los números
+y la geometría elemental junto con la topología. No se trata de cuatro etapas de procesamiento independientes, sino de capacidades
+previas que condicionan la forma en que se representan los problemas y se interpretan las transformaciones.
+
+El análisis de \textit{CompressARC} permite determinar hasta qué punto estos cuatro núcleos están presentes en su arquitectura. El modelo
+representa cada tarea mediante un sistema de tensores con cinco ejes, correspondientes a ejemplos, colores, direcciones, filas y
+columnas. Esta decisión incorpora de forma explícita algunas relaciones espaciales, pero no proporciona una representación completa
+de todos los conceptos que pueden aparecer en una tarea de ARC-AGI. Por tanto, el rendimiento del modelo no solo depende de la
+optimización de sus parámetros, sino también de que la transformación buscada pueda expresarse mediante los conocimientos previos
+que la arquitectura ya contiene.
+
+\subsubsection{Objetualidad}
+
+La objetualidad  se comprende como la capacidad de percibir entidades como objetos
+cohesionados, persistentes y diferenciables del fondo. En muchas tareas de ARC-AGI la regla no se aplica a cada celda de manera
+aislada, sino a una figura completa. El tamaño, la forma, la posición, el color o la relación de una figura con otras entidades
+determinan la transformación que debe realizarse.
+
+\textit{CompressARC} no incluye una representación explícita de objetos. Sus operaciones trabajan sobre tensores densos y sobre las
+combinaciones de ejes del sistema Multitensor. La información sobre una figura puede mantenerse de forma implícita mediante los
+valores de sus celdas, las máscaras y las operaciones espaciales, pero el modelo no detecta componentes conexas como unidades
+independientes ni reserva un estado específico para sus propiedades. Tampoco existe un mecanismo dedicado para comparar dos objetos,
+seleccionar el de mayor tamaño o agruparlos según su forma.
+
+Esta carencia explica que algunas tareas de selección, la agrupación de objetos solo son accesibles cuando la regla
+puede aproximarse mediante operaciones píxel a píxel y relaciones direccionales. Cuando la solución exige conservar la identidad de
+varias figuras y operar sobre cada una de ellas de manera independiente, la representación actual debe codificar esa información en
+activaciones distribuidas. El modelo posee, por tanto, una objetualidad implícita y débil, pero no un núcleo de conocimiento
+dedicado a la detección y manipulación de objetos.
+
+\subsubsection{Orientación hacia objetivos}
+
+El segundo núcleo describe la capacidad de representar entidades que actúan, persiguen
+objetivos y modifican su entorno. Aunque no todas las tareas de ARC-AGI requieren un agente explícito, este conocimiento resulta
+relevante cuando la solución depende de una secuencia de acciones, de una interacción entre entidades o de la distinción entre un
+estado inicial y un estado objetivo.
+
+\textit{CompressARC} no existe una representación de agentes, acciones ni objetivos intermedios. El modelo recibe los ejemplos de entrada
+y salida, transforma sus representaciones internas y optimiza directamente la correspondencia con la salida esperada. No mantiene
+un estado de planificación ni dispone de un mecanismo que evalúe qué acción debe ejecutarse a continuación. En consecuencia, las
+tareas que pueden resolverse como una transformación global de la cuadrícula son compatibles con el diseño actual, mientras que las
+que requieren simular una interacción o encadenar decisiones dependen de que dicha secuencia quede codificada indirectamente en las
+capas disponibles.
+
+La ausencia de este núcleo no constituye una limitación para todas las tareas de ARC-AGI, puesto que muchas de ellas son
+transformaciones estáticas. Sin embargo, reduce la capacidad del modelo para representar reglas con varios pasos consecutivos y
+contribuye a explicar la falta de planificación a largo plazo observada en los experimentos.
+
+\subsubsection{Números y conteo}
+
+El tercer núcleo corresponde al conocimiento de los números y a la capacidad de contar. En una tarea de ARC-AGI, contar no implica
+únicamente sumar valores, sino identificar unidades discretas, conservar su cardinalidad y comparar cantidades. Ejemplos de este tipo
+son determinar cuántos objetos aparecen, comparar el número de celdas de dos regiones o repetir una operación tantas veces como
+indique una cantidad observada.
+
+La arquitectura analizada no contiene una primitiva explícita de conteo ni una representación entera de las cantidades. Los colores
+se tratan como categorías y las activaciones internas son variables continuas. Las normalizaciones, las agregaciones y las
+proyecciones pueden producir magnitudes relacionadas con el número de celdas activas, pero esas magnitudes no tienen garantizada una
+interpretación discreta ni una correspondencia estable con los números naturales. Del mismo modo, una comparación de intensidades no
+equivale a una comparación exacta de cardinalidades.
+
+Esta limitación hace que las tareas basadas en conteo de píxeles, regiones u objetos queden fuera del sesgo inductivo principal del
+modelo. El sistema puede aprender una correlación aproximada cuando la cantidad está asociada a un patrón espacial sencillo, pero no
+dispone de un operador que garantice el resultado para tamaños, colores o configuraciones nuevas. La ausencia de este núcleo es,
+por ello, una restricción representacional y no únicamente un problema de entrenamiento.
+
+\subsubsection{Geometría elemental y topología}
+
+El cuarto núcleo es el que se encuentra más desarrollado en CompressARC. La arquitectura incorpora una cuadrícula bidimensional con
+ejes de filas y columnas, ocho orientaciones espaciales y operaciones que propagan información en esas direcciones. Las funciones
+\textit{shift} y \textit{cummax} permiten comunicar activaciones entre celdas vecinas y acumular señales a lo largo de recorridos,
+mientras que \textit{direction\_share} intercambia información entre orientaciones. Además, la parametrización compartida de las
+direcciones introduce una equivarianza asociada a las simetrías del cuadrado, es decir, al grupo $D_4$.
+
+Este conjunto de mecanismos proporciona un sesgo adecuado para transformaciones espaciales elementales, como prolongar líneas,
+propagar colores, reconocer relaciones de vecindad y tratar simetrías compatibles con rotaciones de 90 grados y reflexiones. La
+representación direccional también facilita que una misma operación se aplique de forma coherente en diferentes orientaciones, lo que
+reduce la cantidad de parámetros que debe aprender el modelo.
+
+La geometría incorporada, no obstante, es parcial. El grupo $D_4$ no cubre rotaciones de ángulo arbitrario, escalados ni
+transformaciones afines generales. Tampoco existe una primitiva específica para copiar, trasladar o replicar una figura completa
+conservando simultáneamente su estructura. Por otra parte, el componente topológico está poco desarrollado. El modelo no representa
+de forma explícita la conectividad, los agujeros, los contornos ni la relación de inclusión entre regiones. En consecuencia, puede
+capturar regularidades geométricas locales, pero tiene dificultades cuando la solución depende de una propiedad topológica o de una
+transformación global de un objeto.
+
+\subsubsection{Síntesis de los núcleos presentes}
+
+La comparación anterior muestra que \textit{CompressARC} materializa con mayor claridad el conocimiento geométrico y direccional. El conteo carece de una
+operación propia. Esta distribución de capacidades es coherente con los resultados observados en las tareas experimentales. El modelo
+resuelve con mayor facilidad las transformaciones que pueden expresarse como propagaciones, simetrías o relaciones espaciales sobre
+una cuadrícula, pero encuentra dificultades cuando debe identificar objetos como entidades persistentes, contar elementos o ejecutar
+una secuencia de transformaciones.
+
+Desde esta perspectiva, el límite de rendimiento no se explica únicamente por el número de capas o por la duración del entrenamiento.
+También refleja el alcance del conjunto de conocimientos previos incorporado en el diseño. Aumentar la capacidad de cálculo puede
+mejorar la optimización dentro de este espacio, pero no garantiza que el modelo pueda resolver una tarea cuyo concepto central no
+esté representado. Por ello, los ejes de mejora deben considerar la incorporación de operaciones de copia y manipulación de objetos,
+primitivas de conteo y mecanismos de iteración adaptativa, manteniendo al mismo tiempo las ventajas de las representaciones
+direccionales y de la equivarianza espacial.
+
 \section{Ejes de mejora}
+
+Debido a las limitaciones observadas en los experimentos previos, se proponen los siguientes ejes de mejora para abordar los problemas identificados en el modelo:
+
+\begin{enumerate}
+	\item \textbf{Eje H: Reducción de saturación de procesos en paralelo}. El objetivo es estabilizar los problemas de saturación de la CPU sobre todo 
+	para el entrenamiento de tareas en paralelo. También se deben desarrollar herramientas para obtener métricas comparativas cuantitativas.
+	\item \textbf{Eje D: Eficiencia computacional y aprovechamiento de recursos}. Acelerar el proceso de entrenamiento aprovechando la capacidad
+	computacional medido en TFLOPs y VRAM.
+	\item \textbf{Eje B: Mejora de robustez del espacio latente}. Tratar de contener el colapso del espacio latente para mejorar la robustez en el proceso de entrenamiento.
+\end{enumerate}
 
 \subsection{Eje H: Reducción de saturación de procesos en paralelo}
 
+Las primeras pruebas ejecutadas en el equipo mostraron una saturación de la CPU alrededor del 80\% con diversos procesos en paralelo. Esto
+indicaba una saturación entre la comunicación de la CPU y la GPU. Como consecuencia del alto uso intensivo, también provoca serios problemas
+de temperatura durante procesos prolongados. En muchas ocasiones, los diversos procesos en paralelo
+han provocado temperaturas por encima de 90°C, lo que representa un riesgo de supervivencia técnica del proyecto. Dado que la mayor parte de operaciones es realizada por la GPU, no tiene sentido
+tal problema de sincronización. El código tampoco requiere operaciones complejas relacionadas con la CPU.
+
+Para controlar, al menos, temporalmente este problema, se implemento un argumento opcional para limitar el número de hilos de procesamiento
+cada vez que se entrenaba en paralelo. El número de hilos de procesamiento prácticamente equivale al número de tareas de entrenamiento al mismo tiempo.
+
+El objetivo principal de este eje es la optimización del tiempo de ejecución. No se busca una mejora en el modelo
+ni que razone mejor, simplemente con los mismos procesos que cada tarea recurra menos sobrecarga de la CPU. La mayoría de 
+operaciones recaen en la GPU pero existen numerosas operaciones pequeñas que son realizadas por el procesador:
+
+\begin{itemize}
+	\item Llamadas a frecuentes.
+	\item Operaciones tensoriales reducidos.
+	\item Lanzamientos de kernels GPU
+	\item Bucles de procesamiento.
+	\item Conversiones de datos entre la CPU y la GPU. La CPU carga información constantemente en la GPU.
+	\item Cálculos de recolección de datos para el error.
+\end{itemize}
+
+El problema era que la CPU debía coordinar demasiadas operaciones pequeñas. Cada proceso consumía CPU 
+preparando operaciones, esperando resultados y comunicándose con la GPU. Una operación como 
+\(\text{.cpu().numpy()}\) es especialmente importante. Las operaciones del \textit{software} de bajo nivel como ROCm suelen ejecutarse de forma asíncrona, 
+Python deja operaciones en la cola de la GPU y continúa. Sin embargo, cuando el programa solicita los datos en CPU, la CPU debe esperar a que la GPU termine. 
+Esa espera se denomina sincronización GPU y CPU.
+
+\subsubsection{Eliminación de sincronizaciones necesarias}
+
+Los entrenamientos de tareas requieren una gran cantidad de iteraciones para encontrar la solución. Este número de iteraciones oscilan entre 1500 y
+2000. En cada iteración se realiza diversas operaciones como el error acumulado, el error de reconstrucción y la pérdida total. Estos datos
+se estaban registrando mediante objetos en memoria. Aunque cada valor podría ser solamente un escalar, la operación obligaba el registro en 
+memoria por medio de la CPU. El problema radica en la cantidad de sincronizaciones necesarias en los diferentes componentes del sistema y el
+coste de detener el proceso y esperar a que finalicen las operaciones de la GPU pueden ser mucho mayor. Muchas de estas sincronizaciones
+se utilizaban para generar registros de análisis y visualización, lo cual no interesa cuando se trata de realizar trabajos en paralelo.
+
+Se realizaron una serie de cambios para que de manera opcional todo tipo de estas operaciones de registro
+no se realizaran en procesos largos y en paralelo. No se fuerza la sincronización en cada iteración, ya no es necesario hacerlo. Toda esta transferencia de 
+datos se conservaría en la memoria de la GPU y posteriormente de manera opcional se transfiere a la CPU en caso de análisis o visualización.
+
+Se introdujo también un componente denominado \textit{profiler} que se encargaría de lanzar los procesos de manera independiente y realizar
+mediciones para posteriormente analizar y comparar métricas.
+
+\subsubsection{Reducción de la frecuencia de post-procesamiento}
+
+Durante el entrenamiento no es necesario generar curvas, gráficos ni análisis detallados en cada iteración. Por ello, el
+post-procesamiento se realiza con menor frecuencia y se concentra al finalizar el entrenamiento o en puntos concretos de supervisión.
+De este modo, la GPU se dedica principalmente al cálculo del modelo y se reducen las transferencias de datos y las esperas de la CPU.
+
+Esta mejora no modifica la pérdida ni los parámetros aprendidos. Solo evita repetir tareas de registro y visualización que no son
+necesarias para cada paso, lo que disminuye el tiempo total de ejecución, especialmente cuando se entrenan varias tareas en paralelo.
+
+\subsubsection{Vectorización del cálculo de la pérdida}
+
+El cálculo del error de reconstrucción generaba muchas operaciones pequeñas en la CPU. Para cada ejemplo se probaban distintas
+posiciones de la cuadrícula objetivo y se calculaba una pérdida para cada recorte. H1 agrupa estas operaciones para procesarlas de
+forma vectorizada en la GPU.
+
+En primer lugar se calculan las puntuaciones de todas las posiciones posibles mediante una suma prefija de la máscara $m$. Si $P(k)$
+es la suma de los valores anteriores a la posición $k$, la puntuación de un desplazamiento $o$ puede escribirse como:
+
+\begin{equation}
+P(k)=\sum_{i=0}^{k-1}m_i,
+\qquad
+\ell(o)=2P(o+L)-2P(o)-P(n),
+\qquad 0\leq o\leq n-L.
+\label{eq:h1-perdida-vectorizada}
+\end{equation}
+
+Así, la suma de cada región de la máscara se obtiene reutilizando los valores de $P$, en lugar de repetirla para cada desplazamiento.
+Todas las puntuaciones se calculan a la vez y se convierten en probabilidades mediante \textit{logsumexp}:
+
+\begin{equation}
+\log p(o\mid m,L)=\ell(o)-\operatorname{logsumexp}_{o'}\bigl(\ell(o')\bigr).
+\label{eq:h1-particion-desplazamiento}
+\end{equation}
+
+La segunda parte de H1 vectoriza la reconstrucción de los colores. La operación \textit{unfold} extrae todos los recortes posibles de
+los \textit{logits} y los organiza como un lote. Para cada posición $(x,y)$, el tensor resultante contiene los valores:
+
+\begin{equation}
+\mathcal{A}_{x,y,c,i,j}=a_{c,x+i,y+j},
+\qquad
+\operatorname{CE}_{x,y}=\operatorname{CE}(\mathcal{A}_{x,y},G).
+\label{eq:h1-unfold}
+\end{equation}
+
+La entropía cruzada se calcula entonces para todos los recortes en una sola llamada. Una pérdida de clasificación mayor implica una menor
+probabilidad de reconstrucción. Por ello, la probabilidad final suma todos los desplazamientos posibles con \textit{logsumexp}:
+
+\begin{equation}
+\log p(G\mid a,L_x,L_y)=\operatorname{logsumexp}_{x,y}\left[
+\log p(x)+\log p(y)-\operatorname{CE}_{x,y}\right].
+\label{eq:h1-marginalizacion}
+\end{equation}
+
+El objetivo de entrenamiento no cambia:
+
+\begin{equation}
+\mathcal{L}=\mathrm{total\_KL}+10\,\mathrm{reconstruction\_error}.
+\label{eq:h1-objetivo-global}
+\end{equation}
+
+Los bucles externos sobre ejemplos, cuadrículas y tamaños posibles se mantienen porque cada caso tiene máscaras y dimensiones
+diferentes. La vectorización se aplica a la parte con más candidatos, es decir, a los desplazamientos y a los recortes espaciales. De
+este modo se reducen las llamadas de Python, los lanzamientos de \textit{kernels} y las sincronizaciones entre CPU y GPU, sin cambiar
+la función de pérdida salvo por pequeñas diferencias de redondeo.
+
+Se realizaron una serie de pruebas con pequeños conjuntos de tareas de entrenamiento para comprobar realmente que existen mejoras cuantitativas.
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{4.5cm}|p{2.3cm}|p{2.3cm}|p{3.0cm}|}
+\hline
+\textbf{Métrica} & \textbf{Base} & \textbf{Optimizada} & \textbf{Variación} \\
+\hline
+Tiempo total de ejecución & 7929,4 s & 7140,2 s & $-10,0\%$ \\
+\hline
+Duración media por tarea & 7101,4 s & 6379,4 s & $-10,2\%$ \\
+\hline
+Uso medio de CPU & 84,8\% & 80,4\% & $-4,4$ p.p. \\
+\hline
+Tiempo con CPU $>90\%$ & 74,3\% & 65,0\% & $-9,3$ p.p. ($-12,5\%$ relativo) \\
+\hline
+Utilización media de GPU & 99,5\% & 99,6\% & $+0,1$ p.p. \\
+\hline
+Tareas resueltas & 5 de 12 (41,7\%) & 5 de 12 (41,7\%) & Sin variación \\
+\hline
+\end{tabular}
+\caption{Resultados comparativos de la línea base y la versión optimizada del Eje H en 12 tareas de entrenamiento en paralelo.}
+\label{tab:eje-h-resultados}
+\end{table}
+
+\FloatBarrier
+
+Las métricas se han calculado con únicamente las 12 tareas reales, sin incluir el proceso auxiliar de gestión. En conjunto, las optimizaciones
+redujeron el tiempo de ejecución y la saturación de la CPU, sin disminuir la utilización de la GPU ni la precisión observada en las tareas.
+
 \subsection{Eje D: Eficiencia computacional y aprovechamiento de recursos}
 
-\subsection{Eje B: Mejora de robustez del conjuntos de tensores}
+El objetivo principal de este eje de mejoras es acelerar las operaciones realizadas en los procesos de entrenamiento. Principalmente se requiere
+optimizar los procesos en paralelo y reducir el tiempo de entrenamiento lo máximo posible. No se requiere modificar el núcleo principal del modelo.
 
+El modelo base realiza los entrenamiento con una precisión predeterminada de 32 bits de punto flotante (FP32). Se realizan pruebas utilizando
+punto flotante cerebral de 16 bits (BF16) para acelerar el entrenamiento sin reducir la capacidad del modelo. Tras probarlo, se pudo apreciar
+un impacto en el rendimiento considerablemente peor, descartando reducir la precisión de los datos de manera definitiva.
+
+La tarjeta gráfica Radeon RX 9070 XT dispone de cómputo aritmético suficiente como para poder realizar operaciones de entrenamiento
+a un mayor ritmo. Algo que se pudo detectar es que el trabajo realizado por la gráfica estaba por debajo de sus capacidades. Tras inspeccionar
+el código se pudo comprobar que una de las posibles causas es que la CPU estaba solicitando continuamente muchos \textit{kernels} pequeños y
+el tiempo de lanzar y coordinar tal número de micro-códigos podía ser mayor que el tiempo utilizado para realizar las operaciones.
+
+Para resolver este problema se diseña un nuevo componente denominado \textit{inductor}. Este componente mejora la eficiencia de las operaciones mediante
+compilación de \textit{kernels}, construyendo una versión optimizada de las regiones que Pytorch puede analizar. Internamente el código de bajo
+nivel construye un grafo para conectar las diversas operaciones en lugar de ejecutar inmediatamente cada operación. Las diversas operaciones
+de las capas se agrupan en bloques más grandes, por ejemplo, combinando la normalización, activación y vuelta a la normalización en un solo bloque. 
+La mejora radica principalmente en reducir el número de llamadas y por lo tanto, menos solicitudes a la GPU.
+
+Utilizando este método, al principio del entrenamiento de la tarea existirá un tiempo de preparación donde todavía no se realize ninguna operación.
+Durante este tiempo de realiza la compilación y se cargan los \textit{kernels} en la memoria RAM de la CPU. Cuando la compilación ha terminado,
+se lanza el entrenamiento y las operaciones se ejecutan mucho más rápidas. En algunos momentos del entrenamiento en paralelo se ha conseguido
+una mejora significativa incrementando la iteración por segundo de hasta 4 veces. Para comprobar que esta técnica funciona, se debe medir
+el tiempo completo de ejecución, desde el tiempo de compilación hasta que ha terminado el entrenamiento.
+
+Tras realizar una serie de pruebas, se puedo comprobar una reducción significativa del tiempo de entrenamiento por tarea alrededor del 66,8\%. Esto
+sumado al entrenamiento en paralelo también se nota una mejora más considerable. Se manejan los tiempos de manera más eficiente por que
+se combina la compilación con el entrenamiento entre tareas. Esta optimización mantiene intacta la arquitectura y no añade parámetros. Tampoco
+es necesario cambiar el número de iteraciones.
+
+En la siguiente tabla se presentan los resultados comparativos entre la línea base y la optimización mediante compilación. Se
+debe tener en cuenta que en los resultados aparece una tarea resuelta adicionalmente. Esto es debido a la variabilidad
+de algunas tareas dependiendo de la semilla. No se considera una mejora del modelo. También requiere remarcar
+que esta comparativa se ha realizado con entrenamientos de 1500 iteraciones por tarea, mientras que, para hacer
+una comparativa justo respecto al modelo base, en los resultados finales se realizará la comparación con 2000
+iteraciones por tarea.
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{4.3cm}|p{2.3cm}|p{2.8cm}|p{2.2cm}|}
+\hline
+\textbf{Métrica} & \textbf{Línea base} &
+\begin{tabular}{c}\textbf{Compilación}\\\end{tabular} &
+\textbf{Variación} \\
+\hline
+Tiempo total (50 tareas) & 40 550,7 s (11,3 h) & 13 476,0 s (3,7 h) & $-66,8\%$ \\
+\hline
+Velocidad de entrenamiento en fase 2 (pasos/s) & 1,85 & 5,67 & $+206,5\%$ \\
+\hline
+Uso medio de CPU & 79,4\% & 61,2\% & $-22,9\%$ \\
+\hline
+Utilización media de GPU & 99,9\% & 98,8\% & $-1,1$ p.p. \\
+\hline
+Pico de VRAM & 15 768 MB & 9 417 MB & $-40,3\%$ \\
+\hline
+Pico de RAM del sistema & 21,9\% & 89,5\% & $+307\%$ \\
+\hline
+Energía por 1.000 pasos (Wh) & 14,08 & 5,08 & $-64,0\%$ \\
+\hline
+Tareas resueltas (\textit{pass@2}) & 18 de 50 (36\%) & 19 de 50 (38\%) & +1 tarea \\
+\hline
+\end{tabular}
+\caption{Resultados de la comparación final del Eje D sobre 50 tareas con 1500 iteraciones por tarea.}
+\label{tab:eje-d-resultados}
+\end{table}
+
+\FloatBarrier
+
+\subsection{Eje B: Mejora de robustez del espacio latente}
+
+\subsubsection{Herramienta de visualización de procesos}
+
+\subsection{Problemas encontrados}
+
+Durante el desarrollo se han ido encontrado diversos problemas relacionados con la puesta en marcha del \textit{software} de entorno
+entre otros problemas:
+
+\begin{itemize}
+	\item A pesar de los grandes avances ROCm, todavía se encuentran errores de drivers en medio de procesos de entrenamiento. Esto era un problema
+	especialmente preocupante al inicio del desarrollo por que podía provocar que todo el conjunto de entrenamiento de las tareas que dura muchas
+	horas se pueda verse afectado. Se tuvieron que realizar protocolos y excepciones de código para controlar de forma aislada aquellos entrenamientos
+	que provocaban fallos en todo el sistema.
+	\item Se encontraron problemas del \textit{software} que controlaban diversos sistemas del equipo durante largas horas de entrenamiento. 
+	Los ventiladores del equipo podían quedarse sin funcionar en cualquier momento.
+	\item Problemas de falta de memoria gráfica durante el entrenamiento de diversas tareas en paralelo. Se tuvo que recurrir a una especia de fase
+	previa en la que la GPU carga los modelos en memoria, calcula el consumo y se guarda en un archivo temporal para que luego el programa
+	supiera de alguna manera el tamaño de reserva antes de cargarlo.
+	\item La compilación de \textit{kernels} también presentaba problemas en ciertas circunstancias. Los millones de archivos que se generan con
+	el tiempo aumentaban el espacio del disco. Se tuvo que recurrir al uso de un dispositivo de almacenamiento adicional para recoger los 842 GB
+	de documentos creados tras el entrenamiento de las 800 tareas (conjunto de entrenamiento y evaluación).
+	\item Además de optimizar el flujo de entrenamiento y el uso de la CPU, los problemas de temperatura continuaron. Se cambió el sistema de
+	refrigeración y se añadió un marco de contacto de CPU, además de aplicar un menor voltaje por medio de la BIOS.
+\end{itemize}
 
 % Conversación chatGPT https://chatgpt.com/share/6a260857-7178-83eb-89a4-2001dce06c2d
 % Coste actual por hora de 5070 TI https://cloud.vast.ai/?utm_source=getdeploying.com&utm_medium=paid&utm_content=nvidia-rtx-5070-ti
 \chapter{Resultados}
 
-Pendiente de redactar.
+La Tabla \ref{tab:resultados-finales} presenta un resumen provisional de las métricas
+principales obtenidas con la configuración base y con los ejes de mejora H/B y D.
+En el momento de redactar esta sección todavía no se dispone de la ejecución final,
+por lo que los valores incluidos tienen carácter orientativo y deberán sustituirse
+por las mediciones definitivas.
 
-\chapter{Planificación}
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{4.5cm}|p{2.3cm}|p{2.8cm}|p{2.2cm}|}
+\hline
+\textbf{Métrica} & \textbf{Base} &
+\begin{tabular}{c}\textbf{Eje H / B}\end{tabular} &
+\begin{tabular}{c}\textbf{Eje D}\end{tabular} \\
+\hline
+Tiempo total de ejecución (evaluación) & 300 h & 270 h & 101 h \\
+\hline
+\textit{pass@2} Et. (entrenamiento) & 70 de 400 (17,5\%) & 74 de 400 (18,5\%) & 78 de 400 (19,5\%) \\
+\hline
+\textit{pass@2} Ev. (evaluación) & 17 de 400 (4,3\%) & 18 de 400 (4,5\%) & 20 de 400 (5,0\%) \\
+\hline
+Uso medio de CPU & 84,8\% & 80,4\% & 61,2\% \\
+\hline
+Coste por tarea (aproximación) & 0,35 EUR & 0,31 EUR & 0,12 EUR \\
+\hline
+\end{tabular}
+\caption{Resumen provisional de los resultados finales por eje de mejora. Los valores son orientativos y deberán sustituirse por las mediciones definitivas.}
+\label{tab:resultados-finales}
+\end{table}
 
-Pendiente de redactar.
+\FloatBarrier
 
 \chapter{Estudio económico}
 
 Pendiente de redactar.
+
+\chapter{Ética del proyecto}
+
+En diversas ocasiones, las decisiones que se toman en cualquier aspecto de la vida pueden implicar alguna consideración ética. Teniendo en cuenta el mercado y la evolución de las tecnologías 
+cada vez se puede considerar de mayor importancia plantear dimensiones éticas ante decisiones que se tomen.
+
+En este caso, el proyecto utiliza infraestructuras de computación local y esto conlleva diversas reflexiones éticas. Cada vez más entidades están dispuestas a delegar sus propios 
+servicios de computación a proveedores externos que ofrecen servicio de inteligencia artificial a un precio relativamente asequible. Por lo tanto, también se les está delegando la posibilidad de mantener 
+los servicios de computación sin importar cuestiones éticas en el ámbito medioambiental. Los servicios de computación en la nube indirectamente necesitan materias primas y suministro eléctrico 
+en un contexto en el que se debe de tener en cuenta la responsabilidad y el impacto que supone el gasto energético.
+
+Cuidar el medioambiente y proteger el impacto en el medioambiente es responsabilidad de cada ciudadano y, por lo tanto, en este proyecto se puede hacer un análisis ético de dos aspectos 
+fundamentales: como individuo y como profesional de la ingeniería del \textit{software}.
+
+Desde una dimensión deontológica se debe impulsar el deber de cada individuo de informarse ante las consecuencias del impacto ambiental en el caso de convertirse en un abonado de un 
+proveedor de servicios de cualquier tecnología de inteligencia artificial. Se debe conocer en qué condiciones y cuáles son los principios que defiende la entidad ante un problema que afecta a todos los ciudadanos. 
+Todo ciudadano tiene derecho a disfrutar y a beneficiarse del mundo globalizado, pero se debe tener en cuenta que las generaciones posteriores también tienen el mismo derecho y por lo tanto 
+se debe salvaguardar el planeta lo más sano posible.
+
+Como profesional de la ingeniería del \textit{software} se debe impulsar el uso de tecnologías apoyen la eficiencia energética y el uso de infraestructuras propia, evitando depender excesivamente de servicios 
+externos. El uso de infraestructura propia permite mayor control y libertad al ciudadano sin tener que depender de ciertas compañías.
+
+Se debe apoyar verdaderamente tecnologías que promuevan una verdadera generalización de la inteligencia sin ``comprarla'' mediante computación y datos masivos, a costa del impacto medioambiental mencionado.
 
 \chapter{Conclusiones y Trabajo Futuro}
 
@@ -1697,8 +2792,8 @@ Pendiente de redactar.
 \bibliographystyle{apacite}
 \bibliography{bibliografia}
 
-\appendix
-\chapter{Apéndices}
+%\appendix
+%\chapter{Apéndices}
 
 \end{document}
 
