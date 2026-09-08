@@ -9,8 +9,11 @@
 \contentsline {table}{\numberline {4.1}{\ignorespaces Rendimiento por nivel de precisión y formato}}{51}{table.4.1}%
 \contentsline {table}{\numberline {4.2}{\ignorespaces Librerías de entorno en Python, versión y abreviación}}{52}{table.4.2}%
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Combinaciones dimensionales del sistema Multitensor.}}{67}{table.5.1}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Resultados comparativos de la línea base y la versión optimizada del Eje H en 12 tareas de entrenamiento en paralelo.}}{86}{table.5.2}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Resultados de la comparación final del Eje D sobre 50 tareas con 1500 iteraciones por tarea.}}{88}{table.5.3}%
 \addvspace {10\p@ }
-\addvspace {10\p@ }
+\contentsline {table}{\numberline {6.1}{\ignorespaces Resumen provisional de los resultados finales por eje de mejora. Los valores son orientativos y deberán sustituirse por las mediciones definitivas.}}{90}{table.6.1}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
