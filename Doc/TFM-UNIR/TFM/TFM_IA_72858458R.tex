@@ -121,7 +121,7 @@ a gran escala.
 
 \section{Objetivos}
 
-El objetivo principal es diseñar y desarrollar un modelo compacto (SLM) que maximice la puntuación en la resolución del benchmark ARC-AGI-1, priorizando estrictamente la
+El objetivo principal es diseñar y desarrollar un modelo compacto (SLM) que maximice la puntuación en la resolución del \textit{benchmark} ARC-AGI-1, priorizando estrictamente la
 eficiencia computacional y el rendimiento por parámetro frente a los modelos de lenguaje a gran escala.
 
 En cuanto a objetivos particulares se enumeran los siguientes:
@@ -135,7 +135,7 @@ En cuanto a objetivos particulares se enumeran los siguientes:
 	alcanzado una solución convergente, optimizando drásticamente el consumo de memoria y tiempo de ejecución.
 	\item Implementar estrategias de consistencia y ensamblado \textit{top-k} que operen sobre diversas variantes o aumentos de los datos de entrada para seleccionar las predicciones más 
 	robustas.
-	\item Realizar una comparativa exhaustiva de eficiencia que evalúe cualitativamente la relación entre la precisión lograda en el benchmark y el coste computacional empleado, como el uso de VRAM,
+	\item Realizar una comparativa exhaustiva de eficiencia que evalúe cualitativamente la relación entre la precisión lograda en el \textit{benchmark} y el coste computacional empleado, como el uso de VRAM,
 	y precisión en FLOPs, validando la viabilidad de la inteligencia algorítmica en entornos de recursos restringidos.
 \end{itemize}
 
@@ -207,7 +207,7 @@ investigadores a demostrar que existe un sistema cognitivo único \cite{spelke20
 poco imprecisas, esta imprecisión crece de forma lineal a medida que aumenta el número representado.
 
 \begin{enumerate}
-\item \textbf{Sistema de representación de objetos inanimados:} Es la capacidad de percibir límites de objetos, la forma forma completo o parcial de objetos ocultos y percibir cuándo y hacia donde se moverán los objetos.
+\item \textbf{Sistema de representación de objetos inanimados:} Es la capacidad de percibir límites de objetos, la forma completo o parcial de objetos ocultos y percibir cuándo y hacia donde se moverán los objetos.
 \item \textbf{Sistema de representación de agentes y sus acciones:} Es la capacidad de percibir agentes animados, sus acciones y sus intenciones, incluso sin lenguaje.
 \item \textbf{Sistema de representación numérica:} Es la capacidad de representar cantidades numéricas, incluso sin lenguaje, y de realizar operaciones aritméticas básicas.
 \item \textbf{Sistema de representación geométrica del espacio:} Es la capacidad de representar el espacio y las relaciones espaciales entre objetos.
@@ -278,7 +278,7 @@ razonamiento más complejo o intensivo, el pensamiento inductivo es más adecuad
 
 Teóricamente, casi cualquier problema puede ser resuelto por fuerza bruta, pero en la la realidad el coste computacional y tiempo hace inabarcable este enfoque. El problema y el espacio
 son características fundamentales para determinar la estrategia de búsqueda y optimización más adecuada. En este sentido, existen diferentes algoritmos de búsqueda y optimización que se pueden aplicar
-en función de las características del problema y el espacio.
+en función de las características del problema.
 
 Tradicionalmente los algoritmos de búsqueda se han clasificado en dos grandes categorías, los algoritmos de búsqueda no informada y los algoritmos de búsqueda informada. Los
 algoritmos de búsqueda no informada, son aquellos algoritmos que no están guiados o simplemente están basados en fuerza bruta. No existe información sobre el dominio del
@@ -415,7 +415,7 @@ acciones desde el nuevo nodo hasta alcanzar un estado final. Estas simulaciones 
 dominio para obtener estimaciones más precisas.
 
 Actualmente existen variantes como Adaptive Branching MCTS (AB-MCTS) que introduce un mecanismo de ramificación adaptativa para mejorar la eficiencia en espacios 
-de búsqueda con alta ramificación, o Sakana AI, un sistema de inteligencia artificial que utiliza MCTS para resolver puzzles del benchmark ARC-AGI.
+de búsqueda con alta ramificación, o Sakana AI, un sistema de inteligencia artificial que utiliza MCTS para resolver puzzles del \textit{benchmark} ARC-AGI.
 
 \subsection{Síntesis de programas}
 
@@ -434,7 +434,7 @@ en cada paso \cite{swiechowski2023monte}, generando una explosión combinatoria 
 
 Por otro lado, las Redes Neuronales Profundas son excelentes reconociendo patrones e intuiciones de un solo vistazo,
 pero carecen de la capacidad algorítmica para planificar deliberadamente a largo plazo o corregir sus propios errores secuenciales. La Búsqueda Guiada por Redes
-Neuronales soluciona las carencias de ambos mundos inyectando la "intuición" del aprendizaje profundo dentro de la estructura lógica de los árboles de búsqueda. 
+Neuronales soluciona las carencias de ambos mundos inyectando la ``intuición'' del aprendizaje profundo dentro de la estructura lógica de los árboles de búsqueda. 
 Esto se materializó entrenando redes neuronales para que actuaran como entes evaluadores dentro de algoritmos como MCTS.
 
 En su versión clásica, MCTS depende de simulaciones masivas para estimar la calidad de cada rama. Sin embargo, en los enfoques híbridos modernos se incorporan redes neuronales que guían de forma explícita la exploración:
@@ -508,8 +508,8 @@ antemano, para conseguir la generalización el agente debe ser capaz de aprender
 \subsection{Espectro de la generalización}
 
 La generalización es un concepto que ha llegado de la mano del aprendizaje automático, desarrollado originalmente para caracterizar el buen rendimiento de un modelo estadístico en 
-datos de entrada que no forman parte de su conjunto de datos de entrenamiento. Este concepto ha seguido siendo parte de la conversación  y se puede definir como la "habilidad" de
-un modelo para gestionar una situación o varias situaciones (o tareas) que no se ha encontrado previamente. Nótese que el concepto de la frase "situación que no se ha encontrado previamente"
+datos de entrada que no forman parte de su conjunto de datos de entrenamiento. Este concepto ha seguido siendo parte de la conversación  y se puede definir como la ``habilidad'' de
+un modelo para gestionar una situación o varias situaciones (o tareas) que no se ha encontrado previamente. Nótese que el concepto de la frase ``situación que no se ha encontrado previamente''
 puede ser tremendamente ambigua y el autor \cite{chollet2019measure} propone un espectro de generalización para aclarar esta ambigüedad. En este espectro, se pueden encontrar diferentes tipos de generalización, 
 como la generalización sistémica (centrada en el sistema)  o generalización consciente-desarrollada (capacidad de manejar situaciones que ni el sistema ni su creador humano habían encontrado antes) que no se va a 
 profundizar en este artículo. Al contrario, se va a profundizar en la generalización de habilidades, que es más útil para cuantificar los grados de generalización.
@@ -537,9 +537,9 @@ aprendizaje profundo moderno. El autor \cite{chollet2019measure} hace referencia
 
 Existen dos perspectivas fundamentales sobre la mente humana, una que es una colección de habilidades que se han grabado en nuestro ADN en la evolución y y la otra que se trata de ver la
 mente como una página en blanco. El autor François Chollet, en el manifiesto ``On the Measure of Intelligence'' \cite{chollet2019measure}, sugiere que los humanos no nacen con una mente vacía que
-aprende cualquier conocimiento desde cero., pero tampoco son una colección de instintos. Se puede decir que nacemos con algunos conocimientos previos innatos \cite{spelke2007core}.
+aprende cualquier conocimiento desde cero, pero tampoco son una colección de instintos. Se puede decir que nacemos con algunos conocimientos previos innatos \cite{spelke2007core}.
 
-Para que un ``benchmark'' como ARC pueda ser una medida real de la inteligencia no puede depender de conocimientos adquiridos y las tareas deb ser resolubles utilizando únicamente los principios de los
+Para que un \textit{benchmark} como ARC pueda ser una medida real de la inteligencia no puede depender de conocimientos adquiridos y las tareas deb ser resolubles utilizando únicamente los principios de los
 núcleos de conocimiento. Cómo de eficiente puede ser un agente para usar usu conocimientos innatos en resolver problemas que no ha conocido antes.
 
 François Chollet define la inteligencia no como un programa estático, sino como un proceso de síntesis de programas. Para establecer esta definición, hay que detallar en una primera
@@ -584,7 +584,7 @@ este aspecto es el diseño para evitar trampas estadísticas que no requieran un
 
 El control de la experiencia debe ser fundamental. No se debe ``comprar'' el rendimiento de un \textit{benchmark} mediante un conjunto de datos de entrenamiento ilimitados. Si un sistema inteligente
 necesita de millones de datos de entrenamiento para generar programas de habilidad consistentes que un humando puede captar con apenas pocos ejemplos, significa que el sistema es ineficiente y no inteligente 
-aun que logre la misma puntuación. La cantidad de datos de entrenamiento sería estrictamente limitada. Por último, el \textit{benchmark} debe ser funcional de la misma forma para humanos y máquinas, de forma justa, asumiendo que
+Aunque logre la misma puntuación. La cantidad de datos de entrenamiento sería estrictamente limitada. Por último, el \textit{benchmark} debe ser funcional de la misma forma para humanos y máquinas, de forma justa, asumiendo que
 ambos agentes poseen los mismos núcleos de conocimiento y que requiere tiempo y tamaño del entrenamiento de un humano.
 
 \subsection{ARC-AGI-1}
@@ -603,14 +603,14 @@ ejemplos.
 \item Describir el conjunto completo de núcleos de conocimiento y comparación ``precisa'' con la inteligencia entre el ser humano y los agentes de inteligencia artificial.
 \end{itemize}
 
-En la imagen siguiente \ref{fig:fig6SECTION2} se muestra un ejemplo de una tarea de ARC-AGI-1. En esta tarea, el objetivo es completar un patrón de una area dada. La solución de esta tarea pasa por generar una cuadrícula
+En la imagen siguiente \ref{fig:fig6SECTION2} se muestra un ejemplo de una tarea de ARC-AGI-1. En esta tarea, el objetivo es completar un patrón de una área dada. La solución de esta tarea pasa por generar una cuadrícula
 de salida que corresponde con la entrada a su izquierda. Para resolver esta tarea, el agente debe ser capaz de identificar el patrón subyacente en la entrada y generar la salida correcta, demostrando así su capacidad para 
 generalizar a partir de los ejemplos proporcionados.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113847784.png}
-\caption[Tarea donde el objetivo es completar un patrón de una area dada]{Tarea donde el objetivo es completar un patrón de una area dada. Para solucionar esta tarea debe generar una cuadrícula de salida que corresponde con la entrada a su izquierda.}
+\caption[Tarea donde el objetivo es completar un patrón de una área dada]{Tarea donde el objetivo es completar un patrón de una área dada. Para solucionar esta tarea debe generar una cuadrícula de salida que corresponde con la entrada a su izquierda.}
 \label{fig:fig6SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
@@ -637,7 +637,7 @@ de la entrada en diferentes objetos basándose en valores o criterios de continu
 
 \FloatBarrier
 
-Generalmente, los objetos presentes en la cuadrícula de entrada persisten en la salida, a menudo trasformando algún transformación geométrica. A pesar del ruido visual o la inclusión
+Generalmente, los objetos presentes en la cuadrícula de entrada persisten en la salida, a menudo con transformación geométrica. A pesar del ruido visual o la inclusión
 provocada por otros objetos, muchos de los objetos persisten.
 
 \begin{figure}[h]
@@ -700,11 +700,11 @@ diversos objetos repetidamente también se incluyen en este núcleo de conocimie
 Los datos de ARC-AGI se pueden encontrar en el repositorio de GitHub \cite{githubGitHubFcholletARCAGI}. Los datos están contenidos en dos sub-directorios diferentes:
 
 \begin{itemize}
-\item \textbf{training}: Contiene 400 tareas de entrenamiento. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son 400 archivos. Todos los archivos de este directorio
-sirven para el entrenamiento del modelo y la adquisición de habilidades.
+\item \textbf{Training}: Contiene 400 tareas de entrenamiento. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son 400 archivos. Todos los archivos de este directorio
+Sirven para el entrenamiento del modelo y la adquisición de habilidades.
 	\subitem{\textbf{a.}} Pares ``train'': Típicamente suele tener tres o más pares de ``arrays''. Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
 	\subitem{\textbf{b.}} Pares ``test'': Típicamente suele tener un par de ``arrays''. El par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
-\item \textbf{evaluation}: Contiene 400 tareas de evaluación. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son otros 400 archivos.
+\item \textbf{Evaluation}: Contiene 400 tareas de evaluación. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son otros 400 archivos.
 \end{itemize}
 	
 Los archivos están en formato JSON. Cada archivo contiene un diccionario con dos claves: ``train'' y ``test''. El valor de cada clave es una lista de pares de ``arrays''.
@@ -746,7 +746,7 @@ destinadas a evaluar capacidades de razonamiento nuevas y más complejas:
 
 \begin{itemize}
 	\item \textbf{Interpretación simbólica:} tareas en las que los símbolos visuales deben interpretarse como portadores de un significado semántico
-más allá de su forma, por ejemplo, cuando una figura representa una acción.
+más allá de su forma. Por ejemplo, cuando una figura representa una acción.
 	\item \textbf{Razonamiento composicional:} tareas que requieren descubrir y aplicar simultáneamente múltiples reglas que interactúan entre sí.
 	\item \textbf{Aplicación contextual de reglas:} tareas en las que la regla correcta depende del contexto específico dentro de la cuadrícula,
 superando la simple identificación de patrones globales superficiales.
@@ -836,7 +836,7 @@ requiere técnicas de aprendizaje por refuerzo y modelado del mundo más que ing
 \subsection{Domain Specific Languages (DSLs) y síntesis de programas}\label{sec:DSL}
 
 En 2020 Johan Sokrates Wind publicó uno de los primero intentos basado en un Lenguaje de Dominio Específico o DSL. El uso de código estrictamente diseñado para resolver tareas específicas
-de ARC-AGI permitió alcanzar una puntuación de 20\% en el benchmark. La idea detrás de esto es codificar algoritmos de programación para crear un conjunto de programas primitivos
+de ARC-AGI permitió alcanzar una puntuación de 20\% en el \textit{benchmark}. La idea detrás de esto es codificar algoritmos de programación para crear un conjunto de programas primitivos
 capaces de modificar matrices bidimensionales.
 
 Los algoritmos realizan búsquedas exhaustivas sobre el espacio de programas posibles que se puede construir cambiando núcleos de conocimiento. Esta mecánica se puede considerar
@@ -1120,7 +1120,7 @@ FP16 de 116,6 TFLOPs es realmente sorprendente.
 \section{Modelos basados en Transformers compactos}
 
 \citeA{li2024tackling} estudian la viabilidad de aplicar un \textit{Vision Transformer} 
-compacto al benchmark ARC mediante entrenamiento supervisado específico por tarea con grandes volúmenes de ejemplos sintéticos. 
+compacto al \textit{benchmark} ARC mediante entrenamiento supervisado específico por tarea con grandes volúmenes de ejemplos sintéticos. 
 El hallazgo central es que un \textit{ViT} convencional sigue rindiendo de forma muy pobre incluso con abundantes datos, 
 lo que apunta a una limitación de representación más que a un simple problema de escala. Para corregir esta debilidad, el 
 trabajo propone \textit{ViTARC}, una arquitectura que sustituye la representación por parches por una codificación a nivel de píxel e 
@@ -1200,7 +1200,7 @@ La autora del trabajo ha realizado el pre-entrenamiento del modelo en un clúste
 
 \section{Estado actual con perspectiva de eficiencia computacional}
 
-Desde una perspectiva estrictamente computacional, el estado actual de ARC-AGI muestra un patrón muy claro. Cada nueva generación del benchmark ha introducido 
+Desde una perspectiva estrictamente computacional, el estado actual de ARC-AGI muestra un patrón muy claro. Cada nueva generación del \textit{benchmark} ha introducido 
 un precipicio de rendimiento que reduce de forma drástica la precisión de los sistemas previos. En términos agregados, el paso de ARC-AGI-1 a ARC-AGI-2 y 
 posteriormente a ARC-AGI-3 implica caídas del orden de 2.5 a 3 veces, lo que sugiere que buena parte de los avances recientes siguen dependiendo de regularidades
 explotables en una versión concreta del problema más que de una generalización robusta. Este comportamiento refuerza la idea de que el progreso en ARC no puede
@@ -1282,7 +1282,7 @@ representación es más fiel a la realidad que el tamaño del modelo, ya que un 
 \section{Enfoque Científico y Método de Investigación}
 
 El presente trabajo se enmarca dentro del método científico empírico-analítico. Dado que el objetivo principal es evaluar la eficiencia y capacidad de un modelo de lenguaje compacto
-en la resolución del benchmark ARC-AGI-1, el enfoque adoptado es de carácter cuantitativo. La investigación sigue un proceso hipotético-deductivo articulado en etapas: planteamiento del problema ante los 
+en la resolución del \textit{benchmark} ARC-AGI-1, el enfoque adoptado es de carácter cuantitativo. La investigación sigue un proceso hipotético-deductivo articulado en etapas: planteamiento del problema ante los 
 límites de la hipótesis de escala en modelos LLM, formulación de la hipótesis basada en modelos compactos, diseño experimental, ejecución y análisis métrico de los resultados.
 
 Desde la perspectiva investigadora, se aplica un método empírico experimental. Este método es el más idóneo ya que permite establecer relaciones causales bajo condiciones de laboratorio estrictamente 
@@ -1413,6 +1413,24 @@ junto con sus versiones y abreviaciones para su referencia en el resto del docum
 
 \FloatBarrier
 
+\section{Herramientas externas}
+
+El desarrollo del proyecto se ha usando herramientas externas de control de código, y plataformas de colaboración de código y desarrollo
+Github Copilot. Adicionalmente, para potenciar la productividad se ha usado diversas herramientas como servidores MCP.
+
+Mencionar el uso de la herramienta Codebase Memory como \textit{indexer} de código para búsquedas e implementación de soluciones. La herramienta
+ayuda a agentes de inteligencia artificial a organizar y localizar el código de manera estructural en lugar de recorrer archivos constantemente.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{image/images/codebase_memory.png}
+	\caption[Representación semántica y relacional del uso de la herramienta Codebase Memory como \textit{indexer} de código.]{Representación semántica y relacional del uso de la herramienta Codebase Memory como \textit{indexer} de código.}
+	\label{fig:fig1SECTION4}
+	{\footnotesize Fuente: Elaboración propia.}
+\end{figure}
+
+\FloatBarrier
+
 % TODO: Añadir herramientas de visualización y análisis de resultados.
 % \section{Utilidades externas de ARC-AGI}
 
@@ -1440,9 +1458,9 @@ La idea (también llamada programación inductiva) es escribir automáticamente 
 simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente, nada más. Este enfoque es inductivo,
 parte de una regla general y busca deducir la regla a partir de los ejemplos. El otro enfoque es transductivo, que es evitar generar un programa general e intentar
 predecir la salida directamente a partir de los ejemplos de entrada. Las soluciones Domain Specific Languages (DSLs) como se ha visto en la sección \ref{sec:DSL},
-el espacio de psobiles programas que se pueden generar es inmenso, computacionalmente costoso para CPU y poco práctico.
+el espacio de posibles programas que se pueden generar es inmenso, computacionalmente costoso para CPU y poco práctico.
 
-Resolver el benchmark ARC-AGI requiere de un enfoque meticuloso y una comprensión profunda de los principios subyacentes que rigen la inteligencia general. Es necesario establecer
+Resolver el \textit{benchmark} ARC-AGI requiere de un enfoque meticuloso y una comprensión profunda de los principios subyacentes que rigen la inteligencia general. Es necesario establecer
 una serie de desarrollos básicos previos:
 
 \begin{enumerate}
@@ -1478,7 +1496,6 @@ lo que supone una diferencia de más de 67 veces. En cuestión de eficiencia com
 
 En la siguiente imagen \ref{fig:fig2SECTION5} se puede observar también la comparativa de diferentes modelos compactos desde la perspectiva de coste por tarea, otra comparativa
 que busca un punto de vista desde la eficiencia.
-
 
 \begin{figure}[h]
 	\centering
@@ -1561,7 +1578,7 @@ secciones se analizará con detalle este enfoque y se presentará una variante p
 
 \subsection{Análisis exploratorio de datos}
 
-Los datos de entrada del benchmark ARC-AGI se presentan en forma de pares de matrices, donde cada par consiste en una matriz de entrada y su correspondiente matriz de salida.
+Los datos de entrada del \textit{benchmark} ARC-AGI se presentan en forma de pares de matrices, donde cada par consiste en una matriz de entrada y su correspondiente matriz de salida.
 El análisis exploratorio de datos (EDA) es un paso crucial para comprender la naturaleza de estos datos y para identificar patrones, tendencias y posibles anomalías que puedan influir en el diseño del modelo. Los
 datos típicamente se presentan en archivos de lenguaje de texto simple JSON, que contienen representaciones de las matrices en formato de listas anidadas. Cada matriz puede variar en tamaño y contenido,
 lo que introduce un nivel adicional de complejidad en el análisis.
@@ -2493,7 +2510,7 @@ Esa espera se denomina sincronización GPU y CPU.
 
 Los entrenamientos de tareas requieren una gran cantidad de iteraciones para encontrar la solución. Este número de iteraciones oscilan entre 1500 y
 2000. En cada iteración se realiza diversas operaciones como el error acumulado, el error de reconstrucción y la pérdida total. Estos datos
-se estaban registrando mediante objetos en memoria. Aun que cada valor podría ser solamente un escalar, la operación obligaba el registro en 
+se estaban registrando mediante objetos en memoria. Aunque cada valor podría ser solamente un escalar, la operación obligaba el registro en 
 memoria por medio de la CPU. El problema radica en la cantidad de sincronizaciones necesarias en los diferentes componentes del sistema y el
 coste de detener el proceso y esperar a que finalicen las operaciones de la GPU pueden ser mucho mayor. Muchas de estas sincronizaciones
 se utilizaban para generar registros de análisis y visualización, lo cual no interesa cuando se trata de realizar trabajos en paralelo.
@@ -2719,7 +2736,7 @@ por las mediciones definitivas.
 \begin{tabular}{c}\textbf{Eje H / B}\end{tabular} &
 \begin{tabular}{c}\textbf{Eje D}\end{tabular} \\
 \hline
-Tiempo total de ejecución & 300 h & 270 h & 101 h \\
+Tiempo total de ejecución (evaluación) & 300 h & 270 h & 101 h \\
 \hline
 \textit{pass@2} Et. (entrenamiento) & 70 de 400 (17,5\%) & 74 de 400 (18,5\%) & 78 de 400 (19,5\%) \\
 \hline

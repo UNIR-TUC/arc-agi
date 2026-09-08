@@ -8,7 +8,7 @@
 \contentsline {figure}{\numberline {2.3}{\ignorespaces Pasos algoritmo MCTS}}{12}{figure.2.3}%
 \contentsline {figure}{\numberline {2.4}{\ignorespaces Modelo jerárquico de habilidades cognitivas y su mapeo del espectro de generalización}}{17}{figure.2.4}%
 \contentsline {figure}{\numberline {2.5}{\ignorespaces Posición del problema, un sistema inteligente que genera programas de habilidades}}{18}{figure.2.5}%
-\contentsline {figure}{\numberline {2.6}{\ignorespaces Tarea donde el objetivo es completar un patrón de una area dada}}{21}{figure.2.6}%
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Tarea donde el objetivo es completar un patrón de una área dada}}{21}{figure.2.6}%
 \contentsline {figure}{\numberline {2.7}{\ignorespaces Prueba de ruido}}{22}{figure.2.7}%
 \contentsline {figure}{\numberline {2.8}{\ignorespaces El objetivo rojo debe ``moverse'' junto al objeto azul hasta hacer ``contacto''}}{22}{figure.2.8}%
 \contentsline {figure}{\numberline {2.9}{\ignorespaces Tarea donde el objetivo es contar el objeto que aparece más veces}}{23}{figure.2.9}%
@@ -25,16 +25,17 @@
 \contentsline {figure}{\numberline {2.20}{\ignorespaces Comparativa del coste por tarea entre modelos}}{47}{figure.2.20}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Representación semántica y relacional del uso de la herramienta Codebase Memory como \textit {indexer} de código.}}{53}{figure.4.1}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Comparativa del coste por tarea entre modelos compactos}}{55}{figure.5.1}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Comparativa del coste por tarea modelos compactos}}{56}{figure.5.2}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Ejemplo de tarea desde el editor de código}}{57}{figure.5.3}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces Valor asignado a cada color}}{58}{figure.5.4}%
-\contentsline {figure}{\numberline {5.5}{\ignorespaces Tarea 045e512c}}{58}{figure.5.5}%
-\contentsline {figure}{\numberline {5.6}{\ignorespaces Tarea 06df4c85}}{59}{figure.5.6}%
-\contentsline {figure}{\numberline {5.7}{\ignorespaces Tarea 0dfd9992}}{59}{figure.5.7}%
-\contentsline {figure}{\numberline {5.8}{\ignorespaces Tarea 05a7bcf2}}{60}{figure.5.8}%
-\contentsline {figure}{\numberline {5.9}{\ignorespaces Arquitectura \textit {CompressARC}}}{62}{figure.5.9}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Comparativa del coste por tarea entre modelos compactos}}{56}{figure.5.1}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Comparativa del coste por tarea modelos compactos}}{57}{figure.5.2}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Ejemplo de tarea desde el editor de código}}{58}{figure.5.3}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Valor asignado a cada color}}{59}{figure.5.4}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Tarea 045e512c}}{59}{figure.5.5}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Tarea 06df4c85}}{60}{figure.5.6}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Tarea 0dfd9992}}{60}{figure.5.7}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Tarea 05a7bcf2}}{61}{figure.5.8}%
+\contentsline {figure}{\numberline {5.9}{\ignorespaces Arquitectura \textit {CompressARC}}}{63}{figure.5.9}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
