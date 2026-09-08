@@ -1263,13 +1263,14 @@ representación es más fiel a la realidad que el tamaño del modelo, ya que un 
     \centering
     \vspace*{\fill}
     \rotatebox{90}{%
-        \includegraphics[width=0.7\textheight, height=0.9\textwidth, keepaspectratio]{../../../src/arc_agi_data_scraper/images/tflops_models_cost_light_large_font.png}%
+        \includegraphics[width=0.7\textheight, height=0.9\textwidth, keepaspectratio]{../../../src/arc_agi_data_scraper/images/tflops_models_cost_light.png}%
     }
     
     \vspace{0.5cm}
     \caption[Comparativa del coste por tarea entre modelos]{Comparativa del coste por tarea entre modelos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
     \label{fig:fig20SECTION1}
-    {\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI. }
+    {\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.
+	Imagen completa: \url{https://github.com/UNIR-TUC/arc-agi/blob/main/src/arc_agi_data_scraper/images/tflops_models_cost_light.png}}
     \vspace*{\fill}
 \end{figure}
 \clearpage
@@ -1438,30 +1439,30 @@ ayuda a agentes de inteligencia artificial a organizar y localizar el código de
 % Utilizar las pautas de  https://arahim3.github.io/arc-agi-guide/ para realizar la introducción del texto.
 \chapter{Desarrollo}
 
-ARC-AGI es algo más que un \textit{benchmark}, es un riguroso manifiesto sobre la naturaleza de la propia inteligencia. Ha sido diseñado fundamentalmente para que la comunidad
-realice mediciones objetivas de forma progresiva. Esta mecánica de medición es relativamente sencilla para humanos pero extremadamente compleja para sistemas de 
-inteligencia artificial. El diseño y desarrollo de modelos de lenguaje para resolver la diferentes tareas de ARC-AGI requiere de un enfoque meticuloso y una comprensión 
+ARC-AGI es algo más que un \textit{benchmark}; es un riguroso manifiesto sobre la naturaleza de la propia inteligencia. Su diseño permite a la comunidad realizar 
+mediciones objetivas y evaluar progresivamente el avance de los sistemas. Esta mecánica de medición es relativamente sencilla para humanos pero extremadamente compleja para sistemas de 
+inteligencia artificial. El diseño y desarrollo de modelos de lenguaje para resolver las diferentes tareas de ARC-AGI requiere de un enfoque meticuloso y una comprensión 
 profunda de los principios subyacentes que rigen la inteligencia general. Es por ello, que se convierte en un gran desafío para el trabajo del autor de este proyecto
 y para toda la comunidad de investigación en inteligencia artificial.
 
 La idea central es que la inteligencia no se demuestra mediante la posesión de una habilidad específica, sino mediante la eficiencia en la adquisición
-de nuevas habilidades al enfrentarse a un problema nuevo. Esto es caso lo opuesto a lo que premia la mayoría de los indicadores de rendimiento clásicos. Éstos indicadores
-miden el desempeño en tareas que se pueden dominar con suficientes datos, comprando el rendimiento.
+de nuevas habilidades al enfrentarse a un problema nuevo. Esto es casi lo opuesto de lo que premian la mayoría de los indicadores de rendimiento clásicos. Estos indicadores
+miden el desempeño en tareas que se pueden dominarse mediante grandes cantidades de datos, en lugar de medir la capacidad de adquirir nuevas habilidades.
 
 Para que exista una comparación justa entre humanos y modelos de inteligencia artificial, la tarea debe basarse en inteligencia fluida, con capacidad de razonar,
 resolver problemas nuevos y adaptarse a nuevas situaciones y no en la inteligencia cristalizada que se basa en conocimiento y las habilidades acumuladas.
 ARC-AGI sortea este problema basándose únicamente en un pequeño conjunto de conocimientos previos básicos, bloques cognitivos fundamentales que están presentes al 
 nacer o que se adquieren muy temprano en la vida, con una instrucción explícita mínima.
 
-La síntesis de programas es el enfoque serio más antiguo para ARC-AGI, y va directamente al fondo del problema, que es deducir la regla a partir de los ejemplos.
-La idea (también llamada programación inductiva) es escribir automáticamente un programa que satisfaga una especificación, y en este caso la especificación es
-simplemente los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente, nada más. Este enfoque es inductivo,
+La síntesis de programas es uno de los enfoques clásicos para ARC-AGI, y aborda directamente al fondo del problema, que es deducir la regla a partir de los ejemplos.
+La idea, también llamada programación inductiva, es escribir automáticamente un programa que satisfaga una especificación. En este caso, la especificación está
+formada por los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente, nada más. Este enfoque es inductivo,
 parte de una regla general y busca deducir la regla a partir de los ejemplos. El otro enfoque es transductivo, que es evitar generar un programa general e intentar
-predecir la salida directamente a partir de los ejemplos de entrada. Las soluciones Domain Specific Languages (DSLs) como se ha visto en la sección \ref{sec:DSL},
+predecir la salida directamente a partir de los ejemplos de entrada. Las soluciones \textit{Domain Specific Languages} (DSLs) como se ha visto en la sección \ref{sec:DSL},
 el espacio de posibles programas que se pueden generar es inmenso, computacionalmente costoso para CPU y poco práctico.
 
 Resolver el \textit{benchmark} ARC-AGI requiere de un enfoque meticuloso y una comprensión profunda de los principios subyacentes que rigen la inteligencia general. Es necesario establecer
-una serie de desarrollos básicos previos:
+una serie de componentes básicos previos:
 
 \begin{enumerate}
 	\item \textbf{Preparación de datos:} Tratamiento del corpus ARC-AGI, definiendo las rutinas de visualización y codificación espacial necesarias. Existen ya herramientas externas que permiten realizar esta tarea de forma más eficiente y rápida.
@@ -1484,7 +1485,8 @@ Los datos obtenidos son datos oficiales de la página web oficial de ARC-AGI.
 	\includegraphics[width=0.85\textwidth]{../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light.png}
 	\caption[Comparativa del coste por tarea entre modelos compactos]{Comparativa del coste por tarea entre modelos compactos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
 	\label{fig:fig1SECTION5}
-	{\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.}
+	{\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.
+	Imagen completa: \url{https://github.com/UNIR-TUC/arc-agi/blob/main/src/arc_agi_data_scraper/images/compact_tflops_cost_light.png}}
 \end{figure}
 
 \FloatBarrier
@@ -1502,7 +1504,8 @@ que busca un punto de vista desde la eficiencia.
 	\includegraphics[width=0.85\textwidth]{../../../src/arc_agi_data_scraper/images/cost_models_cost_light.png}
 	\caption[Comparativa del coste por tarea modelos compactos]{Comparativa del coste por tarea entre modelos compactos.}
 	\label{fig:fig2SECTION5}
-	{\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.}
+	{\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.
+	Imagen completa: \url{https://github.com/UNIR-TUC/arc-agi/blob/main/src/arc_agi_data_scraper/images/cost_models_cost_light.png}}
 \end{figure}
 
 \FloatBarrier
@@ -2753,9 +2756,11 @@ Coste por tarea (aproximación) & 0,35 EUR & 0,31 EUR & 0,12 EUR \\
 
 \FloatBarrier
 
-\chapter{Estudio económico}
 
-Pendiente de redactar.
+
+% \chapter{Estudio económico}
+
+% Pendiente de redactar.
 
 \chapter{Ética del proyecto}
 
