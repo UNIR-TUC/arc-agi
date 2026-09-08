@@ -83,11 +83,15 @@
 \contentsline {subsubsection}{Reducción de la frecuencia de post-procesamiento}{85}{subsubsection*.28}%
 \contentsline {subsubsection}{Vectorización del cálculo de la pérdida}{85}{subsubsection*.29}%
 \contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{87}{subsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del espacio latente}{89}{subsection.5.2.3}%
-\contentsline {subsubsection}{Herramienta de visualización de procesos}{89}{subsubsection*.30}%
-\contentsline {subsection}{\numberline {5.2.4}Problemas encontrados}{89}{subsection.5.2.4}%
-\contentsline {chapter}{\numberline {6}Resultados}{90}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Estudio económico}{91}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Ética del proyecto}{92}{chapter.8}%
-\contentsline {chapter}{\numberline {9}Conclusiones y Trabajo Futuro}{93}{chapter.9}%
-\contentsline {section}{Referencias}{93}{section*.31}%
+\contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del espacio latente y multi-semilla}{88}{subsection.5.2.3}%
+\contentsline {subsubsection}{Umbral de información libre por hoja latente}{92}{subsubsection*.30}%
+\contentsline {subsubsection}{Aprendizaje adaptativo de demostraciones}{93}{subsubsection*.31}%
+\contentsline {subsubsection}{Entrenamiento independiente mediante varias semillas}{94}{subsubsection*.32}%
+\contentsline {subsubsection}{Selección de candidatos dentro de cada semilla}{95}{subsubsection*.33}%
+\contentsline {subsubsection}{Fusión de las soluciones obtenidas por las semillas}{96}{subsubsection*.34}%
+\contentsline {subsubsection}{Herramienta de visualización de procesos}{97}{subsubsection*.35}%
+\contentsline {subsection}{\numberline {5.2.4}Problemas encontrados}{97}{subsection.5.2.4}%
+\contentsline {chapter}{\numberline {6}Resultados}{99}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Ética del proyecto}{101}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Conclusiones y Trabajo Futuro}{102}{chapter.8}%
+\contentsline {section}{Referencias}{103}{section*.36}%
