@@ -2531,7 +2531,7 @@ necesarias para cada paso, lo que disminuye el tiempo total de ejecución, espec
 \subsubsection{Vectorización del cálculo de la pérdida}
 
 El cálculo del error de reconstrucción generaba muchas operaciones pequeñas en la CPU. Para cada ejemplo se probaban distintas
-posiciones de la cuadrícula objetivo y se calculaba una pérdida para cada recorte. H1 agrupa estas operaciones para procesarlas de
+posiciones de la cuadrícula objetivo y se calculaba una pérdida para cada recorte. Se agrupan estas operaciones para procesarlas de
 forma vectorizada en la GPU.
 
 En primer lugar se calculan las puntuaciones de todas las posiciones posibles mediante una suma prefija de la máscara $m$. Si $P(k)$
@@ -2553,7 +2553,7 @@ Todas las puntuaciones se calculan a la vez y se convierten en probabilidades me
 \label{eq:h1-particion-desplazamiento}
 \end{equation}
 
-La segunda parte de H1 vectoriza la reconstrucción de los colores. La operación \textit{unfold} extrae todos los recortes posibles de
+La segunda parte de este procedimiento vectoriza la reconstrucción de los colores. La operación \textit{unfold} extrae todos los recortes posibles de
 los \textit{logits} y los organiza como un lote. Para cada posición $(x,y)$, el tensor resultante contiene los valores:
 
 \begin{equation}
@@ -2636,7 +2636,7 @@ nivel construye un grafo para conectar las diversas operaciones en lugar de ejec
 de las capas se agrupan en bloques más grandes, por ejemplo, combinando la normalización, activación y vuelta a la normalización en un solo bloque. 
 La mejora radica principalmente en reducir el número de llamadas y, por tanto, de solicitudes a la GPU.
 
-Con este método, al principio del entrenamiento de la tarea existe un tiempo de preparación durante el que todavía no se realiza ninguna operación.
+Con este método, al principio del entrenamiento de la tarea existe un tiempo de preparación en el que todavía no se realiza ninguna operación.
 Durante este periodo se realiza la compilación y se cargan los \textit{kernels} en la memoria RAM de la CPU. Cuando la compilación ha terminado,
 se lanza el entrenamiento y las operaciones se ejecutan mucho más rápidas. En algunos momentos del entrenamiento en paralelo se ha conseguido
 una mejora significativa incrementando la iteración por segundo de hasta 4 veces. Para comprobar que esta técnica funciona, se debe medir
@@ -2689,7 +2689,7 @@ Tareas resueltas (\textit{pass@2}) & 18 de 50 (36\%) & 19 de 50 (38\%) & +1 tare
 
 \subsection{Eje B: Mejora de robustez del espacio latente y multi-semilla}
 
-El objetivo del eje B es mejorar la estabilidad del proceso de entrenamiento. \textit{CompressARC} puede resolver algunas tareas de manera "afortunada" dependiendo
+El objetivo del eje B es mejorar la estabilidad del proceso de entrenamiento. \textit{CompressARC} puede resolver algunas tareas de manera ``afortunada'' dependiendo
 de la semilla inicial. Esto lleva a algunos resultados inconsistentes. Sumado al problema del colapso del espacio latente, es necesario analizar una estrategia
 para estabilizar el espacio latente distribuido en las 18 hojas del Multitensor. Cada una de estas hojas representa una combinación de diferentes dimensiones,
 como ejemplos, colores, direcciones, filas y columnas (píxeles).
@@ -2951,7 +2951,7 @@ Cada semilla conserva el selector original de \textit{CompressARC}. En cada
 paso se consideran dos candidatos:
 
 \begin{enumerate}
-    \item Predicción actual del modelo;
+    \item Predicción actual del modelo.
     \item Predicción suavizada mediante una media móvil exponencial.
 \end{enumerate}
 
