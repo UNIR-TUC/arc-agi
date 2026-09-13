@@ -236,13 +236,13 @@ INPUT ./TFM_IA_72858458R.lof
 INPUT ./TFM_IA_72858458R.lof
 INPUT TFM_IA_72858458R.lof
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm
-OUTPUT TFM_IA_72858458R.lof
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmti10.tfm
 INPUT /usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc
+OUTPUT TFM_IA_72858458R.lof
 INPUT ./TFM_IA_72858458R.lot
 INPUT ./TFM_IA_72858458R.lot
 INPUT TFM_IA_72858458R.lot
 OUTPUT TFM_IA_72858458R.lot
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmti10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmr12.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT ./image/images/1780498631168.png
@@ -342,11 +342,33 @@ INPUT ./image/images/1782939793801.png
 INPUT ./image/images/1782939793801.png
 INPUT ./image/images/1782939793801.png
 INPUT ./image/images/1782939793801.png
-INPUT ../../../src/arc_agi_data_scraper/images/tflops_models_cost_light_large_font.png
-INPUT ../../../src/arc_agi_data_scraper/images/tflops_models_cost_light_large_font.png
-INPUT ../../../src/arc_agi_data_scraper/images/tflops_models_cost_light_large_font.png
-INPUT ../../../src/arc_agi_data_scraper/images/tflops_models_cost_light_large_font.png
-INPUT ../../../src/arc_agi_data_scraper/images/tflops_models_cost_light_large_font.png
+INPUT ../../../src/arc_agi_data_scraper/images/tflops_models_cost_light.png
+INPUT ../../../src/arc_agi_data_scraper/images/tflops_models_cost_light.png
+INPUT ../../../src/arc_agi_data_scraper/images/tflops_models_cost_light.png
+INPUT ../../../src/arc_agi_data_scraper/images/tflops_models_cost_light.png
+INPUT ../../../src/arc_agi_data_scraper/images/tflops_models_cost_light.png
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt9.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmmi9.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmsy9.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex9.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/matha9.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/matha5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/mathb9.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/mathb5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt8.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt8.tfm
+INPUT ./image/images/codebase_memory.png
+INPUT ./image/images/codebase_memory.png
+INPUT ./image/images/codebase_memory.png
+INPUT ./image/images/codebase_memory.png
+INPUT ./image/images/codebase_memory.png
 INPUT ../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light.png
 INPUT ../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light.png
 INPUT ../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light.png
@@ -387,11 +409,53 @@ INPUT ./image/images/1783613832670.png
 INPUT ./image/images/1783613832670.png
 INPUT ./image/images/1783613832670.png
 INPUT ./image/images/1783613832670.png
+INPUT ./image/images/SuperCompressARC-Arquitectura Baseline_dia.png
+INPUT ./image/images/SuperCompressARC-Arquitectura Baseline_dia.png
+INPUT ./image/images/SuperCompressARC-Arquitectura Baseline_dia.png
+INPUT ./image/images/SuperCompressARC-Arquitectura Baseline_dia.png
+INPUT ./image/images/SuperCompressARC-Arquitectura Baseline_dia.png
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx6.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx7.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam7.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/matha10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/matha7.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/mathb10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/mathb7.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmti10.tfm
+INPUT ./image/images/SuperCompressARC-KL.png
+INPUT ./image/images/SuperCompressARC-KL.png
+INPUT ./image/images/SuperCompressARC-KL.png
+INPUT ./image/images/SuperCompressARC-KL.png
+INPUT ./image/images/SuperCompressARC-KL.png
+INPUT ./image/images/SuperCompressARC-Arquitectura Multiseeds.png
+INPUT ./image/images/SuperCompressARC-Arquitectura Multiseeds.png
+INPUT ./image/images/SuperCompressARC-Arquitectura Multiseeds.png
+INPUT ./image/images/SuperCompressARC-Arquitectura Multiseeds.png
+INPUT ./image/images/SuperCompressARC-Arquitectura Multiseeds.png
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
+INPUT ./image/images/arc_agi_dashboard.png
+INPUT ./image/images/arc_agi_dashboard.png
+INPUT ./image/images/arc_agi_dashboard.png
+INPUT ./image/images/arc_agi_dashboard.png
+INPUT ./image/images/arc_agi_dashboard.png
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm
+INPUT ../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light_final.png
+INPUT ../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light_final.png
+INPUT ../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light_final.png
+INPUT ../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light_final.png
+INPUT ../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light_final.png
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx9.tfm
 INPUT ./TFM_IA_72858458R.bbl
 INPUT ./TFM_IA_72858458R.bbl
 INPUT TFM_IA_72858458R.bbl
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt8.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt8.tfm
 INPUT TFM_IA_72858458R.aux
 INPUT ./TFM_IA_72858458R.out
@@ -402,12 +466,22 @@ INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/mathabx-type1/matha10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/mathabx-type1/matha6.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/mathabx-type1/matha8.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/mathabx-type1/mathb10.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/mathabx-type1/mathb8.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/mathabx-type1/mathx10.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb
+INPUT /usr/share/texmf/fonts/type1/public/cm-super/sfrm1000.pfb
 INPUT /usr/share/texmf/fonts/type1/public/cm-super/sfrm1095.pfb
