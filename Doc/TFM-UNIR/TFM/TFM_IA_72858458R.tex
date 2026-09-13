@@ -76,16 +76,16 @@ This work designs and optimizes \textit{SuperCompressARC}, a compact model for p
 \mainmatter
 \chapter{Introducción} % 1. Introducción
 
-Actualmente existe una tendencia ascendente en el campo de inteligencia artificial. El paradigma del aprendizaje profundo ha demostrado ser una herramienta de presente y de futuro. El \textit{software}
+Actualmente existe una tendencia ascendente en el campo de inteligencia artificial. El paradigma del aprendizaje profundo ha demostrado ser una herramienta del presente y del futuro. El \textit{software}
 es un elemento fundamental en la sociedad actual, y con la evolución del propio \textit{software} también evolucionan los distintos campos tecnológicos, entre ellos el de la inteligencia artificial.
 
 La inteligencia artificial es un campo de estudio que se centra en la creación de sistemas capaces de realizar tareas que normalmente requieren inteligencia humana, como el aprendizaje,
 el razonamiento, la resolución de problemas, la comprensión del lenguaje natural y la percepción visual. En los últimos años, ha habido un aumento significativo en el interés y el
 desarrollo de la inteligencia artificial, lo que ha llevado a avances notables en áreas como el aprendizaje automático, el procesamiento del lenguaje natural y la visión por computadora.
 
-Cada vez se le da más importancia a las herramientas basadas en inteligencia artificial y cada vez llega a un público más amplio. En este contexto, los mecanismos para que esta tecnología
+Cada vez se le da más importancia a las herramientas basadas en inteligencia artificial y se llega a un público más amplio. En este contexto, los mecanismos para que esta tecnología
 pueda ser consumida por el público general se vuelven cada vez más importantes. En este sentido, la eficiencia en el consumo de estos recursos tecnológicos cada vez es más relevante. Con la
-llegada de más modelos de lenguaje, la necesidad de encontrar formas de medir la capacidad de generalización de estos modelos se vuelve cada vez más importante también.
+llegada de más modelos de lenguaje, la necesidad de encontrar formas de medir la capacidad de generalización de estos modelos se vuelve con el tiempo más importante.
 
 Es aquí donde entra en juego el \textit{Abstraction and Reasoning Corpus (ARC-AGI)}, un \textit{benchmark} diseñado específicamente para evaluar la inteligencia de los sistemas y su capacidad para
 adquirir nuevas habilidades de forma eficiente a partir de unos pocos ejemplos, basándose en los principios del conocimiento central innato humano. El estándar ARC-AGI es una respuesta a la necesidad
@@ -95,12 +95,12 @@ de medir la inteligencia, permitiendo la comparación entre sistemas y humanos.
 \section{Contexto}
 
 A pesar de los avances recientes, los Grandes Modelos de Lenguaje siguen teniendo dificultades para resolver este tipo de tareas, ya que sus capacidades se derivan principalmente de
-volúmenes masivos de datos de pre-entrenamiento y memorización probabilística. Esto evidencia que, la hipótesis de escalar los modelos sin límites insospechados, no es suficiente
+volúmenes masivos de datos de pre-entrenamiento y memorización probabilística. Esto evidencia que la hipótesis de escalar los modelos sin límites insospechados no es suficiente
 para alcanzar el razonamiento abstracto. Aumentar ciegamente la cantidad de parámetros no dota automáticamente al sistema de la capacidad de resolver tareas que requieren un razonamiento
 abstracto más novedoso.
 
 ARC-AGI representa el indicador estándar por excelencia de la industria para medir el progreso real hacia la inteligencia general artificial a través de la generalización
-amplia y síntesis de programas.
+amplia y la síntesis de programas.
 
 \section{Justificación}
 
@@ -110,7 +110,7 @@ concentrarse exclusivamente en descubrir transformaciones algorítmicas robustas
 
 La viabilidad de este enfoque está respaldada por investigaciones muy recientes. Arquitecturas como el \textit{Hierarchical Reasoning Model} y el \textit{Tiny Recursive Model} han
 logrado superar el rendimiento de modelos masivos en ARC-AGI utilizando redes minúsculas de apenas 7 a 27 millones de parámetros, gracias a la aplicación de pasos de 
-computación recursiva en un espacio latente. Asimismo, enfoques revolucionarios como \textit{CompressARC} han demostrado que es posible resolver un alto porcentaje de puzzles sin absolutamente ningún 
+computación recursiva en un espacio latente. Asimismo, enfoques revolucionarios como \textit{CompressARC} han demostrado que es posible resolver un alto porcentaje de \textit{puzzles} sin absolutamente ningún 
 pre-entrenamiento, utilizando apenas 76.000 parámetros y minimizando la longitud de descripción puramente en el tiempo de inferencia \textit{(Test-Time Training)}.
 
 Dadas las restricciones de capacidad de cómputo disponibles para este proyecto, apostar por estos paradigmas (bucles de refinamiento, síntesis de programas y entrenamiento en tiempo de prueba) 
@@ -130,7 +130,7 @@ En cuanto a objetivos particulares se enumeran los siguientes:
 	\item Explorar y aplicar técnicas de adaptación en tiempo de prueba \textit{Test-Time Training y Test-Time Compute} para que el modelo aprenda y descubra abstracciones algorítmicas directamente
 	sobre las tareas objetivo, reduciendo la dependencia del pre-entrenamiento.
 	\item Integrar mecanismos de tiempo de cálculo adaptativo o \textit{early-stopping} que permitan al sistema abortar el bucle de razonamiento iterativo una vez haya 
-	alcanzado una solución convergente, optimizando drásticamente el consumo de memoria y tiempo de ejecución.
+	alcanzado una solución convergente, optimizando drásticamente el consumo de memoria y el tiempo de ejecución.
 	\item Implementar estrategias de consistencia y ensamblado \textit{top-k} que operen sobre diversas variantes o aumentos de los datos de entrada para seleccionar las predicciones más 
 	robustas.
 	\item Realizar una comparativa exhaustiva de eficiencia que evalúe cualitativamente la relación entre la precisión lograda en el \textit{benchmark} y el coste computacional empleado, como el uso de VRAM,
@@ -143,16 +143,16 @@ En cuanto a objetivos particulares se enumeran los siguientes:
 \section{Definición de la inteligencia}
 
 La definición de inteligencia no es una tarea sencilla. A lo largo de la historia, filósofos, científicos y expertos en diversas disciplinas han propuesto 
-diferentes definiciones de inteligencia, cada una con su propia perspectiva y enfoque. A pesar de muchos intentos, no existe una definición estándar 
+diferentes definiciones de inteligencia, cada una con su propia perspectiva y enfoque. A pesar de numerosos intentos, no existe una definición estándar 
 de inteligencia.
 
-La inteligencia se ha descrito de manera aproximada pero no se ha llegado a una definición concreta. Según la real academia española,
-la inteligencia es la ``capacidad de entender o comprender'', ``capacidad de resolver problemas'' y ``conocimiento, compresión, acto de entender''. 
+La inteligencia se ha descrito de manera aproximada pero no se ha llegado a una definición concreta. Según la Real Academia Española,
+la inteligencia es la ``capacidad de entender o comprender'', ``capacidad de resolver problemas'' y ``conocimiento, comprensión, acto de entender''. 
 Sin embargo, esta definición es bastante amplia y no captura completamente la complejidad de lo que implica la inteligencia.
 
 Para crear una definición única se debe tener en cuenta varios factores. La inteligencia es una propiedad que tiene en consideración 
 la interacción con uno o diversos entornos. La inteligencia también se relaciona con la capacidad del agente para tener éxito u obtener ganancias 
-al respecto de alguna meta. De la misma forma, también dependen de cómo el agente está capacitado en diferentes objetivos y entornos. En base a 
+al respecto de alguna meta. De la misma forma, también depende de cómo el agente está capacitado en diferentes objetivos y entornos. Con base en
 referencias de diversos autores, en este trabajo se adoptará el estándar de definición más utilizada a día de hoy.
 
 \begin{quote}
@@ -197,15 +197,15 @@ respecto de lo inteligible algo análogo a lo que es la facultad sensitiva respe
 \section{Núcleos del conocimiento}
 
 En la teoría se ha considerado que el conocimiento humano se basa en un único sistema de aprendizaje de propósito general. Investigaciones recientes del departamento
-de Psicología de la Universidad de Harvard ha propuesto una teoría alternativa, que sugiere que el conocimiento humano se basa en una serie de núcleos o módulos innatos 
+de Psicología de la Universidad de Harvard han propuesto una teoría alternativa que sugiere que el conocimiento humano se basa en una serie de núcleos o módulos innatos 
 de conocimiento, cada uno especializado en un dominio específico, como el espacio, los objetos, las personas, los números y el lenguaje \cite{spelke2007core}.
 
 Cada sistema se define por un conjunto de principios y un conjunto de fronteras cognitivas. Estas fronteras actúan como un sello de identidad que ayuda a diversos 
 investigadores a demostrar que existe un sistema cognitivo único \cite{spelke2007core}. Por ejemplo, el sistema numérico central, se evidencia con representaciones numéricas
-poco imprecisas, esta imprecisión crece de forma lineal a medida que aumenta el número representado.
+imprecisas, esta imprecisión crece de forma lineal a medida que aumenta el número representado.
 
 \begin{enumerate}
-\item \textbf{Sistema de representación de objetos inanimados:} Es la capacidad de percibir límites de objetos, la forma completo o parcial de objetos ocultos y percibir cuándo y hacia donde se moverán los objetos.
+\item \textbf{Sistema de representación de objetos inanimados:} Es la capacidad de percibir límites de objetos, la forma completa o parcial de objetos ocultos y percibir cuándo y hacia donde se moverán los objetos.
 \item \textbf{Sistema de representación de agentes y sus acciones:} Es la capacidad de percibir agentes animados, sus acciones y sus intenciones, incluso sin lenguaje.
 \item \textbf{Sistema de representación numérica:} Es la capacidad de representar cantidades numéricas, incluso sin lenguaje, y de realizar operaciones aritméticas básicas.
 \item \textbf{Sistema de representación geométrica del espacio:} Es la capacidad de representar el espacio y las relaciones espaciales entre objetos.
@@ -229,8 +229,8 @@ por el ganador del Nobel Daniel Kahneman en su libro \textit{Thinking, Fast and 
 	esto se corresponde con la inducción o la síntesis de programas, donde un sistema construye deliberadamente un programa lógico paso a paso para llegar a una solución.
 \end{itemize}
 
-La clave de estos conceptos es que el pensamiento humano hace uso de una combinación de ambos sistemas, tiene la capacidad de usar un pensamiento más transductor o
-inductivo dependiendo de la tarea y situación. Para la mayoría de tareas diarias es más eficiente el uso de un pensamiento más transductor, pero cuando se requiere un 
+La clave de estos conceptos es que el pensamiento humano hace uso de una combinación de ambos sistemas. Tiene la capacidad de usar un pensamiento más transductivo o
+inductivo dependiendo de la tarea y situación. Para la mayoría de tareas diarias es más eficiente el uso de un pensamiento más transductivo, pero cuando se requiere un 
 razonamiento más complejo o intensivo, el pensamiento inductivo es más adecuado.
 
 % Monte Carlo Tree Search (MCTS) -> https://www.cs.us.es/~fsancho/Blog/posts/MCTS.md
@@ -274,7 +274,7 @@ razonamiento más complejo o intensivo, el pensamiento inductivo es más adecuad
 % 23. Multi-LLM AB-MCTS
 \section{Algoritmos de búsqueda y optimización}
 
-Teóricamente, casi cualquier problema puede ser resuelto por fuerza bruta, pero en la la realidad el coste computacional y tiempo hace inabarcable este enfoque. El problema y el espacio
+Teóricamente, casi cualquier problema puede ser resuelto por fuerza bruta, pero en la realidad el coste computacional y tiempo hacen inabarcable este enfoque. El problema y el espacio
 son características fundamentales para determinar la estrategia de búsqueda y optimización más adecuada. En este sentido, existen diferentes algoritmos de búsqueda y optimización que se pueden aplicar
 en función de las características del problema.
 
@@ -282,12 +282,12 @@ Tradicionalmente los algoritmos de búsqueda se han clasificado en dos grandes c
 algoritmos de búsqueda no informada, son aquellos algoritmos que no están guiados o simplemente están basados en fuerza bruta. No existe información sobre el dominio del
 problema, sólo representación. Estos algoritmos intentan explorar todas las opciones posibles en cada nodo. Para buscar una solución óptima
 se imponen una serie de restricciones o reglas con el objetivo de evitar caer en bucles o ciclos de la estructura de los datos. Algunos ejemplos
-de algoritmos de búsqueda no informada son; búsqueda en anchura (BFS), búsqueda en profundidad (DFS), 
+de algoritmos de búsqueda no informada son: búsqueda en anchura (BFS), búsqueda en profundidad (DFS), 
 búsqueda de coste uniforme, búsqueda iterativa o limitada en profundidad, entre otros.
 
 Los algoritmos no informados pueden ser mejorados proporcionando más información sobre el problema. Búsqueda informada significa que el algoritmo tiene un contexto específico y la
 heurística ayuda a representar el contexto. La heurística puede ser una serie de reglas para evaluar un estado y puede medir su rendimiento. De esta manera,
-no existe un camino fijo y los nodos son visitados de acuerdo al coste heurística. Los costes son calculados a medida que se recorre
+no existe un camino fijo y los nodos son visitados de acuerdo al coste heurístico. Los costes son calculados a medida que se recorre
 el árbol de cada nodo visitado y se añade a la cola. El objetivo es simple, ignorar los árboles cuyo coste es mayor 
 que los visitados, ahorrando coste computacional. La heurística se puede definir como la capacidad de realizar innovaciones para conseguir
 alcanzar los objetivos.
@@ -300,13 +300,13 @@ alcanzar los objetivos.
 \cite{newell1962processes}
 \end{center}
 
-La heurística puede reducir drásticamente el coste computacional de problemas que son resueltos con algoritmos no informados, pero también puede llevar a soluciones sub-óptimas.
+La heurística puede reducir drásticamente el coste computacional de problemas que son resueltos con algoritmos no informados, pero también puede llevar a soluciones subóptimas.
 Algunos algoritmos de búsqueda informados son; búsqueda el primero el mejor (BFA), búsqueda codiciosa el primero el mejor (GBFS), búsqueda A*, búsqueda de haz (Beam Search), entre otros.
 
 \subsection{Búsqueda en anchura}
 
 Explora todas las opciones de un determinado nivel de profundidad antes de pasar al siguiente nivel. Es necesario visitar todos los nodos hijos de un
-determinado nivel y finalizar al llegar al objetivo. Para implementarlo se usa una cola FIFO ó \textit{First In First Out}, los nodos de un nivel son 
+determinado nivel y finalizar al llegar al objetivo. Para implementarlo se usa una cola FIFO o \textit{First In First Out}, los nodos de un nivel son 
 procesados y sus nodos hijos son añadidos a la cola. Puede ser óptimo si todas las acciones tienen el mismo coste y es completo siempre
 que el espacio sea discreto o finito.
 
@@ -332,7 +332,7 @@ los nodos con menor coste acumulado, lo que puede llevar a encontrar una soluci�
 
 \subsection{Búsqueda en profundidad}
 
-Explora un nodo hijo antes de explorar los nodos hermanos. Repite el proceso para el resto de hijos que ya ha
+Explora un nodo hijo antes de explorar los nodos hermanos. Repite el proceso para el resto de hijos que todavía no ha
 visitado. Para implementarlo se usa una pila LIFO ó \textit{Last In First Out}, el nodo más recientemente visitado es el primero en ser procesado. 
 
 \begin{figure}[h]
@@ -345,7 +345,7 @@ visitado. Para implementarlo se usa una pila LIFO ó \textit{Last In First Out},
 
 \FloatBarrier
 
-No es completo en caso de entorno no finito. Tampoco es óptimo en caso de entorno no finito. Es aconsejable utilizar
+No es completo en caso de un entorno no finito. Tampoco es óptimo en caso de entorno no finito. Es aconsejable utilizar
 la búsqueda en profundidad de manera limitada, se considera que los nodos por debajo del límite no tienen hijos.
 
 También existe la alternativa al uso del algoritmo en profundidad iterativa, incrementando el límite del nivel de 
@@ -353,12 +353,12 @@ profundidad de manera iterativa, hasta que se alcance el objetivo. Es completo y
 
 \subsection{Búsqueda A*}
 
-Existen distintas variantes de algoritmos de búsquedas informadas \textit{Best Search}. La mayoría de estos algoritmos emplean una función heurística para estimar el coste de la ruta
+Existen distintas variantes de algoritmos de búsqueda informadas \textit{Best Search}. La mayoría de estos algoritmos emplean una función heurística para estimar el coste de la ruta
 a nivel computacional más eficiente. Por ejemplo, el algoritmo el primero el mejor codicioso (GBFS) es el caso más básico, se expande aquel nodo que parece más cerca del objetivo según
 la estimación heurística.
 
-La búsqueda A* es el más utilizado de esta categoría. Se considera el coste tanto el coste acumulado desde el nodo raíz, como el coste estimado mediante heurística hasta el objetivo. Es 
-completo siempre que la heurística sea admisible. También se puede considerar óptimo y una complejidad temporal y espacial de $O(b^d)$, donde b es el factor de ramificación y d es la 
+La búsqueda A* es el más utilizado de esta categoría. Se consideran tanto el coste acumulado desde el nodo raíz, como el coste estimado mediante heurística hasta el objetivo. Es 
+completo siempre que la heurística sea admisible. También se puede considerar óptimo y presenta una complejidad temporal y espacial de $O(b^d)$, donde b es el factor de ramificación y d es la 
 profundidad de la solución óptima. Para que la heurística sea admisible, nunca debe sobrestimar el coste real y debe ser consistente. Se asume que el coste de cualquier transición es mayor
 que 0.
 
@@ -369,24 +369,23 @@ un dominio y encontrar soluciones que satisfagan esas restricciones.
 
 En diversos problemas o juegos, se puede construir, al menos en teoría, un espacio que se asemeja a un árbol de estados completo que puede contener
 todos los resultados posibles. Un algoritmo como Minimax se basa precisamente en la idea de evaluar la bondad de las jugadas de etiquetas de estados
-que se propagan hasta un estado actual. El objetivo es decidir cual es el camino o árbol que conduce a mejores resultados al jugador. El problema
+que se propagan hasta un estado actual. El objetivo es decidir cuál es el camino o árbol que conduce a mejores resultados al jugador. El problema
 que se encuentra con el algoritmo Minimax y derivados es que el espacio de búsqueda puede ser tan grande que resulta absolutamente inabarcable. En todos
 los algoritmos se han proporcionado métodos para mitigar el problema mediante acotaciones de la profundidad de búsqueda hacia adelante ó directamente la
 poda de ramificaciones para evitar visitar aquellos nodos que parecen resultar menos prometedores.
 
 Como respuesta a este tipo de aproximaciones hace unos años surgió la técnica de \textit{Monte Carlo Tree Search} (Búsqueda en Árboles con Monte Carlo)
 que ofrece algunas ventajas inherentes. Se puede aplicar en espacios de búsqueda con muchas ramificaciones, espacios que antes eran inabarcables. No requiere 
-conocimiento específico del juego y no siempre tiene porqué encontrar una solución óptima. \textit{Upper Confidence Bound applied to Trees} (UCBT) 
+conocimiento específico del juego y no siempre tiene por qué encontrar una solución óptima. \textit{Upper Confidence Bound applied to Trees} (UCBT) 
 es la variante más común que trata de equilibrar la exploración y explotación de nodos. La idea general es simular jugadas al azar desde una posición actual 
-para realizar una muestra de cómo se comportan las distintas. El algoritmo del límite superior de confianza (UCB) trata de equilibrar la exploración
+para realizar una muestra de cómo se comportan las distintas simulaciones. El algoritmo del límite superior de confianza (UCB) trata de equilibrar la exploración
 y explotación de nodos. Para que UCBT no genere un gran número de simulaciones aleatorias y minimizar riesgos, la variante UCT hace uso de estadísticas
 de bondad disponibles para todos los estados sucesores. MCTS cuenta con diversas fases:
 
 \begin{itemize}
 	\item \textbf{Selección:} Se parte del nodo raíz y en cada nivel se elige la rama más prometedora utilizando una función de utilidad como UCT. Se continúa descendiendo hasta 
 	alcanzar un nodo terminal o un nodo que aún tiene acciones sin explorar.
-	\item \textbf{Expansión:} Si el nodo seleccionado no está completamente explorado, se elige una de sus acciones no visitadas. Se crea un nuevo nodo hijo y se añade al árbol. 
-	Se crea un nuevo nodo hijo y se añade al árbol.
+	\item \textbf{Expansión:} Si el nodo seleccionado no está completamente explorado, se elige una de sus acciones no visitadas. Se crea un nuevo nodo hijo y se añade al árbol.
 	\item \textbf{Simulación:} Desde el nuevo nodo se simula una partida o secuencia completa de acciones hasta llegar a un estado final. La simulación puede ser aleatoria o 
 	guiada por heurísticas. El resultado proporciona una recompensa o valoración de la rama explorada.
 	\item \textbf{Retro-propagación:} La recompensa obtenida se propaga hacia atrás por todos los nodos recorridos durante la iteración.
@@ -404,7 +403,7 @@ de bondad disponibles para todos los estados sucesores. MCTS cuenta con diversas
 \FloatBarrier
 
 MCTS selecciona la rama más prometedora, expande una acción nueva, simula el resultado y actualiza las estadísticas del camino recorrido para mejorar futuras decisiones.
-Se puede definir tres estrategias fundamentales que intervienen en distintas fases del algoritmo. Durante la fase de selección es necesario decidir 
+Se pueden definir tres estrategias fundamentales que intervienen en distintas fases del algoritmo. Durante la fase de selección es necesario decidir 
 qué nodo del árbol debe explorarse a continuación. Esta decisión puede tomarse utilizando diferentes criterios, como elegir el nodo con mayor recompensa acumulada,
 el que haya participado en un mayor número de simulaciones exitosas o, más habitualmente, aplicar una función que equilibre exploración y explotación, como UCB.
 En la fase de expansión se determina qué nuevo nodo añadir al árbol \cite{perez2014knowledge}. Aunque lo más común es seleccionar una acción disponible de forma aleatoria,
@@ -413,7 +412,7 @@ acciones desde el nuevo nodo hasta alcanzar un estado final. Estas simulaciones 
 dominio para obtener estimaciones más precisas.
 
 Actualmente existen variantes como Adaptive Branching MCTS (AB-MCTS) que introduce un mecanismo de ramificación adaptativa para mejorar la eficiencia en espacios 
-de búsqueda con alta ramificación, o Sakana AI, un sistema de inteligencia artificial que utiliza MCTS para resolver puzzles del \textit{benchmark} ARC-AGI.
+de búsqueda con alta ramificación, o Sakana AI, un sistema de inteligencia artificial que utiliza MCTS para resolver \textit{puzzles} del \textit{benchmark} ARC-AGI.
 
 \subsection{Síntesis de programas}
 
@@ -426,13 +425,13 @@ comportamiento deseado y el sistema genera un programa que satisfaga dichas espe
 
 \subsection{Búsqueda Guiada por Redes Neuronales}
 
-Históricamente, los algoritmos de búsqueda clásicos como A* ó MCTS, funcionaban explorando sistemáticamente las posibles acciones futuras. 
+Históricamente, los algoritmos de búsqueda clásicos como A* o MCTS, funcionaban explorando sistemáticamente las posibles acciones futuras.
 Sin embargo, en dominios complejos como el ajedrez, o la síntesis de programas para ARC-AGI, el número de ramificaciones posibles crece de forma exponencial
 en cada paso \cite{swiechowski2023monte}, generando una explosión combinatoria que hace imposible la resolución por fuerza bruta dentro de un límite de tiempo o memoria manejable.
 
-Por otro lado, las Redes Neuronales Profundas son excelentes reconociendo patrones e intuiciones de un solo vistazo,
-pero carecen de la capacidad algorítmica para planificar deliberadamente a largo plazo o corregir sus propios errores secuenciales. La Búsqueda Guiada por Redes
-Neuronales soluciona las carencias de ambos mundos inyectando la ``intuición'' del aprendizaje profundo dentro de la estructura lógica de los árboles de búsqueda. 
+Por otro lado, las redes neuronales profundas son excelentes reconociendo patrones e intuiciones de un solo vistazo,
+pero carecen de la capacidad algorítmica para planificar deliberadamente a largo plazo o corregir sus propios errores secuenciales. La búsqueda guiada por redes
+neuronales soluciona las carencias de ambos mundos inyectando la ``intuición'' del aprendizaje profundo dentro de la estructura lógica de los árboles de búsqueda. 
 Esto se materializó entrenando redes neuronales para que actuaran como entes evaluadores dentro de algoritmos como MCTS.
 
 En su versión clásica, MCTS depende de simulaciones masivas para estimar la calidad de cada rama. Sin embargo, en los enfoques híbridos modernos se incorporan redes neuronales que guían de forma explícita la exploración:
@@ -452,7 +451,7 @@ imposibles para las máquinas.
 
 \section{Abstract and Reasoning Corpus}\label{sec:arc}
 
-Los sistemas de evaluación de la inteligencia artificial han ido evolucionando a lo largo del tiempo. La investigación de esta área de ha centrado
+Los sistemas de evaluación de la inteligencia artificial han ido evolucionando a lo largo del tiempo. La investigación de esta área se ha centrado
 históricamente en comprobar si las máquinas realizan bien tareas específicas, siendo una evaluación orientada a tareas y no una evaluación de 
 la inteligencia intrínseca.
 
@@ -465,15 +464,15 @@ la inteligencia intrínseca.
 \cite{minsky1968matter}
 \end{center}
 
-Tras los métodos tradicionales de evaluar algoritmos, la IA ha pasado a una evaluación de ``caja negra'' basada en el comportamiento que involucra la discriminación
-humana (comparación directa por o contra humanos) y pruebas de rendimiento de problemas. Se iniciaron evaluaciones metodológicas de dudosa validez,
-donde los investigadores a menudo seleccionaban los conjuntos de datos que mejor les convenían y ajustaban parámetros en exceso provocando sobre-ajustes. Esto
+Tras los métodos tradicionales de evaluación de algoritmos, la IA ha pasado a una evaluación de ``caja negra'' basada en el comportamiento que involucra la discriminación
+humana (comparación directa con humanos) y pruebas de rendimiento en problemas. Se iniciaron evaluaciones metodológicas de dudosa validez,
+donde los investigadores a menudo seleccionaban los conjuntos de datos que mejor les convenían y ajustaban parámetros en exceso provocando sobreajustes. Esto
 llevó a situaciones donde muchos resultados publicados eran reproducibles pero difícilmente replicables \cite{hernandez2017evaluation}. En consecuencia,
-la aparente mejora del modelo desaparecía en cuanto cambiaba ligeramente el dominio de los datos, además de una fuerte dispersión de los métodos
+la aparente mejora del modelo desaparecía en cuanto cambiaba ligeramente el dominio de los datos. Además, existía una fuerte dispersión de los métodos
 en las diferentes disciplinas.
 
-Para sistemas de inteligencia artificial de propósito general era necesario un nuevo enfoque orientado a habilidades. Este enfoque se basa en la evaluación de capacidades cognitivas en lugar de tareas en
-las que fue diseñado originalmente \cite{hernandez2017evaluation}. Para garantizar la validez de este enfoque, las pruebas de evaluación requieren directrices estrictas, como definir con antelación
+Para los sistemas de inteligencia artificial de propósito general era necesario un nuevo enfoque orientado a habilidades. Este enfoque se basa en la evaluación de capacidades cognitivas en lugar de tareas para
+las que fueron diseñados originalmente \cite{hernandez2017evaluation}. Para garantizar la validez de este enfoque, las pruebas de evaluación requieren directrices estrictas, como definir con antelación
 los conjuntos de datos para entrenamiento y evaluación, y evitar el sobre-ajuste a conjuntos de datos específicos.
 
 \begin{quote}
@@ -485,14 +484,14 @@ los conjuntos de datos para entrenamiento y evaluación, y evitar el sobre-ajust
 \cite{hernandez2017evaluation}
 \end{center}
 
-Para avanzar hacia sistemas de inteligencia artificial más inteligentes y humanos es necesario un método de evaluación de la inteligencia que compare dos o más sistemas y humanos. Es aquí donde entra en juego
+Para avanzar hacia sistemas de inteligencia artificial más inteligentes y similares a los humanos es necesario un método de evaluación de la inteligencia que compare dos o más sistemas entre sí y con seres humanos. Es aquí donde entra en juego
 el Abstract and Reasoning Corpus (ARC-AGI), un \textit{benchmark} diseñado para respetar todas las directrices necesarias. ARC-AGI está construido con un conjunto de prioridades para ser lo más parecido posible
 a la capacidad de razonamiento innata del ser humano \cite{chollet2019measure}.
 
-Los modelos que existen en la actualidad funcionan correctamente en tareas específicas, todavía están ciertamente limitados y hambrientos de datos. En situaciones en los que se desvían ligeramente de sus datos de entrenamiento,
+Los modelos que existen en la actualidad funcionan correctamente en tareas específicas, pero todavía están limitados y requieren grandes cantidades de datos. En situaciones en las que se desvían ligeramente de sus datos de entrenamiento,
 son incapaces de afrontar tareas que requieren un razonamiento novedoso. ARC-AGI también está pensado para medir el progreso de manera precisa y cuantitativa de la inteligencia. En este sentido, las definiciones
-que se han dado en este trabajo en secciones anteriores puede ayudar a intuir la estructura de las pruebas de evaluación de ARC-AGI. Las tareas de evaluación no deben ser necesariamente conocidas de
-antemano, para conseguir la generalización el agente debe ser capaz de aprender y gestionar nuevas tareas \cite{chollet2019measure}.
+que se han dado en secciones anteriores pueden ayudar a comprender la estructura de las pruebas de evaluación de ARC-AGI. Las tareas de evaluación no tienen por qué ser conocidas de
+antemano. Para conseguir la generalización, el agente debe ser capaz de aprender y gestionar nuevas tareas \cite{chollet2019measure}.
 
 \begin{quote}
 \itshape
@@ -506,18 +505,18 @@ antemano, para conseguir la generalización el agente debe ser capaz de aprender
 \subsection{Espectro de la generalización}
 
 La generalización es un concepto que ha llegado de la mano del aprendizaje automático, desarrollado originalmente para caracterizar el buen rendimiento de un modelo estadístico en 
-datos de entrada que no forman parte de su conjunto de datos de entrenamiento. Este concepto ha seguido siendo parte de la conversación  y se puede definir como la ``habilidad'' de
+datos de entrada que no forman parte de su conjunto de datos de entrenamiento. Este concepto ha seguido formando parte del debate y se puede definir como la ``habilidad'' de
 un modelo para gestionar una situación o varias situaciones (o tareas) que no se ha encontrado previamente. Nótese que el concepto de la frase ``situación que no se ha encontrado previamente''
-puede ser tremendamente ambigua y el autor \cite{chollet2019measure} propone un espectro de generalización para aclarar esta ambigüedad. En este espectro, se pueden encontrar diferentes tipos de generalización, 
-como la generalización sistémica (centrada en el sistema)  o generalización consciente-desarrollada (capacidad de manejar situaciones que ni el sistema ni su creador humano habían encontrado antes) que no se va a 
-profundizar en este artículo. Al contrario, se va a profundizar en la generalización de habilidades, que es más útil para cuantificar los grados de generalización.
+puede ser tremendamente ambiguo y \citeA{chollet2019measure} propone un espectro de generalización para aclarar esta ambigüedad. En este espectro se pueden encontrar diferentes tipos de generalización, 
+como la generalización sistémica (centrada en el sistema) o la generalización consciente-desarrollada (capacidad de manejar situaciones que ni el sistema ni su creador humano habían encontrado antes), en las que no se 
+profundizará en este trabajo. En cambio, se profundizará en la generalización de habilidades, que resulta más útil para cuantificar los grados de generalización.
 
 \begin{itemize}
 \item \textbf{Ausencia de generalización:} Sistemas donde no existe incertidumbre ni novedad. Entorno cerrado como un algoritmo que juega al ``tres en raya'',  iterando exhaustivamente sobre todas las jugadas posibles. No hay adaptación posible.
 \item \textbf{Generalización local o robustez:} Es la capacidad de un sistema para manejar nuevos ejemplos dentro de una distribución de datos conocida para una sola tarea o un conjunto bien definido de ellas.  Este es el nivel en el que ha operado históricamente el 
 aprendizaje profundo moderno. El autor \cite{chollet2019measure} hace referencia a un ejemplo de clasificador de gatos en el que se clasifican gatos que el modelo no había visto antes.
 \item \textbf{Generalización amplia o flexibilidad:} Es la capacidad de manejar una categoría amplia de tareas y entornos relacionados sin intervención humana adicional, incluyendo situaciones imprevistas por los creadores \cite{chollet2019measure}. Un ejemplo de esto puede ser el coche autónomo de nivel 5.
-\item \textbf{Generalización extrema o generalidad:} Sistemas abiertos capaces de manejar tareas enteramente nuevas que solo comparten características abstractas con las ya conocidas, aplicable a cualquier dominio. También se puede denominar como inteligencia general.
+\item \textbf{Generalización extrema o generalidad:} Sistemas abiertos capaces de manejar tareas enteramente nuevas que solo comparten características abstractas con las ya conocidas y que son aplicables a cualquier dominio. También se puede denominar inteligencia general.
 \end{itemize}
 
 \begin{figure}[h]
@@ -533,20 +532,20 @@ aprendizaje profundo moderno. El autor \cite{chollet2019measure} hace referencia
 	
 \subsection{La inteligencia desde la perspectiva de la adquisición de habilidades}
 
-Existen dos perspectivas fundamentales sobre la mente humana, una que es una colección de habilidades que se han grabado en nuestro ADN en la evolución y y la otra que se trata de ver la
-mente como una página en blanco. El autor François Chollet, en el manifiesto ``On the Measure of Intelligence'' \cite{chollet2019measure}, sugiere que los humanos no nacen con una mente vacía que
+Existen dos perspectivas fundamentales sobre la mente humana: una la considera una colección de habilidades que se han grabado en nuestro ADN durante la evolución y la otra la concibe como una
+mente en blanco. François Chollet, en el manifiesto ``On the Measure of Intelligence'' \cite{chollet2019measure}, sugiere que los humanos no nacen con una mente vacía que
 aprende cualquier conocimiento desde cero, pero tampoco son una colección de instintos. Se puede decir que nacemos con algunos conocimientos previos innatos \cite{spelke2007core}.
 
-Para que un \textit{benchmark} como ARC pueda ser una medida real de la inteligencia no puede depender de conocimientos adquiridos y las tareas deb ser resolubles utilizando únicamente los principios de los
-núcleos de conocimiento. Cómo de eficiente puede ser un agente para usar usu conocimientos innatos en resolver problemas que no ha conocido antes.
+Para que un \textit{benchmark} como ARC pueda ser una medida real de la inteligencia, no puede depender de conocimientos adquiridos y sus tareas deben poder resolverse utilizando únicamente los principios de los
+núcleos de conocimiento. De este modo, se puede medir la eficiencia con la que un agente utiliza sus conocimientos innatos para resolver problemas que no ha conocido antes.
 
 François Chollet define la inteligencia no como un programa estático, sino como un proceso de síntesis de programas. Para establecer esta definición, hay que detallar en una primera
-instancia la posición del problema y el proceso técnico de una tarea según su marco formal. La arquitectura del sistema se compone de tres entidades principales;
+instancia la posición del problema y el proceso técnico de una tarea según su marco formal. La arquitectura del sistema se compone de tres entidades principales:
 
 \begin{itemize}
 \item \textbf{El Sistema Inteligente ($IS$)}: Es el agente que genera un programa de habilidad ($SP$) basándose en la experiencia recibida.
-\item \textbf{La Tarea ($T$)}: Es el entorno que plantea un problema a resolver. La tarea tiene la función de puntuación (éxito o fracaso) y una función de retroalimentación que devuelve al sistema inteligente.
-\item \textbf{El programa de habilidad ($SP$)}: Artefacto producido por ($IS$), un programa ejecutable que trata de resolver la tarea y devuelve una respuesta. Representa la capacidad del sistema para gestionar el entorno o problema dado. Un sistema es más inteligente si proporciona programas de alta habilidad usando los menos recursos posibles en tareas de alta dificultad de generalización.
+\item \textbf{La Tarea ($T$)}: Es el entorno que plantea un problema. La tarea dispone de una función de puntuación (éxito o fracaso) y de una función que devuelve retroalimentación al sistema inteligente.
+\item \textbf{El programa de habilidad ($SP$)}: Artefacto producido por ($IS$), un programa ejecutable que trata de resolver la tarea y devuelve una respuesta. Representa la capacidad del sistema para gestionar el entorno o problema dado. Un sistema es más inteligente si proporciona programas de alta habilidad utilizando la menor cantidad de recursos posible en tareas de elevada dificultad de generalización.
 \end{itemize}
 
 \begin{figure}[h]
@@ -567,48 +566,48 @@ El proceso de la resolución de una tarea se podría dividir en dos fases:
 	\subitem{\textbf{b.}} Fase de Producción. El $IS$ genera un programa de habilidad ($SP$).
 	\subitem{\textbf{c.}} Fase de Acción. El $SP$ interactúa con la tarea ($T$) para producir una respuesta.
 	\subitem{\textbf{d.}} Fase de Retroalimentación. La tarea evalúa la respuesta, se asigna una puntuación y se genera un \textit{feedback}.
-	\subitem{\textbf{e.}} Fase de Actualización. El sistema inteligente ($IS$) recibe ese feedback para actualizar su estado ó estados internos, mejorando su comprensión del problema para una siguiente iteración.
+	\subitem{\textbf{e.}} Fase de Actualización. El sistema inteligente ($IS$) recibe ese \textit{feedback} para actualizar su estado o estados internos, mejorando su comprensión del problema para una siguiente iteración.
 \item \textbf{Fase de evaluación o prueba de generalización:} Una vez terminada la fase de entrenamiento, el $IS$ entrega la versión definitiva de su programa de habilidad. En esta fase el programa se enfrenta a situaciones o entornos que no ha percibido anteriormente.
 	\subitem{\textbf{a.}} Fase de Desafío. Se presenta una situación nueva (test) que implica incertidumbre.
 	\subitem{\textbf{b.}} Fase de Ejecución. El programa de habilidad produce respuestas sin posibilidad de recibir retroalimentación.
-	\subitem{\textbf{c.}} Fase de Medición. Suma de la puntuación obtenida. Si el programa ha podido gestionar las situaciones nuevas significa que se ha demostrado el principio de generalización.
+	\subitem{\textbf{c.}} Fase de Medición. Suma de la puntuación obtenida. Si el programa ha podido gestionar las situaciones nuevas, significa que se ha demostrado el principio de generalización.
 \end{enumerate}
 
-En conclusión, ¿qué se puede esperar de un \textit{benchmark} de inteligencia ideal? Un \textit{benchmark} ideal debe ser explícito sobre su alcance, se debe demostrar el éxito sobre las pruebas y que exista una correlación
-estadística con éxito en un entorno real. Los resultados deben ser reproducibles, tal como señalaba el autor Jose Hernandez-Orallo \citeyear{hernandez2017evaluation}. Además, se debería 
+En conclusión, ¿qué se puede esperar de un \textit{benchmark} de inteligencia ideal? Un \textit{benchmark} ideal debe ser explícito sobre su alcance, demostrar el éxito en las pruebas y presentar una correlación
+estadística con el éxito en un entorno real. Los resultados deben ser reproducibles, tal como señalaba José Hernández-Orallo \citeyear{hernandez2017evaluation}. Además, se debería 
 medir la capacidad de generalización, es decir, medir la capacidad de gestionar situaciones que ni el sistema ni el desarrollador ha visto anteriormente. Esto indica que el conjunto de tareas dedicadas
-a la evaluación debe ser estrictamente privado para evitar el se inyecte la solución o bien en el código o en los propios datos de entrenamiento (contaminación). Otro punto relevante que acompaña a
+a la evaluación debe ser estrictamente privado para evitar que se inyecte la solución en el código o en los propios datos de entrenamiento (contaminación). Otro punto relevante que acompaña a
 este aspecto es el diseño para evitar trampas estadísticas que no requieran una verdadera comprensión abstracta.
 
-El control de la experiencia debe ser fundamental. No se debe ``comprar'' el rendimiento de un \textit{benchmark} mediante un conjunto de datos de entrenamiento ilimitados. Si un sistema inteligente
-necesita de millones de datos de entrenamiento para generar programas de habilidad consistentes que un humando puede captar con apenas pocos ejemplos, significa que el sistema es ineficiente y no inteligente 
-Aunque logre la misma puntuación. La cantidad de datos de entrenamiento sería estrictamente limitada. Por último, el \textit{benchmark} debe ser funcional de la misma forma para humanos y máquinas, de forma justa, asumiendo que
-ambos agentes poseen los mismos núcleos de conocimiento y que requiere tiempo y tamaño del entrenamiento de un humano.
+El control de la experiencia debe ser fundamental. No se debe ``comprar'' el rendimiento de un \textit{benchmark} mediante un conjunto ilimitado de datos de entrenamiento. Si un sistema inteligente
+necesita millones de datos de entrenamiento para generar programas de habilidad consistentes que un humano puede captar con apenas unos pocos ejemplos, significa que el sistema es ineficiente y no inteligente,
+aunque logre la misma puntuación. La cantidad de datos de entrenamiento debería estar estrictamente limitada. Por último, el \textit{benchmark} debe funcionar de la misma forma para humanos y máquinas, de manera justa, asumiendo que
+ambos agentes poseen los mismos núcleos de conocimiento y teniendo en cuenta el tiempo y el volumen de entrenamiento de un humano.
 
 \subsection{ARC-AGI-1}
 % 400 tareas trainning
 % 400 tareas evaluation
 
-Con el objetivo de dar respuesta a todas las necesidades que se han mencionado en las secciones anteriores, nace el la propuesta de \textit{benchmark} Abstraction and Reasoning Corpus (ARC), un repositorio de datos 
-con la intención de servir como referencia para medir la inteligencia general. En esta sección se va a explorar los objetivos y el diseño de este repositorio.
+Con el objetivo de dar respuesta a todas las necesidades mencionadas en las secciones anteriores, nace la propuesta del \textit{benchmark} Abstraction and Reasoning Corpus (ARC), un repositorio de datos 
+destinado a servir como referencia para medir la inteligencia general. En esta sección se van a explorar los objetivos y el diseño de este repositorio.
 
 ARC-AGI como \textit{benchmark} de síntesis de programas tiene diferentes objetivos finales:
 \begin{itemize}
 \item Mantener un formato cercano o simple para que pueda ser solucionable por humanos.
-\item Centrar el foco en medir la generalización y no sólo habilidades. La generalización de debe medir de una manera cuantitativa. Presentar tareas altamente abstractas que deben ser entendidas por el ser humano con pocos
+\item Centrar el foco en medir la generalización y no solo las habilidades. La generalización se debe medir de manera cuantitativa. Presentar tareas altamente abstractas que deben ser entendidas por el ser humano con pocos
 ejemplos.
-\item Control cuantitavo de la experiencia proporcionada (datos de entrenamiento limitados). Los datos de entrenamiento tendrán una cantidad fija.
-\item Describir el conjunto completo de núcleos de conocimiento y comparación ``precisa'' con la inteligencia entre el ser humano y los agentes de inteligencia artificial.
+\item Control cuantitativo de la experiencia proporcionada (datos de entrenamiento limitados). Los datos de entrenamiento tendrán una cantidad fija.
+\item Describir el conjunto completo de núcleos de conocimiento y comparar de manera ``precisa'' la inteligencia humana con la de los agentes de inteligencia artificial.
 \end{itemize}
 
-En la imagen siguiente \ref{fig:fig6SECTION2} se muestra un ejemplo de una tarea de ARC-AGI-1. En esta tarea, el objetivo es completar un patrón de una área dada. La solución de esta tarea pasa por generar una cuadrícula
+En la imagen siguiente \ref{fig:fig6SECTION2} se muestra un ejemplo de una tarea de ARC-AGI-1. En esta tarea, el objetivo es completar un patrón de un área dada. La solución de esta tarea pasa por generar una cuadrícula
 de salida que corresponde con la entrada a su izquierda. Para resolver esta tarea, el agente debe ser capaz de identificar el patrón subyacente en la entrada y generar la salida correcta, demostrando así su capacidad para 
 generalizar a partir de los ejemplos proporcionados.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113847784.png}
-\caption[Tarea donde el objetivo es completar un patrón de una área dada]{Tarea donde el objetivo es completar un patrón de una área dada. Para solucionar esta tarea debe generar una cuadrícula de salida que corresponde con la entrada a su izquierda.}
+\caption[Tarea donde el objetivo es completar un patrón de un área dada]{Tarea donde el objetivo es completar un patrón de un área dada. Para solucionar esta tarea se debe generar una cuadrícula de salida que se corresponda con la entrada situada a su izquierda.}
 \label{fig:fig6SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
@@ -617,12 +616,12 @@ generalizar a partir de los ejemplos proporcionados.
 
 \subsection{Núcleos de conocimiento aplicado en ARC-AGI}
 
-Todos los problemas planteados están diseñados espcificamente para abordar los núcleos de conocimiento. Los nucleos de conocimiento de ARC están planteados
+Todos los problemas planteados están diseñados específicamente para abordar los núcleos de conocimiento. Los núcleos de conocimiento de ARC están planteados
 para ser lo más parecido posible a los núcleos de conocimiento del ser humano.
 
 \subsubsection{Objetualidad}
 
-Núcleo de conocimiento centrado en la capacidad de interpretación del entorno, analizando las diferentes entidades. Se fundamenta bajo el principio cohesión y persistencia de objetos. Se analiza y se separa la cuadrícula
+Núcleo de conocimiento centrado en la capacidad de interpretación del entorno mediante el análisis de las diferentes entidades. Se fundamenta en el principio de cohesión y persistencia de los objetos. Se analiza y se separa la cuadrícula
 de la entrada en diferentes objetos basándose en valores o criterios de continuidad como los bloques del mismo color.
 
 \begin{figure}[h]
@@ -648,21 +647,21 @@ provocada por otros objetos, muchos de los objetos persisten.
 
 \FloatBarrier
 
-La influencia mediante el contacto es otro punto especialmente relevante, muchas tareas requieren de entender ciertas interacciones físicas, como un objeto que se desplaza hasta tocar a otro o una
+La influencia mediante el contacto es otro punto especialmente relevante. Muchas tareas requieren entender ciertas interacciones físicas, como un objeto que se desplaza hasta tocar a otro o una
 línea que se dibuja y rebota al entrar en contacto con un obstáculo.
 
 \subsubsection{Orientación a objetivos}
 
 Las cuadrículas de entrada y salida suelen ser comprendidas por los humanos como los estados iniciales y finales de un proceso que conlleva intencionalidad. Las transformaciones buscan alcanzar una meta
-y resulta ser una heurística útil para resolver puzzles.
+y resulta ser una heurística útil para resolver \textit{puzzles}.
 
 \subsubsection{Números y conteo}
 
 Diversas tareas de ARC implican contar y clasificar objetos. Las tareas pueden tener distintos tamaños y
 es especialmente relevante la comparación de magnitudes. No es sólo contar objetos o ``puntos'',
 es también identificar aquellos símbolos que aparecen en más ocasiones (concurrencia). Son necesarias nociones básicas de suma y resta en cantidades pequeñas. En ARC las cantidades
-utilizadas no tienen un número mayor de 9. Esto se refleja como una capacidad innata de los humanos para la representación numérica, en secciones anteriores se ha explorado
-esta capacidad como uno de los núcleos de conocimiento innato. El ser humano es capaz de usar esta capacidad sin ninguna formación previa con limitación en la cantidad de objetos que contar.
+utilizadas no superan el número 9. Esto refleja una capacidad innata de los humanos para la representación numérica. En secciones anteriores se ha explorado
+esta capacidad como uno de los núcleos de conocimiento innato. El ser humano es capaz de usarla sin formación previa, aunque con limitaciones en la cantidad de objetos que puede contar.
 
 \begin{figure}[h]
 \centering
@@ -679,14 +678,14 @@ esta capacidad como uno de los núcleos de conocimiento innato. El ser humano es
 La orientación espacial es un aspecto fundamental como núcleo de conocimiento. Se engloban aquellas tareas de reconocimiento de formas para la comprensión de líneas u otras figuras
 geométricas. El agente debe ser capaz de estimar con mayor probabilidad la aparición de formas regulares frente a otras formas más complejas.
 
-Las transformaciones espaciales como las simetrías y rotaciones, así como el escalado, deben ser comprendidas y aplicables. Relaciones espaciales específicamente en nociones topológicas sobre contener
-o ser contenido y estar fuera o dentro de un perímetro delimitado también serán requeridas en diversas tareas. El trazado de líneas o la conexión de puntos (proyecciones ortogonales) o la copia de 
+Las transformaciones espaciales, como las simetrías, las rotaciones y el escalado, deben ser comprendidas y aplicables. En diversas tareas también se requieren relaciones espaciales basadas en nociones topológicas, como contener
+o estar contenido y situarse fuera o dentro de un perímetro delimitado. El trazado de líneas, la conexión de puntos (proyecciones ortogonales) o la copia de 
 diversos objetos repetidamente también se incluyen en este núcleo de conocimiento.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width= 0.8\textwidth]{image/images/1779113897546.png}
-\caption[Tarea donde el objetivo es generar un línea diagonal hasta rebotar al hacer contacto con el obstáculo  rojo]{Tarea donde el objetivo es generar un línea diagonal hasta rebotar al hacer contacto con el obstáculo rojo.}
+\caption[Tarea donde el objetivo es generar una línea diagonal hasta rebotar al hacer contacto con el obstáculo rojo]{Tarea donde el objetivo es generar una línea diagonal hasta rebotar al hacer contacto con el obstáculo rojo.}
 \label{fig:fig10SECTION2}
 {\footnotesize Fuente: Adaptado de ``On the Measure of Intelligence'' \cite{chollet2019measure}}
 \end{figure}
@@ -695,11 +694,11 @@ diversos objetos repetidamente también se incluyen en este núcleo de conocimie
 
 \subsection{Repositorio de datos}
 
-Los datos de ARC-AGI se pueden encontrar en el repositorio de GitHub \cite{githubGitHubFcholletARCAGI}. Los datos están contenidos en dos sub-directorios diferentes:
+Los datos de ARC-AGI se pueden encontrar en el repositorio de GitHub \cite{githubGitHubFcholletARCAGI}. Los datos están contenidos en dos subdirectorios diferentes:
 
 \begin{itemize}
-\item \textbf{Training}: Contiene 400 tareas de entrenamiento. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son 400 archivos. Todos los archivos de este directorio
-Sirven para el entrenamiento del modelo y la adquisición de habilidades.
+\item \textbf{Training}: Contiene 400 tareas de entrenamiento. Cada tarea contiene todo el contenido en un archivo; por lo tanto, son 400 archivos. Todos los archivos de este directorio
+sirven para el entrenamiento del modelo y la adquisición de habilidades.
 	\subitem{\textbf{a.}} Pares ``train'': Típicamente suele tener tres o más pares de ``arrays''. Cada par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
 	\subitem{\textbf{b.}} Pares ``test'': Típicamente suele tener un par de ``arrays''. El par de ``arrays'' contiene un ``array'' de ``input'' y otro de ``output''.
 \item \textbf{Evaluation}: Contiene 400 tareas de evaluación. Cada tarea contiene todo el contenido en un archivo, por lo tanto, son otros 400 archivos.
@@ -762,7 +761,7 @@ superando la simple identificación de patrones globales superficiales.
 
 \subsection{ARC-AGI-3}
 
-En marzo de 2026, la Fundación ARC Prize introdujo un cambio fundamental en el \textit{benchmark} ARC-AGI-3, trasladando el paradigma de evaluación de puzzles 
+En marzo de 2026, la Fundación ARC Prize introdujo un cambio fundamental en el \textit{benchmark} ARC-AGI-3, trasladando el paradigma de evaluación de \textit{puzzles} 
 estáticos a entornos interactivos. A diferencia de versiones anteriores, se coloca al agente en un juego por turnos sin instrucciones, sin objetivo explícito ni 
 reglas definidas. El agente debe explorar el entorno, deducir las mecánicas del sistema y determinar por sí mismo la meta a alcanzar.
 
@@ -783,8 +782,8 @@ Una puntuación del 100\% indica paridad con el desempeño humano.
 \subsubsection{Resultados preliminares}
 
 En el lanzamiento de marzo de 2026, todos los modelos de frontera obtuvieron puntuaciones inferiores al 1\%, 
-incluyendo GPT-5.x, Gemini 3 y Claude Opus 4.x. En contraste, humanos resolvieron prácticamente la totalidad de los juegos.
-Los enfoques más efectivos combinaron modelos basados en neuronales redes convolucionales entrenados con aprendizaje por refuerzo para predecir cambios ambientales, junto con representaciones 
+incluyendo GPT-5.x, Gemini 3 y Claude Opus 4.x. En contraste, los humanos resolvieron prácticamente la totalidad de los juegos.
+Los enfoques más efectivos combinaron modelos basados en redes neuronales convolucionales entrenadas con aprendizaje por refuerzo para predecir cambios ambientales, junto con representaciones 
 gráficas del espacio de estados. Los agentes basados únicamente en lenguaje mostraron un desempeño significativamente inferior, indicando que este dominio 
 requiere técnicas de aprendizaje por refuerzo y modelado del mundo más que ingeniería de \textit{prompts}.
 
@@ -818,7 +817,7 @@ requiere técnicas de aprendizaje por refuerzo y modelado del mundo más que ing
     \hline
     \begin{tabular}{c}Fuerza bruta\end{tabular} & Sí & No, por diseño & Nuevo paradigma \\
     \hline
-	\begin{tabular}{c}Base humana\end{tabular} & Alta & $\sim$60--66\% individual / 100\% panel & Los humanos resuelven $\sim$todas \\
+	\begin{tabular}{c}Base humana\end{tabular} & Alta & $\sim$60--66\% individual / 100\% panel & Los humanos resuelven $\sim$ todas \\
     \hline
 	\begin{tabular}{c}E. Resolución\end{tabular} & $\sim$90--96\% & $\sim$85\% sin restricciones / $\sim$24\% con límites de competencia & $<$1\% \\
     \hline
@@ -833,7 +832,7 @@ requiere técnicas de aprendizaje por refuerzo y modelado del mundo más que ing
 
 \subsection{Domain Specific Languages (DSLs) y síntesis de programas}\label{sec:DSL}
 
-En 2020 Johan Sokrates Wind publicó uno de los primero intentos basado en un Lenguaje de Dominio Específico o DSL. El uso de código estrictamente diseñado para resolver tareas específicas
+En 2020, Johan Sokrates Wind publicó uno de los primeros intentos basados en un lenguaje específico de dominio o DSL. El uso de código estrictamente diseñado para resolver tareas específicas
 de ARC-AGI permitió alcanzar una puntuación de 20\% en el \textit{benchmark}. La idea detrás de esto es codificar algoritmos de programación para crear un conjunto de programas primitivos
 capaces de modificar matrices bidimensionales.
 
@@ -841,25 +840,25 @@ Los algoritmos realizan búsquedas exhaustivas sobre el espacio de programas pos
 casi fuerza bruta. Formalmente, el método evalúa de manera iterativa funciones unarias sobre fragmentos de las cuadrículas de entrada, formando un Grafo Acíclico Dirigido (DAG) que representa
 múltiples secuencias de transformaciones.
 
-Según el propio autor, la búsqueda de nivel 4, siendo de las más altas, dura en torno a 9 horas usando solamente CPU. Este enfoque no requiere de ningún pre-entrenamiento y sus conocimientos
-previos son inyectados mediante líneas de código. El espacio de búsqueda crece de manera exponencial a medida que aumenta el tamaño del DSL y para los puzzles que requieren
-de más pasos lógicos, la búsqueda simplemente sin tiempo. Otro aspecto negativo del enfoque es que si un problema de transformación no se programó específicamente, el sistema
-simplemente no es capaz de resolverlo. Escalar este enfoque significa que es necesario de capacidad humana constante para seguir añadiendo conocimientos primitivos  y heurística
-de poda diseñada manualmente para guiar la búsqueda \cite{wind2020dsl}.
+Según el propio autor, la búsqueda de nivel 4, una de las más altas, dura en torno a 9 horas usando solamente la CPU. Este enfoque no requiere ningún preentrenamiento y sus conocimientos
+previos son inyectados mediante líneas de código. El espacio de búsqueda crece de manera exponencial a medida que aumenta el tamaño del DSL y, para los rompecabezas que requieren
+más pasos lógicos, la búsqueda simplemente agota el tiempo disponible. Otro aspecto negativo del enfoque es que, si un problema de transformación no se programó específicamente, el sistema
+no es capaz de resolverlo. Escalar este enfoque requiere capacidad humana constante para seguir añadiendo conocimientos primitivos y heurísticas
+de poda diseñadas manualmente para guiar la búsqueda \cite{wind2020dsl}.
 
 \subsection{Enfoque Neurosimbólico}
 
 El enfoque propuesto por Simon Alford \citeyear{alford2021neurosymbolic}  aborda el reto de la 
 inteligencia general artificial utilizando el \textit{benchmark ARC-AGI}. \citeA{alford2021neurosymbolic} parte de la premisa de que los sistemas tradicionales de aprendizaje profundo fallan en la 
 generalización porque tienden a memorizar datos en lugar de aprender procedimientos. Para superar esto, la tesis propone un enfoque 
-neurosimbólico inspirado en la teoría de los sistema de pensamiento combinando la rapidez asociativa de las redes neuronales (Sistema 1) con la 
+neurosimbólico inspirado en la teoría de los sistemas de pensamiento, que combina la rapidez asociativa de las redes neuronales (Sistema 1) con la 
 capacidad estructurada y lógica del razonamiento simbólico (Sistema 2). La solución se divide en dos grandes pilares dependientes, la abstracción y el razonamiento.
 
 Para el primer pilar, la abstracción, el sistema emplea un motor de síntesis de programas llamado \textit{DreamCoder}. La clave de este motor radica en su algoritmo de
-"compresión". A medida que el agente resuelve problemas básicos combinando funciones sencillas, como rotar o espejar una  matriz, analiza los programas exitosos 
+compresión. A medida que el agente resuelve problemas básicos combinando funciones sencillas, como rotar o espejar una  matriz, analiza los programas exitosos 
 para identificar patrones recurrentes. Luego, empaqueta estas secuencias comunes en nuevas funciones de alto nivel, ampliando así su vocabulario de comandos y logrando 
 generalizar su conocimiento hacia tareas cada vez más complejas que el desarrollador original no había anticipado. No obstante, \citeA{alford2021neurosymbolic} advierte que la búsqueda guiada 
-por redes neuronales estándar de DreamCoder es insuficiente para escalar y resolver programas largos o con muchas operaciones repetidas, algo muy habitual en los puzzles 
+por redes neuronales estándar de DreamCoder es insuficiente para escalar y resolver programas largos o con muchas operaciones repetidas, algo muy habitual en los \textit{puzzles} 
 de ARC-AGI \cite{alford2021neurosymbolic}.
 
 Para solventar esta limitación en la búsqueda, \citeA{alford2021neurosymbolic} desarrolla el segundo pilar, un modelo de razonamiento avanzado basado en la síntesis guiada por ejecución 
@@ -876,16 +875,16 @@ paso a paso.
 
 \section{Grandes Modelos de Lenguaje en ARC-AGI-1}
 
-Desde 2019 se han evaluado los Grandes Modelos de Lenguaje (LLMs) en el contexto de ARC-AGI-1. \citeA{gendron2024largelanguagemodelsstrong} evalúa una de estas debilidades fundamentales de los LLMs,
+Desde 2019 se han evaluado los grandes modelos de lenguaje (LLM) en el contexto de ARC-AGI-1. \citeA{gendron2024largelanguagemodelsstrong} analizan una de estas debilidades fundamentales de los LLM,
 el razonamiento abstracto. Aunque estos modelos destacan en tareas de procesamiento de lenguaje natural como la traducción o 
-la generación de código, los mecanismos detrás de este éxito son opacos y dudan de si realmente poseen capacidades cognitivas similares a las humanas o si sus resultados
+la generación de código, los mecanismos detrás de este éxito son opacos, lo que genera dudas sobre si realmente poseen capacidades cognitivas similares a las humanas o si sus resultados
 provienen de la memorización de datos. El razonamiento abstracto, el cual consiste en identificar patrones generales a partir de muy pocos
 ejemplos, es ideal para evaluar la capacidad de generalización profunda de un sistema. Se han podido probar una amplia gama de arquitecturas modernas, desde modelos de la familia GPT hasta modelos de 
 código abierto como LLaMA, Alpaca y Zephyr.
 
 % Explicar Raven?
 Los resultados de los experimentos revelan de manera contundente que los LLMs actuales tienen un rendimiento muy deficiente en tareas de razonamiento abstracto. En las 
-pruebas abiertas, modelos como GPT-4 y Text-Davinci-3 obtuvieron los mejores resultados, pero aún así fallaron en la gran mayoría de los puzzles. Además, \citeA{gendron2024largelanguagemodelsstrong} 
+pruebas abiertas, modelos como GPT-4 y Text-Davinci-3 obtuvieron los mejores resultados, pero aun así fallaron en la gran mayoría de los rompecabezas. Además, \citeA{gendron2024largelanguagemodelsstrong} 
 advierten que el relativo ``éxito'' de GPT-4 en pruebas clásicas como las matrices de Raven podría deberse a que dichas pruebas ya estaban incluidas en sus datos de 
 entrenamiento, más que a una verdadera capacidad de deducción. En los escenarios de opción múltiple, el rendimiento también se mantuvo cercano a la aleatoriedad, 
 demostrando que los modelos ni siquiera son capaces de reconocer la respuesta correcta cuando se les da a elegir, lo que los hace ineficaces para tareas de auto-evaluación o auto-refinamiento.
@@ -895,7 +894,7 @@ funcionan en este dominio. Estrategias como la ``Cadena de Pensamiento'' (\texti
 el problema no proporcionaron mejoras significativas. Por otro lado, al aplicar \textit{fine-tuning} a modelos como LLaMA2, se logró una precisión casi perfecta en 
 problemas similares a los del entrenamiento, pero fracasaron estrepitosamente al evaluar variaciones fuera de esa distribución, como agrupar múltiples objetos. Esto 
 indica que el modelo memoriza reglas de sintaxis pero no adquiere una verdadera capacidad de abstracción. Curiosamente, los modelos muestran un mejor 
-rendimiento cuando los problemas se representaban mediante vectores numéricos en lugar de texto en lenguaje natural, ya que este último introduce sesgos y 
+rendimiento cuando los problemas se representan mediante vectores numéricos en lugar de texto en lenguaje natural, ya que este último introduce sesgos y 
 distracciones perjudiciales.
 
 Los Grandes Modelos de Lenguaje  actuales carecen de las propiedades fundamentales necesarias para lograr un 
@@ -911,9 +910,9 @@ combinando técnicas neurosimbólicas, transformers compactos y síntesis de pro
 % 2302.09425v3_visual_imagery_and_program_synthesis
 \section{Modelos basados en la Neurodiversidad}
 
-Una linea de trabajo particularmente original dentro del ecosistema ARC-AGI es la propuesta por \citeA{ainooson2023neurodiversity}, que toma como punto de 
-partida hallazgos de la psicología cognitiva y de la investigación sobre Neurodiversidad para replantear el modo en que un sistema artificial representa y 
-manipula regularidades visuales. Su tesis central es que muchas tareas de ARC-AGI no fallan por ausencia de potencia de calculo en sentido estricto, sino porque 
+Una línea de trabajo particularmente original dentro del ecosistema ARC-AGI es la propuesta por \citeA{ainooson2023neurodiversity}, que toma como punto de 
+partida hallazgos de la psicología cognitiva y de la investigación sobre neurodiversidad para replantear el modo en que un sistema artificial representa y 
+manipula regularidades visuales. Su tesis central es que muchas tareas de ARC-AGI no fallan por ausencia de potencia de cálculo en sentido estricto, sino porque 
 los sistemas habituales carecen de una forma adecuada de representar conocimiento nuclear sobre objetos, relaciones espaciales, continuidad visual y 
 transformaciones topológicas. Desde esta perspectiva, el problema no se reduce a encontrar una salida correcta, sino a disponer de una representación interna 
 capaz de operar sobre configuraciones visuales de forma flexible, composicional y cercana a la manera en que ciertos sujetos humanos resuelven problemas 
@@ -971,7 +970,7 @@ combinar las ventajas de las dos anteriores, porque no solo propone operaciones 
 estado parcial de la solución a medida que se ejecuta \cite{ouellette2024towards}.
 
 La aportación técnica principal del artículo reside en GridCoder, una implementación del paradigma LPS. En este enfoque, una arquitectura de 
-tipo \textit{Vision-Language Model} recibe pares de rejillas de entrada y salida y produce, de forma auto-regresiva, probabilidades sobre tokens que 
+tipo \textit{Vision-Language Model} recibe pares de rejillas de entrada y salida y produce, de forma autorregresiva, probabilidades sobre \textit{tokens} que 
 codifican primitivas del DSL. A diferencia de otros enfoques clásicos apoyados en n-gramas o en expansión puramente simbólica, GridCoder utiliza la 
 secuencia completa de probabilidades emitidas por el decodificador para construir una enumeración probabilística del espacio de programas. El algoritmo 
 calcula una distribución inicial, la refuerza mediante un pequeño proceso de \textit{bootstrapping} con distintos ejemplos y prefijos, y después ordena 
@@ -1002,7 +1001,7 @@ Sin embargo, el artículo no se limita a presentar mejoras cuantitativas, sino q
 enfoque. Según \citeA{ouellette2024towards}, GridCoder generaliza razonablemente bien ante desplazamientos en la distribución visual de las rejillas, 
 pero sigue mostrando debilidades claras cuando debe afrontar estructuras de programa no observadas durante el entrenamiento. En otras palabras, el 
 modelo aprende con eficacia qué primitivas locales parecen plausibles, pero tiende a fijar con excesiva rigidez los esqueletos de los 
-programas. Este diagnóstico es especialmente valioso para el presente trabajo, porque refuerza la idea de que la mera predicción auto-regresiva de 
+programas. Este diagnóstico es especialmente valioso para el presente trabajo, porque refuerza la idea de que la mera predicción autorregresiva de 
 secuencias no basta para capturar razonamiento abstracto robusto si no se reintroduce algún mecanismo de comprobación o refinamiento sobre estados intermedios.
 
 Un modelo verdaderamente útil para ARC debería recibir de forma explícita el estado parcial de ejecución y utilizarlo para decidir la 
@@ -1011,7 +1010,7 @@ idea aproxima la síntesis de programas a un proceso iterativo de razonamiento, 
 obtenido. En términos conceptuales, esta hipótesis conecta de forma directa con la lógica de los modelos compactos con refinamiento iterativo, 
 con los esquemas de \textit{test-time compute} y con la necesidad de invertir cómputo de forma adaptativa solo cuando la tarea lo exige.
 
-\citeA{ouellette2024towards} ofrece evidencia empírica de que la 
+Por un lado, \citeA{ouellette2024towards} ofrece evidencia empírica de que la 
 búsqueda guiada por redes neuronales puede hacer viable una síntesis de programas más eficiente que la enumeración ciega, incluso cuando el DSL 
 crece y las tareas exigen combinar múltiples primitivas. Por otro, delimita con precisión por qué ese mismo enfoque sigue siendo insuficiente 
 para una generalización fuerte en ARC-AGI, lo que justifica explorar arquitecturas compactas capaces de mantener y refinar estados latentes 
@@ -1028,18 +1027,18 @@ del estado interno.
 \section{Afinamiento eficiente de modelos para ARC-AGI}
 
 En 2024, un grupo de investigadores realizó un hito histórico alcanzando una puntuación de 56\% en el concurso público de ARC Prize. El éxito de este enfoque 
-no radica en el uso de redes neuronales de gran tamaño, ni en la síntesis de programas propiamente dicho, sino más bien en una estrategia
-de optimización extrema de  Modelos de Lenguaje Pequeños (SLM). Estos modelos no son especialmente compactos, pero con técnicas
+no radica en el uso de redes neuronales de gran tamaño ni en la síntesis de programas propiamente dicha, sino más bien en una estrategia
+de optimización extrema de modelos de lenguaje pequeños (SLM). Estos modelos no son especialmente compactos, pero con técnicas
 de optimización pueden llegar a ser lo suficientemente eficientes como para poder ser ejecutados en entornos limitados.
 
-Los concursos de ARC Prize exigen que los modelos sean desplegados e inferenciados en entornos de computación especialmente limitados, con
-capacidad de computación equivalentes a dos GPUs Nvidia T4 ó en una Nvidia P100 ambos de 16 GB de memoria de capacidad. \citeA{franzen2024llm} 
-consiguen un ajuste fine inteligente, \textit{tokenizar} de manera brillante y adaptación en tiempo de prueba \textit{Test-Time Training}.
+Los concursos de ARC Prize exigen que los modelos sean desplegados y ejecutados en entornos de computación especialmente limitados, con
+una capacidad de computación equivalente a dos GPU Nvidia T4 o una Nvidia P100, todas ellas con 16 GB de memoria. \citeA{franzen2024llm} 
+consiguen un ajuste fino eficiente, una tokenización específica y una adaptación en tiempo de prueba mediante \textit{Test-Time Training}.
 
 El equipo realiza un proceso de pre-entrenamiento masivo a partir de muchos datos aumentados sintéticamente. Partiendo del conjunto de datos original,
-se generaron casi 400.000 tareas adicionales con el repositorio público de Re-ARC. Además de esto, de manera complementaria se añadió conjuntos de datos de 
-entrenamiento proporcionados por la comunidad como ARC-AGI como Concept-ARC y ARC-Heavy. Realizando una mezcla estructural con hasta más de medio millón
-de tareas, se realizó otro proceso de aumentos de datos llegando a 290 millones de tareas sintéticas. Con tal magnitud de datos, el pre-entrenamiento del
+se generaron casi 400.000 tareas adicionales con el repositorio público de Re-ARC. Además, se añadieron conjuntos de datos de 
+entrenamiento proporcionados por la comunidad, como Concept-ARC y ARC-Heavy. Tras realizar una mezcla estructural de más de medio millón
+de tareas, se aplicó otro proceso de aumento de datos hasta alcanzar 290 millones de tareas sintéticas. Con tal magnitud de datos, el preentrenamiento del
 modelo debe hacerse mediante computación en la nube acelerada de considerable potencia.
 
 % Foto de flujo pre-entrenamiento
@@ -1053,8 +1052,8 @@ modelo debe hacerse mediante computación en la nube acelerada de considerable p
 
 \FloatBarrier
 
-Se hace uso de un modelo de lenguaje de Nvidia Mistral-NeMo-Minitron-8B-Base, de 8 billones de parámetros. Para que el modelo de lenguaje pueda entender
-el lenguaje de matrices 2D de ARC.AGI, el equipo desarrolló un \textit{tokenizador} personalizado reduciendo el vocabulario a 64 \textit{tokens}. Este sistema
+Se hace uso de un modelo de lenguaje de Nvidia Mistral-NeMo-Minitron-8B-Base, de 8.000 millones de parámetros. Para que el modelo de lenguaje pueda entender
+el lenguaje de matrices 2D de ARC-AGI, el equipo desarrolló un \textit{tokenizador} personalizado que reducía el vocabulario a 64 \textit{tokens}. Este sistema
 reduce significativamente el tamaño de la capa de \textit{embedding} para abaratar el coste de inferencia. También ayuda a evitar alucinaciones,
 pero es necesario dominar el arte de usar estructuras y marcadores concretos. Este sistema es muy sensible al uso de delimitación de regiones
 para que el modelo sepa cuándo empieza una tarea y cuándo empieza otra.
@@ -1062,27 +1061,27 @@ para que el modelo sepa cuándo empieza una tarea y cuándo empieza otra.
 % Foto de encoder
 
 Para que el modelo pueda ser inferenciado en GPUs de 16 GB, el equipo realiza una cuantización del modelo de 4 bits mediante el paquete \textit{unsloth-4bit}, 
-el más bajo posible. También hace uso de LoRA ó \textit{Low-Rank Adaptation}, que es una técnica de ajuste fino eficiente para hacer viable esta arquitectura. Sin LoRA, ajustar el modelos de
+el más bajo posible. También hace uso de LoRA o \textit{Low-Rank Adaptation}, una técnica de ajuste fino eficiente para hacer viable esta arquitectura. Sin LoRA, ajustar el modelo de
 8 millones de parámetros sería imposible. Esta limitación condiciona diversas decisiones del flujo de diseño. LoRA puede conseguir la reducción de hasta
-32 veces el número de parámetros y reducir solamente un pequeño subconjunto de parámetros del modelo entrenables \cite{franzen2024llm}.
+32 veces el número de parámetros y reducir solamente un pequeño subconjunto de parámetros entrenables del modelo \cite{franzen2024llm}.
 
 % Foto arquitectura
 
-Para la inferencia se usó el algoritmo DFS con un umbral probabilístico y poda. Otros algoritmos como GBFS ó \textit{Beam Search} provocaban baja diversidad de soluciones
-o era a nivel de memoria demasiado costoso. Tras la búsqueda, se realiza una selección de candidatos.
+Para la inferencia se usó el algoritmo DFS con un umbral probabilístico y poda. Otros algoritmos, como GBFS o \textit{Beam Search}, provocaban una baja diversidad de soluciones
+o resultaban demasiado costosos en términos de memoria. Tras la búsqueda, se realiza una selección de candidatos.
 
-El proceso de pre-entrenamiento se realiza usando una GPU Nvidia H100 con 1,979 TFLOPs en FP16 de precisión de 80 HB VRAM HMB. Esta capacidad de computación
-sólo está alojada en servicios de computación en la nube y es altamente costosa incluso en despliegue de \textit{cluster} optimizados.La adaptación en tiempo de prueba
-e inferencia se realiza con dos GPUs Nvidia T4 de 16 GB de VRAM durante casi 12 horas, el límite permitido por el concurso.
+El proceso de preentrenamiento se realiza usando una GPU Nvidia H100 con 1.979 TFLOPs en precisión FP16 y 80 GB de VRAM HBM. Esta capacidad de computación
+solo está disponible en servicios de computación en la nube y resulta muy costosa incluso en despliegues de \textit{clústeres} optimizados. La adaptación en tiempo de prueba
+y la inferencia se realizan con dos GPU Nvidia T4 de 16 GB de VRAM durante casi 12 horas, el límite permitido por el concurso.
 
 
 % Hay que calcular el coste por tarea debugeando el modelo para toda la base de datos. Según el tiempo que tarde , se hará un cálculo estimado con mi gráfica
 % con la conversación de chatgpt
-\section{Enfoques de modelos sin Pre-entrenamiento}
+\section{Enfoques de modelos sin preentrenamiento}
 
-Durante años la creencia de que es necesario realizar un exhaustivo pre-entrenamiento de modelos para poder desarrollar la capacidad
-de razonamiento abstracto ha sido dominante. A lo largo de \citeyear{liao2025arcagiwithoutpretraining}, se han desarrollado diferentes enfoques
-de los que se encuentra CompressARC, un decodificador VAE o \textit{Variational Autoencoder} encargado de reconstruir una serie de datos a partir
+Durante años, la creencia de que es necesario realizar un preentrenamiento exhaustivo de los modelos para poder desarrollar la capacidad
+de razonamiento abstracto ha sido dominante. En el trabajo de \citeA{liao2025arcagiwithoutpretraining} se desarrollan diferentes enfoques,
+entre los que se encuentra CompressARC, un decodificador VAE o \textit{Variational Autoencoder} encargado de reconstruir una serie de datos a partir
 de una representación comprimida. El modelo realiza su aprendizaje exclusivamente en el tiempo de inferencia, no cuenta con bases de datos externas,
 su único conjunto de datos son las matrices del problema exacto que se intenta resolver en un momento determinado.
 
@@ -1094,10 +1093,10 @@ su único conjunto de datos son las matrices del problema exacto que se intenta 
 \cite[p.~15]{ouellette2024towards}
 \end{center}
 
-El modelo es realmente compacto, de tan sólo 76 mil parámetros. Este sistema se rige por el principio de longitud de descripción mínima y la comprensión
+El modelo es realmente compacto, con tan solo 76 mil parámetros. Este sistema se rige por el principio de longitud de descripción mínima y la comprensión
 de información. La optimización se realiza mediante redes neuronales en lugar de algoritmos de búsqueda ciegos. Las redes neuronales pueden restringir
-el espacio de búsqueda\cite{liao2025arcagiwithoutpretraining}. La red neuronal incluye operaciones diseñadas a mano (sesgos inductivos) que son muy útiles 
-para transformaciones geométricas como medias, expansiones de tensores, funciones de activación SiLU, máximos acumulativos, y desplazamientos directos de píxeles.
+el espacio de búsqueda \cite{liao2025arcagiwithoutpretraining}. La red neuronal incluye operaciones diseñadas a mano (sesgos inductivos) que son muy útiles 
+para transformaciones geométricas como medias, expansiones de tensores, funciones de activación SiLU, máximos acumulativos y desplazamientos directos de píxeles.
 
 % Foto arquitectura
 \begin{figure}[h]
@@ -1159,9 +1158,9 @@ A nivel de entrenamiento, la propuesta incorpora un esquema de gradiente de un s
 \textit{Deep Equilibrium Models}. En la práctica, la mayor parte de las iteraciones recurrentes se ejecutan sin 
 almacenar todo el grafo completo, y únicamente el último tramo se utiliza para retro-propagación. Esta decisión reduce 
 de forma drástica el coste de memoria y hace viable incrementar la profundidad efectiva del razonamiento sin multiplicar 
-el consumo de recursos. Sobre este núcleo se añade un mecanismo de 	\textit{Adaptive Computational Time}, de manera que el 
-modelo aprende cuándo debe detener su refinamiento interno y cuándo conviene seguir computando.Con aproximadamente 27 millones de parámetros y sin 
-depender de pre-entrenamiento masivo ni de \textit{Chain-of-Thought} textual, HRM alcanza en torno al 40\% en ARC-AGI-1 y 
+el consumo de recursos. Sobre este núcleo se añade un mecanismo de \textit{Adaptive Computational Time}, de manera que el 
+modelo aprende cuándo debe detener su refinamiento interno y cuándo conviene seguir computando. Con aproximadamente 27 millones de parámetros y sin 
+depender de preentrenamiento masivo ni de \textit{Chain-of-Thought} textual, HRM alcanza en torno al 40\% en ARC-AGI-1 y 
 muestra que es posible competir en razonamiento abstracto aumentando la profundidad de cómputo antes que la escala bruta del 
 modelo \cite{wang2025hierarchical}.
 
@@ -1200,7 +1199,7 @@ La autora del trabajo ha realizado el pre-entrenamiento del modelo en un clúste
 
 Desde una perspectiva estrictamente computacional, el estado actual de ARC-AGI muestra un patrón muy claro. Cada nueva generación del \textit{benchmark} ha introducido 
 un precipicio de rendimiento que reduce de forma drástica la precisión de los sistemas previos. En términos agregados, el paso de ARC-AGI-1 a ARC-AGI-2 y 
-posteriormente a ARC-AGI-3 implica caídas del orden de 2.5 a 3 veces, lo que sugiere que buena parte de los avances recientes siguen dependiendo de regularidades
+posteriormente a ARC-AGI-3 implica caídas del orden de 2,5 a 3 veces, lo que sugiere que buena parte de los avances recientes siguen dependiendo de regularidades
 explotables en una versión concreta del problema más que de una generalización robusta. Este comportamiento refuerza la idea de que el progreso en ARC no puede
 evaluarse solo por la puntuación absoluta, sino por la estabilidad del rendimiento cuando aumenta la profundidad conceptual de las tareas.
 
@@ -1241,7 +1240,7 @@ no reside en el tamaño bruto del modelo, sino en la calidad del proceso de refi
 \centering
 \includegraphics[width=0.65\textwidth]{image/images/1782939793801.png}
 \caption[Comparativa del coste por tarea \$ entre diferentes soluciones]{Comparativa del coste por tarea \$ entre diferentes soluciones. El tamaño de los círculos
-representan el tamaño en parámetros de cada modelo.}
+representa el tamaño en parámetros de cada modelo.}
 \label{fig:fig19SECTION2}
 {\footnotesize Fuente: Adaptado de ``The ARC of Progress towards AGI: A Living Survey of Abstraction and Reasoning'' \cite{vahdati2026arc}}
 \end{figure}
@@ -1249,8 +1248,8 @@ representan el tamaño en parámetros de cada modelo.}
 \FloatBarrier
 
 El coste por tarea es un indicador especialmente relevante para medir la eficiencia de los diferentes modelos. También existen diferentes sistemas como TRM que suponen
-un coste especialmente elevado tendiendo en cuenta el poco tamaño del modelo. El tamaño del modelo no siempre es un indicador de coste equivalente. Este sistema tiene
-pocos parámetros pero su proceso de entrenamiento requiere una desmesurada capacidad de cómputo cómo se ha podido ver en la sección anterior. Esta capacidad
+un coste especialmente elevado teniendo en cuenta el reducido tamaño del modelo. El tamaño del modelo no siempre es un indicador de coste equivalente. Este sistema tiene
+pocos parámetros, pero su proceso de entrenamiento requiere una desmesurada capacidad de cómputo, como se ha podido ver en la sección anterior. Esta capacidad
 de computación no está al alcance de la mayoría de investigadores y es un factor limitante para la reproducibilidad de los resultados. La figura \ref{fig:fig20SECTION1} muestra 
 una comparativa de coste por tarea entre diferentes modelos, donde el tamaño de los círculos representa la capacidad computacional en TFLOPs FP16 usada en cada modelo. Esta
 representación es más fiel a la realidad que el tamaño del modelo, ya que un modelo pequeño puede requerir una gran capacidad de cómputo para su entrenamiento y ajuste fino.
@@ -1265,7 +1264,7 @@ representación es más fiel a la realidad que el tamaño del modelo, ya que un 
     }
     
     \vspace{0.5cm}
-    \caption[Comparativa del coste por tarea entre modelos]{Comparativa del coste por tarea entre modelos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
+	\caption[Comparativa del coste por tarea entre modelos]{Comparativa del coste por tarea entre modelos. El tamaño de los círculos representa la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
     \label{fig:fig20SECTION1}
     {\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.
 	Imagen completa: \url{https://github.com/UNIR-TUC/arc-agi/blob/main/src/arc_agi_data_scraper/images/tflops_models_cost_light.png}}
@@ -1280,13 +1279,13 @@ representación es más fiel a la realidad que el tamaño del modelo, ya que un 
 
 \section{Enfoque Científico y Método de Investigación}
 
-El presente trabajo se enmarca dentro del método científico empírico-analítico. Dado que el objetivo principal es evaluar la eficiencia y capacidad de un modelo de lenguaje compacto
+El presente trabajo se enmarca dentro del método científico empírico-analítico. Dado que el objetivo principal es evaluar la eficiencia y la capacidad de un modelo de lenguaje compacto
 en la resolución del \textit{benchmark} ARC-AGI-1, el enfoque adoptado es de carácter cuantitativo. La investigación sigue un proceso hipotético-deductivo articulado en etapas: planteamiento del problema ante los 
 límites de la hipótesis de escala en modelos LLM, formulación de la hipótesis basada en modelos compactos, diseño experimental, ejecución y análisis métrico de los resultados.
 
 Desde la perspectiva investigadora, se aplica un método empírico experimental. Este método es el más idóneo ya que permite establecer relaciones causales bajo condiciones de laboratorio estrictamente 
-controladas. Se manipularán de forma deliberada variables independientes arquitectónicas para medir su impacto sobre variables dependientes clave de rendimiento, 
-siendo la tasa de precisión en la evaluación de ARC-AGI y el coste computacional asociado.
+controladas. Se manipularán de forma deliberada variables arquitectónicas independientes para medir su impacto sobre variables dependientes clave del rendimiento: 
+la tasa de precisión en la evaluación de ARC-AGI y el coste computacional asociado.
 
 \section{Metodología de Desarrollo y Gestión del Proyecto}
 
@@ -1301,18 +1300,18 @@ El trabajo se ha estructurado en torno a una épica principal desglosada en cuat
 \end{itemize}
 
 El ciclo de desarrollo se ejecuta en iteraciones cortas o \textit{Sprints} de 14 días de duración. Esta cadencia temporal permite realizar inspecciones regulares del código, 
-facilitando la adaptación temprana de hiper-parámetros o la corrección de derivas en el entrenamiento. El control de versiones, el seguimiento de tareas y la representación visual de los tableros 
+facilitando la adaptación temprana de hiperparámetros o la corrección de derivas en el entrenamiento. El control de versiones, el seguimiento de tareas y la representación visual de los tableros 
 Kanban se centralizan mediante un repositorio de código alojado en GitHub.
 
 \section{Ciclo de Vida del Modelo basado en MLOps}
 
-Alineado con las prácticas de desarrollo ágil para proyectos de Inteligencia Artificial, se ha adoptado una versión adaptada del ciclo de vida MLOps orientada a la experimentación en entornos restringidos. 
+En consonancia con las prácticas de desarrollo ágil para proyectos de inteligencia artificial, se ha adoptado una versión adaptada del ciclo de vida MLOps orientada a la experimentación en entornos restringidos. 
 Este ciclo se compone de las siguientes fases iterativas:
 
 \begin{itemize}
 	\item \textbf{Preparación de datos:} Tratamiento del corpus ARC-AGI, definiendo las rutinas de visualización y codificación espacial necesarias.
 	\item \textbf{Desarrollo del modelo y selección algorítmica:} Diseño de las arquitecturas compactas y las rutinas de inferencia iterativa.
-	\item \textbf{Entrenamiento y ajuste:} Ejecución de pruebas de Test-Time Training y refinamiento de hiper-parámetros bajo las restricciones de hardware.
+	\item \textbf{Entrenamiento y ajuste:} Ejecución de pruebas de \textit{Test-Time Training} y refinamiento de hiperparámetros bajo las restricciones de \textit{hardware}.
 	\item \textbf{Evaluación:} Medición cuantitativa del rendimiento del modelo utilizando conjuntos de evaluación de ARC-AGI-1.
 \end{itemize}
 
@@ -1326,19 +1325,19 @@ reproducibles.
 Para el desarrollo y experimentación de este proyecto, se ha utilizado una estación de trabajo local equipada con hardware de alto rendimiento. Las especificaciones técnicas del equipo base son las siguientes:
 
 \begin{itemize}
-	\item Sistema Operativo y Entorno: El sistema opera bajo la distribución de Linux Ubuntu 24.04.4 LTS con el kernel 6.14.0-34-generic. 
+	\item Sistema operativo y entorno: El sistema opera bajo la distribución Linux Ubuntu 24.04.4 LTS con el \textit{kernel} 6.14.0-34-generic. 
 	Para la aceleración de cargas de trabajo de IA en la GPU, se emplea la plataforma abierta de AMD, ROCm en su versión 7.2.3.
 	\item Procesador (CPU): Intel Core i9-12900K de 12ª generación.
-	\item Memoria Principal (RAM): El sistema dispone de aproximadamente 96 GB de memoria RAM disponible.
+	\item Memoria principal (RAM): El sistema dispone de aproximadamente 96 GB de memoria RAM disponible.
 \end{itemize}
 
-El componente central para el entrenamiento de este proyecto es la GPU AMD Radeon RX 9070 XT. Esta GPU de arquitectura avanzada está equipada con 64 Unidades de Cómputo, 4096 Stream Processors y 
+El componente central para el entrenamiento de este proyecto es la GPU AMD Radeon RX 9070 XT. Esta GPU de arquitectura avanzada está equipada con 64 unidades de cómputo, 4096 \textit{stream processors} y 
 cuenta con 128 aceleradores de IA dedicados específicamente a optimizar las cargas de trabajo de aprendizaje profundo. Su consumo típico (Typical Board Power) es de 304 W.
 
 Para las tareas de Inteligencia Artificial, las dos métricas más críticas son la memoria de vídeo (VRAM) y el rendimiento en diferentes precisiones matemáticas. La tarjeta cuenta con 16 GB de 
 memoria GDDR6 operando sobre una interfaz de 256 bits. Esta memoria proporciona un ancho de banda de hasta 640 GB/s.
 
-La GPU ofrece un rendimiento de hasta 48.7 TFLOPs en precisión de punto flotante de 32 bits (FP32) para operaciones vectoriales, y hasta 195.0 TFLOPs en precisión de punto flotante de 16 bits (FP16) 
+La GPU ofrece un rendimiento de hasta 48,7 TFLOPs en precisión de punto flotante de 32 bits (FP32) para operaciones vectoriales y hasta 195,0 TFLOPs en precisión de punto flotante de 16 bits (FP16) 
 para operaciones matriciales. En la siguiente tabla \ref{tab:rendimiento-precision} se muestra el rendimiento de la GPU en diferentes niveles de precisión y formatos, 
 incluyendo el impacto de la dispersión estructurada en el rendimiento.
 
@@ -1368,7 +1367,7 @@ incluyendo el impacto de la dispersión estructurada en el rendimiento.
 
 \section{Entorno de desarrollo}
 
-Se ha un amplio ecosistema de paquetes y librerías para el desarrollo y la experimentación. En la tabla \ref{tab:python-libs} se muestra una lista de las principales librerías utilizadas, 
+Se ha utilizado un amplio ecosistema de paquetes y librerías para el desarrollo y la experimentación. En la tabla \ref{tab:python-libs} se muestra una lista de las principales librerías utilizadas, 
 junto con sus versiones y abreviaciones para su referencia en el resto del documento.
 
 \begin{table}[h]
@@ -1414,10 +1413,10 @@ junto con sus versiones y abreviaciones para su referencia en el resto del docum
 
 \section{Herramientas externas}
 
-El desarrollo del proyecto se ha usando herramientas externas de control de código, y plataformas de colaboración de código y desarrollo
-Github Copilot. Adicionalmente, para potenciar la productividad se ha usado diversas herramientas como servidores MCP.
+En el desarrollo del proyecto se han usado herramientas externas de control de versiones y plataformas de colaboración y desarrollo,
+como GitHub Copilot. Además, para potenciar la productividad se han utilizado diversas herramientas, como los servidores MCP.
 
-Mencionar el uso de la herramienta Codebase Memory como \textit{indexer} de código para búsquedas e implementación de soluciones. La herramienta
+Cabe mencionar el uso de la herramienta Codebase Memory como \textit{indexer} de código para realizar búsquedas e implementar soluciones. La herramienta
 ayuda a agentes de inteligencia artificial a organizar y localizar el código de manera estructural en lugar de recorrer archivos constantemente.
 
 \begin{figure}[h]
@@ -1440,24 +1439,24 @@ ayuda a agentes de inteligencia artificial a organizar y localizar el código de
 ARC-AGI es algo más que un \textit{benchmark}; es un riguroso manifiesto sobre la naturaleza de la propia inteligencia. Su diseño permite a la comunidad realizar 
 mediciones objetivas y evaluar progresivamente el avance de los sistemas. Esta mecánica de medición es relativamente sencilla para humanos pero extremadamente compleja para sistemas de 
 inteligencia artificial. El diseño y desarrollo de modelos de lenguaje para resolver las diferentes tareas de ARC-AGI requiere de un enfoque meticuloso y una comprensión 
-profunda de los principios subyacentes que rigen la inteligencia general. Es por ello, que se convierte en un gran desafío para el trabajo del autor de este proyecto
+profunda de los principios subyacentes que rigen la inteligencia general. Por ello, se convierte en un gran desafío para el autor de este proyecto
 y para toda la comunidad de investigación en inteligencia artificial.
 
 La idea central es que la inteligencia no se demuestra mediante la posesión de una habilidad específica, sino mediante la eficiencia en la adquisición
 de nuevas habilidades al enfrentarse a un problema nuevo. Esto es casi lo opuesto de lo que premian la mayoría de los indicadores de rendimiento clásicos. Estos indicadores
-miden el desempeño en tareas que se pueden dominarse mediante grandes cantidades de datos, en lugar de medir la capacidad de adquirir nuevas habilidades.
+miden el desempeño en tareas que se pueden dominar mediante grandes cantidades de datos, en lugar de medir la capacidad de adquirir nuevas habilidades.
 
 Para que exista una comparación justa entre humanos y modelos de inteligencia artificial, la tarea debe basarse en inteligencia fluida, con capacidad de razonar,
 resolver problemas nuevos y adaptarse a nuevas situaciones y no en la inteligencia cristalizada que se basa en conocimiento y las habilidades acumuladas.
 ARC-AGI sortea este problema basándose únicamente en un pequeño conjunto de conocimientos previos básicos, bloques cognitivos fundamentales que están presentes al 
 nacer o que se adquieren muy temprano en la vida, con una instrucción explícita mínima.
 
-La síntesis de programas es uno de los enfoques clásicos para ARC-AGI, y aborda directamente al fondo del problema, que es deducir la regla a partir de los ejemplos.
+La síntesis de programas es uno de los enfoques clásicos para ARC-AGI y aborda directamente el fondo del problema, que es deducir la regla a partir de los ejemplos.
 La idea, también llamada programación inductiva, es escribir automáticamente un programa que satisfaga una especificación. En este caso, la especificación está
 formada por los pares de matrices. Se busca un programa que convierta la entrada del entrenamiento en la salida correspondiente, nada más. Este enfoque es inductivo,
 parte de una regla general y busca deducir la regla a partir de los ejemplos. El otro enfoque es transductivo, que es evitar generar un programa general e intentar
-predecir la salida directamente a partir de los ejemplos de entrada. Las soluciones \textit{Domain Specific Languages} (DSLs) como se ha visto en la sección \ref{sec:DSL},
-el espacio de posibles programas que se pueden generar es inmenso, computacionalmente costoso para CPU y poco práctico.
+predecir la salida directamente a partir de los ejemplos de entrada. En las soluciones basadas en \textit{Domain Specific Languages} (DSL), como se ha visto en la sección \ref{sec:DSL},
+el espacio de posibles programas que se pueden generar es inmenso, computacionalmente costoso para la CPU y poco práctico.
 
 Resolver el \textit{benchmark} ARC-AGI requiere de un enfoque meticuloso y una comprensión profunda de los principios subyacentes que rigen la inteligencia general. Es necesario establecer
 una serie de componentes básicos previos:
@@ -1471,7 +1470,7 @@ una serie de componentes básicos previos:
 \end{enumerate}
 
 Como se ha visto en la sección \ref{sec:arc}, el espíritu de ARC-AGI es encontrar soluciones que sean lo más eficientes posible, no solo en términos de precisión, sino también en términos de coste computacional. La inteligencia
-no se debe comprar con datos ni con cómputo masivo. Este trabajo se construye a partir de este espíritu de la norma, se ha estudiado numerosos modelos y soluciones para tratar de buscar un enfoque de acuerdo con este principio.
+no se debe comprar con datos ni con cómputo masivo. Este trabajo se construye a partir de este espíritu de la norma. Se han estudiado numerosos modelos y soluciones para buscar un enfoque acorde con este principio.
 
 Dejando al margen los grandes modelos de lenguaje y los modelos de frontera, se han estudiado diferentes enfoques de modelos compactos y eficientes. 
 La figura \ref{fig:fig1SECTION5} muestra una comparativa del coste por tarea entre diferentes modelos compactos, donde el tamaño de los círculos representa la capacidad computacional en TFLOPs FP16 usada en cada modelo.
@@ -1481,7 +1480,7 @@ Los datos obtenidos son datos oficiales de la página web oficial de ARC-AGI.
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.85\textwidth]{../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light.png}
-	\caption[Comparativa del coste por tarea entre modelos compactos]{Comparativa del coste por tarea entre modelos compactos. El tamaño de los círculos representan la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
+	\caption[Comparativa del coste por tarea entre modelos compactos]{Comparativa del coste por tarea entre modelos compactos. El tamaño de los círculos representa la capacidad computacional en TFLOPs FP16 usada en cada modelo.}
 	\label{fig:fig1SECTION5}
 	{\footnotesize Fuente: Elaboración propia. Datos obtenidos de la página web oficial de ARC-AGI.
 	Imagen completa: \url{https://github.com/UNIR-TUC/arc-agi/blob/main/src/arc_agi_data_scraper/images/compact_tflops_cost_light.png}}
@@ -1490,8 +1489,8 @@ Los datos obtenidos son datos oficiales de la página web oficial de ARC-AGI.
 \FloatBarrier
 
 Algunas soluciones, como TRM, requieren de una capacidad de cómputo muy elevada, que no está al alcance de cualquier investigador. Por otra parte, este enfoque también se encuentra en el filo
-del espíritu de ARC-AGI, ya que es necesario realizar pre-entrenamientos sin ningún límite de capacidad de computación para posteriormente realizar ajustes finos e inferencia
-en la las GPUs obligadas por los órganos de ARC-PRIZE. La diferencia de la capacidad de cómputo usada para el modelo TRM en comparación al modelo de \textit{CompressARC} es de 7.916 PFLOPs frente a 116,6 TFLOPs, 
+del espíritu de ARC-AGI, ya que es necesario realizar preentrenamientos sin ningún límite de capacidad de computación para posteriormente realizar ajustes finos e inferencia
+en las GPU exigidas por los órganos de ARC Prize. La diferencia entre la capacidad de cómputo usada para el modelo TRM y la del modelo \textit{CompressARC} es de 7.916 PFLOPs frente a 116,6 TFLOPs, 
 lo que supone una diferencia de más de 67 veces. En cuestión de eficiencia computacional es realmente destacable el modelo de \textit{CompressARC}.
 
 La siguiente figura \ref{fig:fig2SECTION5} muestra otra comparativa de diferentes modelos compactos desde la perspectiva de coste por tarea.
@@ -1580,17 +1579,17 @@ secciones se analizará con detalle este enfoque y se presentará una variante p
 
 Los datos de entrada del \textit{benchmark} ARC-AGI se presentan en forma de pares de matrices, donde cada par consiste en una matriz de entrada y su correspondiente matriz de salida.
 El análisis exploratorio de datos (EDA) es un paso crucial para comprender la naturaleza de estos datos y para identificar patrones, tendencias y posibles anomalías que puedan influir en el diseño del modelo. Los
-datos típicamente se presentan en archivos de lenguaje de texto simple JSON, que contienen representaciones de las matrices en formato de listas anidadas. Cada matriz puede variar en tamaño y contenido,
+datos se presentan habitualmente en archivos JSON de texto simple, que contienen representaciones de las matrices en forma de listas anidadas. Cada matriz puede variar en tamaño y contenido,
 lo que introduce un nivel adicional de complejidad en el análisis.
 
-Los datos se componen de 5 archivos:
+El conjunto de datos se compone de cinco archivos:
 
 \begin{itemize}
 	\item \textbf{train\_challenges:} Tareas para el entrenamiento. 400 tareas de entrenamiento, cada una con 3 ejemplos de entrada (o más) y salida. Estas tareas son públicas y se pueden usar para entrenar modelos de lenguaje.
 	\item \textbf{train\_solutions:} Soluciones correspondientes a las tareas de entrenamiento. 400 soluciones de entrenamiento, también son públicas.
 	\item \textbf{evaluation\_challenges:} Tareas para la evaluación. 400 tareas de evaluación, cada una con 3 ejemplos de entrada (o más) y salida. Estas tareas son públicas y se pueden usar para evaluar modelos de lenguaje.
 	\item \textbf{evaluation\_solutions:} Soluciones correspondientes a las tareas de evaluación. 400 soluciones de evaluación, también son públicas.
-	\item \textbf{test\_challenges:} Tareas adicionales para el \textit{test} privado final de ARC-PRIZE. Estas tareas suelen ser nuevas y totalmente privadas hasta que no son inferenciados en una máquina de evaluación oficial. La idea es que los modelos no puedan sobre-ajustarse a estas tareas y que la evaluación final sea lo más objetiva posible. No se dispone de las soluciones de estas tareas, ya que son privadas y solo se pueden evaluar en la máquina oficial de ARC-PRIZE.
+	\item \textbf{test\_challenges:} Tareas adicionales para la prueba privada final de ARC Prize. Estas tareas suelen ser nuevas y totalmente privadas hasta que se evalúan en una máquina oficial. La idea es que los modelos no puedan sobreajustarse a estas tareas y que la evaluación final sea lo más objetiva posible. No se dispone de sus soluciones, ya que son privadas y solo se pueden evaluar en la máquina oficial de ARC Prize.
 \end{itemize}
 
 
@@ -1604,7 +1603,7 @@ Los datos se componen de 5 archivos:
 
 \FloatBarrier
 
-Los datos típicamente se presentan en pares de matrices y está compuesto por valores enteros que representan colores en una paleta de 10 colores.
+Los datos se presentan habitualmente en pares de matrices y están compuestos por valores enteros que representan una paleta de 10 colores.
 
 \begin{figure}[h]
 	\centering
@@ -1616,7 +1615,7 @@ Los datos típicamente se presentan en pares de matrices y está compuesto por v
 
 \FloatBarrier
 
-Cada tarea está identificada por un identificador único de 8 caracteres alfanuméricos. En los conjuntos de datos se pueden encontrar las diferentes tareas, que pueden ser especialmente
+Cada tarea está identificada por un código único de 8 caracteres alfanuméricos. En los conjuntos de datos se pueden encontrar tareas muy
 diferentes entre sí.
 
 \begin{figure}[h]
@@ -1670,29 +1669,29 @@ fundamenta en los principios de \textit{CompressARC} \cite{liao2025arcagiwithout
 un equilibrio entre la expresividad del modelo y la eficiencia computacional, evitando el pre-entrenamiento masivo en favor de una optimización centrada en 
 el tiempo de inferencia (\textit{Test-Time Training}). 
 
-Un Autocodificador es un modelo de aprendizaje profundo que aprende a generar variables latentes que representen
+Un autocodificador es un modelo de aprendizaje profundo que aprende a generar variables latentes que representen
 características ocultas de los datos, para posteriormente, decodificarlas y reconstruir los datos de entrada. Estos modelos
 son especialmente útiles para tareas de reducción de dimensionalidad, compresión de datos y generación de nuevas muestras a partir de las características aprendidas.
 El problema de estos modelos es que aprenden los datos hasta el punto de memorizar en lugar de generalizar, 
-haciendo que sean especialmente buenas para clonar comportamientos concretos. Los autocodificadores en concreto
-son capaces de generar representaciones discretas, como puede ser un vector variables simple binario.
+haciendo que sean especialmente buenos para reproducir comportamientos concretos. Los autocodificadores, en concreto,
+son capaces de generar representaciones discretas, como un vector simple de variables binarias.
 
-Los Autocodificadores Varicionales o VAE son un tipo de autocodificadores con ciertas particularidades. A diferencia de los
+Los autocodificadores variacionales o VAE son un tipo de autocodificador con ciertas particularidades. A diferencia de los
 autocodificadores tradicionales, codifican representaciones continuas y probabilísticas en un espacio latente. En vez de codificar
 un vector de valores determinísticos, típicamente se genera una media y una desviación estándar por cada variable latente.
-Este mecanismo tiene una ventaja, lo convierte en un modelo de aprendizaje profundo generativo capaz de reconstruir con
+Este mecanismo presenta una ventaja: lo convierte en un modelo de aprendizaje profundo generativo capaz de reconstruir con
 precisión la entrada general exacta y además variaciones que se parecen a los datos originales.
 
-Profundizando más acerca de los Autocodificadores Varicionales, destacar que se compone típicamente de dos componentes principales;
-un codificador y un decodificador. Ambos componentes son redes neuronales densas, la diferencia es que el codificador codifica la entrada
-convirtiendo la salida en variables de medias y desviaciones estándar y el decodificador recoge estas variables para reconstruir 
+Cabe destacar que los autocodificadores variacionales se componen habitualmente de dos elementos principales:
+un codificador y un decodificador. Ambos son redes neuronales densas. El codificador transforma la entrada
+en variables de medias y desviaciones estándar, mientras que el decodificador recoge estas variables para reconstruir 
 la entrada original. Este proceso permite que el modelo capture la incertidumbre inherente en los datos y genere nuevas muestras que sean coherentes con la distribución aprendida.
 El espacio latente es un conjunto de variables latentes. Estas variables latentes son características ocultas de los datos, representaciones
 que no son directamente observables en los datos de entrada, pero que capturan información relevante para la generación y reconstrucción de los mismos.
 
-\textit{CompressARC} es un sistema basado en autocodificadores varicionales, hasta cierto punto. Este sistema es mucho más profundo, complejo y contiene
+\textit{CompressARC} es, hasta cierto punto, un sistema basado en autocodificadores variacionales. Este sistema es más profundo y complejo, y contiene
 un sistema de estructuras con diversas variaciones. Las tareas de ARC-AGI son complejas y variadas. Cada tarea puede contener
-diversos ejemplos, colores, tamaños y patrones diferentes. Todas estas variaciones en los datos deben ser capturados y representados en variables
+diversos ejemplos, colores, tamaños y patrones diferentes. Todas estas variaciones en los datos deben ser capturadas y representadas en variables
 latentes. Este proceso es mucho más complejo a simple vista y requiere de un diseño sofisticado. Para poder realizar este cometido,
 \textit{CompressARC} hace uso de un sistema denominado Multitensor, y posteriormente se descodifica mediante una compleja arquitectura 
 de redes neuronales densas.
@@ -1707,9 +1706,9 @@ de redes neuronales densas.
 
 \FloatBarrier
 
-El objetivo del modelo es el mismo que cualquier Autocodificador Varicional, codificar un espacio latente y posteriormente decodificarlo 
-para reconstruirlo mediante los denominados \textit{logits}. En los siguientes apartados se explicará con todos tipo de detalles
-el funcionamiento de cada sistema en detalle.
+El objetivo del modelo es el mismo que el de cualquier autocodificador variacional: codificar un espacio latente y posteriormente decodificarlo 
+para reconstruirlo mediante los denominados \textit{logits}. En los siguientes apartados se explicará con todo tipo de detalles
+el funcionamiento de cada sistema.
 
 El flujo completo de entrenamiento en tiempo de inferencia de manera simple podría ser el siguiente:
 \begin{enumerate}
@@ -1723,7 +1722,7 @@ El flujo completo de entrenamiento en tiempo de inferencia de manera simple podr
 \end{enumerate}
 
 El sistema está basado en el principio de Mínima Longitud de Descripción (MDL). Si el modelo logra describir los ejemplos de entrenamiento de una
-tarea con un código más corto que el código más corto ue el código trivial de enumerar píxeles, entonces significa que ha descubierto la estructura
+tarea con un código más corto que el código trivial de enumerar píxeles, significa que ha descubierto la estructura
 de la tarea y esa estructura debería extrapolar al ejemplo de pruebas. Entre dos explicaciones que describen correctamente los datos conocidos, 
 se prefiere la que necesita menos información para expresarse. Formalmente, para un conjunto
 de datos $D$ y un modelo $M$, esta longitud puede expresarse como:
@@ -1736,7 +1735,7 @@ de datos $D$ y un modelo $M$, esta longitud puede expresarse como:
 donde $L(M)$ representa la información necesaria para describir el modelo y
 $L(D\mid M)$ representa la información adicional necesaria para describir los datos una vez conocido dicho modelo. En el caso de
 \textit{CompressARC}, esta descomposición se implementa mediante una aproximación diferenciable de la pérdida del VAE, que combina el coste de
-codificar las variables latentes y el coste de reconstruir los las cuadrículas observadas:
+codificar las variables latentes y el coste de reconstruir las cuadrículas observadas:
 
 \begin{equation}
 	\mathcal{L}_{\mathrm{MDL}} =
@@ -1754,19 +1753,19 @@ formulación, los píxeles observados incluyen las entradas de prueba, pero no s
 
 En cada tarea se realiza un bucle de entrenamiento completo. Esto lo convierte en un sistema esencialmente transductivo. Se realiza
 una optimización específica por tarea en vez de un entrenamiento global. No es un modelo inductivo convencional entrenado globalmente para
-una función reutilizable entre tareas. Por decir alguna definición, \textit{CompressARC} es un modelo transductivo por tarea,
+una función reutilizable entre tareas. En términos más precisos, \textit{CompressARC} es un modelo transductivo por tarea,
 con aprendizaje durante la inferencia y con sesgos inductivos arquitectónicos derivados de características específicas.
 
 \subsection{Pruebas iniciales}
 
-El autor del modelo \citeauthor{liao2025arcagiwithoutpretraining} \citeyear{liao2025arcagiwithoutpretraining} muestra una seria de métricas del laboratorio de pruebas realizadas en 
-exhaustivos documentos explicativos. El entrenamiento del modelo, para todas las tareas se realizan de manera secuencial, es decir, se realiza
-el entrenamiento de una tarea, se compara el resultado y continua con el siguiente. Este procedimiento se realiza al completo en ambos 
+El autor del modelo \citeauthor{liao2025arcagiwithoutpretraining} \citeyear{liao2025arcagiwithoutpretraining} muestra una serie de métricas de las pruebas realizadas en 
+documentos explicativos exhaustivos. El entrenamiento del modelo para todas las tareas se realiza de manera secuencial: se entrena
+una tarea, se compara el resultado y se continúa con la siguiente. Este procedimiento se realiza por completo en ambos 
 conjuntos de datos de entrenamiento y evaluación. El autor reporta que el tiempo total de ejecución de todas las tareas de entrenamiento es 
-de 130 horas realizando 2000 iteraciones por tarea. El proceso de ejecución de las tareas de evaluación es un poco más, 138 horas.
+de 130 horas realizando 2000 iteraciones por tarea. El proceso de ejecución de las tareas de evaluación es algo más largo: 138 horas.
 
 De manera experimental también incluye una opción de lanzar diversos procesos en paralelo, lo que puede reducir 
-el tiempo total de ejecución. En las pruebas iniciales, se uso ambas técnicas para probar si realmente existe una mejora
+el tiempo total de ejecución. En las pruebas iniciales se usaron ambas técnicas para comprobar si realmente existía una mejora
 significativa con un subconjunto pequeño de tareas. Ambas pruebas se realizaron y tardaron alrededor de 17,3 horas, con lo cual,
 el uso de ejecuciones en paralelo tal y como está diseñado el proceso de entrenamiento no proporciona una mejora significativa en términos de tiempo de ejecución.
 
@@ -1782,15 +1781,15 @@ diseño.
 
 \subsection{Codificador Multitensor}
 
-Las tareas de ARC-AGI típicamente contienen en los datos de entrenamiento entre 2 y 7 ejemplos. También puede contener entre 2 y 5 colores,
-además de cambios espaciales. En ARC-AGI, las tareas que presentan una variación en el tamaño de la matriz se puede ver reflejado
+Las tareas de ARC-AGI contienen habitualmente entre 2 y 7 ejemplos en los datos de entrenamiento. También pueden contener entre 2 y 5 colores,
+además de cambios espaciales. En ARC-AGI, las tareas que presentan una variación en el tamaño de la matriz pueden verse reflejadas
 en las salidas de los propios ejemplos. Si tomamos todas estas características en conjunto podemos tener una representación compleja
 de 5 dimensiones: [número de ejemplos, número de colores, direcciones, número de filas, número de columnas]. El sistema al principio
 almacena toda esta información de un vector de estas características. Debido a las grandes variaciones de las 800 tareas que
 representa ARC-AGI, se recurre a la creación de una estructura denominada Multitensor.
 
 El Multitensor es un conjunto de tensores, cada tensor guarda combinaciones dimensionales. No todas las combinaciones posibles pueden contener
-información relevante. Para aquellas combinaciones que no representan información relevante se le considera inválida. Una máscara binaria de
+información relevante. Las combinaciones que no representan información relevante se consideran inválidas. Una máscara binaria de
 5 dimensiones da como resultado 32 posibles combinaciones binarias. De estas 32 posibles combinaciones, se consideran
 sólo 18 como tensores válidos.
 
@@ -1877,8 +1876,8 @@ $X$ e $Y$ las dimensiones espaciales. El último eje corresponde siempre a los c
 
 \FloatBarrier
 
-A estos tensores se le añade una dimensión adicional denominada canal o más correctamente espacio latente. Cada posible valor de las hojas contendrán un vector de 4
-valores que representará este espacio. Para recorrer todas las posibilidades de los diferentes tensores, en el que haya datos
+A estos tensores se les añade una dimensión adicional denominada canal o, más correctamente, espacio latente. Cada posible valor de las hojas contendrá un vector de 4
+valores que representará este espacio. Para recorrer todas las posibilidades de los diferentes tensores en los que haya datos
 representados, se hará uso de una máscara binaria de 5 dimensiones. Posteriormente se representará todo el estado latente mediante un
 tensor denominado \(z\).
 
@@ -1889,7 +1888,7 @@ los demás de forma controlada.
 \subsubsection{Direcciones}
 
 El eje de direcciones del Multitensor tiene 8 dimensiones fijas. Estas direcciones cubren un grupo diédrico con el conjunto de simetrías
-de un cuadrado, es decir, todas las formas de moverlo. Las formas de moverlo más habituales es mediante rotaciones o reflexiones, de manera
+de un cuadrado, es decir, todas las formas de moverlo. Las transformaciones más habituales son las rotaciones o reflexiones, mediante las cuales
 que vuelve a ocupar exactamente la misma posición. La operación del grupo es componer simetrías, es decir, aplicar una tras otra. Está formada
 por 8 elementos, correspondientes a las 4 rotaciones y 4 reflexiones posibles de un cuadrado. Básicamente describe todas las maneras de mover 
 un cuadrado sin cambiar su apariencia geométrica.
@@ -1897,18 +1896,18 @@ un cuadrado sin cambiar su apariencia geométrica.
 \subsection{Arquitectura de decodificación}
 
 El objetivo de la capa de decodificación es decodificar el espacio latente \(z\). Este proceso se realiza mediante un método interno que
-se encarga de decodificar de manera independiente cada una de los 18 tensores del Multitensor. Utiliza una tabla de parámetros ajustables
-con la forma de la vista correspondiente, indicando la dirección que debe desviarse los valores latentes respecto al ruido inicial genérico.
+se encarga de decodificar de manera independiente cada uno de los 18 tensores del Multitensor. Utiliza una tabla de parámetros ajustables
+con la forma de la vista correspondiente, que indica la dirección en la que deben desviarse los valores latentes respecto al ruido inicial genérico.
 Durante todo el proceso de entrenamiento se crean valores aleatorios basados en una distribución normal estándar. Mantener una parte
 de ruido evita que el espacio latente se convierta en una tabla de memoria sin coste.
 
 También se hace uso de divergencia de Kullback-Leibler,
-una medida que compara distribuciones de probabilidad y cuantifica cuanta información adicional hace falta para describir la distribución 
+una medida que compara distribuciones de probabilidad y cuantifica cuánta información adicional hace falta para describir la distribución 
 real a partir de la aproximación. En el modelo el tensor latente \(z\) funciona como un código interno de la tarea ARC. 
 Ese código debe contener la información necesaria para reconstruir los ejemplos y descubrir la regla.
 
-El proceso de decodificación consta de 4 bloques idénticos que se ejecutan de manera secuencial, como una especie de bucle. Este bloque
-está formado por una serie de operaciones:
+El proceso de decodificación consta de 4 bloques idénticos que se ejecutan de manera secuencial, como una especie de bucle. Estos bloques
+están formados por una serie de operaciones:
 
 \begin{itemize}
 	\item \textbf{Comunicación ascendente:} difunde información desde las hojas compactas hacia representaciones con más ejes.
@@ -2304,12 +2303,10 @@ Al sustituir estos valores se obtiene el resultado de la Ecuación \eqref{eq:nor
 La matriz resultante tiene media nula y una magnitud cuadrática media próxima a uno. Esto impide que las sumas residuales de los cuatro
 bloques aumenten progresivamente la escala de las activaciones y proporciona al bloque siguiente una entrada numéricamente estable.
 
-En conjunto, \textit{share\_up} y \textit{share\_down} conectan distintos niveles de detalle. \textit{softmax} introduce selección
+En conjunto, \textit{share\_up} y \textit{share\_down} conectan distintos niveles de detalle; \textit{softmax} introduce selección;
 \textit{cummax} y \textit{shift} realizan propagación espacial; \textit{direction\_share} integra orientaciones. SiLU
 aporta capacidad no lineal y \textit{normalize} mantiene estable el flujo. La repetición de esta secuencia durante cuatro bloques
 permite componer estas operaciones elementales para aproximar transformaciones más complejas de las tareas ARC-AGI.
-
-\subsubsection{Contantes}
 
 %\subsection{Función de error}
 
@@ -2318,7 +2315,7 @@ permite componer estas operaciones elementales para aproximar transformaciones m
 \subsection{Limitaciones}
 
 El autor \citeauthor{liao2025arcagiwithoutpretraining} \citeyear{liao2025arcagiwithoutpretraining} deja claro en su trabajo lo que el modelo sabe y
-no sabe hacer. Entre las habilidades del modelo se podría resumir en lo siguiente:
+no sabe hacer. Las habilidades del modelo se pueden resumir del siguiente modo:
 
 \begin{itemize}
 	\item Completar patrones espaciales (extensión de líneas, propagación de colores).
@@ -2332,28 +2329,28 @@ no sabe hacer. Entre las habilidades del modelo se podría resumir en lo siguien
 También existen numerosas limitaciones arquitectónicas y de capacidad del modelo que restringen su desempeño en tareas más complejas o abstractas:
 
 \begin{itemize}
-	\item Existen algunas ausencias claras de habilidades primitivas, como es la capacidad de contar. El modelo no es capaz de contar
-	regiones ni cuantos píxeles de un color en la cuadrícula. Esta habilidad simplemente no está presenta en una función dentro del modelo. Esta habilidad
+	\item Existen algunas ausencias claras de habilidades primitivas, como la capacidad de contar. El modelo no es capaz de contar
+	regiones ni cuántos píxeles de un color hay en la cuadrícula. Esta habilidad simplemente no está presente en una función del modelo y
 	podría ser implementada dentro de la capa del núcleo de descompresión.
-	\item Limitaciones que requieren recurrencia en el tiempo como simulaciones de pixeles que se mueven con reglas específicas como es es la tarea
+	\item Limitaciones que requieren recurrencia en el tiempo, como simulaciones de píxeles que se mueven con reglas específicas, como sucede en la tarea
 	2dd70a9a.
 	\item Ausencia de planificación a largo plazo, reglas con múltiples pasos secuenciales no se suelen descubrir.
-	\item Se ha experimenta aleatoriedad en la semilla. Distintas semillas son capaces de resolver o no ciertas tareas. Existen ciertos casos
+	\item Se ha observado aleatoriedad en la semilla. Distintas semillas son capaces de resolver o no ciertas tareas. Existen ciertos casos
 	en los que algunos tensores críticos pueden llegar recomponerse tras una caída en el error de manera abrupta.
-	\item Entrenar el conjunto total de tareas de ARC-AGI dura dura en torno a 300 horas, lo que equivale a 20 minutos por tarea.
+	\item Entrenar el conjunto total de tareas de ARC-AGI dura en torno a 300 horas, lo que equivale a 20 minutos por tarea.
 	\item El uso de la CPU mediante el entrenamiento en paralelo es demasiado alto. A pesar de poder ejecutar diversos modelos al mismo tiempo
-	gracias a la capacidad de la tarjeta gráfica, el alto uso de CPU produce una especia de "cuello de botella" que limita el rendimiento global.
+	gracias a la capacidad de la tarjeta gráfica, el alto uso de CPU produce una especie de ``cuello de botella'' que limita el rendimiento global.
 	Ya sea de forma secuencial o paralela, la velocidad de entrenamiento rara vez supera las 2 iteraciones por segundo.
 	\item Destacar que existen limitaciones estructurales de capas neuronales densas. La arquitectura está fijada como una constante en 4 capas
-	para todas las tareas. El objetivo es mantener la longitud de la descripción del modelo baja. La consecuencia de esto es pueden existir
+	para todas las tareas. El objetivo es mantener baja la longitud de la descripción del modelo. La consecuencia es que pueden existir
 	tareas que requieren más de 4 capas o directamente que necesitan iterar más veces un mismo operador. Esto deja claro una evidente ausencia de recurrencia
-	y capacidad adaptativa profunda. Otros modelos como los modelos de razonamiento jerárquicos si presentan mecanismos de razonamiento iterativo
+	y capacidad adaptativa profunda. Otros modelos, como los de razonamiento jerárquico, sí presentan mecanismos de razonamiento iterativo
 	y adaptativo.
-	\item Limitaciones operacionales de replica de formas. Ciertas tareas que requieren traslación, rotación, reflexión y escalado de una forma completa
-	se quedas sin solución. Este es probablemente la mayor categoría de fallos que se pueden resolver con mejoras arquitectónicas.
+	\item Limitaciones operacionales de réplica de formas. Ciertas tareas que requieren traslación, rotación, reflexión y escalado de una forma completa
+	se quedan sin solución. Esta es probablemente la mayor categoría de fallos que se pueden resolver con mejoras arquitectónicas.
 	\item En muchos casos ocurre un colapso del espacio latente. Generalmente suelen ser 4 tensores los que sostienen el aprendizaje dentro del
 	bucle iterativo. 14 de los 18 tensores nunca llegan a recuperarse de un colapso tras 200 iteraciones. Si alguno de los tensores colapsados es
-	requerido para codificar información crítica, la tarea se queda sin solución y no existe método de rescate. Fortaleces la robustez del
+	requerido para codificar información crítica, la tarea se queda sin solución y no existe método de rescate. Fortalecer la robustez del
 	espacio latente parece ser fundamental.
 	\item Se ha observado que el código implementa un mecanismo de puntuación de los diversos candidatos mediante variables constantes.
 \end{itemize}
@@ -2387,7 +2384,7 @@ valores de sus celdas, las máscaras y las operaciones espaciales, pero el model
 independientes ni reserva un estado específico para sus propiedades. Tampoco existe un mecanismo dedicado para comparar dos objetos,
 seleccionar el de mayor tamaño o agruparlos según su forma.
 
-Esta carencia explica que algunas tareas de selección, la agrupación de objetos solo son accesibles cuando la regla
+Esta carencia explica que algunas tareas de selección y agrupación de objetos solo sean accesibles cuando la regla
 puede aproximarse mediante operaciones píxel a píxel y relaciones direccionales. Cuando la solución exige conservar la identidad de
 varias figuras y operar sobre cada una de ellas de manera independiente, la representación actual debe codificar esa información en
 activaciones distribuidas. El modelo posee, por tanto, una objetualidad implícita y débil, pero no un núcleo de conocimiento
@@ -2400,7 +2397,7 @@ objetivos y modifican su entorno. Aunque no todas las tareas de ARC-AGI requiere
 relevante cuando la solución depende de una secuencia de acciones, de una interacción entre entidades o de la distinción entre un
 estado inicial y un estado objetivo.
 
-\textit{CompressARC} no existe una representación de agentes, acciones ni objetivos intermedios. El modelo recibe los ejemplos de entrada
+En \textit{CompressARC} no existe una representación de agentes, acciones ni objetivos intermedios. El modelo recibe los ejemplos de entrada
 y salida, transforma sus representaciones internas y optimiza directamente la correspondencia con la salida esperada. No mantiene
 un estado de planificación ni dispone de un mecanismo que evalúe qué acción debe ejecutarse a continuación. En consecuencia, las
 tareas que pueden resolverse como una transformación global de la cuadrícula son compatibles con el diseño actual, mientras que las
@@ -2472,29 +2469,29 @@ Debido a las limitaciones observadas en los experimentos previos, se proponen lo
 	\item \textbf{Eje H: Reducción de saturación de procesos en paralelo}. El objetivo es estabilizar los problemas de saturación de la CPU sobre todo 
 	para el entrenamiento de tareas en paralelo. También se deben desarrollar herramientas para obtener métricas comparativas cuantitativas.
 	\item \textbf{Eje D: Eficiencia computacional y aprovechamiento de recursos}. Acelerar el proceso de entrenamiento aprovechando la capacidad
-	computacional medido en TFLOPs y VRAM.
+	computacional medida en TFLOPs y VRAM.
 	\item \textbf{Eje B: Mejora de robustez del espacio latente}. Tratar de contener el colapso del espacio latente para mejorar la robustez en el proceso de entrenamiento.
 \end{enumerate}
 
 \subsection{Eje H: Reducción de saturación de procesos en paralelo}
 
-Las primeras pruebas ejecutadas en el equipo mostraron una saturación de la CPU alrededor del 80\% con diversos procesos en paralelo. Esto
-indicaba una saturación entre la comunicación de la CPU y la GPU. Como consecuencia del alto uso intensivo, también provoca serios problemas
+Las primeras pruebas ejecutadas en el equipo mostraron una saturación de la CPU de alrededor del 80\% con diversos procesos en paralelo. Esto
+indicaba una saturación en la comunicación entre la CPU y la GPU. Como consecuencia del uso intensivo, también se produjeron serios problemas
 de temperatura durante procesos prolongados. En muchas ocasiones, los diversos procesos en paralelo
-han provocado temperaturas por encima de 90°C, lo que representa un riesgo de supervivencia técnica del proyecto. Dado que la mayor parte de operaciones es realizada por la GPU, no tiene sentido
+han provocado temperaturas por encima de 90 °C, lo que representa un riesgo para la viabilidad técnica del proyecto. Dado que la mayor parte de las operaciones son realizadas por la GPU, no tiene sentido
 tal problema de sincronización. El código tampoco requiere operaciones complejas relacionadas con la CPU.
 
-Para controlar, al menos, temporalmente este problema, se implemento un argumento opcional para limitar el número de hilos de procesamiento
+Para controlar, al menos temporalmente, este problema, se implementó un argumento opcional para limitar el número de hilos de procesamiento
 cada vez que se entrenaba en paralelo. El número de hilos de procesamiento prácticamente equivale al número de tareas de entrenamiento al mismo tiempo.
 
 El objetivo principal de este eje es la optimización del tiempo de ejecución. No se busca una mejora en el modelo
-ni que razone mejor, simplemente con los mismos procesos que cada tarea recurra menos sobrecarga de la CPU. La mayoría de 
-operaciones recaen en la GPU pero existen numerosas operaciones pequeñas que son realizadas por el procesador:
+ni que razone mejor, sino que cada tarea requiera una menor carga de la CPU con los mismos procesos. La mayoría de las
+operaciones recaen en la GPU, pero existen numerosas operaciones pequeñas que son realizadas por el procesador:
 
 \begin{itemize}
-	\item Llamadas a frecuentes.
-	\item Operaciones tensoriales reducidos.
-	\item Lanzamientos de kernels GPU
+	\item Llamadas frecuentes a la CPU.
+	\item Operaciones tensoriales reducidas.
+	\item Lanzamientos de \textit{kernels} en la GPU.
 	\item Bucles de procesamiento.
 	\item Conversiones de datos entre la CPU y la GPU. La CPU carga información constantemente en la GPU.
 	\item Cálculos de recolección de datos para el error.
@@ -2506,16 +2503,16 @@ preparando operaciones, esperando resultados y comunicándose con la GPU. Una op
 Python deja operaciones en la cola de la GPU y continúa. Sin embargo, cuando el programa solicita los datos en CPU, la CPU debe esperar a que la GPU termine. 
 Esa espera se denomina sincronización GPU y CPU.
 
-\subsubsection{Eliminación de sincronizaciones necesarias}
+\subsubsection{Eliminación de sincronizaciones innecesarias}
 
-Los entrenamientos de tareas requieren una gran cantidad de iteraciones para encontrar la solución. Este número de iteraciones oscilan entre 1500 y
-2000. En cada iteración se realiza diversas operaciones como el error acumulado, el error de reconstrucción y la pérdida total. Estos datos
-se estaban registrando mediante objetos en memoria. Aunque cada valor podría ser solamente un escalar, la operación obligaba el registro en 
+Los entrenamientos de tareas requieren una gran cantidad de iteraciones para encontrar la solución. Este número de iteraciones oscila entre 1500 y
+2000. En cada iteración se realizan diversas operaciones, como el cálculo del error acumulado, el error de reconstrucción y la pérdida total. Estos datos
+se estaban registrando mediante objetos en memoria. Aunque cada valor podría ser solamente un escalar, la operación obligaba a registrarlo en 
 memoria por medio de la CPU. El problema radica en la cantidad de sincronizaciones necesarias en los diferentes componentes del sistema y el
-coste de detener el proceso y esperar a que finalicen las operaciones de la GPU pueden ser mucho mayor. Muchas de estas sincronizaciones
+coste de detener el proceso y esperar a que finalicen las operaciones de la GPU puede ser mucho mayor. Muchas de estas sincronizaciones
 se utilizaban para generar registros de análisis y visualización, lo cual no interesa cuando se trata de realizar trabajos en paralelo.
 
-Se realizaron una serie de cambios para que de manera opcional todo tipo de estas operaciones de registro
+Se realizaron una serie de cambios para que, de manera opcional, este tipo de operaciones de registro
 no se realizaran en procesos largos y en paralelo. No se fuerza la sincronización en cada iteración, ya no es necesario hacerlo. Toda esta transferencia de 
 datos se conservaría en la memoria de la GPU y posteriormente de manera opcional se transfiere a la CPU en caso de análisis o visualización.
 
@@ -2624,8 +2621,8 @@ redujeron el tiempo de ejecución y la saturación de la CPU, sin disminuir la u
 El objetivo principal de este eje de mejoras es acelerar las operaciones realizadas en los procesos de entrenamiento. Principalmente se requiere
 optimizar los procesos en paralelo y reducir el tiempo de entrenamiento lo máximo posible. No se requiere modificar el núcleo principal del modelo.
 
-El modelo base realiza los entrenamiento con una precisión predeterminada de 32 bits de punto flotante (FP32). Se realizan pruebas utilizando
-punto flotante cerebral de 16 bits (BF16) para acelerar el entrenamiento sin reducir la capacidad del modelo. Tras probarlo, se pudo apreciar
+El modelo base realiza los entrenamientos con una precisión predeterminada de 32 bits de punto flotante (FP32). Se realizaron pruebas utilizando
+formato de punto flotante \textit{bfloat16} (BF16) para acelerar el entrenamiento sin reducir la capacidad del modelo. Tras probarlo, se pudo apreciar
 un impacto en el rendimiento considerablemente peor, descartando reducir la precisión de los datos de manera definitiva.
 
 La tarjeta gráfica Radeon RX 9070 XT dispone de cómputo aritmético suficiente como para poder realizar operaciones de entrenamiento
@@ -2634,19 +2631,19 @@ el código se pudo comprobar que una de las posibles causas es que la CPU estaba
 el tiempo de lanzar y coordinar tal número de micro-códigos podía ser mayor que el tiempo utilizado para realizar las operaciones.
 
 Para resolver este problema se diseña un nuevo componente denominado \textit{inductor}. Este componente mejora la eficiencia de las operaciones mediante
-compilación de \textit{kernels}, construyendo una versión optimizada de las regiones que Pytorch puede analizar. Internamente el código de bajo
+compilación de \textit{kernels}, construyendo una versión optimizada de las regiones que PyTorch puede analizar. Internamente, el código de bajo
 nivel construye un grafo para conectar las diversas operaciones en lugar de ejecutar inmediatamente cada operación. Las diversas operaciones
 de las capas se agrupan en bloques más grandes, por ejemplo, combinando la normalización, activación y vuelta a la normalización en un solo bloque. 
-La mejora radica principalmente en reducir el número de llamadas y por lo tanto, menos solicitudes a la GPU.
+La mejora radica principalmente en reducir el número de llamadas y, por tanto, de solicitudes a la GPU.
 
-Utilizando este método, al principio del entrenamiento de la tarea existirá un tiempo de preparación donde todavía no se realize ninguna operación.
-Durante este tiempo de realiza la compilación y se cargan los \textit{kernels} en la memoria RAM de la CPU. Cuando la compilación ha terminado,
+Con este método, al principio del entrenamiento de la tarea existe un tiempo de preparación durante el que todavía no se realiza ninguna operación.
+Durante este periodo se realiza la compilación y se cargan los \textit{kernels} en la memoria RAM de la CPU. Cuando la compilación ha terminado,
 se lanza el entrenamiento y las operaciones se ejecutan mucho más rápidas. En algunos momentos del entrenamiento en paralelo se ha conseguido
 una mejora significativa incrementando la iteración por segundo de hasta 4 veces. Para comprobar que esta técnica funciona, se debe medir
 el tiempo completo de ejecución, desde el tiempo de compilación hasta que ha terminado el entrenamiento.
 
-Tras realizar una serie de pruebas, se puedo comprobar una reducción significativa del tiempo de entrenamiento por tarea alrededor del 66,8\%. Esto
-sumado al entrenamiento en paralelo también se nota una mejora más considerable. Se manejan los tiempos de manera más eficiente por que
+Tras realizar una serie de pruebas, se pudo comprobar una reducción significativa del tiempo de entrenamiento por tarea de alrededor del 66,8\%. Esta mejora,
+sumada al entrenamiento en paralelo, resulta todavía más considerable. Los tiempos se gestionan de manera más eficiente porque
 se combina la compilación con el entrenamiento entre tareas. Esta optimización mantiene intacta la arquitectura y no añade parámetros. Tampoco
 es necesario cambiar el número de iteraciones.
 
@@ -2654,7 +2651,7 @@ En la siguiente tabla se presentan los resultados comparativos entre la línea b
 debe tener en cuenta que en los resultados aparece una tarea resuelta adicionalmente. Esto es debido a la variabilidad
 de algunas tareas dependiendo de la semilla. No se considera una mejora del modelo. También requiere remarcar
 que esta comparativa se ha realizado con entrenamientos de 1500 iteraciones por tarea, mientras que, para hacer
-una comparativa justo respecto al modelo base, en los resultados finales se realizará la comparación con 2000
+una comparativa justa respecto al modelo base, en los resultados finales se realizará la comparación con 2000
 iteraciones por tarea.
 
 \begin{table}[h]
@@ -2694,8 +2691,8 @@ Tareas resueltas (\textit{pass@2}) & 18 de 50 (36\%) & 19 de 50 (38\%) & +1 tare
 
 El objetivo del eje B es mejorar la estabilidad del proceso de entrenamiento. \textit{CompressARC} puede resolver algunas tareas de manera "afortunada" dependiendo
 de la semilla inicial. Esto lleva a algunos resultados inconsistentes. Sumado al problema del colapso del espacio latente, es necesario analizar una estrategia
-para estabilizar el estacio latente distribuido en las 18 hojas del Multitensor. Cada una de estas hojas representa una combinación de diferentes dimensiones,
-como ejemplos, colores, direcciones, filas y columnas (pixeles).
+para estabilizar el espacio latente distribuido en las 18 hojas del Multitensor. Cada una de estas hojas representa una combinación de diferentes dimensiones,
+como ejemplos, colores, direcciones, filas y columnas (píxeles).
 
 \begin{figure}[h]
 	\centering
@@ -2710,7 +2707,7 @@ como ejemplos, colores, direcciones, filas y columnas (pixeles).
 Durante el entrenamiento, cada hoja aporta una cantidad de información mediante su divergencia de Kullback-Leibler. Sin embargo, se observó que muchas
 hojas reducían rápidamente su contribución. Alrededor de las iteraciones 200-300, muchas hojas colapsaban hasta valores próximos a 0. Este fenómeno
 se conoce como \textit{posterior collapse}, ya que es el propio espacio latente el que es incapaz de aportar información significativa al modelo.
-Cuando una hoja colapsa,deja de transportar información relevante sobre la tarea. Si la hoja afectada era necesaria para representar la regla del problema, 
+Cuando una hoja colapsa, deja de transportar información relevante sobre la tarea. Si la hoja afectada era necesaria para representar la regla del problema, 
 el modelo podía quedar atrapado en una solución incorrecta sin disponer de un mecanismo para recuperarla.
 
 \begin{figure}[h]
@@ -2725,23 +2722,23 @@ el modelo podía quedar atrapado en una solución incorrecta sin disponer de un 
 
 Además, el entrenamiento depende de la inicialización aleatoria de los pesos, de los posteriores latentes y de las muestras de ruido utilizadas por el
 decodificador. Por este motivo, dos ejecuciones de la misma tarea pueden seguir trayectorias diferentes y producir soluciones distintas. Existen casos en los que
-una hoja ha colapsado y posteriormente se ha recuperado, por lo que, el colapso no siempre es irreversible si se recupera a tiempo.
+una hoja ha colapsado y posteriormente se ha recuperado, por lo que el colapso no siempre es irreversible si se recupera a tiempo.
 
 \begin{enumerate}
     \item Umbral de información libre  aplicado a cada
     hoja latente;
     \item Aprendizaje adaptativo que concede mayor importancia a los ejemplos
-    de entrenamiento más difíciles.
-    \item Varias ejecuciones independientes mediante diferentes semillas durante las primeras estapas de la fase de entrenamiento y una
+    de entrenamiento más difíciles;
+	\item Varias ejecuciones independientes mediante diferentes semillas durante las primeras etapas de la fase de entrenamiento y una
     fusión final de sus candidatos.
 \end{enumerate}
 
 Estos mecanismos no modifican la arquitectura de \textit{CompressARC}. No se añaden capas, parámetros ni nuevas operaciones al decodificador. 
-El cambio seaplica exclusivamente al flujo de optimización, a la generación de trayectorias independientes y a la selección final de las predicciones.
+El cambio se aplica exclusivamente al flujo de optimización, a la generación de trayectorias independientes y a la selección final de las predicciones.
 
-La inicialización de diferentes semillas independientes por tarea y por lo tanto, entrenamiento independiente durante las primeras etapas tiene como
+La inicialización de diferentes semillas independientes por tarea y, por tanto, el entrenamiento independiente durante las primeras etapas tienen como
 consecuencia un coste computacional evidente. Con esta implementación, cada tarea necesita ejecutarse varias veces de forma independiente
-en las etapas iniciales y de forma simultánea. Esto obliga a disponer capacidad de paralelización suficiente y de lanzar las multiples intances
+en las etapas iniciales y de forma simultánea. Esto obliga a disponer de suficiente capacidad de paralelización y a lanzar las múltiples instancias
 en lotes. La estrategia utilizada para gestionar este caso es lanzar solamente dos tareas de manera simultánea. Cada tarea se divide en 4 procesos
 independientes lo que da un total de 8 procesos simultáneos. Una vez que terminan las etapas iniciales, se procede a la fusión de los candidatos generados 
 por cada ejecución independiente. Se ha especificado en código un límite de 2 tareas y 8 procesos simultáneos.
@@ -2752,9 +2749,9 @@ La configuración utilizada en los experimentos principales fue la siguiente:
     \item Cuatro semillas independientes: \(0,1,2,3\);
     \item Umbral inicial de \textit{free-bits} de \(2\) nats por hoja;
     \item Decaimiento lineal del umbral hasta cero;
-    \item Aprendizaje adaptativo de ejemplos activado.
-    \item intensidad máxima del aprendizaje adaptativo igual a \(1\).
-    \item Decaimiento de la dificultad histórica igual a \(0{,}9\);
+	\item Aprendizaje adaptativo de ejemplos activado;
+	\item Intensidad máxima del aprendizaje adaptativo igual a \(1\);
+	\item Decaimiento de la dificultad histórica igual a \(0{,}9\);
     \item Postprocesamiento de candidatos cada cuatro iteraciones.
 \end{itemize}
 
@@ -2837,7 +2834,7 @@ constante \(\tau_t\). En consecuencia, el optimizador deja de recibir el gradien
 hoja tiene \(K_{\ell,t}=0{,}5\) y el umbral es \(\tau_t=2\), la hoja aporta \(2\) nats a la pérdida, pero el gradiente asociado a la operación
 \(\max(K_{\ell,t},2)\) es cero en esa región.
 
-Este mecanismo no obliga a la hoja a aprender información. Su función es más limitada, simplemente evita que la que el proceso de compresión la
+Este mecanismo no obliga a la hoja a aprender información. Su función es más limitada: simplemente evita que el proceso de compresión la
 reduzca de manera anticipada a 0. De este modo, la hoja conserva una oportunidad de recibir gradientes procedentes del error de reconstrucción y de recuperar una
 representación útil.
 
@@ -2855,7 +2852,7 @@ entrenamiento se recupera la pérdida KL original. Durante el entrenamiento se r
 
 La segunda mejora modifica la importancia relativa de los ejemplos de entrenamiento. Una tarea de ARC-AGI contiene varios pares de demostración. Cada
 par está compuesto por una entrada y una salida conocida. En el modelo base, todos los pares contribuyen a la reconstrucción con el mismo peso.
-Destacar que en los datos de evaluación, el número de ejemplos para la fase de entrenamiento suele ser menor y en ocasiones mucho menor.
+Cabe destacar que, en los datos de evaluación, el número de ejemplos para la fase de entrenamiento suele ser menor y, en ocasiones, mucho menor.
 
 El Eje B mantiene un historial de dificultad para cada ejemplo. En cada iteración se calcula la pérdida de reconstrucción del par y se divide por el
 número de píxeles observables:
@@ -2877,7 +2874,7 @@ donde \(i\) identifica la demostración, \(N_i\) es el número de píxeles de su
 cuadrículas y \(r_{i,t}\) representa el error medio por píxel.
 
 El uso de la pérdida por píxel evita favorecer a los ejemplos que poseen cuadrículas más grandes. Sin esta normalización, una demostración con mayor tamaño 
-endría una pérdida superior aunque el modelo lo resuelva proporcionalmente mejor.
+tendría una pérdida superior aunque el modelo la resolviera proporcionalmente mejor.
 
 El código calcula el error de reconstrucción de cada ejemplo, lo divide por el número de píxeles y conserva una media móvil de ese valor.
 Por tanto, una demostración tiene mayor dificultad cuando el modelo lleva varias iteraciones reconstruyéndola peor que las demás.
@@ -2975,7 +2972,7 @@ podría quedar oculta por una solución repetida por las demás.
 
 La fusión no utiliza las soluciones reales de las tareas. Aunque se ejecuten cuatro modelos internos,
 el sistema continúa entregando únicamente dos respuestas por tarea y sigue siendo
-compatible con la métrica \textit{pass@2}. Esto es especialmente importante por que si no fuera así,
+compatible con la métrica \textit{pass@2}. Esto es especialmente importante porque, de no ser así,
 las pruebas no serían representativas del rendimiento real del sistema.
 
 El conjunto de las soluciones correctas obtenidas por las cuatro semillas no
@@ -2985,7 +2982,7 @@ es correcta. El sistema real debe elegir solo dos candidatos utilizando sus
 puntuaciones internas.
 
 Se realizaron varios experimentos con reducidos conjuntos de tareas. Los experimentos evidenciaron
-que el modelo no había empeorado y consiguió incluso una ligera mejora aproximado del 4 \% de taras
+que el modelo no había empeorado e incluso consiguió una ligera mejora aproximada del 4\% de tareas
 resueltas. Estas mejoras no garantizan que resuelva todas las tareas, al contrario, el modelo
 sigue careciendo de habilidades primitivas necesarias para resolver ciertas tareas.
 
@@ -3013,17 +3010,17 @@ La interfaz proporciona información activa de entrenamiento, velocidad de itera
 
 \subsection{Problemas encontrados}
 
-Durante el desarrollo se han ido encontrado diversos problemas relacionados con la puesta en marcha del \textit{software} de entorno
-entre otros problemas:
+Durante el desarrollo se han ido encontrando diversos problemas relacionados con la puesta en marcha del \textit{software} del entorno,
+entre otros:
 
 \begin{itemize}
-	\item A pesar de los grandes avances ROCm, todavía se encuentran errores de drivers en medio de procesos de entrenamiento. Esto era un problema
-	especialmente preocupante al inicio del desarrollo por que podía provocar que todo el conjunto de entrenamiento de las tareas que dura muchas
-	horas se pueda verse afectado. Se tuvieron que realizar protocolos y excepciones de código para controlar de forma aislada aquellos entrenamientos
+	\item A pesar de los grandes avances de ROCm, todavía se encuentran errores de controladores en medio de los procesos de entrenamiento. Este era un problema
+	especialmente preocupante al inicio del desarrollo porque podía provocar que todo el conjunto de entrenamiento de las tareas, que duraba muchas
+	horas, se viera afectado. Se tuvieron que implementar protocolos y excepciones de código para controlar de forma aislada aquellos entrenamientos
 	que provocaban fallos en todo el sistema.
 	\item Se encontraron problemas del \textit{software} que controlaban diversos sistemas del equipo durante largas horas de entrenamiento. 
 	Los ventiladores del equipo podían quedarse sin funcionar en cualquier momento.
-	\item Problemas de falta de memoria gráfica durante el entrenamiento de diversas tareas en paralelo. Se tuvo que recurrir a una especia de fase
+	\item Problemas de falta de memoria gráfica durante el entrenamiento de diversas tareas en paralelo. Se tuvo que recurrir a una especie de fase
 	previa en la que la GPU carga los modelos en memoria, calcula el consumo y se guarda en un archivo temporal para que luego el programa
 	supiera de alguna manera el tamaño de reserva antes de cargarlo.
 	\item La compilación de \textit{kernels} también presentaba problemas en ciertas circunstancias. Los millones de archivos que se generan con
@@ -3040,8 +3037,8 @@ entre otros problemas:
 Los resultados de la ejecución base se han obtenido de la documentación oficial del modelo \textit{CompressARC}. Las métricas
 del autor original se han utilizado como referencia, para comparar los resultados obtenidos en este proyecto.
 
-Se ha realizado una ejecución completa de los datos entrenamiento y los datos de evaluación tras la implementación de cada eje de mejora. La comparativa
-se ajusta entre el modelo base, el eje de mejora H/B y el eje de mejora acumulado H/B/D. El eje de mejora H/B hace referencia a las optimizaciones 
+Se ha realizado una ejecución completa de los datos de entrenamiento y de evaluación tras la implementación de cada eje de mejora. La comparativa
+se establece entre el modelo base, el eje de mejora H/B y el eje de mejora acumulado H/B/D. El eje de mejora H/B hace referencia a las optimizaciones 
 relacionadas con el \textit{hardware} y la memoria, mientras que el eje de mejora D se centra en mejorar el modelo. El eje de mejora acumulado H/B/D 
 combina todas las optimizaciones anteriores.
 
@@ -3063,7 +3060,7 @@ combinando las ventajas de las optimizaciones de \textit{hardware}, memoria y mo
 \hline
 Tiempo total de ejecución (evaluación) & 138 h & 35,6 h & 64,3 h \\
 \hline
-\textit{pass@2} Etrenamiento & 139 de 400 (34,75\%) & 139 de 400 (34,75\%) & 176 de 400 (44\%) \\
+\textit{pass@2} Entrenamiento & 139 de 400 (34,75\%) & 139 de 400 (34,75\%) & 176 de 400 (44\%) \\
 \hline
 \textit{pass@2} Evaluación& 80 de 400 (20\%) & 80 de 400 (20\%) & 101 de 400 (25,25\%) \\
 \hline
@@ -3078,8 +3075,8 @@ Coste por tarea (aproximación) & 0,086 \$ & 0,02225 \$ & 0,040 \$ \\
 
 \FloatBarrier
 
-Con los resultados obtenidos, el modelo renombrado \textit{SuperCompressARC} demuestra una ligera mejora en las áreas de coste por tarea y
-puntuación respecto a las métricas de evaluación. El modelo se acerca al modelo compacto HRM siendo computacionalmente exigente y más barato.
+Con los resultados obtenidos, el modelo renombrado \textit{SuperCompressARC} demuestra una ligera mejora en las métricas de coste por tarea y
+puntuación de evaluación. El modelo se acerca al rendimiento del modelo compacto HRM, aunque resulta menos exigente desde el punto de vista computacional y más barato.
 
 \begin{figure}[h]
 	\centering
@@ -3098,32 +3095,32 @@ puntuación respecto a las métricas de evaluación. El modelo se acerca al mode
 
 \chapter{Ética del proyecto}
 
-En diversas ocasiones, las decisiones que se toman en cualquier aspecto de la vida pueden implicar alguna consideración ética. Teniendo en cuenta el mercado y la evolución de las tecnologías 
+En diversas ocasiones, las decisiones que se toman en cualquier aspecto de la vida pueden implicar alguna consideración ética. Teniendo en cuenta el mercado y la evolución de las tecnologías,
 cada vez se puede considerar de mayor importancia plantear dimensiones éticas ante decisiones que se tomen.
 
 En este caso, el proyecto utiliza infraestructuras de computación local y esto conlleva diversas reflexiones éticas. Cada vez más entidades están dispuestas a delegar sus propios 
-servicios de computación a proveedores externos que ofrecen servicio de inteligencia artificial a un precio relativamente asequible. Por lo tanto, también se les está delegando la posibilidad de mantener 
-los servicios de computación sin importar cuestiones éticas en el ámbito medioambiental. Los servicios de computación en la nube indirectamente necesitan materias primas y suministro eléctrico 
-en un contexto en el que se debe de tener en cuenta la responsabilidad y el impacto que supone el gasto energético.
+servicios de computación a proveedores externos que ofrecen servicios de inteligencia artificial a un precio relativamente asequible. De este modo, también se delega en estos proveedores la responsabilidad de mantener
+los servicios de computación sin desatender las cuestiones éticas del ámbito medioambiental. Los servicios de computación en la nube necesitan indirectamente materias primas y suministro eléctrico,
+por lo que se deben tener en cuenta la responsabilidad y el impacto derivados del gasto energético.
 
-Cuidar el medioambiente y proteger el impacto en el medioambiente es responsabilidad de cada ciudadano y, por lo tanto, en este proyecto se puede hacer un análisis ético de dos aspectos 
+Cuidar el medioambiente y reducir el impacto sobre él es responsabilidad de cada ciudadano. Por tanto, en este proyecto se puede realizar un análisis ético desde dos perspectivas
 fundamentales: como individuo y como profesional de la ingeniería del \textit{software}.
 
-Desde una dimensión deontológica se debe impulsar el deber de cada individuo de informarse ante las consecuencias del impacto ambiental en el caso de convertirse en un abonado de un 
+Desde una dimensión deontológica, se debe impulsar que cada individuo se informe sobre las consecuencias medioambientales de convertirse en un abonado de un
 proveedor de servicios de cualquier tecnología de inteligencia artificial. Se debe conocer en qué condiciones y cuáles son los principios que defiende la entidad ante un problema que afecta a todos los ciudadanos. 
-Todo ciudadano tiene derecho a disfrutar y a beneficiarse del mundo globalizado, pero se debe tener en cuenta que las generaciones posteriores también tienen el mismo derecho y por lo tanto 
-se debe salvaguardar el planeta lo más sano posible.
+Todo ciudadano tiene derecho a disfrutar y a beneficiarse del mundo globalizado, pero se debe tener en cuenta que las generaciones posteriores también tienen el mismo derecho y, por tanto,
+se debe preservar el planeta en las mejores condiciones posibles.
 
-Como profesional de la ingeniería del \textit{software} se debe impulsar el uso de tecnologías apoyen la eficiencia energética y el uso de infraestructuras propia, evitando depender excesivamente de servicios 
+Como profesional de la ingeniería del \textit{software}, se debe impulsar el uso de tecnologías que favorezcan la eficiencia energética y el uso de infraestructuras propias, evitando depender excesivamente de servicios 
 externos. El uso de infraestructura propia permite mayor control y libertad al ciudadano sin tener que depender de ciertas compañías.
 
-Se debe apoyar verdaderamente tecnologías que promuevan una verdadera generalización de la inteligencia sin ``comprarla'' mediante computación y datos masivos, a costa del impacto medioambiental mencionado.
+Se deben apoyar tecnologías que promuevan una generalización real de la inteligencia sin ``comprarla'' mediante computación y datos masivos a costa del impacto medioambiental mencionado.
 
 \chapter{Conclusiones y Trabajo Futuro}
 
 La industria de la inteligencia artificial es un mercado cambiante y exigente. Es un mercado que exige innovaciones constantes
-en búsqueda de una inteligencia artificial general. En este contexto, es importante tener en cuenta la responsabilidad ética y
-medioambiental que conlleva el estudio y desarrollo de tecnologías y modelos.
+en busca de una inteligencia artificial general. En este contexto, es importante tener en cuenta la responsabilidad ética y
+medioambiental que conllevan el estudio y el desarrollo de tecnologías y modelos.
 
 Este trabajo ha estudiado el diseño y la optimización de un modelo compacto
 orientado a la resolución del \textit{benchmark} ARC-AGI-1. El objetivo principal
@@ -3139,9 +3136,9 @@ observa que las estrategias de estabilización del espacio latente, la utilizaci
 de varias semillas y la selección de candidatos pueden mejorar la robustez de
 las predicciones.
 
-Los recientes avances también evidencian que los modelos compactos son todavía una 
+Los recientes avances también evidencian que los modelos compactos siguen siendo una 
 opción para la sociedad al margen de grandes compañías y granjas de computación.
-El uso de tecnología propia y modelos compactos permite tener libertad al ciudadano.
+El uso de tecnología propia y modelos compactos proporciona una mayor libertad a la ciudadanía.
 Los avances tecnológicos no pueden estar ligados a quienes pueden comprar la inteligencia
 mediante computación infinita.
 
@@ -3157,7 +3154,7 @@ para cada tarea, como sí realizan modelos como HRM y TRM.
 
 En conjunto, el trabajo confirma que los modelos compactos pueden ofrecer una
 alternativa viable para investigar el razonamiento abstracto bajo restricciones
-de hardware. La reducción del tamaño o del tiempo de
+de \textit{hardware}. La reducción del tamaño o del tiempo de
 ejecución, por sí sola, no es suficiente para alcanzar una generalización
 robusta en ARC-AGI-1.
 

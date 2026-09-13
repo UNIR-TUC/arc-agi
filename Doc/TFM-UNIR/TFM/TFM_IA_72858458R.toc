@@ -10,7 +10,7 @@
 \contentsline {section}{\numberline {2.2}La inteligencia desde un punto de vista filosófico}{4}{section.2.2}%
 \contentsline {section}{\numberline {2.3}Núcleos del conocimiento}{5}{section.2.3}%
 \contentsline {section}{\numberline {2.4}Sistemas de pensamiento}{6}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Algoritmos de búsqueda y optimización}{6}{section.2.5}%
+\contentsline {section}{\numberline {2.5}Algoritmos de búsqueda y optimización}{7}{section.2.5}%
 \contentsline {subsection}{\numberline {2.5.1}Búsqueda en anchura}{8}{subsection.2.5.1}%
 \contentsline {subsection}{\numberline {2.5.2}Búsqueda de coste uniforme}{8}{subsection.2.5.2}%
 \contentsline {subsection}{\numberline {2.5.3}Búsqueda en profundidad}{9}{subsection.2.5.3}%
@@ -40,7 +40,7 @@
 \contentsline {section}{\numberline {2.9}Modelos basados en la Neurodiversidad}{32}{section.2.9}%
 \contentsline {subsection}{\numberline {2.9.1}Inducción de Síntesis de programas mediante Redes Neuronales Eficientes}{34}{subsection.2.9.1}%
 \contentsline {section}{\numberline {2.10}Afinamiento eficiente de modelos para ARC-AGI}{37}{section.2.10}%
-\contentsline {section}{\numberline {2.11}Enfoques de modelos sin Pre-entrenamiento}{39}{section.2.11}%
+\contentsline {section}{\numberline {2.11}Enfoques de modelos sin preentrenamiento}{39}{section.2.11}%
 \contentsline {section}{\numberline {2.12}Modelos basados en Transformers compactos}{40}{section.2.12}%
 \contentsline {section}{\numberline {2.13}Modelos compactos basados en bucles de refinamiento iterativo}{41}{section.2.13}%
 \contentsline {subsection}{\numberline {2.13.1}Modelos de razonamiento jerárquico}{41}{subsection.2.13.1}%
@@ -69,29 +69,28 @@
 \contentsline {subsubsection}{Transformación no lineal}{74}{subsubsection*.18}%
 \contentsline {subsubsection}{Comunicación descendente del Multitensor}{75}{subsubsection*.19}%
 \contentsline {subsubsection}{Normalización final}{76}{subsubsection*.20}%
-\contentsline {subsubsection}{Contantes}{77}{subsubsection*.21}%
 \contentsline {subsection}{\numberline {5.1.4}Limitaciones}{77}{subsection.5.1.4}%
 \contentsline {subsection}{\numberline {5.1.5}Núcleos de conocimiento}{79}{subsection.5.1.5}%
-\contentsline {subsubsection}{Objetualidad}{79}{subsubsection*.22}%
-\contentsline {subsubsection}{Orientación hacia objetivos}{80}{subsubsection*.23}%
-\contentsline {subsubsection}{Números y conteo}{81}{subsubsection*.24}%
-\contentsline {subsubsection}{Geometría elemental y topología}{81}{subsubsection*.25}%
-\contentsline {subsubsection}{Síntesis de los núcleos presentes}{82}{subsubsection*.26}%
+\contentsline {subsubsection}{Objetualidad}{79}{subsubsection*.21}%
+\contentsline {subsubsection}{Orientación hacia objetivos}{80}{subsubsection*.22}%
+\contentsline {subsubsection}{Números y conteo}{80}{subsubsection*.23}%
+\contentsline {subsubsection}{Geometría elemental y topología}{81}{subsubsection*.24}%
+\contentsline {subsubsection}{Síntesis de los núcleos presentes}{82}{subsubsection*.25}%
 \contentsline {section}{\numberline {5.2}Ejes de mejora}{82}{section.5.2}%
 \contentsline {subsection}{\numberline {5.2.1}Eje H: Reducción de saturación de procesos en paralelo}{83}{subsection.5.2.1}%
-\contentsline {subsubsection}{Eliminación de sincronizaciones necesarias}{84}{subsubsection*.27}%
-\contentsline {subsubsection}{Reducción de la frecuencia de post-procesamiento}{85}{subsubsection*.28}%
-\contentsline {subsubsection}{Vectorización del cálculo de la pérdida}{85}{subsubsection*.29}%
-\contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{87}{subsection.5.2.2}%
+\contentsline {subsubsection}{Eliminación de sincronizaciones innecesarias}{84}{subsubsection*.26}%
+\contentsline {subsubsection}{Reducción de la frecuencia de post-procesamiento}{84}{subsubsection*.27}%
+\contentsline {subsubsection}{Vectorización del cálculo de la pérdida}{85}{subsubsection*.28}%
+\contentsline {subsection}{\numberline {5.2.2}Eje D: Eficiencia computacional y aprovechamiento de recursos}{86}{subsection.5.2.2}%
 \contentsline {subsection}{\numberline {5.2.3}Eje B: Mejora de robustez del espacio latente y multi-semilla}{88}{subsection.5.2.3}%
-\contentsline {subsubsection}{Umbral de información libre por hoja latente}{92}{subsubsection*.30}%
-\contentsline {subsubsection}{Aprendizaje adaptativo de demostraciones}{93}{subsubsection*.31}%
-\contentsline {subsubsection}{Entrenamiento independiente mediante varias semillas}{94}{subsubsection*.32}%
-\contentsline {subsubsection}{Selección de candidatos dentro de cada semilla}{95}{subsubsection*.33}%
-\contentsline {subsubsection}{Fusión de las soluciones obtenidas por las semillas}{96}{subsubsection*.34}%
-\contentsline {subsubsection}{Herramienta de visualización de procesos}{97}{subsubsection*.35}%
+\contentsline {subsubsection}{Umbral de información libre por hoja latente}{92}{subsubsection*.29}%
+\contentsline {subsubsection}{Aprendizaje adaptativo de demostraciones}{93}{subsubsection*.30}%
+\contentsline {subsubsection}{Entrenamiento independiente mediante varias semillas}{94}{subsubsection*.31}%
+\contentsline {subsubsection}{Selección de candidatos dentro de cada semilla}{96}{subsubsection*.32}%
+\contentsline {subsubsection}{Fusión de las soluciones obtenidas por las semillas}{96}{subsubsection*.33}%
+\contentsline {subsubsection}{Herramienta de visualización de procesos}{97}{subsubsection*.34}%
 \contentsline {subsection}{\numberline {5.2.4}Problemas encontrados}{97}{subsection.5.2.4}%
 \contentsline {chapter}{\numberline {6}Resultados}{99}{chapter.6}%
 \contentsline {chapter}{\numberline {7}Ética del proyecto}{101}{chapter.7}%
 \contentsline {chapter}{\numberline {8}Conclusiones y Trabajo Futuro}{102}{chapter.8}%
-\contentsline {section}{Referencias}{103}{section*.36}%
+\contentsline {section}{Referencias}{103}{section*.35}%
