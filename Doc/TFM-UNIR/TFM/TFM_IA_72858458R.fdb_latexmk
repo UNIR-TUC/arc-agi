@@ -1,19 +1,19 @@
 # Fdb version 4
-["bibtex TFM_IA_72858458R"] 1789317272.5949 "TFM_IA_72858458R.aux" "TFM_IA_72858458R.bbl" "TFM_IA_72858458R" 1789317729.10822 0
+["bibtex TFM_IA_72858458R"] 1789330793.54929 "TFM_IA_72858458R.aux" "TFM_IA_72858458R.bbl" "TFM_IA_72858458R" 1789331021.95767 0
   "./bibliografia.bib" 1782160298.13459 12271 c17720fabb495ef16037c00bdd87bd6c ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/apacite/apacite.bst" 1374530685 141073 9d7b79dbf9d91133318126032cff8c27 ""
-  "TFM_IA_72858458R.aux" 1789317728.91757 37610 60f6cbd81460f6a211c699963d002aa3 "pdflatex"
+  "TFM_IA_72858458R.aux" 1789331021.76603 37613 889226ec136acbd56e2599f374ff5325 "pdflatex"
   (generated)
   "TFM_IA_72858458R.bbl"
   "TFM_IA_72858458R.blg"
   (rewritten before read)
-["pdflatex"] 1789317716.21812 "/home/asier/repos/arc-agi/Doc/TFM-UNIR/TFM/TFM_IA_72858458R.tex" "TFM_IA_72858458R.pdf" "TFM_IA_72858458R" 1789317729.10836 0
+["pdflatex"] 1789331008.99846 "/home/asier/repos/arc-agi/Doc/TFM-UNIR/TFM/TFM_IA_72858458R.tex" "TFM_IA_72858458R.pdf" "TFM_IA_72858458R" 1789331021.95781 0
   "../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light.png" 1789155565.54048 1061866 9b7f5b50c7da264b9cde3dfaff2f8a48 ""
   "../../../src/arc_agi_data_scraper/images/compact_tflops_cost_light_final.png" 1789155565.54548 1112303 6c430eef14228dd1edbecccb472b4a70 ""
   "../../../src/arc_agi_data_scraper/images/cost_models_cost_light.png" 1789155565.55948 1072878 bb723a5948cf0f7d8737c09320f6153b ""
   "../../../src/arc_agi_data_scraper/images/tflops_models_cost_light.png" 1789155565.72049 4978364 aa01b6995f82c0551d34fc5461cadd13 ""
   "/etc/texmf/web2c/texmf.cnf" 1766149145.60144 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/asier/repos/arc-agi/Doc/TFM-UNIR/TFM/TFM_IA_72858458R.tex" 1789317716.05224 215142 9d08f06536614733bcf192239a94616b ""
+  "/home/asier/repos/arc-agi/Doc/TFM-UNIR/TFM/TFM_IA_72858458R.tex" 1789330999.50174 215145 262cec28d4704a0f65355f2970480598 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1136768653 1536 02c06700a42be0f5a28664c7273f82e7 ""
@@ -175,13 +175,13 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1769038489.10307 5472669 54eaf61a88b6b7896ebd0dac973cb29c ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1769038538 8214393 c3bb473726382c5bd72eaa8943506e81 ""
-  "TFM_IA_72858458R.aux" 1789317728.91757 37610 60f6cbd81460f6a211c699963d002aa3 "pdflatex"
-  "TFM_IA_72858458R.bbl" 1789317299.29844 16543 6cc741387773a5b5ea9bc42ebada36e7 "bibtex TFM_IA_72858458R"
-  "TFM_IA_72858458R.lof" 1789317728.92057 4509 db89c74d2718c5ddcde33808c1df265d "pdflatex"
-  "TFM_IA_72858458R.lot" 1789317728.92057 1226 af0e83f14dce1b440b0782b7735af67c "pdflatex"
-  "TFM_IA_72858458R.out" 1789317728.92057 14255 cc6acb33ba1516bc7cd73ca8965c1e04 "pdflatex"
-  "TFM_IA_72858458R.tex" 1789317716.05224 215142 9d08f06536614733bcf192239a94616b ""
-  "TFM_IA_72858458R.toc" 1789317728.92057 8833 d5b4851d9fdb343b875ed1c2d440fdf1 "pdflatex"
+  "TFM_IA_72858458R.aux" 1789331021.76603 37613 889226ec136acbd56e2599f374ff5325 "pdflatex"
+  "TFM_IA_72858458R.bbl" 1789330793.61062 16437 8fc49dc129117e7344f6fd11b1bc6a28 "bibtex TFM_IA_72858458R"
+  "TFM_IA_72858458R.lof" 1789331021.76903 4509 db89c74d2718c5ddcde33808c1df265d "pdflatex"
+  "TFM_IA_72858458R.lot" 1789331021.76903 1229 60651678084ea12dc47eb3fcd9e69c08 "pdflatex"
+  "TFM_IA_72858458R.out" 1789331021.76903 14255 cc6acb33ba1516bc7cd73ca8965c1e04 "pdflatex"
+  "TFM_IA_72858458R.tex" 1789330999.50174 215145 262cec28d4704a0f65355f2970480598 ""
+  "TFM_IA_72858458R.toc" 1789331021.76903 8833 d5b4851d9fdb343b875ed1c2d440fdf1 "pdflatex"
   "estilo_unir-1.sty" 1776894148.58202 3307 47f512e159fdf783b8019cb68ae7777d ""
   "image/images/1779113749902.png" 1779224258.50385 120479 5e4f1f806a97387dd3520095c177c1db ""
   "image/images/1779113798928.png" 1779224258.504 28710 a5b63c92f522e55a81c1c554bbc74062 ""

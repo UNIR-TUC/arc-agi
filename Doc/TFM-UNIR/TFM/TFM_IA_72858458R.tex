@@ -822,7 +822,7 @@ requiere técnicas de aprendizaje por refuerzo y modelado del mundo más que ing
 	\begin{tabular}{c}E. Resolución\end{tabular} & $\sim$90--96\% & $\sim$85\% sin restricciones / $\sim$24\% con límites de competencia & $<$1\% \\
     \hline
 \end{tabular}
-\caption{Comparación de las versiones de ARC-AGI}
+\caption{Comparación de las versiones de ARC-AGI.}
 \label{tab:arc-agi-comparison}
 \end{table}
 
@@ -1359,7 +1359,7 @@ incluyendo el impacto de la dispersión estructurada en el rendimiento.
     \begin{tabular}{c}Precisión de 4 bits\\(Matriz)\end{tabular} & INT4 & 779.0 TOPs & 1557.0 TOPs \\
     \hline
 \end{tabular}
-\caption{Rendimiento por nivel de precisión y formato}
+\caption{Rendimiento por nivel de precisión y formato.}
 \label{tab:rendimiento-precision}
 \end{table}
 
@@ -1405,7 +1405,7 @@ junto con sus versiones y abreviaciones para su referencia en el resto del docum
 	Tensorflow & 2.19.1 & tensorflow\_rocm \\
 	\hline
 \end{tabular}
-\caption{Librerías de entorno en Python, versión y abreviación}
+\caption{Librerías de entorno en Python, versión y abreviación.}
 \label{tab:python-libs}
 \end{table}
 
@@ -2726,9 +2726,9 @@ una hoja ha colapsado y posteriormente se ha recuperado, por lo que el colapso n
 
 \begin{enumerate}
     \item Umbral de información libre  aplicado a cada
-    hoja latente;
+    hoja latente.
     \item Aprendizaje adaptativo que concede mayor importancia a los ejemplos
-    de entrenamiento más difíciles;
+    de entrenamiento más difíciles.
 	\item Varias ejecuciones independientes mediante diferentes semillas durante las primeras etapas de la fase de entrenamiento y una
     fusión final de sus candidatos.
 \end{enumerate}
@@ -2746,12 +2746,12 @@ por cada ejecución independiente. Se ha especificado en código un límite de 2
 La configuración utilizada en los experimentos principales fue la siguiente:
 
 \begin{itemize}
-    \item Cuatro semillas independientes: \(0,1,2,3\);
-    \item Umbral inicial de \textit{free-bits} de \(2\) nats por hoja;
-    \item Decaimiento lineal del umbral hasta cero;
-	\item Aprendizaje adaptativo de ejemplos activado;
-	\item Intensidad máxima del aprendizaje adaptativo igual a \(1\);
-	\item Decaimiento de la dificultad histórica igual a \(0{,}9\);
+    \item Cuatro semillas independientes: \(0,1,2,3\).
+    \item Umbral inicial de \textit{free-bits} de \(2\) nats por hoja.
+    \item Decaimiento lineal del umbral hasta cero.
+	\item Aprendizaje adaptativo de ejemplos activado.
+	\item Intensidad máxima del aprendizaje adaptativo igual a \(1\).
+	\item Decaimiento de la dificultad histórica igual a \(0{,}9\).
     \item Postprocesamiento de candidatos cada cuatro iteraciones.
 \end{itemize}
 
