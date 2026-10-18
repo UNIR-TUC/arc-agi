@@ -213,6 +213,7 @@ __marimo__/
 **.vscode/
 **results/
 **.inductor_cache
+**.torchinductor_isolated
 results_*.txt
 **.partial/
 **.partial_eje_b/

@@ -50,7 +50,9 @@ torch.set_default_dtype(torch.float32)
 WARMUP_STEPS = 20
 PLOT_INTERVAL = 50
 DEFAULT_POSTPROCESS_STRIDE = 4  # same default as parallel_train.py
-DEFAULT_INDUCTOR_CACHE_DIR = '/mnt/supercompressarc-cache/.inductor_cache'
+DEFAULT_INDUCTOR_CACHE_DIR = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), '.torchinductor_isolated'
+)  # anchored to this file so the cache does not depend on the cwd
 
 # For specific tasks that we found interesting, color some KL components differently.
 SPECIAL_CURVE_COLORS = {
