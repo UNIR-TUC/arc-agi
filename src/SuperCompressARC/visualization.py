@@ -1,3 +1,4 @@
+import ast
 import os
 
 import matplotlib.pyplot as plt
@@ -95,7 +96,7 @@ def plot_problem(logger, task_name=None):
     plt.savefig('plots/' + task_name + '_problem.png', bbox_inches='tight', pad_inches=0)
     plt.close()
 
-def plot_solution(logger, fname=None, task_name=None):
+def plot_solution(logger, fname=None, task_name=None, annotation=None):
     """
     Draw a plot of a model's solution to an ARC-AGI problem, and save it in plots/
     Draws four plots: A model output sample, the mean of samples, and the top two most common samples.
@@ -182,6 +183,8 @@ def plot_solution(logger, fname=None, task_name=None):
                         linewidth=0.3)
     for solution_num, solution_label in enumerate(solutions_labels):
         ax.text((2*n_y+8)*solution_num+4+n_y-0.5, -3, solution_label, size='xx-small', ha='center', va='center')
+    if annotation:
+        ax.set_title(annotation, size='xx-small', pad=14)
     plt.axis('off')
     if fname is None:
         if task_name is None:
@@ -189,5 +192,173 @@ def plot_solution(logger, fname=None, task_name=None):
         fname = 'plots/' + task_name + '_solutions.pdf'
     plt.savefig(fname, bbox_inches='tight', pad_inches=0)
     plt.close()
+
+
+def _log_axis_setup(ax, xlabel, ylabel):
+    ax.set_yscale('log')
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.grid(which='both', linestyle='-', linewidth='0.5', color='gray')
+
+
+def _kl_line_style(component_name, special_colors):
+    line_color = (0.5, 0.5, 0.5)
+    label = None
+    if special_colors is not None:
+        dims = tuple(ast.literal_eval(component_name))
+        for special_dims, color in zip(special_colors['dims'], special_colors['colors']):
+            if dims == special_dims:
+                line_color = color
+                axis_names = ['example', 'color', 'direction', 'height', 'width']
+                axis_names = [axis_name
+                    for axis_name, axis_exists in zip(axis_names, dims) if axis_exists]
+                label = '(' + ', '.join(axis_names) + ', channel)'
+    return line_color, label
+
+
+def plot_kl_components(KL_curves, fname, special_colors=None,
+                       free_bits_curve=None, ylim=None):
+    """Plot the raw KL of every multitensor leaf; with Eje B, overlay the free-bits floor."""
+    fig, ax = plt.subplots()
+    for component_name, curve in KL_curves.items():
+        line_color, label = _kl_line_style(component_name, special_colors)
+        ax.plot(np.arange(len(curve)), curve, color=line_color, label=label)
+    if free_bits_curve is not None:
+        floor = np.asarray(free_bits_curve, dtype=float)
+        floor = np.where(floor > 0, floor, np.nan)  # log axis cannot show tau == 0
+        ax.plot(np.arange(len(floor)), floor, 'r--', linewidth=1.5,
+                label='free-bits floor (tau)')
+    if ylim is not None:
+        ax.set_ylim(ylim)
+    if ax.get_legend_handles_labels()[0]:
+        ax.legend()
+    _log_axis_setup(ax, 'step', 'KL contribution')
+    fig.savefig(fname, bbox_inches='tight')
+    plt.close(fig)
+
+
+def plot_kl_components_seeds(KL_curves_by_seed, fname, special_colors=None,
+                             free_bits_curve=None, ylim=None):
+    """Per-leaf KL across seeds: mean line with a min-max band."""
+    fig, ax = plt.subplots()
+    all_curves = list(KL_curves_by_seed.values())
+    for component_name in all_curves[0]:
+        stack = np.stack([np.asarray(curves[component_name], dtype=float)
+                          for curves in all_curves])
+        steps = np.arange(stack.shape[1])
+        line_color, label = _kl_line_style(component_name, special_colors)
+        ax.fill_between(steps, stack.min(axis=0), stack.max(axis=0),
+                        color=line_color, alpha=0.2, linewidth=0)
+        ax.plot(steps, stack.mean(axis=0), color=line_color, label=label)
+    if free_bits_curve is not None:
+        floor = np.asarray(free_bits_curve, dtype=float)
+        floor = np.where(floor > 0, floor, np.nan)  # log axis cannot show tau == 0
+        ax.plot(np.arange(len(floor)), floor, 'r--', linewidth=1.5,
+                label='free-bits floor (tau)')
+    if ylim is not None:
+        ax.set_ylim(ylim)
+    if ax.get_legend_handles_labels()[0]:
+        ax.legend()
+    ax.set_title('KL per leaf, mean and min-max over seeds ' +
+                 ','.join(str(seed) for seed in KL_curves_by_seed), size='small')
+    _log_axis_setup(ax, 'step', 'KL contribution')
+    fig.savefig(fname, bbox_inches='tight')
+    plt.close(fig)
+
+
+def plot_kl_vs_reconstruction(KL_curves, reconstruction_error_curve, fname,
+                              effective_total_KL_curve=None,
+                              reconstruction_label='reconstruction error'):
+    total_KL = 0
+    for curve in KL_curves.values():
+        total_KL = total_KL + np.asarray(curve, dtype=float)
+    fig, ax = plt.subplots()
+    ax.plot(np.arange(total_KL.shape[0]), total_KL, label='KL from z', color='k')
+    if effective_total_KL_curve is not None:
+        effective = np.asarray(effective_total_KL_curve, dtype=float)
+        ax.plot(np.arange(effective.shape[0]), effective, '--', color='tab:blue',
+                label='effective KL (free bits)')
+    reconstruction = np.asarray(reconstruction_error_curve, dtype=float)
+    ax.plot(np.arange(reconstruction.shape[0]), reconstruction,
+            label=reconstruction_label, color='r')
+    ax.legend()
+    _log_axis_setup(ax, 'step', 'total KL or reconstruction error')
+    fig.savefig(fname, bbox_inches='tight')
+    plt.close(fig)
+
+
+def plot_eje_b_free_bits(n_below_floor_curve, free_bits_curve, fname):
+    """Leaves whose KL is under the free-bits floor, with the floor schedule."""
+    fig, ax = plt.subplots()
+    count = np.asarray(n_below_floor_curve, dtype=float)
+    ax.plot(np.arange(count.shape[0]), count, color='k', label='leaves below floor')
+    ax.set_xlabel('step')
+    ax.set_ylabel('leaves below floor')
+    ax.grid(linestyle='-', linewidth='0.5', color='gray')
+    twin = ax.twinx()
+    floor = np.asarray(free_bits_curve, dtype=float)
+    twin.plot(np.arange(floor.shape[0]), floor, 'r--', label='tau (nats)')
+    twin.set_ylabel('free-bits floor tau (nats)')
+    handles = ax.get_legend_handles_labels()[0] + twin.get_legend_handles_labels()[0]
+    labels = ax.get_legend_handles_labels()[1] + twin.get_legend_handles_labels()[1]
+    ax.legend(handles, labels)
+    fig.savefig(fname, bbox_inches='tight')
+    plt.close(fig)
+
+
+def plot_eje_b_curriculum(weights_curve, fname):
+    """Per-demonstration curriculum weights over training (mean is 1 by construction)."""
+    weights = np.asarray(weights_curve, dtype=float)
+    fig, ax = plt.subplots()
+    for demo_num in range(weights.shape[1]):
+        ax.plot(np.arange(weights.shape[0]), weights[:, demo_num],
+                label='demo ' + str(demo_num))
+    ax.axhline(1.0, color='gray', linestyle=':')
+    ax.legend()
+    ax.set_xlabel('step')
+    ax.set_ylabel('curriculum weight')
+    ax.grid(linestyle='-', linewidth='0.5', color='gray')
+    fig.savefig(fname, bbox_inches='tight')
+    plt.close(fig)
+
+
+def plot_pass2_curves(curves, fname, highlight=None):
+    """Per-step pass@2 correctness (0/1) for each labelled curve, vertically offset to stay legible."""
+    fig, ax = plt.subplots()
+    for curve_num, (label, curve) in enumerate(curves.items()):
+        curve = np.asarray(curve, dtype=float)
+        is_highlight = label == highlight
+        ax.step(np.arange(curve.shape[0]), curve + 0.04*curve_num, where='post',
+                color='k' if is_highlight else None,
+                linewidth=2.0 if is_highlight else 1.0, label=label)
+    ax.set_ylim(-0.05, 1.05 + 0.04*len(curves))
+    ax.legend(loc='center right')
+    ax.set_xlabel('step')
+    ax.set_ylabel('pass@2 correct (curves offset)')
+    ax.grid(linestyle='-', linewidth='0.5', color='gray')
+    fig.savefig(fname, bbox_inches='tight')
+    plt.close(fig)
+
+
+def plot_fused_solution(attempts, fname, title=None):
+    """Draw the two fused guesses (attempt_1, attempt_2) for every test input."""
+    n_test = len(attempts)
+    fig, axes = plt.subplots(n_test, 2, squeeze=False)
+    for example_num, attempt_pair in enumerate(attempts):
+        for column, key in enumerate(('attempt_1', 'attempt_2')):
+            ax = axes[example_num][column]
+            grid = np.array(attempt_pair[key])
+            image = convert_color((np.arange(10) == grid[:, :, None]).astype(np.float32))
+            ax.imshow(image, interpolation='none')
+            ax.set_xticks(np.arange(-0.5, grid.shape[1], 1), minor=True)
+            ax.set_yticks(np.arange(-0.5, grid.shape[0], 1), minor=True)
+            ax.grid(which='minor', color=(59/255, 59/255, 59/255), linewidth=0.3)
+            ax.tick_params(which='both', bottom=False, left=False,
+                           labelbottom=False, labelleft=False)
+            ax.set_title('guess ' + str(column + 1), size='small')
+    if title:
+        fig.suptitle(title, size='small')
+    fig.savefig(fname, bbox_inches='tight')
+    plt.close(fig)
 
 
